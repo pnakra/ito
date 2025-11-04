@@ -13,10 +13,10 @@ const Index = () => {
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight lowercase bg-gradient-primary bg-clip-text text-transparent">
-            no creepy vibes
+            are the vibes off?
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto lowercase">
-            honest feedback on what actually works
+            find out before you quit or creep
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="text-lg px-8 py-6 lowercase rounded-full">
