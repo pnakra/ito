@@ -23,37 +23,37 @@ const Scenarios = () => {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            See What Other Guys Are Asking
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center lowercase">
+            see what others are asking
           </h1>
-          <p className="text-xl text-muted-foreground mb-12 text-center">
-            Real scenarios from guys like you
+          <p className="text-xl text-muted-foreground mb-12 text-center lowercase">
+            real scenarios from people like you
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {scenarios.map((scenario) => (
               <Card 
                 key={scenario.id}
-                className="p-6 bg-card border-border hover:border-foreground/20 transition-colors cursor-pointer"
+                className="p-6 bg-card border-border hover:border-foreground/20 transition-colors cursor-pointer rounded-2xl"
                 onClick={() => setSelectedScenario(scenario)}
               >
                 <div className="mb-4">
                   <RiskBadge level={scenario.riskLevel} size="sm" />
                 </div>
-                <h3 className="font-bold text-lg mb-2">"{scenario.title}"</h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                <h3 className="font-bold text-lg mb-2 lowercase">"{scenario.title}"</h3>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2 lowercase">
                   {scenario.situation}
                 </p>
-                <Button variant="outline" className="w-full" size="sm">
-                  Read Vibecheck
+                <Button variant="outline" className="w-full lowercase rounded-full" size="sm">
+                  read vibecheck
                 </Button>
               </Card>
             ))}
           </div>
 
           <div className="text-center">
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-              <Link to="/submit">Get Your Own Vibecheck</Link>
+            <Button asChild size="lg" className="lowercase rounded-full">
+              <Link to="/submit">get your own vibecheck</Link>
             </Button>
           </div>
         </div>

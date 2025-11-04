@@ -37,16 +37,16 @@ const Results = () => {
 
           {/* Assessment */}
           <div className="text-center">
-            <p className="text-xl md:text-2xl font-bold leading-relaxed">
+            <p className="text-xl md:text-2xl font-bold leading-relaxed lowercase">
               {result.assessment}
             </p>
           </div>
 
           {/* What's Actually Happening */}
-          <Card className="p-6 bg-card border-border">
+          <Card className="p-6 bg-card border-border rounded-2xl">
             <div className="flex items-start gap-3 mb-4">
               <Eye className="w-6 h-6 flex-shrink-0 mt-1" />
-              <h2 className="text-2xl font-bold">What's Actually Happening</h2>
+              <h2 className="text-2xl font-bold lowercase">what's actually happening</h2>
             </div>
             <ul className="space-y-3">
               {result.whatsHappening.map((point, i) => (
@@ -59,10 +59,10 @@ const Results = () => {
           </Card>
 
           {/* What NOT to Do */}
-          <Card className="p-6 bg-card border-border">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="p-6 bg-card border-border rounded-2xl">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 lowercase">
               <X className="w-6 h-6 text-destructive" />
-              What NOT to Do
+              what not to do
             </h2>
             <div className="space-y-3">
               {result.whatNotToDo.map((point, i) => (
@@ -75,10 +75,10 @@ const Results = () => {
           </Card>
 
           {/* What to Do Instead */}
-          <Card className="p-6 bg-card border-border">
-            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="p-6 bg-card border-border rounded-2xl">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 lowercase">
               <Check className="w-6 h-6 text-success" />
-              What to Do Instead
+              what to do instead
             </h2>
             <div className="space-y-3">
               {result.whatToDoInstead.map((point, i) => (
@@ -91,65 +91,65 @@ const Results = () => {
           </Card>
 
           {/* Real Talk */}
-          <Card className="p-6 bg-accent border-border">
+          <Card className="p-6 bg-accent/20 border-accent rounded-2xl">
             <div className="flex items-start gap-3 mb-3">
               <MessageCircle className="w-6 h-6 flex-shrink-0 mt-1" />
-              <h2 className="text-2xl font-bold">Real Talk</h2>
+              <h2 className="text-2xl font-bold lowercase">real talk</h2>
             </div>
-            <p className="text-lg leading-relaxed">
+            <p className="text-lg leading-relaxed lowercase">
               {result.realTalk}
             </p>
           </Card>
 
           {/* Resources (Red Flags Only) */}
           {result.riskLevel === "red" && (
-            <Card className="p-6 bg-card border-warning">
-              <h2 className="text-xl font-bold mb-4">Need to talk to someone?</h2>
-              <div className="space-y-2 text-sm">
-                <p><strong>Crisis Text Line:</strong> Text HOME to 741741</p>
+            <Card className="p-6 bg-card border-warning rounded-2xl">
+              <h2 className="text-xl font-bold mb-4 lowercase">need to talk to someone?</h2>
+              <div className="space-y-2 text-sm lowercase">
+                <p><strong>crisis text line:</strong> text HOME to 741741</p>
                 <p><strong>RAINN:</strong> 1-800-656-HOPE (4673)</p>
                 <p className="text-muted-foreground mt-4">
-                  These resources are confidential and available 24/7
+                  these resources are confidential and available 24/7
                 </p>
               </div>
             </Card>
           )}
 
           {/* Feedback */}
-          <Card className="p-6 bg-card border-border">
-            <h2 className="text-xl font-bold mb-4">Was this helpful?</h2>
+          <Card className="p-6 bg-card border-border rounded-2xl">
+            <h2 className="text-xl font-bold mb-4 lowercase">was this helpful?</h2>
             <div className="flex gap-4">
               <Button
                 variant={feedback === "yes" ? "default" : "outline"}
                 onClick={() => setFeedback("yes")}
-                className="flex-1"
+                className="flex-1 lowercase rounded-full"
               >
                 <ThumbsUp className="w-4 h-4 mr-2" />
-                Yes
+                yes
               </Button>
               <Button
                 variant={feedback === "no" ? "default" : "outline"}
                 onClick={() => setFeedback("no")}
-                className="flex-1"
+                className="flex-1 lowercase rounded-full"
               >
                 <ThumbsDown className="w-4 h-4 mr-2" />
-                No
+                no
               </Button>
             </div>
             {feedback && (
-              <p className="text-sm text-muted-foreground mt-4 text-center">
-                Thanks for your feedback!
+              <p className="text-sm text-muted-foreground mt-4 text-center lowercase">
+                thanks for your feedback!
               </p>
             )}
           </Card>
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild className="flex-1" size="lg">
-              <Link to="/submit">Get Another Vibecheck</Link>
+            <Button asChild className="flex-1 lowercase rounded-full" size="lg">
+              <Link to="/submit">get another vibecheck</Link>
             </Button>
-            <Button asChild variant="outline" className="flex-1" size="lg">
-              <Link to="/scenarios">See More Scenarios</Link>
+            <Button asChild variant="outline" className="flex-1 lowercase rounded-full" size="lg">
+              <Link to="/scenarios">see more scenarios</Link>
             </Button>
           </div>
         </div>

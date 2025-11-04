@@ -36,11 +36,11 @@ const Submit = () => {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
-            Get Your Vibecheck
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center lowercase">
+            get your vibecheck
           </h1>
-          <p className="text-xl text-muted-foreground mb-10 text-center">
-            Describe what's happening. Be specific.
+          <p className="text-xl text-muted-foreground mb-10 text-center lowercase">
+            describe what's happening. be specific.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -48,16 +48,16 @@ const Submit = () => {
               <Textarea
                 value={situation}
                 onChange={(e) => setSituation(e.target.value.slice(0, maxLength))}
-                placeholder="What's the situation? Be specific. Example: I've texted this girl 15 times and she's not responding..."
-                className="min-h-[300px] text-lg bg-card border-border resize-none"
+                placeholder="what's the situation? be specific. example: i've texted this girl 15 times and she's not responding..."
+                className="min-h-[300px] text-lg bg-card border-border resize-none rounded-2xl"
                 disabled={isSubmitting}
               />
               <div className="flex justify-between items-center mt-2">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground lowercase">
                   {situation.length} / {maxLength} characters
                 </p>
                 {situation.length >= maxLength && (
-                  <p className="text-sm text-destructive">Character limit reached</p>
+                  <p className="text-sm text-destructive lowercase">character limit reached</p>
                 )}
               </div>
             </div>
@@ -65,14 +65,14 @@ const Submit = () => {
             <Button 
               type="submit" 
               size="lg" 
-              className="w-full text-lg py-6 bg-primary hover:bg-primary/90"
+              className="w-full text-lg py-6 rounded-full lowercase"
               disabled={!situation.trim() || isSubmitting}
             >
-              {isSubmitting ? "Analyzing your vibe..." : "Get Vibecheck"}
+              {isSubmitting ? "analyzing your vibe..." : "get vibecheck"}
             </Button>
 
-            <p className="text-sm text-center text-muted-foreground">
-              100% anonymous. We don't store identifying info.
+            <p className="text-sm text-center text-muted-foreground lowercase">
+              100% anonymous. we don't store identifying info.
             </p>
           </form>
         </div>

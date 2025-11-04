@@ -56,6 +56,10 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)',
+        'gradient-accent': 'linear-gradient(180deg, hsl(var(--accent) / 0.1) 0%, transparent 100%)',
+      },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
       },
