@@ -28,14 +28,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Social Proof */}
-        <section className="container mx-auto px-4 py-12 text-center">
-          <div className="bg-card border border-border rounded-2xl p-6 max-w-2xl mx-auto lowercase">
-            <p className="text-2xl font-bold mb-2">247 vibechecks delivered today</p>
-            <p className="text-muted-foreground">top scenarios this week: "is she playing hard to get?" • "should i keep texting?"</p>
-          </div>
-        </section>
-
         {/* Quick Explainer */}
         <section className="container mx-auto px-4 py-20">
           <div className="grid md:grid-cols-3 gap-8">
@@ -63,40 +55,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* How It Works */}
-        <section className="container mx-auto px-4 py-20">
-          <h2 className="text-4xl font-bold text-center mb-16 lowercase">how it works</h2>
-          <div className="max-w-3xl mx-auto space-y-12">
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-xl">
-                1
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2 lowercase">describe your situation or upload a screenshot</h3>
-                <p className="text-muted-foreground lowercase">be specific about what's happening. more detail = better feedback.</p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-xl">
-                2
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2 lowercase">get honest feedback on your approach</h3>
-                <p className="text-muted-foreground lowercase">we'll tell you if you're on track or heading into red flag territory.</p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-xl">
-                3
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2 lowercase">learn what works instead</h3>
-                <p className="text-muted-foreground lowercase">get specific, actionable advice on what to do differently.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="container mx-auto px-4 py-20 text-center">
           <div className="bg-card border border-border rounded-2xl p-12 max-w-3xl mx-auto">
@@ -109,6 +67,14 @@ const Index = () => {
             <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full lowercase">
               <Link to="/submit">get your vibecheck</Link>
             </Button>
+          </div>
+        </section>
+
+        {/* Social Proof */}
+        <section className="container mx-auto px-4 py-12 text-center">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-2xl mx-auto lowercase">
+            <p className="text-2xl font-bold mb-2">247 vibechecks delivered today</p>
+            <p className="text-muted-foreground">top scenarios this week: "is she playing hard to get?" • "should i keep texting?"</p>
           </div>
         </section>
       </main>
