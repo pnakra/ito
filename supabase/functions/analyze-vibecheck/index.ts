@@ -2,8 +2,8 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const SYSTEM_PROMPT = `You are vibecheck - you give teenage boys (ages 14-18) direct, honest feedback about consent and dating situations.
@@ -49,83 +49,92 @@ RESPOND IN THIS EXACT JSON FORMAT:
 }`;
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { scenario } = await req.json();
-    
+
     if (!scenario || !scenario.trim()) {
-      return new Response(
-        JSON.stringify({ error: 'Scenario text is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: "Scenario text is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
-    if (!ANTHROPIC_API_KEY) {
-      throw new Error('ANTHROPIC_API_KEY is not configured');
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log('Analyzing scenario:', scenario.substring(0, 100) + '...');
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
+        model: "google/gemini-2.5-flash",
         messages: [
+          { role: "system", content: SYSTEM_PROMPT },
           {
-            role: 'user',
-            content: `${SYSTEM_PROMPT}\n\nSCENARIO: ${scenario}\n\nRespond with ONLY the JSON, no other text.`
-          }
-        ]
+            role: "user",
+            content: `SCENARIO: ${scenario}\n\nRespond with ONLY the JSON, no other text.`,
+          },
+        ],
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Anthropic API error:', response.status, errorText);
-      throw new Error(`Anthropic API error: ${response.status}`);
+    if (!resp.ok) {
+      if (resp.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (resp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Payment required, please add funds to your Lovable AI workspace." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const t = await resp.text();
+      console.error("AI gateway error:", resp.status, t);
+      return new Response(JSON.stringify({ error: "AI gateway error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const data = await response.json();
-    console.log('Anthropic response received');
+    const data = await resp.json();
+    const raw = data?.choices?.[0]?.message?.content ?? "";
 
-    const responseText = data.content[0].type === 'text' ? data.content[0].text : '';
-    
-    // Parse JSON response
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Failed to parse AI response');
+    // Extract JSON from the model response safely
+    const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
+    if (!match) {
+      throw new Error("Failed to parse AI response");
     }
-    
-    const result = JSON.parse(jsonMatch[0]);
 
-    return new Response(
-      JSON.stringify(result),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    const parsed = JSON.parse(match[0]);
 
+    return new Response(JSON.stringify(parsed), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error('Error in analyze-vibecheck function:', error);
+    console.error("Error in analyze-vibecheck function:", error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Unknown error occurred',
-        riskLevel: 'yellow',
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Unknown error",
+        riskLevel: "yellow",
         assessment: "We're having trouble analyzing this right now. Please try again.",
         whatsHappening: ["The system is temporarily unavailable"],
         whatNotToDo: ["Don't proceed if you're uncertain"],
         whatToDoInstead: ["Try submitting again in a moment"],
-        realTalk: "When in doubt, slow down and communicate clearly."
+        realTalk: "When in doubt, slow down and communicate clearly.",
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
