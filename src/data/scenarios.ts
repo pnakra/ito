@@ -304,43 +304,38 @@ export const scenarios: Scenario[] = [
   }
 ];
 
-export const analyzeScenario = (text: string): Scenario => {
-  const lowercaseText = text.toLowerCase();
-  
-  // Find matching scenario based on keywords
-  for (const scenario of scenarios) {
-    const matchCount = scenario.keywords.filter(keyword => 
-      lowercaseText.includes(keyword.toLowerCase())
-    ).length;
+import { analyzeWithAI } from "../lib/ai-analyzer";
+
+export const analyzeScenario = async (text: string): Promise<Scenario> => {
+  try {
+    const aiResult = await analyzeWithAI(text);
     
-    if (matchCount > 0) {
-      return scenario;
-    }
+    return {
+      id: "ai-generated",
+      title: "AI Analysis",
+      situation: text,
+      riskLevel: aiResult.riskLevel,
+      assessment: aiResult.assessment,
+      whatsHappening: aiResult.whatsHappening,
+      whatNotToDo: aiResult.whatNotToDo,
+      whatToDoInstead: aiResult.whatToDoInstead,
+      realTalk: aiResult.realTalk,
+      keywords: []
+    };
+  } catch (error) {
+    console.error("AI analysis failed:", error);
+    // Fallback to default response
+    return {
+      id: "error",
+      title: "Analysis Error",
+      situation: text,
+      riskLevel: "yellow",
+      assessment: "We're having trouble analyzing this right now. Please try again.",
+      whatsHappening: ["The system is temporarily unavailable"],
+      whatNotToDo: ["Don't proceed if you're uncertain"],
+      whatToDoInstead: ["Try submitting again in a moment"],
+      realTalk: "When in doubt, slow down and communicate clearly.",
+      keywords: []
+    };
   }
-  
-  // Default fallback scenario for when no keywords match
-  return {
-    id: "general-advice",
-    title: "General relationship advice",
-    situation: text,
-    riskLevel: "yellow",
-    assessment: "We need more context to give you specific feedback. But here's the most important thing: clear, enthusiastic consent is essential in any interaction.",
-    whatsHappening: [
-      "You're in a situation where you're not sure how to proceed",
-      "The other person's feelings and boundaries should be your top priority",
-      "Communication is key to understanding where you both stand"
-    ],
-    whatNotToDo: [
-      "Don't assume silence or uncertainty means yes",
-      "Don't pressure someone into anything they seem hesitant about",
-      "Don't ignore signs that someone is uncomfortable"
-    ],
-    whatToDoInstead: [
-      "Ask directly and give them space to answer honestly",
-      "Look for enthusiastic responses, not just the absence of 'no'",
-      "If you're not sure about their interest, assume they're not interested until they show you otherwise"
-    ],
-    realTalk: "When in doubt, slow down and communicate. The best relationships are built on clarity and mutual enthusiasm, not guessing games and pressure. If someone wants to be with you, they'll make it clear.",
-    keywords: []
-  };
 };

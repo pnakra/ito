@@ -23,11 +23,11 @@ const Scenarios = () => {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center lowercase">
-            see what others are asking
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+            See What Others Are Asking
           </h1>
-          <p className="text-xl text-muted-foreground mb-12 text-center lowercase">
-            real scenarios from people like you
+          <p className="text-xl text-muted-foreground mb-12 text-center">
+            Real scenarios from people like you
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
@@ -40,20 +40,20 @@ const Scenarios = () => {
                 <div className="mb-4">
                   <RiskBadge level={scenario.riskLevel} size="sm" />
                 </div>
-                <h3 className="font-bold text-lg mb-2 lowercase">"{scenario.title}"</h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2 lowercase">
+                <h3 className="font-bold text-lg mb-2">"{scenario.title}"</h3>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                   {scenario.situation}
                 </p>
-                <Button variant="outline" className="w-full lowercase rounded-full" size="sm">
-                  read vibecheck
+                <Button variant="outline" className="w-full rounded-full" size="sm">
+                  Read Vibecheck
                 </Button>
               </Card>
             ))}
           </div>
 
           <div className="text-center">
-            <Button asChild size="lg" className="lowercase rounded-full">
-              <Link to="/submit">get your own vibecheck</Link>
+            <Button asChild size="lg" className="rounded-full">
+              <Link to="/submit">Get Your Own Vibecheck</Link>
             </Button>
           </div>
         </div>

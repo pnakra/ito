@@ -7,18 +7,18 @@ const Header = () => {
         <Link to="/" className="text-2xl font-bold">
           vibecheck
         </Link>
-        <div className="flex gap-6 lowercase">
+        <div className="flex gap-6">
           <Link 
             to="/about" 
             className="text-foreground hover:text-foreground/80 transition-colors"
           >
-            about
+            About
           </Link>
           <Link 
             to="/resources" 
             className="text-foreground hover:text-foreground/80 transition-colors"
           >
-            resources
+            Resources
           </Link>
         </div>
       </nav>
