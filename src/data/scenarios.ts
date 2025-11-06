@@ -303,39 +303,3 @@ export const scenarios: Scenario[] = [
     keywords: ["how to ask", "without being pushy", "good way", "respectful", "should I ask"]
   }
 ];
-
-import { analyzeWithAI } from "../lib/ai-analyzer";
-
-export const analyzeScenario = async (text: string): Promise<Scenario> => {
-  try {
-    const aiResult = await analyzeWithAI(text);
-    
-    return {
-      id: "ai-generated",
-      title: "AI Analysis",
-      situation: text,
-      riskLevel: aiResult.riskLevel,
-      assessment: aiResult.assessment,
-      whatsHappening: aiResult.whatsHappening,
-      whatNotToDo: aiResult.whatNotToDo,
-      whatToDoInstead: aiResult.whatToDoInstead,
-      realTalk: aiResult.realTalk,
-      keywords: []
-    };
-  } catch (error) {
-    console.error("AI analysis failed:", error);
-    // Fallback to default response
-    return {
-      id: "error",
-      title: "Analysis Error",
-      situation: text,
-      riskLevel: "yellow",
-      assessment: "We're having trouble analyzing this right now. Please try again.",
-      whatsHappening: ["The system is temporarily unavailable"],
-      whatNotToDo: ["Don't proceed if you're uncertain"],
-      whatToDoInstead: ["Try submitting again in a moment"],
-      realTalk: "When in doubt, slow down and communicate clearly.",
-      keywords: []
-    };
-  }
-};

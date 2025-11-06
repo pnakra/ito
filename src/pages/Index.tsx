@@ -20,7 +20,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Link to="/submit">Get Your Vibecheck</Link>
+              <Link to="/chat">Start Chatting</Link>
             </Button>
             <Button asChild variant="ghost" size="lg" className="text-lg">
               <Link to="/scenarios">See What Others Are Asking</Link>
@@ -65,7 +65,7 @@ const Index = () => {
               Get advice, check your approach, don't be a creep
             </p>
             <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Link to="/submit">Get Your Vibecheck</Link>
+              <Link to="/chat">Get Your Vibecheck</Link>
             </Button>
           </div>
         </section>

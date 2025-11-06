@@ -1,1 +1,4 @@
 project_id = "ochulsnvnqcbzqnlkazu"
+
+[functions.analyze-vibecheck]
+verify_jwt = false

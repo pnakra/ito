@@ -53,7 +53,7 @@ const Scenarios = () => {
 
           <div className="text-center">
             <Button asChild size="lg" className="rounded-full">
-              <Link to="/submit">Get Your Own Vibecheck</Link>
+              <Link to="/chat">Get Your Own Vibecheck</Link>
             </Button>
           </div>
         </div>
