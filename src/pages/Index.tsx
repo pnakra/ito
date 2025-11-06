@@ -8,7 +8,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
+
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-20 text-center">
@@ -20,7 +20,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Link to="/chat">Start Chatting</Link>
+              <Link to="/chat">Check the Vibes</Link>
             </Button>
             <Button asChild variant="ghost" size="lg" className="text-lg">
               <Link to="/scenarios">See What Others Are Asking</Link>
@@ -58,12 +58,8 @@ const Index = () => {
         {/* CTA Section */}
         <section className="container mx-auto px-4 py-20 text-center">
           <div className="bg-card border border-border rounded-2xl p-12 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Check Your Vibe?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Get advice, check your approach, don't be a creep
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Check Your Vibe?</h2>
+            <p className="text-xl text-muted-foreground mb-8">Get advice, check your approach, don't be a creep</p>
             <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
               <Link to="/chat">Get Your Vibecheck</Link>
             </Button>
@@ -74,7 +70,9 @@ const Index = () => {
         <section className="container mx-auto px-4 py-12 text-center">
           <div className="bg-card border border-border rounded-2xl p-6 max-w-2xl mx-auto">
             <p className="text-2xl font-bold mb-2">247 vibechecks delivered today</p>
-            <p className="text-muted-foreground">Top scenarios this week: "Is she playing hard to get?" • "Should I keep texting?"</p>
+            <p className="text-muted-foreground">
+              Top scenarios this week: "Is she playing hard to get?" • "Should I keep texting?"
+            </p>
           </div>
         </section>
       </main>
