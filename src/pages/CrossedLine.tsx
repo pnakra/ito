@@ -74,6 +74,10 @@ const CrossedLine = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-center">
               Let's figure out what happened — calmly.
             </h1>
+
+            <div className="bg-muted/50 border border-border rounded-lg p-4 text-sm text-muted-foreground italic text-center max-w-3xl mx-auto">
+              This tool does not provide legal advice or mental health treatment. It's a reflective guide — not a substitute for speaking with a professional.
+            </div>
             
             <div className="prose prose-lg max-w-none text-foreground space-y-4">
               <p className="text-xl text-center text-muted-foreground">
@@ -187,14 +191,23 @@ const CrossedLine = () => {
               <p className="text-muted-foreground whitespace-pre-wrap">{results.avoidingRepetition}</p>
             </Card>
 
-            <div className="bg-card border border-border rounded-lg p-6 mt-8">
-              <h3 className="text-lg font-semibold mb-3">Resources</h3>
+            <div className="bg-card border-2 border-primary/30 rounded-lg p-6 mt-8">
+              <h3 className="text-lg font-semibold mb-3">If someone was harmed</h3>
+              <p className="text-muted-foreground mb-4">
+                If someone was hurt or uncomfortable, they may also need support. Everyone deserves safety.
+              </p>
               <ul className="space-y-2 text-muted-foreground">
-                <li>• RAINN - rainn.org</li>
-                <li>• 1in6 - 1in6.org</li>
-                <li>• Crisis Text Line - crisistextline.org</li>
-                <li>• Love Is Respect - loveisrespect.org</li>
+                <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
+                <li>• 1in6 — <a href="https://1in6.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">1in6.org</a></li>
+                <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
+                <li>• Love Is Respect — <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">loveisrespect.org</a></li>
               </ul>
+            </div>
+
+            <div className="text-center py-6">
+              <p className="text-lg text-muted-foreground italic">
+                Acknowledging harm doesn't make you a bad person — it means you're taking responsibility for learning and doing better.
+              </p>
             </div>
 
             <div className="flex gap-4 justify-center pt-8">
