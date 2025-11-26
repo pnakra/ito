@@ -16,15 +16,38 @@ const Index = () => {
             Are the Vibes Off?
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Find out before you quit or creep
+            Choose the path that fits your situation
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Link to="/chat">Check the Vibes</Link>
-            </Button>
-            <Button asChild variant="ghost" size="lg" className="text-lg">
-              <Link to="/scenarios">See What Others Are Asking</Link>
-            </Button>
+          
+          {/* Two Main Tiles */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-16">
+            {/* Tile 1 - Avoid Crossing a Line */}
+            <div className="bg-card border-2 border-border rounded-2xl p-8 hover:border-primary transition-colors">
+              <div className="bg-gradient-primary w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Eye className="w-10 h-10" />
+              </div>
+              <h2 className="text-2xl font-bold mb-4">I want to avoid crossing a line</h2>
+              <p className="text-muted-foreground mb-8 text-lg">
+                Get clarity before things go wrong. Understand consent and get scripts to pause, check in, or stop.
+              </p>
+              <Button asChild size="lg" className="w-full text-lg py-6 rounded-full">
+                <Link to="/chat">Start Vibecheck</Link>
+              </Button>
+            </div>
+
+            {/* Tile 2 - I Crossed a Line */}
+            <div className="bg-card border-2 border-border rounded-2xl p-8 hover:border-secondary transition-colors">
+              <div className="bg-gradient-to-br from-secondary to-secondary/70 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MessageSquare className="w-10 h-10" />
+              </div>
+              <h2 className="text-2xl font-bold mb-4">I think I crossed a line</h2>
+              <p className="text-muted-foreground mb-8 text-lg">
+                Figure out what happened, understand harm, and learn what to do next.
+              </p>
+              <Button asChild size="lg" variant="secondary" className="w-full text-lg py-6 rounded-full">
+                <Link to="/crossed/start">Start Reflection</Link>
+              </Button>
+            </div>
           </div>
         </section>
 
