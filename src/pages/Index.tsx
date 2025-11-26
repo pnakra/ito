@@ -92,6 +92,13 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Footnote */}
+        <section className="container mx-auto px-4 py-8 text-center">
+          <p className="text-sm text-muted-foreground italic">
+            Built for early exploration — not a finished product.
+          </p>
+        </section>
       </main>
 
       <Footer />
