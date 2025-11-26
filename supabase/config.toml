@@ -2,3 +2,6 @@ project_id = "ochulsnvnqcbzqnlkazu"
 
 [functions.analyze-vibecheck]
 verify_jwt = false
+
+[functions.analyze-crossed-line]
+verify_jwt = false

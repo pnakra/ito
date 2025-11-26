@@ -9,6 +9,18 @@ const Header = () => {
         </Link>
         <div className="flex gap-6">
           <Link 
+            to="/avoid-line" 
+            className="text-foreground hover:text-foreground/80 transition-colors"
+          >
+            Check a situation
+          </Link>
+          <Link 
+            to="/crossed-line" 
+            className="text-foreground hover:text-foreground/80 transition-colors"
+          >
+            Reflect on what happened
+          </Link>
+          <Link 
             to="/about" 
             className="text-foreground hover:text-foreground/80 transition-colors"
           >
