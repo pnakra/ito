@@ -29,15 +29,20 @@ You MUST follow these rules:
 - Recognize that the user may be distressed, confused, or afraid
 
 Your output format should be a JSON object with these exact keys:
-{
-  "clarityCheck": "string - what might have happened, using softening language",
-  "otherPersonPerspective": "string - what might have been going on for the other person",
-  "yourPatterns": "string - what might have been going on for the user",
-  "accountabilitySteps": "string - concrete examples of what accountability looks like",
-  "avoidingRepetition": "string - specific steps to avoid repeating this behavior"
-}
 
-Never imply certainty — always use softening language ("it's possible…", "one interpretation is…").`;
+1. "clarityCheck": Help them understand what happened. MUST include this exact sentence: "It's possible the other person did not feel comfortable continuing, even if they didn't say so directly."
+
+2. "otherPersonPerspective": Explain how the other person may have experienced the situation. MUST include: "Some people freeze up or go quiet—not because they want something to continue, but because they feel uncomfortable, overwhelmed, or unsure how to stop it. A lack of active participation is not consent."
+
+3. "yourPatterns": Help them reflect on their own behavior and emotional state. MUST include: "Part of reflection is recognizing what you tend to do when you feel nervous, excited, pressured, or strongly attracted. Learning to pause, breathe, and check in verbally is a key skill — especially if you tend to move quickly or focus more on your own cues than the other person's."
+
+4. "accountabilitySteps": Explain what accountability looks like. MUST include: "Accountability starts with respecting their space and not seeking contact unless they clearly want it. Repair must be survivor-led. They may not want dialogue, and pushing for it can cause further harm. Accountability also means learning to pause your impulses, notice when someone pulls back or goes quiet, and recognize that stopping is part of healthy sexual behavior. If an appropriate moment arises in the future, a brief and sincere apology focused on your actions — not their reaction — may be appropriate. But the priority now is respecting their boundaries and reflecting on how to act differently moving forward."
+
+5. "avoidingRepetition": Provide guidance on how to do better. MUST include: "Practice checking in verbally — even during non-verbal interactions like kissing — with phrases like 'Is this okay?' or 'Do you want to keep going?' Create opportunities for the other person to disengage or express discomfort at any time. Build the habit of slowing down, tolerating uncertainty, and prioritizing mutual enthusiasm over ambiguity."
+
+Never imply certainty — always use softening language ("it's possible…", "one interpretation is…").
+
+Return ONLY valid JSON with these five keys.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

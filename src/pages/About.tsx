@@ -19,16 +19,13 @@ const About = () => {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">About Vibecheck</h1>
             <div className="space-y-4 text-lg text-muted-foreground">
               <p>
-                Vibecheck exists because teenage guys deserve honest, straightforward advice about dating and relationships—without the toxic pickup artist nonsense or preachy lectures.
+                vibecheck is an exploratory harm-reduction tool designed to help young people understand consent, boundaries, and accountability. It is not legal advice, therapy, or a substitute for professional help. All content is anonymous and designed for early prototyping.
               </p>
               <p>
-                The internet is full of terrible advice that teaches young guys to be manipulative, disrespectful, or straight-up creepy. We're here to cut through that noise with real talk about what actually makes you attractive and what drives people away.
+                The internet is full of terrible advice that teaches young people to be manipulative, disrespectful, or straight-up creepy. We're here to cut through that noise with real talk about what actually makes healthy relationships work and what causes harm.
               </p>
               <p>
-                Our goal is simple: help you understand healthy boundaries, recognize when you're crossing lines, and learn what genuine attraction looks like. We're not here to judge—we're here to give you the honest feedback your friends might be too uncomfortable to share.
-              </p>
-              <p>
-                Think of this as your older brother telling you straight up when you're about to do something dumb, and showing you a better way forward.
+                Our goal is simple: help you understand healthy boundaries, recognize when you're crossing lines, and learn what genuine consent and respect look like. We're not here to judge—we're here to give you honest, supportive guidance.
               </p>
             </div>
           </div>
