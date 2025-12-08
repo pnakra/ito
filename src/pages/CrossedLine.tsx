@@ -70,27 +70,27 @@ const CrossedLine = () => {
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
-          <div className="space-y-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-center">
+          <div className="space-y-6 sm:space-y-8">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center">
               Let's figure out what happened — calmly.
             </h1>
 
-            <div className="bg-muted/50 border border-border rounded-lg p-4 text-sm text-muted-foreground italic text-center max-w-3xl mx-auto">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center">
               This tool does not provide legal advice or mental health treatment. It's a reflective guide — not a substitute for speaking with a professional.
             </div>
             
             <div className="prose prose-lg max-w-none text-foreground space-y-4">
-              <p className="text-xl text-center text-muted-foreground">
+              <p className="text-base sm:text-xl text-center text-muted-foreground px-2">
                 Sometimes you realize afterward that a moment felt off — or you worry you crossed a boundary. 
                 You're not alone. This space helps you slow down, reflect, and understand next steps without judgment.
               </p>
             </div>
 
-            <div className="flex justify-center pt-8">
+            <div className="flex justify-center pt-6 sm:pt-8">
               <Button 
                 onClick={() => setScreen("input")} 
                 size="lg" 
-                className="px-12 py-6 text-lg rounded-full"
+                className="px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg rounded-full w-full sm:w-auto"
               >
                 Start reflecting
               </Button>
@@ -106,12 +106,12 @@ const CrossedLine = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
-          <div className="space-y-8">
-            <h1 className="text-3xl md:text-4xl font-bold">What happened?</h1>
+        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-3xl">
+          <div className="space-y-6 sm:space-y-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">What happened?</h1>
             
             <div className="space-y-4">
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base sm:text-lg text-muted-foreground">
                 Can you describe what happened, in your own words? You don't need to share details — 
                 just the parts that feel important to understand.
               </p>
@@ -120,11 +120,11 @@ const CrossedLine = () => {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 placeholder="Take your time to describe what happened..."
-                className="min-h-[250px] text-base"
+                className="min-h-[200px] sm:min-h-[250px] text-base"
                 disabled={isLoading}
               />
 
-              <div className="flex gap-4 justify-between pt-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-between pt-4">
                 <Button 
                   variant="ghost" 
                   onClick={() => setScreen("intro")}
@@ -160,43 +160,43 @@ const CrossedLine = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-12 max-w-4xl">
-          <div className="space-y-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">
+        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-4xl">
+          <div className="space-y-6 sm:space-y-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">
               Reflection Steps
             </h1>
 
-            <Card className="p-6 border-2 border-primary/30">
-              <h2 className="text-2xl font-bold mb-4">Clarity Check</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">{results.clarityCheck}</p>
+            <Card className="p-4 sm:p-6 border-2 border-primary/30">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Clarity Check</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.clarityCheck}</p>
             </Card>
 
-            <Card className="p-6 border-2 border-secondary/30">
-              <h2 className="text-2xl font-bold mb-4">Understanding Others' Boundaries</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">{results.otherPersonPerspective}</p>
+            <Card className="p-4 sm:p-6 border-2 border-secondary/30">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Understanding Others' Boundaries</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.otherPersonPerspective}</p>
             </Card>
 
-            <Card className="p-6 border-2 border-accent/30">
-              <h2 className="text-2xl font-bold mb-4">Understanding Your Patterns</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">{results.yourPatterns}</p>
+            <Card className="p-4 sm:p-6 border-2 border-accent/30">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Understanding Your Patterns</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.yourPatterns}</p>
             </Card>
 
-            <Card className="p-6 border-2 border-warning/30">
-              <h2 className="text-2xl font-bold mb-4">What Accountability Could Look Like</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">{results.accountabilitySteps}</p>
+            <Card className="p-4 sm:p-6 border-2 border-warning/30">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What Accountability Could Look Like</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.accountabilitySteps}</p>
             </Card>
 
-            <Card className="p-6 border-2 border-success/30">
-              <h2 className="text-2xl font-bold mb-4">How to Do Better Next Time</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">{results.avoidingRepetition}</p>
+            <Card className="p-4 sm:p-6 border-2 border-success/30">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How to Do Better Next Time</h2>
+              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.avoidingRepetition}</p>
             </Card>
 
-            <div className="bg-card border-2 border-primary/30 rounded-lg p-6 mt-8">
-              <h3 className="text-lg font-semibold mb-3">If someone was harmed</h3>
-              <p className="text-muted-foreground mb-4">
+            <div className="bg-card border-2 border-primary/30 rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
+              <h3 className="text-base sm:text-lg font-semibold mb-3">If someone was harmed</h3>
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
                 If someone was hurt or uncomfortable, they may also need support. Everyone deserves safety.
               </p>
-              <ul className="space-y-2 text-muted-foreground">
+              <ul className="space-y-2 text-muted-foreground text-sm sm:text-base">
                 <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
                 <li>• 1in6 — <a href="https://1in6.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">1in6.org</a></li>
                 <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
@@ -204,17 +204,17 @@ const CrossedLine = () => {
               </ul>
             </div>
 
-            <div className="text-center py-6">
-              <p className="text-lg text-muted-foreground italic">
+            <div className="text-center py-4 sm:py-6">
+              <p className="text-base sm:text-lg text-muted-foreground italic px-2">
                 Acknowledging harm doesn't make you a bad person — it means you're taking responsibility for learning and doing better.
               </p>
             </div>
 
-            <div className="flex gap-4 justify-center pt-8">
-              <Button variant="outline" onClick={handleStartOver} size="lg">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-6 sm:pt-8">
+              <Button variant="outline" onClick={handleStartOver} size="lg" className="w-full sm:w-auto">
                 Start Over
               </Button>
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="w-full sm:w-auto">
                 <a href="/">Return Home</a>
               </Button>
             </div>
