@@ -2,6 +2,7 @@
 
 **Version:** 1.0  
 **Last Updated:** January 2026  
+**Version:** 2.0 — Decision-First Refactor  
 **Status:** Early Prototype / Exploratory
 
 ---
@@ -53,7 +54,7 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 │                    (React + TypeScript)                      │
 ├─────────────────────────────────────────────────────────────┤
 │  /                    │  Landing page with 3 pathways       │
-│  /avoid-line          │  Prevention chat (multi-turn)       │
+│  /avoid-line          │  Prevention DECISION-FIRST flow     │
 │  /crossed-line        │  Accountability reflection + chat   │
 │  /someone-crossed     │  Survivor support chat (multi-turn) │
 │  /about               │  Product information                │
@@ -62,9 +63,20 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
+│               RISK CLASSIFICATION LAYER                      │
+│            (Deterministic Frontend Logic)                    │
+├─────────────────────────────────────────────────────────────┤
+│  src/lib/riskClassification.ts                              │
+│  - Maps user selections → risk level (red/yellow/green)     │
+│  - Enforces hard rules (e.g., "no response" = yellow+)      │
+│  - LLM does NOT determine risk level                        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
 │                    EDGE FUNCTIONS (Deno)                     │
 ├─────────────────────────────────────────────────────────────┤
-│  analyze-vibecheck        │  Prevention flow AI             │
+│  analyze-vibecheck        │  Prevention EXPLANATION AI      │
 │  analyze-crossed-line     │  Initial accountability AI      │
 │  crossed-line-followup    │  Accountability follow-up AI    │
 │  analyze-someone-crossed  │  Survivor support AI            │
@@ -78,6 +90,16 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 ```
 
 ### 3.2 Data Flow
+
+**Prevention Flow (Decision-First):**
+1. User answers 3 guided questions via buttons
+2. Frontend deterministically calculates risk level
+3. If RED/YELLOW: Mandatory "Stop Moment" displayed
+4. User acknowledges → Edge function called with pre-computed risk
+5. AI explains (does not assess) the risk level
+6. Outcome check: User self-reports what they did
+
+**Accountability & Survivor Flows:**
 1. User inputs scenario/message in frontend
 2. Frontend sends request to edge function
 3. Edge function constructs prompt with system instructions
@@ -89,6 +111,7 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 - **No authentication** — Fully anonymous access
 - **No analytics tracking** — No user behavior logging
 - **Stateless conversations** — Context maintained only in-session via frontend state
+- **Outcome check** — Self-reported, aggregate only, no raw text storage
 
 ---
 
@@ -100,79 +123,209 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 `/avoid-line`
 
 ### Purpose
-Help users recognize consent signals and make better decisions BEFORE acting.
+Interrupt risky behavior in the moment. Help users recognize consent signals and make better decisions BEFORE acting.
 
-### Interaction Model
-**Multi-turn chat** — Users can describe situations and ask follow-up questions.
+### Interaction Model (v2.0 — Decision-First)
+**Guided decision sequence → Stop Moment → AI Explanation → Outcome Check**
+
+This is NOT a chatbot. It is a consent risk assessment and behavioral interruption tool.
 
 ### Target Persona
 Primarily teenage boys (14-18) navigating dating/hookup situations for the first time.
 
-### UI Components
-1. Welcome card explaining the tool
-2. Chat interface with user/assistant message bubbles
-3. Structured response cards showing:
-   - Risk badge (🔴 Red / 🟡 Yellow / 🟢 Green)
-   - Assessment summary
-   - "What's Actually Happening" bullets
-   - "What NOT to Do" (red highlighted)
-   - "What to Do Instead" (green highlighted)
-   - "Real Talk" callout
+### User Journey
+
+```
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│  Step 1:       │     │  Step 2:       │     │  Step 3:       │
+│  INTENT CHECK  │ ──► │  CONSENT       │ ──► │  CONTEXT       │
+│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │
+│                │     │  (buttons)     │     │  (multi-select)│
+└────────────────┘     └────────────────┘     └────────────────┘
+                                                      │
+                                                      ▼
+                              ┌──────────────────────────────────┐
+                              │   DETERMINISTIC RISK CALCULATION │
+                              │   (Frontend: riskClassification.ts)
+                              └──────────────────────────────────┘
+                                              │
+                    ┌───────────────┬─────────┴─────────┐
+                    ▼               ▼                   ▼
+              ┌──────────┐   ┌──────────┐        ┌──────────┐
+              │   RED    │   │  YELLOW  │        │  GREEN   │
+              │   STOP   │   │  PAUSE   │        │   ───►   │
+              │  MOMENT  │   │  MOMENT  │        │ Explain  │
+              └────┬─────┘   └────┬─────┘        └──────────┘
+                   │              │
+                   └──────┬───────┘
+                          ▼
+                  ┌───────────────┐
+                  │ "I understand"│
+                  │   (required)  │
+                  └───────┬───────┘
+                          ▼
+                 ┌─────────────────┐
+                 │  AI EXPLANATION │
+                 │  (does NOT      │
+                 │  assess risk)   │
+                 └────────┬────────┘
+                          ▼
+                 ┌─────────────────┐
+                 │  OUTCOME CHECK  │
+                 │  (self-report)  │
+                 └─────────────────┘
+```
+
+### Decision Step Options
+
+**Step 1: Intent Check**
+> "What are you thinking about doing next?"
+
+| ID | Label |
+|----|-------|
+| `go-to-their-place` | Go to their place |
+| `invite-to-mine` | Invite them to mine |
+| `keep-texting` | Keep texting / messaging |
+| `physical-move` | Make a physical move |
+| `not-sure` | I'm not sure yet |
+
+**Step 2: Consent Signal Check**
+> "What signals have you gotten from them?"
+
+| ID | Label | Description |
+|----|-------|-------------|
+| `clear-yes` | Clear yes in words | They explicitly said yes |
+| `enthusiastic-actions` | Enthusiastic actions | Initiating, leaning in, reciprocating |
+| `mixed-signals` | Mixed / unclear signals | Sometimes interested, sometimes pulling back |
+| `no-response` | No response | They haven't replied or acknowledged |
+| `said-no` | They said no or pulled away | Verbal refusal or physical withdrawal |
+
+**Step 3: Context Risk Factors**
+> "Anything here that might complicate consent?" (Multi-select)
+
+| ID | Label |
+|----|-------|
+| `alcohol` | Alcohol or drugs involved |
+| `experience-gap` | One of us is much more experienced |
+| `age-imbalance` | Age or power imbalance |
+| `emotional-pressure` | Emotional pressure |
+| `none` | None of these |
+
+### Deterministic Risk Classification Rules
+
+Located in: `src/lib/riskClassification.ts`
+
+**Hard Rules (LLM Cannot Override):**
+
+| Condition | Result |
+|-----------|--------|
+| `said-no` (any intent) | 🔴 RED |
+| `no-response` + physical intent | 🔴 RED |
+| `no-response` + other intent | 🟡 YELLOW |
+| `mixed-signals` + physical intent | 🔴 RED |
+| `mixed-signals` + other intent | 🟡 YELLOW |
+| `alcohol` + physical intent | 🔴 RED |
+| 2+ context factors | 🔴 RED |
+| 1 context factor + physical intent | 🟡 YELLOW |
+| Clear positive signals + no factors | 🟢 GREEN |
+| Clear positive + 1 factor | 🟡 YELLOW |
+
+*Physical intent = `go-to-their-place`, `invite-to-mine`, or `physical-move`*
+
+### Stop Moment Component
+
+For RED and YELLOW risk levels, a full-screen modal appears:
+
+**RED Stop Moment:**
+- Large octagon icon
+- Header: "STOP"
+- Message: Specific action to NOT take (e.g., "Do not go to their place tonight.")
+- Button: "I understand" (required to proceed)
+- Subtext: "Proceeding without consent can cause serious harm."
+
+**YELLOW Pause Moment:**
+- Large triangle warning icon
+- Header: "PAUSE"
+- Message: Specific caution (e.g., "Check in verbally before proceeding.")
+- Button: "I understand" (required to proceed)
+- Subtext: "Clear communication protects both of you."
 
 ### Edge Function
 `analyze-vibecheck`
 
-### AI System Prompt
+### AI System Prompt (Explanation Mode)
 
 ```
-You are vibecheck - you give teenage boys (ages 14-18) direct, honest feedback 
-about consent and dating situations.
+You are vibecheck - you help teenage boys (14-18) understand consent.
 
-YOUR GOAL: Prevent sexual assault by helping boys recognize when consent is absent.
+IMPORTANT: The risk level has ALREADY been determined by the system. 
+Do NOT override or reassess it. Your job is to EXPLAIN why this risk 
+level applies, not to judge it.
 
 TONE:
 - Direct, not preachy. Like an older brother, not a teacher.
 - No lectures. Keep it real and conversational.
-- Use normal capitalization and punctuation (not all lowercase).
+- Use normal capitalization and punctuation.
 
-APPROACH:
-1. If the situation is unclear, note what additional info would help but still 
-   give guidance based on what you have
-
-2. Assess consent level clearly:
-   - 🔴 RED FLAG: Clear absence of consent (she said no, she's drunk and you're 
-     not, no response to multiple texts, showing up uninvited)
-   - 🟡 YELLOW FLAG: Unclear signals (mixed messages, "maybe", uncertain situation)
-   - 🟢 GREEN FLAG: Clear interest (she initiated, enthusiastic response, clear yes)
-
-3. Give SPECIFIC advice based on their EXACT situation, not generic tips.
-
-4. Use multiple angles:
-   - Her perspective: What she's actually experiencing
-   - Self-interest: Why respecting boundaries helps him
-   - Practical: Specific actions
-
-5. Keep responses brief: 3-4 short paragraphs.
+YOUR ROLE:
+1. Accept the pre-computed risk level as fact
+2. Explain what's happening in this specific situation
+3. Describe why the signals/context led to this classification
+4. Offer concrete alternatives that would be safer
 
 CRITICAL RULES:
-- If RED FLAG: Be very direct. "This is stalking. Don't do this."
-- Never blame the girl
-- Never suggest manipulation
-- If he describes assault that already happened, acknowledge seriousness
+- Do NOT say "I would classify this as..." or "This seems like..."
+- Do NOT override the system's risk assessment
+- Focus on explanation and education, not judgment
+- Never blame the other person
+- Never suggest manipulation tactics
+- Keep it brief and actionable
+```
+
+### Request Format
+
+```json
+{
+  "scenario": "Intent: Going to their place\nConsent signals: No response\nContext factors: Alcohol involved",
+  "precomputedRiskLevel": "red"
+}
 ```
 
 ### Response Schema
 
 ```json
 {
-  "riskLevel": "red" | "yellow" | "green",
-  "assessment": "2-3 sentence direct assessment",
+  "assessment": "2-3 sentence explanation of what's happening",
   "whatsHappening": ["bullet 1", "bullet 2", "bullet 3"],
   "whatNotToDo": ["action 1", "action 2", "action 3"],
   "whatToDoInstead": ["action 1", "action 2", "action 3"],
   "realTalk": "One sentence self-interest angle"
 }
 ```
+
+### Outcome Check
+
+After the explanation, users see:
+> "What did you end up doing?"
+
+| ID | Label |
+|----|-------|
+| `stopped` | I stopped |
+| `checked-in` | I checked in verbally |
+| `didnt-proceed` | I didn't go through with it |
+| `not-sure` | I'm not sure / I ignored this |
+
+**Privacy:** No raw text stored. Aggregate counts only if analytics exist.
+
+### UI Components (v2.0)
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| `AvoidLine` | `src/pages/AvoidLine.tsx` | Main page orchestrator |
+| `DecisionStep` | `src/components/prevention/DecisionStep.tsx` | Reusable button-based step |
+| `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
+| `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display |
+| `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
 
 ---
 
