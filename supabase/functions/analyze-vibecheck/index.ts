@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const SYSTEM_PROMPT = `You are vibecheck - you give teenage boys (ages 14-18) direct, honest feedback about consent and dating situations.
+const SYSTEM_PROMPT_LEGACY = `You are vibecheck - you give teenage boys (ages 14-18) direct, honest feedback about consent and dating situations.
 
 YOUR GOAL: Prevent sexual assault by helping boys recognize when consent is absent.
 
@@ -48,6 +48,40 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "realTalk": "One sentence self-interest angle"
 }`;
 
+// New prompt for decision-first flow where risk is pre-computed
+const SYSTEM_PROMPT_EXPLANATION = `You are vibecheck - you help teenage boys (ages 14-18) understand consent in dating situations.
+
+IMPORTANT: The risk level has ALREADY been determined by the system. Do NOT override or reassess it.
+Your job is to EXPLAIN why this risk level applies, not to judge it.
+
+TONE:
+- Direct, not preachy. Like an older brother, not a teacher.
+- No lectures. Keep it real and conversational.
+- Use normal capitalization and punctuation.
+
+YOUR ROLE:
+1. Accept the pre-computed risk level as fact
+2. Explain what's happening in this specific situation
+3. Describe why the signals/context led to this classification
+4. Offer concrete alternatives that would be safer
+
+CRITICAL RULES:
+- Do NOT say things like "I would classify this as..." or "This seems like..."
+- Do NOT override the system's risk assessment
+- Focus on explanation and education, not judgment
+- Never blame the other person
+- Never suggest manipulation tactics
+- Keep it brief and actionable
+
+RESPOND IN THIS EXACT JSON FORMAT:
+{
+  "assessment": "2-3 sentence explanation of what's happening (accept the risk level as given)",
+  "whatsHappening": ["bullet 1 - what the situation looks like", "bullet 2 - what the other person might be experiencing", "bullet 3 - what the signals actually mean"],
+  "whatNotToDo": ["action 1", "action 2", "action 3"],
+  "whatToDoInstead": ["action 1", "action 2", "action 3"],
+  "realTalk": "One sentence self-interest angle - why this matters for HIM"
+}`;
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -55,7 +89,7 @@ serve(async (req) => {
   }
 
   try {
-    const { scenario } = await req.json();
+    const { scenario, precomputedRiskLevel } = await req.json();
 
     if (!scenario || !scenario.trim()) {
       return new Response(JSON.stringify({ error: "Scenario text is required" }), {
@@ -69,6 +103,23 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Use explanation prompt if risk level is pre-computed, otherwise legacy
+    const isDecisionFirstFlow = !!precomputedRiskLevel;
+    const systemPrompt = isDecisionFirstFlow ? SYSTEM_PROMPT_EXPLANATION : SYSTEM_PROMPT_LEGACY;
+    
+    // Build user message based on flow type
+    let userMessage: string;
+    if (isDecisionFirstFlow) {
+      userMessage = `RISK LEVEL (DO NOT CHANGE): ${precomputedRiskLevel.toUpperCase()}
+
+USER SELECTIONS:
+${scenario}
+
+Explain why this risk level applies to their situation. Respond with ONLY the JSON, no other text.`;
+    } else {
+      userMessage = `SCENARIO: ${scenario}\n\nRespond with ONLY the JSON, no other text.`;
+    }
+
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -78,11 +129,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          {
-            role: "user",
-            content: `SCENARIO: ${scenario}\n\nRespond with ONLY the JSON, no other text.`,
-          },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
         ],
       }),
     });
