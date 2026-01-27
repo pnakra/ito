@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Chat from "./pages/Chat";
 import CrossedLine from "./pages/CrossedLine";
+import SomeoneCrossedLine from "./pages/SomeoneCrossedLine";
 import Scenarios from "./pages/Scenarios";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/avoid-line" element={<Chat />} />
           <Route path="/crossed-line" element={<CrossedLine />} />
+          <Route path="/someone-crossed" element={<SomeoneCrossedLine />} />
           <Route path="/scenarios" element={<Scenarios />} />
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />

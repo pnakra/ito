@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.analyze-crossed-line]
 verify_jwt = false
+
+[functions.analyze-someone-crossed]
+verify_jwt = false
+
+[functions.crossed-line-followup]
+verify_jwt = false

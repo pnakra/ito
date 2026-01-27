@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Send, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Screen = "intro" | "input" | "results";
@@ -18,13 +18,26 @@ interface ReflectionResult {
   avoidingRepetition: string;
 }
 
+interface FollowUpMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 const CrossedLine = () => {
   const [screen, setScreen] = useState<Screen>("intro");
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<ReflectionResult | null>(null);
+  
+  // Follow-up chat state
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([]);
+  const [followUpInput, setFollowUpInput] = useState("");
+  const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
+  
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const maxLength = 2000;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,7 +45,7 @@ const CrossedLine = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [results]);
+  }, [results, followUpMessages]);
 
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
@@ -59,10 +72,55 @@ const CrossedLine = () => {
     }
   };
 
+  const handleFollowUpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!followUpInput.trim() || isFollowUpLoading) return;
+
+    const userMessage: FollowUpMessage = { role: "user", content: followUpInput };
+    setFollowUpMessages(prev => [...prev, userMessage]);
+    setFollowUpInput("");
+    setIsFollowUpLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("crossed-line-followup", {
+        body: { 
+          message: followUpInput,
+          conversationHistory: followUpMessages,
+          originalReflection: results
+        }
+      });
+
+      if (error) throw error;
+
+      const assistantMessage: FollowUpMessage = {
+        role: "assistant",
+        content: data.response
+      };
+      setFollowUpMessages(prev => [...prev, assistantMessage]);
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+      const errorMessage: FollowUpMessage = {
+        role: "assistant",
+        content: "I'm having trouble responding right now. Please try again."
+      };
+      setFollowUpMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsFollowUpLoading(false);
+    }
+  };
+
   const handleStartOver = () => {
     setScreen("intro");
     setUserInput("");
     setResults(null);
+    setShowFollowUp(false);
+    setFollowUpMessages([]);
+    setFollowUpInput("");
   };
 
   if (screen === "intro") {
@@ -118,11 +176,17 @@ const CrossedLine = () => {
               
               <Textarea
                 value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
+                onChange={(e) => setUserInput(e.target.value.slice(0, maxLength))}
                 placeholder="Take your time to describe what happened..."
                 className="min-h-[200px] sm:min-h-[250px] text-base"
                 disabled={isLoading}
               />
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">
+                  {userInput.length} / {maxLength}
+                </span>
+              </div>
 
               <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-between pt-4">
                 <Button 
@@ -190,6 +254,85 @@ const CrossedLine = () => {
               <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How to Do Better Next Time</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.avoidingRepetition}</p>
             </Card>
+
+            {/* Follow-up Chat Section */}
+            {!showFollowUp ? (
+              <Card className="p-4 sm:p-6 border-2 border-primary/50 bg-primary/5">
+                <div className="text-center space-y-4">
+                  <MessageCircle className="w-8 h-8 mx-auto text-primary" />
+                  <h3 className="text-lg sm:text-xl font-semibold">Have questions?</h3>
+                  <p className="text-muted-foreground text-sm sm:text-base">
+                    If you'd like to explore any of these topics further or ask follow-up questions, you can continue the conversation.
+                  </p>
+                  <Button onClick={() => setShowFollowUp(true)} variant="outline" size="lg">
+                    Continue the conversation
+                  </Button>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-4 sm:p-6 border-2 border-primary/50">
+                <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5" />
+                  Follow-up Conversation
+                </h3>
+                
+                {/* Follow-up Messages */}
+                <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto">
+                  {followUpMessages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className={`max-w-[85%] p-3 rounded-lg text-sm sm:text-base ${
+                        message.role === "user" 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-muted"
+                      }`}>
+                        <p className="whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {isFollowUpLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted p-3 rounded-lg">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Follow-up Input */}
+                <form onSubmit={handleFollowUpSubmit} className="space-y-3">
+                  <Textarea
+                    value={followUpInput}
+                    onChange={(e) => setFollowUpInput(e.target.value.slice(0, maxLength))}
+                    placeholder="Ask a question or share more..."
+                    className="min-h-[80px] resize-none text-sm sm:text-base"
+                    disabled={isFollowUpLoading}
+                  />
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
+                      {followUpInput.length} / {maxLength}
+                    </span>
+                    <Button 
+                      type="submit" 
+                      disabled={!followUpInput.trim() || isFollowUpLoading}
+                      size="sm"
+                    >
+                      {isFollowUpLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Send
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Card>
+            )}
 
             <div className="bg-card border-2 border-primary/30 rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
               <h3 className="text-base sm:text-lg font-semibold mb-3">If someone was harmed</h3>
