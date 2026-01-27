@@ -8,7 +8,8 @@ const Header = () => {
 
   const navLinks = [
     { to: "/avoid-line", label: "Check a situation" },
-    { to: "/crossed-line", label: "Reflect on what happened" },
+    { to: "/crossed-line", label: "I crossed a line" },
+    { to: "/someone-crossed", label: "Someone crossed with me" },
     { to: "/about", label: "About" },
     { to: "/resources", label: "Resources" },
   ];
