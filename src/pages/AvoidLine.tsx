@@ -8,6 +8,8 @@ import ContextInput from "@/components/prevention/ContextInput";
 import StopMoment from "@/components/prevention/StopMoment";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ExplanationCard from "@/components/prevention/ExplanationCard";
+import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
+import FollowUpChat from "@/components/prevention/FollowUpChat";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, RotateCcw, Shield } from "lucide-react";
@@ -21,6 +23,8 @@ type FlowPhase =
   | "additional-context"
   | "stop-moment"
   | "explanation"
+  | "post-explanation-choice"
+  | "follow-up-chat"
   | "outcome";
 
 interface AnalysisData {
@@ -64,9 +68,10 @@ const AvoidLine = () => {
     contextFactors: [],
     additionalContext: ""
   });
-  const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string } | null>(null);
+  const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string; flaggedWords?: string[] } | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<string[]>([]);
 
   const handleIntentSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, intent: id }));
@@ -114,22 +119,25 @@ const AvoidLine = () => {
       setPhase("stop-moment");
     } else {
       // Green - go straight to explanation
-      fetchExplanation(result.level);
+      fetchExplanation(result.level, result.flaggedWords);
     }
   };
 
   const handleStopMomentAcknowledge = () => {
     if (riskResult) {
-      fetchExplanation(riskResult.level);
+      fetchExplanation(riskResult.level, riskResult.flaggedWords);
     }
   };
 
-  const fetchExplanation = async (riskLevel: RiskLevel) => {
+  const fetchExplanation = async (riskLevel: RiskLevel, flaggedWords?: string[]) => {
     setPhase("explanation");
     setIsLoading(true);
     
     try {
-      const formattedSelections = formatSelectionsForAI(decisions);
+      const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
+      
+      // Add to conversation history
+      setConversationHistory(prev => [...prev, formattedSelections]);
       
       const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
         body: { 
@@ -164,10 +172,55 @@ const AvoidLine = () => {
     }
   };
 
-  const handleOutcomeSelect = (outcome: string) => {
-    // No data storage - just acknowledge and reset
-    console.log("Outcome selected (not stored):", outcome);
-    resetFlow();
+  const handlePostExplanationDone = () => {
+    setPhase("outcome");
+  };
+
+  const handlePostExplanationContinue = () => {
+    setPhase("follow-up-chat");
+  };
+
+  const handleFollowUpSubmit = async (message: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Build context from conversation history
+      const fullContext = [
+        ...conversationHistory,
+        `\nFollow-up from user: "${message}"`
+      ].join("\n\n---\n\n");
+      
+      setConversationHistory(prev => [...prev, `User follow-up: ${message}`]);
+      
+      const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
+        body: { 
+          scenario: fullContext,
+          precomputedRiskLevel: riskResult?.level || "yellow"
+        }
+      });
+
+      if (error) throw error;
+
+      setAnalysis({
+        riskLevel: riskResult?.level || "yellow",
+        assessment: data.assessment,
+        whatsHappening: data.whatsHappening,
+        whatNotToDo: data.whatNotToDo,
+        whatToDoInstead: data.whatToDoInstead,
+        realTalk: data.realTalk
+      });
+      
+      // Go back to explanation to show updated response
+      setPhase("explanation");
+    } catch (error) {
+      console.error("Error in follow-up:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFollowUpDone = () => {
+    setPhase("outcome");
   };
 
   const resetFlow = () => {
@@ -176,6 +229,12 @@ const AvoidLine = () => {
     setRiskResult(null);
     setAnalysis(null);
     setIsLoading(false);
+    setConversationHistory([]);
+  };
+
+  const handleOutcomeSelect = (outcome: string) => {
+    console.log("Outcome selected (not stored):", outcome);
+    resetFlow();
   };
 
   const canProceed = useCallback(() => {
@@ -279,23 +338,25 @@ const AvoidLine = () => {
 
           {/* Explanation Card */}
           {phase === "explanation" && (
-            <>
-              <ExplanationCard analysis={analysis} isLoading={isLoading} />
-              
-              {!isLoading && analysis && (
-                <div className="flex justify-center pt-4">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => setPhase("outcome")}
-                    className="px-8"
-                  >
-                    Continue
-                  </Button>
-                </div>
-              )}
-            </>
+            <ExplanationCard analysis={analysis} isLoading={isLoading} />
           )}
+
+          {/* Post-Explanation Choice */}
+          {phase === "explanation" && !isLoading && analysis && (
+            <PostExplanationChoice
+              onDone={handlePostExplanationDone}
+              onContinue={handlePostExplanationContinue}
+              isActive={true}
+            />
+          )}
+
+          {/* Follow-up Chat */}
+          <FollowUpChat
+            onSubmit={handleFollowUpSubmit}
+            onDone={handleFollowUpDone}
+            isLoading={isLoading}
+            isActive={phase === "follow-up-chat"}
+          />
 
           {/* Outcome Check */}
           {phase === "outcome" && (
