@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DecisionStep, { type StepOption } from "@/components/prevention/DecisionStep";
+import ContextInput from "@/components/prevention/ContextInput";
 import StopMoment from "@/components/prevention/StopMoment";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ExplanationCard from "@/components/prevention/ExplanationCard";
@@ -17,6 +18,7 @@ type FlowPhase =
   | "intent"
   | "consent-signal"
   | "context-factors"
+  | "additional-context"
   | "stop-moment"
   | "explanation"
   | "outcome";
@@ -59,7 +61,8 @@ const AvoidLine = () => {
   const [decisions, setDecisions] = useState<DecisionState>({
     intent: null,
     consentSignal: null,
-    contextFactors: []
+    contextFactors: [],
+    additionalContext: ""
   });
   const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string } | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
@@ -97,16 +100,21 @@ const AvoidLine = () => {
     } else if (phase === "consent-signal" && decisions.consentSignal) {
       setPhase("context-factors");
     } else if (phase === "context-factors" && decisions.contextFactors.length > 0) {
-      // Calculate risk and proceed
-      const result = classifyRisk(decisions);
-      setRiskResult(result);
-      
-      if (result.level === "red" || result.level === "yellow") {
-        setPhase("stop-moment");
-      } else {
-        // Green - go straight to explanation
-        fetchExplanation(result.level);
-      }
+      // Go to additional context step
+      setPhase("additional-context");
+    }
+  };
+
+  const handleContextInputContinue = () => {
+    // Calculate risk and proceed
+    const result = classifyRisk(decisions);
+    setRiskResult(result);
+    
+    if (result.level === "red" || result.level === "yellow") {
+      setPhase("stop-moment");
+    } else {
+      // Green - go straight to explanation
+      fetchExplanation(result.level);
     }
   };
 
@@ -164,7 +172,7 @@ const AvoidLine = () => {
 
   const resetFlow = () => {
     setPhase("welcome");
-    setDecisions({ intent: null, consentSignal: null, contextFactors: [] });
+    setDecisions({ intent: null, consentSignal: null, contextFactors: [], additionalContext: "" });
     setRiskResult(null);
     setAnalysis(null);
     setIsLoading(false);
@@ -193,7 +201,7 @@ const AvoidLine = () => {
               </div>
               <h1 className="text-3xl font-bold mb-4">Before You Act</h1>
               <p className="text-lg text-muted-foreground mb-6">
-                Answer three quick questions. Get a reality check. 
+                Answer a few quick questions. Get a reality check. 
                 <br />No judgment, no data stored.
               </p>
               <Button 
@@ -238,7 +246,15 @@ const AvoidLine = () => {
             isActive={phase === "context-factors"}
           />
 
-          {/* Continue Button (for steps) */}
+          {/* Step 4: Additional Context (free text) */}
+          <ContextInput
+            value={decisions.additionalContext}
+            onChange={(value) => setDecisions(prev => ({ ...prev, additionalContext: value }))}
+            onContinue={handleContextInputContinue}
+            isActive={phase === "additional-context"}
+          />
+
+          {/* Continue Button (for button steps only) */}
           {(phase === "intent" || phase === "consent-signal" || phase === "context-factors") && (
             <div className="flex justify-center pt-4">
               <Button

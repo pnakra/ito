@@ -4,6 +4,13 @@ export interface DecisionState {
   intent: string | null;
   consentSignal: string | null;
   contextFactors: string[];
+  additionalContext: string;
+}
+
+export interface RiskClassification {
+  level: RiskLevel;
+  stopMessage: string;
+  reasoning: string;
 }
 
 export interface RiskClassification {
@@ -147,12 +154,16 @@ export function formatSelectionsForAI(decisions: DecisionState): string {
   };
   
   const lines = [
-    `Intent: ${intentLabels[decisions.intent || ""] || "Not specified"}`,
-    `Consent signals: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
-    `Context factors: ${decisions.contextFactors.length > 0 
+    `What they're thinking about doing: ${intentLabels[decisions.intent || ""] || "Not specified"}`,
+    `Signals from the other person: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
+    `Complicating factors: ${decisions.contextFactors.length > 0 
       ? decisions.contextFactors.map(f => factorLabels[f] || f).join(", ")
       : "None selected"}`
   ];
+  
+  if (decisions.additionalContext?.trim()) {
+    lines.push(`\nAdditional context from the user:\n"${decisions.additionalContext.trim()}"`);
+  }
   
   return lines.join("\n");
 }
