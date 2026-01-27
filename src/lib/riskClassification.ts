@@ -11,24 +11,68 @@ export interface RiskClassification {
   level: RiskLevel;
   stopMessage: string;
   reasoning: string;
+  flaggedWords?: string[];
 }
 
-export interface RiskClassification {
-  level: RiskLevel;
-  stopMessage: string;
-  reasoning: string;
+// Problematic words/phrases that indicate concerning attitudes
+const FLAG_WORDS: { pattern: RegExp; category: string }[] = [
+  { pattern: /\bslut\b/i, category: "derogatory label" },
+  { pattern: /\bwhore\b/i, category: "derogatory label" },
+  { pattern: /\bho\b/i, category: "derogatory label" },
+  { pattern: /\beasy\b/i, category: "objectifying assumption" },
+  { pattern: /\bowes?\s*me\b/i, category: "entitlement" },
+  { pattern: /\bdeserve\b/i, category: "entitlement" },
+  { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming" },
+  { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries" },
+  { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries" },
+  { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation" },
+  { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation" },
+  { pattern: /\bjust\s*let\s*me\b/i, category: "coercion" },
+  { pattern: /\bcome\s*on\b/i, category: "pressure" },
+];
+
+// Detect flag words in additional context
+export function detectFlagWords(text: string): string[] {
+  if (!text?.trim()) return [];
+  
+  const flagged: string[] = [];
+  for (const { pattern, category } of FLAG_WORDS) {
+    if (pattern.test(text)) {
+      // Extract the matched word
+      const match = text.match(pattern);
+      if (match && !flagged.includes(category)) {
+        flagged.push(category);
+      }
+    }
+  }
+  return flagged;
 }
 
 // Hard-coded rules for risk classification - the LLM does NOT determine this
 export function classifyRisk(decisions: DecisionState): RiskClassification {
-  const { intent, consentSignal, contextFactors } = decisions;
+  const { intent, consentSignal, contextFactors, additionalContext } = decisions;
+  
+  // Check for flag words in free text
+  const flaggedWords = detectFlagWords(additionalContext);
+  const hasFlagWords = flaggedWords.length > 0;
   
   // RED FLAG conditions - immediate stop
   if (consentSignal === "said-no") {
     return {
       level: "red",
       stopMessage: "Stop. They said no or pulled away. That's a clear answer.",
-      reasoning: "An explicit 'no' or physical withdrawal is an unambiguous boundary."
+      reasoning: "An explicit 'no' or physical withdrawal is an unambiguous boundary.",
+      flaggedWords
+    };
+  }
+  
+  // Flag words with physical intent = automatic red
+  if (hasFlagWords && (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move")) {
+    return {
+      level: "red",
+      stopMessage: "Stop. The way you're thinking about this situation is a problem.",
+      reasoning: "Your framing suggests attitudes that don't respect the other person's autonomy.",
+      flaggedWords
     };
   }
   
@@ -38,13 +82,15 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       return {
         level: "red",
         stopMessage: "Do not proceed. No response is not consent.",
-        reasoning: "Silence or lack of response to physical advances is not permission."
+        reasoning: "Silence or lack of response to physical advances is not permission.",
+        flaggedWords
       };
     }
     return {
       level: "yellow",
       stopMessage: "Pause. No response means you don't have a green light yet.",
-      reasoning: "Without a clear positive signal, continuing risks crossing a boundary."
+      reasoning: "Without a clear positive signal, continuing risks crossing a boundary.",
+      flaggedWords
     };
   }
   
@@ -54,23 +100,29 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       return {
         level: "red",
         stopMessage: "Do not make a physical move with mixed signals. Check in verbally first.",
-        reasoning: "Mixed signals require verbal clarification before any physical escalation."
+        reasoning: "Mixed signals require verbal clarification before any physical escalation.",
+        flaggedWords
+      };
+    }
+    // Flag words escalate mixed signals to red
+    if (hasFlagWords) {
+      return {
+        level: "red",
+        stopMessage: "Stop. Mixed signals plus concerning assumptions is a red flag.",
+        reasoning: "The way you're interpreting this situation needs to be reconsidered.",
+        flaggedWords
       };
     }
     return {
       level: "yellow",
       stopMessage: "Mixed signals mean you need to check in before going further.",
-      reasoning: "Unclear signals require direct communication, not assumption."
+      reasoning: "Unclear signals require direct communication, not assumption.",
+      flaggedWords
     };
   }
   
   // Context factors escalate risk
   const hasAlcohol = contextFactors.includes("alcohol");
-  const hasPowerImbalance = contextFactors.includes("power-imbalance");
-  const hasAgeImbalance = contextFactors.includes("age-imbalance");
-  const hasEmotionalPressure = contextFactors.includes("emotional-pressure");
-  const hasExperienceGap = contextFactors.includes("experience-gap");
-  
   const riskFactorCount = contextFactors.filter(f => f !== "none").length;
   
   // Alcohol + physical intent = always red
@@ -78,7 +130,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     return {
       level: "red",
       stopMessage: "Do not proceed when alcohol is involved. Consent requires clear judgment.",
-      reasoning: "Alcohol impairs the ability to give meaningful consent."
+      reasoning: "Alcohol impairs the ability to give meaningful consent.",
+      flaggedWords
     };
   }
   
@@ -87,7 +140,18 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     return {
       level: "red",
       stopMessage: "Too many factors that complicate consent. Pause and reassess.",
-      reasoning: "Multiple complicating factors significantly increase the risk of harm."
+      reasoning: "Multiple complicating factors significantly increase the risk of harm.",
+      flaggedWords
+    };
+  }
+  
+  // Flag words alone escalate to yellow minimum
+  if (hasFlagWords) {
+    return {
+      level: "yellow",
+      stopMessage: "Pause. Some of how you're thinking about this needs to be addressed.",
+      reasoning: "Your framing includes assumptions that could lead to harm.",
+      flaggedWords
     };
   }
   
@@ -96,7 +160,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     return {
       level: "yellow",
       stopMessage: "This situation has complications. Check in verbally before proceeding.",
-      reasoning: "Context factors require extra care and explicit verbal consent."
+      reasoning: "Context factors require extra care and explicit verbal consent.",
+      flaggedWords
     };
   }
   
@@ -105,7 +170,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     return {
       level: "green",
       stopMessage: "",
-      reasoning: "You have clear positive signals and no complicating factors."
+      reasoning: "You have clear positive signals and no complicating factors.",
+      flaggedWords
     };
   }
   
@@ -114,7 +180,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     return {
       level: "yellow",
       stopMessage: "You have positive signals, but context factors mean you should still check in verbally.",
-      reasoning: "Even with positive signals, complicating factors require extra care."
+      reasoning: "Even with positive signals, complicating factors require extra care.",
+      flaggedWords
     };
   }
   
@@ -122,12 +189,13 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
   return {
     level: "yellow",
     stopMessage: "When in doubt, slow down and check in verbally.",
-    reasoning: "Uncertainty means you should seek clarity before proceeding."
+    reasoning: "Uncertainty means you should seek clarity before proceeding.",
+    flaggedWords
   };
 }
 
 // Format user selections for the AI explanation
-export function formatSelectionsForAI(decisions: DecisionState): string {
+export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: string[]): string {
   const intentLabels: Record<string, string> = {
     "go-to-their-place": "Going to their place",
     "invite-to-mine": "Inviting them to my place",
@@ -163,6 +231,11 @@ export function formatSelectionsForAI(decisions: DecisionState): string {
   
   if (decisions.additionalContext?.trim()) {
     lines.push(`\nAdditional context from the user:\n"${decisions.additionalContext.trim()}"`);
+  }
+  
+  if (flaggedWords && flaggedWords.length > 0) {
+    lines.push(`\nFLAGGED CONCERNING LANGUAGE: ${flaggedWords.join(", ")}`);
+    lines.push("IMPORTANT: The user's free-text contained problematic framing. Address this directly in your response.");
   }
   
   return lines.join("\n");
