@@ -1,8 +1,7 @@
 # Vibecheck — Product Requirements Document (PRD)
 
-**Version:** 1.0  
+**Version:** 3.0  
 **Last Updated:** January 2026  
-**Version:** 2.0 — Decision-First Refactor  
 **Status:** Early Prototype / Exploratory
 
 ---
@@ -18,12 +17,15 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 - Reflect on and take accountability for past behavior
 - Process experiences where their boundaries may have been crossed
 
-### 1.3 Core Principles
+### 1.3 Core Operating Principle: Behavioral Interruption
+The product's core operating principle is **behavioral interruption**, not advice-giving. The system is designed to pause risky behavior in the moment and provide reality checks, not to mimic a chatbot or therapist. The Stop Moment is a non-negotiable pattern: it must feel like a brake, not guidance. All UI decisions (buttons over text, enforced pauses over suggestions, system rules over model judgment) reflect this philosophy.
+
+### 1.4 Core Principles
 1. **Anonymity First** — No accounts, no data storage, no tracking
 2. **Non-Judgmental** — Supportive guidance without shame or lectures
 3. **Harm Reduction** — Practical, actionable advice over moralizing
 4. **User Autonomy** — Users define their own experiences; we don't label for them
-5. **Balanced Support** — Validation, information, and options in equal measure
+5. **Behavioral Interruption** — Create friction before risky behavior, not guidance after
 
 ---
 
@@ -63,13 +65,18 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│               RISK CLASSIFICATION LAYER                      │
-│            (Deterministic Frontend Logic)                    │
+│               DUAL-LAYER DETECTION SYSTEM                    │
 ├─────────────────────────────────────────────────────────────┤
 │  src/lib/riskClassification.ts                              │
 │  - Maps user selections → risk level (red/yellow/green)     │
+│  - Static flag word detection (regex patterns)              │
 │  - Enforces hard rules (e.g., "no response" = yellow+)      │
 │  - LLM does NOT determine risk level                        │
+├─────────────────────────────────────────────────────────────┤
+│  src/lib/aiLanguageAnalysis.ts                              │
+│  - AI-powered nuanced language detection                     │
+│  - Catches objectification, entitlement, subtle coercion    │
+│  - Graceful fallback to static detection if AI fails        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -77,6 +84,7 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 │                    EDGE FUNCTIONS (Deno)                     │
 ├─────────────────────────────────────────────────────────────┤
 │  analyze-vibecheck        │  Prevention EXPLANATION AI      │
+│  analyze-language         │  AI-powered language detection  │
 │  analyze-crossed-line     │  Initial accountability AI      │
 │  crossed-line-followup    │  Accountability follow-up AI    │
 │  analyze-someone-crossed  │  Survivor support AI            │
@@ -92,12 +100,16 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 ### 3.2 Data Flow
 
 **Prevention Flow (Decision-First):**
-1. User answers 3 guided questions via buttons
-2. Frontend deterministically calculates risk level
-3. If RED/YELLOW: Mandatory "Stop Moment" displayed
-4. User acknowledges → Edge function called with pre-computed risk
-5. AI explains (does not assess) the risk level
-6. Outcome check: User self-reports what they did
+1. User answers 3 guided questions via buttons (Intent, Signals, Context)
+2. User optionally adds free-text context
+3. Dual-layer detection: Static patterns + AI analysis scan free text
+4. Frontend deterministically calculates risk level
+5. If RED/YELLOW: Mandatory "Stop Moment" displayed
+6. User acknowledges → Edge function called with pre-computed risk
+7. AI explains (does not assess) the risk level, directly addressing any flagged language
+8. Post-explanation choice: "I'm done" or "I want to talk more"
+9. Optional follow-up chat if user chooses to continue
+10. Outcome check: User self-reports what they did
 
 **Accountability & Survivor Flows:**
 1. User inputs scenario/message in frontend
@@ -111,7 +123,7 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 - **No authentication** — Fully anonymous access
 - **No analytics tracking** — No user behavior logging
 - **Stateless conversations** — Context maintained only in-session via frontend state
-- **Outcome check** — Self-reported, aggregate only, no raw text storage
+- **Outcome check** — Self-reported, local-only, no storage
 
 ---
 
@@ -125,8 +137,8 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 ### Purpose
 Interrupt risky behavior in the moment. Help users recognize consent signals and make better decisions BEFORE acting.
 
-### Interaction Model (v2.0 — Decision-First)
-**Guided decision sequence → Stop Moment → AI Explanation → Outcome Check**
+### Interaction Model (v3.0 — Decision-First with Dual-Layer Detection)
+**Guided decision sequence → Stop Moment → AI Explanation → Post-Explanation Choice → Optional Follow-up → Outcome Check**
 
 This is NOT a chatbot. It is a consent risk assessment and behavioral interruption tool.
 
@@ -136,44 +148,64 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 ### User Journey
 
 ```
-┌────────────────┐     ┌────────────────┐     ┌────────────────┐
-│  Step 1:       │     │  Step 2:       │     │  Step 3:       │
-│  INTENT CHECK  │ ──► │  CONSENT       │ ──► │  CONTEXT       │
-│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │
-│                │     │  (buttons)     │     │  (multi-select)│
-└────────────────┘     └────────────────┘     └────────────────┘
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│  Step 1:       │     │  Step 2:       │     │  Step 3:       │     │  Step 4:       │
+│  INTENT CHECK  │ ──► │  CONSENT       │ ──► │  CONTEXT       │ ──► │  FREE TEXT     │
+│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │     │  (optional)    │
+│                │     │  (buttons)     │     │  (multi-select)│     │                │
+└────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘
+                                                                            │
+                                                                            ▼
+                              ┌───────────────────────────────────────────────────────┐
+                              │              DUAL-LAYER DETECTION                      │
+                              │  1. Static patterns (instant)                          │
+                              │  2. AI analysis (async, graceful fallback)             │
+                              └───────────────────────────────────────────────────────┘
                                                       │
                                                       ▼
-                              ┌──────────────────────────────────┐
-                              │   DETERMINISTIC RISK CALCULATION │
-                              │   (Frontend: riskClassification.ts)
-                              └──────────────────────────────────┘
-                                              │
-                    ┌───────────────┬─────────┴─────────┐
-                    ▼               ▼                   ▼
-              ┌──────────┐   ┌──────────┐        ┌──────────┐
-              │   RED    │   │  YELLOW  │        │  GREEN   │
-              │   STOP   │   │  PAUSE   │        │   ───►   │
-              │  MOMENT  │   │  MOMENT  │        │ Explain  │
-              └────┬─────┘   └────┬─────┘        └──────────┘
-                   │              │
-                   └──────┬───────┘
-                          ▼
-                  ┌───────────────┐
-                  │ "I understand"│
-                  │   (required)  │
-                  └───────┬───────┘
-                          ▼
-                 ┌─────────────────┐
-                 │  AI EXPLANATION │
-                 │  (does NOT      │
-                 │  assess risk)   │
-                 └────────┬────────┘
-                          ▼
-                 ┌─────────────────┐
-                 │  OUTCOME CHECK  │
-                 │  (self-report)  │
-                 └─────────────────┘
+                              ┌───────────────────────────────────────────────────────┐
+                              │         DETERMINISTIC RISK CALCULATION                 │
+                              │         (Frontend: riskClassification.ts)              │
+                              └───────────────────────────────────────────────────────┘
+                                                      │
+                    ┌───────────────────────┬─────────┴─────────────┐
+                    ▼                       ▼                       ▼
+              ┌──────────┐           ┌──────────┐            ┌──────────┐
+              │   RED    │           │  YELLOW  │            │  GREEN   │
+              │   STOP   │           │  PAUSE   │            │   ───►   │
+              │  MOMENT  │           │  MOMENT  │            │ Explain  │
+              └────┬─────┘           └────┬─────┘            └──────────┘
+                   │                      │
+                   └──────────┬───────────┘
+                              ▼
+                      ┌───────────────┐
+                      │ "I understand"│
+                      │   (required)  │
+                      └───────┬───────┘
+                              ▼
+                     ┌─────────────────┐
+                     │  AI EXPLANATION │
+                     │  (addresses     │
+                     │  flagged lang)  │
+                     └────────┬────────┘
+                              ▼
+                   ┌────────────────────┐
+                   │ POST-EXPLANATION   │
+                   │ "I'm done" OR      │
+                   │ "Talk more"        │
+                   └────────┬───────────┘
+                            │
+               ┌────────────┴────────────┐
+               ▼                         ▼
+        ┌─────────────┐          ┌─────────────────┐
+        │ OUTCOME     │          │ FOLLOW-UP CHAT  │
+        │ CHECK       │          │ (multi-turn)    │
+        └─────────────┘          └────────┬────────┘
+                                          │
+                                          ▼
+                                  ┌─────────────────┐
+                                  │  OUTCOME CHECK  │
+                                  └─────────────────┘
 ```
 
 ### Decision Step Options
@@ -181,13 +213,13 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 **Step 1: Intent Check**
 > "What are you thinking about doing next?"
 
-| ID | Label |
-|----|-------|
-| `go-to-their-place` | Go to their place |
-| `invite-to-mine` | Invite them to mine |
-| `keep-texting` | Keep texting / messaging |
-| `physical-move` | Make a physical move |
-| `not-sure` | I'm not sure yet |
+| ID | Label | Risk Weight |
+|----|-------|-------------|
+| `go-to-their-place` | Go to their place | Physical intent |
+| `invite-to-mine` | Invite them to mine | Physical intent |
+| `keep-texting` | Keep texting / messaging | Non-physical |
+| `physical-move` | Make a physical move | Physical intent |
+| `not-sure` | I'm not sure yet | Non-physical |
 
 **Step 2: Consent Signal Check**
 > "What signals have you gotten from them?"
@@ -211,6 +243,42 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 | `emotional-pressure` | Emotional pressure |
 | `none` | None of these |
 
+**Step 4: Additional Context (Optional)**
+> "Anything else you want to add?"
+
+Free text input (max 800 characters). Subject to dual-layer flag detection.
+
+### Dual-Layer Flag Word Detection
+
+Located in: `src/lib/riskClassification.ts` and `src/lib/aiLanguageAnalysis.ts`
+
+**Layer 1: Static Pattern Matching (instant)**
+Regex-based detection in `riskClassification.ts`:
+
+| Category | Examples |
+|----------|----------|
+| Derogatory labels | "slut", "whore", "thot", "skank", "ho" |
+| Objectifying assumptions | "easy", "gets around" |
+| Entitlement | "owes me", "deserve", "friend zone", "nice guy" |
+| Victim blaming | "asking for it" |
+| Dismissing boundaries | "playing hard to get", "led me on", "means yes", "teasing me" |
+| Secrecy/manipulation | "won't tell", "nobody will know" |
+| Coercion/pressure | "just let me", "come on", "don't be a tease" |
+
+**Layer 2: AI-Powered Analysis (async)**
+Edge function `analyze-language` using Gemini detects nuanced patterns:
+
+| Pattern | Description |
+|---------|-------------|
+| Objectification/dehumanization | Treating the other person as a conquest or object |
+| Entitlement to physical intimacy | Assuming access is owed |
+| Dismissing or reframing rejection | Interpreting "no" as "convince me" |
+| Subtle coercion or pressure | Guilt-tripping, persistence framing |
+| Victim-blaming language | Blaming the other person for user's actions |
+| Consent as obstacle | Treating consent as hurdle vs. requirement |
+
+**Integration:** `aiLanguageAnalysis.ts` merges static and AI-detected categories with graceful fallback if AI fails.
+
 ### Deterministic Risk Classification Rules
 
 Located in: `src/lib/riskClassification.ts`
@@ -220,15 +288,19 @@ Located in: `src/lib/riskClassification.ts`
 | Condition | Result |
 |-----------|--------|
 | `said-no` (any intent) | 🔴 RED |
+| Flag words + physical intent | 🔴 RED |
 | `no-response` + physical intent | 🔴 RED |
-| `no-response` + other intent | 🟡 YELLOW |
 | `mixed-signals` + physical intent | 🔴 RED |
-| `mixed-signals` + other intent | 🟡 YELLOW |
+| Flag words + mixed signals | 🔴 RED |
 | `alcohol` + physical intent | 🔴 RED |
 | 2+ context factors | 🔴 RED |
+| `no-response` + other intent | 🟡 YELLOW |
+| `mixed-signals` + other intent | 🟡 YELLOW |
 | 1 context factor + physical intent | 🟡 YELLOW |
-| Clear positive signals + no factors | 🟢 GREEN |
 | Clear positive + 1 factor | 🟡 YELLOW |
+| Flag words alone | 🟡 YELLOW |
+| Default uncertainty | 🟡 YELLOW |
+| Clear positive signals + no factors | 🟢 GREEN |
 
 *Physical intent = `go-to-their-place`, `invite-to-mine`, or `physical-move`*
 
@@ -239,19 +311,47 @@ For RED and YELLOW risk levels, a full-screen modal appears:
 **RED Stop Moment:**
 - Large octagon icon
 - Header: "STOP"
-- Message: Specific action to NOT take (e.g., "Do not go to their place tonight.")
+- Subtext: "This is a hard stop."
+- Message: Specific action to NOT take (generated from classification reasoning)
 - Button: "I understand" (required to proceed)
-- Subtext: "Proceeding without consent can cause serious harm."
+- Footer: "Proceeding without consent can cause serious harm."
 
 **YELLOW Pause Moment:**
 - Large triangle warning icon
 - Header: "PAUSE"
-- Message: Specific caution (e.g., "Check in verbally before proceeding.")
+- Subtext: "Take a moment before continuing."
+- Message: Specific caution (generated from classification reasoning)
 - Button: "I understand" (required to proceed)
-- Subtext: "Clear communication protects both of you."
+- Footer: "Clear communication protects both of you."
 
-### Edge Function
-`analyze-vibecheck`
+### Post-Explanation Choice
+
+After AI explanation, users see a binary choice:
+- **"I'm done"** — Proceeds to Outcome Check
+- **"I want to talk more"** — Opens follow-up chat
+
+This gates access to follow-up chat rather than automatically proceeding.
+
+### Follow-Up Chat (Optional)
+
+Only accessible if user explicitly chooses "I want to talk more."
+
+**Characteristics:**
+- Multi-turn conversation
+- Maintains context from original selections
+- Risk level remains fixed (doesn't change based on follow-up)
+- Same "older brother" tone as initial explanation
+- User can exit to Outcome Check at any time
+
+### Edge Functions
+
+**`analyze-vibecheck`** — Main explanation AI
+
+Accepts pre-computed risk level and user selections. Explains why the risk level applies without reassessing it.
+
+**`analyze-language`** — AI-powered flag detection
+
+Analyzes free text for nuanced problematic patterns. Returns categories and explanation for AI to address.
 
 ### AI System Prompt (Explanation Mode)
 
@@ -273,6 +373,14 @@ YOUR ROLE:
 3. Describe why the signals/context led to this classification
 4. Offer concrete alternatives that would be safer
 
+CRITICAL - FLAGGED LANGUAGE:
+When flagged language is detected, you MUST:
+- Directly call out the specific problematic word or attitude
+- Reference what they actually said, not system labels
+- Explain WHY this framing is harmful (to the other person AND to him)
+- Do NOT be preachy - be direct and matter-of-fact
+- NEVER output phrases like "FLAGGED CONCERNING LANGUAGE"
+
 CRITICAL RULES:
 - Do NOT say "I would classify this as..." or "This seems like..."
 - Do NOT override the system's risk assessment
@@ -286,7 +394,7 @@ CRITICAL RULES:
 
 ```json
 {
-  "scenario": "Intent: Going to their place\nConsent signals: No response\nContext factors: Alcohol involved",
+  "scenario": "What they're thinking about doing: Going to their place\nSignals from the other person: No response\nComplicating factors: Alcohol or drugs are involved\n\nAdditional context from the user:\n\"...\"\n\nFLAGGED: entitlement, dismissing boundaries",
   "precomputedRiskLevel": "red"
 }
 ```
@@ -295,7 +403,7 @@ CRITICAL RULES:
 
 ```json
 {
-  "assessment": "2-3 sentence explanation of what's happening",
+  "assessment": "2-3 sentence explanation of what's happening (addresses flagged language if present)",
   "whatsHappening": ["bullet 1", "bullet 2", "bullet 3"],
   "whatNotToDo": ["action 1", "action 2", "action 3"],
   "whatToDoInstead": ["action 1", "action 2", "action 3"],
@@ -305,26 +413,29 @@ CRITICAL RULES:
 
 ### Outcome Check
 
-After the explanation, users see:
+After the flow concludes:
 > "What did you end up doing?"
 
-| ID | Label |
-|----|-------|
-| `stopped` | I stopped |
-| `checked-in` | I checked in verbally |
-| `didnt-proceed` | I didn't go through with it |
-| `not-sure` | I'm not sure / I ignored this |
+| ID | Label | Icon |
+|----|-------|------|
+| `stopped` | I stopped | ✓ (green) |
+| `checked-in` | I checked in verbally | 💬 (green) |
+| `didnt-proceed` | I didn't go through with it | ✗ (neutral) |
+| `not-sure` | I'm not sure / I ignored this | ? (muted) |
 
-**Privacy:** No raw text stored. Aggregate counts only if analytics exist.
+**Privacy:** No data is stored. Purely for user self-reflection. Flow resets after selection.
 
-### UI Components (v2.0)
+### UI Components (v3.0)
 
 | Component | Path | Purpose |
 |-----------|------|---------|
 | `AvoidLine` | `src/pages/AvoidLine.tsx` | Main page orchestrator |
 | `DecisionStep` | `src/components/prevention/DecisionStep.tsx` | Reusable button-based step |
+| `ContextInput` | `src/components/prevention/ContextInput.tsx` | Optional free text input |
 | `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
 | `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display |
+| `PostExplanationChoice` | `src/components/prevention/PostExplanationChoice.tsx` | Done/Talk more binary choice |
+| `FollowUpChat` | `src/components/prevention/FollowUpChat.tsx` | Multi-turn follow-up |
 | `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
 
 ---
@@ -639,8 +750,8 @@ These resources should be accessible from all flows:
 
 | Parameter | Client-side | Server-side |
 |-----------|------------|-------------|
-| Max length | 2000 chars (textarea) | 5000 chars (edge function) |
-| Min length | Non-empty | Non-empty |
+| Max length | 800 chars (free text) | 5000 chars (edge function) |
+| Min length | Non-empty (for required steps) | Non-empty |
 | Encoding | UTF-8 | UTF-8 |
 
 ### 7.2 Error Handling
@@ -651,6 +762,7 @@ These resources should be accessible from all flows:
 | Payment required (402) | "Service requires payment. Please contact support." |
 | AI parse error | Graceful fallback with generic supportive message |
 | Network error | "Having trouble connecting. Please try again." |
+| Language analysis failure | Graceful fallback to static detection only |
 
 ### 7.3 AI Model Configuration
 
@@ -672,6 +784,7 @@ These resources should be accessible from all flows:
 - [ ] More inclusive language for LGBTQ+ situations
 - [ ] Audio input option for accessibility
 - [ ] Offline capability via PWA
+- [ ] Analytics/logging for detection frequency (privacy-preserving)
 
 ### 8.2 Prompt Engineering Opportunities
 - Fine-tune tone per demographic
@@ -696,6 +809,9 @@ These resources should be accessible from all flows:
 | **Red flag** | Clear indicator of absent or withdrawn consent |
 | **Yellow flag** | Ambiguous situation requiring clarification |
 | **Green flag** | Clear indicators of enthusiastic consent |
+| **Flag words** | Problematic language patterns indicating concerning attitudes |
+| **Behavioral interruption** | Deliberate friction to pause risky behavior before it happens |
+| **Stop Moment** | Full-screen acknowledgment requirement for RED/YELLOW risk |
 
 ---
 
@@ -705,27 +821,41 @@ These resources should be accessible from all flows:
 vibecheck/
 ├── src/
 │   ├── pages/
-│   │   ├── Index.tsx           # Landing page
-│   │   ├── Chat.tsx            # Prevention flow (/avoid-line)
-│   │   ├── CrossedLine.tsx     # Accountability flow (/crossed-line)
-│   │   ├── SomeoneCrossedLine.tsx  # Survivor flow (/someone-crossed)
+│   │   ├── Index.tsx               # Landing page
+│   │   ├── AvoidLine.tsx           # Prevention flow (decision-first)
+│   │   ├── CrossedLine.tsx         # Accountability flow
+│   │   ├── SomeoneCrossedLine.tsx  # Survivor flow
 │   │   ├── About.tsx
 │   │   └── Resources.tsx
 │   ├── components/
 │   │   ├── Header.tsx
 │   │   ├── Footer.tsx
-│   │   └── RiskBadge.tsx
-│   └── ...
+│   │   ├── RiskBadge.tsx
+│   │   └── prevention/
+│   │       ├── DecisionStep.tsx
+│   │       ├── ContextInput.tsx
+│   │       ├── StopMoment.tsx
+│   │       ├── ExplanationCard.tsx
+│   │       ├── PostExplanationChoice.tsx
+│   │       ├── FollowUpChat.tsx
+│   │       └── OutcomeCheck.tsx
+│   └── lib/
+│       ├── riskClassification.ts   # Deterministic rules + static flags
+│       └── aiLanguageAnalysis.ts   # AI detection integration
 ├── supabase/
 │   └── functions/
 │       ├── analyze-vibecheck/index.ts
+│       ├── analyze-language/index.ts
 │       ├── analyze-crossed-line/index.ts
 │       ├── crossed-line-followup/index.ts
 │       └── analyze-someone-crossed/index.ts
 └── docs/
-    └── PRD.md                  # This document
+    ├── PRD.md                      # This document
+    └── AVOID_LINE_USER_JOURNEY.md  # Detailed flow walkthrough
 ```
 
 ---
 
 *This document is intended for internal development and prompt engineering reference. Vibecheck is an exploratory prototype and not a substitute for professional support.*
+
+*Live preview: https://approach-coach.lovable.app*
