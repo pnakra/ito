@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 import DecisionStep, { type StepOption } from "@/components/prevention/DecisionStep";
 import ContextInput from "@/components/prevention/ContextInput";
 import StopMoment from "@/components/prevention/StopMoment";
@@ -303,6 +304,9 @@ const AvoidLine = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
+          {/* Back button - show only on welcome screen */}
+          {phase === "welcome" && <BackButton to="/" />}
+          
           {/* Session Pattern Warning */}
           {shouldShowPatternWarning && phase === "welcome" && (
             <SessionPatternWarning />

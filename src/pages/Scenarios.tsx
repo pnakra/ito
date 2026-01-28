@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 import RiskBadge from "@/components/RiskBadge";
 import { scenarios, Scenario } from "@/data/scenarios";
 import { Eye, X, Check, MessageCircle } from "lucide-react";
@@ -21,9 +22,10 @@ const Scenarios = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-12">
+      <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+          <BackButton to="/" />
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-center">
             See What Others Are Asking
           </h1>
           <p className="text-xl text-muted-foreground mb-12 text-center">

@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Send, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -129,6 +130,7 @@ const CrossedLine = () => {
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6">
+            <BackButton to="/" />
             <h1 className="text-2xl sm:text-3xl font-bold text-center">
               Let's figure out what happened — calmly.
             </h1>
