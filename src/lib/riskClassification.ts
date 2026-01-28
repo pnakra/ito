@@ -234,8 +234,8 @@ export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: s
   }
   
   if (flaggedWords && flaggedWords.length > 0) {
-    lines.push(`\nFLAGGED CONCERNING LANGUAGE: ${flaggedWords.join(", ")}`);
-    lines.push("IMPORTANT: The user's free-text contained problematic framing. Address this directly in your response.");
+    lines.push(`\nFLAGGED: ${flaggedWords.join(", ")}`);
+    lines.push("IMPORTANT: The user used problematic language/framing. Call out what they said directly without using system labels like 'FLAGGED' in your response.");
   }
   
   return lines.join("\n");
