@@ -15,20 +15,43 @@ export interface RiskClassification {
 }
 
 // Problematic words/phrases that indicate concerning attitudes
+// This is a FAST first-pass - AI-powered detection catches nuanced patterns
 const FLAG_WORDS: { pattern: RegExp; category: string }[] = [
+  // Derogatory labels
   { pattern: /\bslut\b/i, category: "derogatory label" },
   { pattern: /\bwhore\b/i, category: "derogatory label" },
   { pattern: /\bho\b/i, category: "derogatory label" },
+  { pattern: /\bthot\b/i, category: "derogatory label" },
+  { pattern: /\bskank\b/i, category: "derogatory label" },
+  
+  // Objectifying assumptions
   { pattern: /\beasy\b/i, category: "objectifying assumption" },
+  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption" },
+  
+  // Entitlement
   { pattern: /\bowes?\s*me\b/i, category: "entitlement" },
   { pattern: /\bdeserve\b/i, category: "entitlement" },
+  { pattern: /\bfriend\s*zone[d]?\b/i, category: "entitlement" },
+  { pattern: /\bnice\s*guy\b/i, category: "entitlement" },
+  
+  // Victim blaming / dismissing boundaries  
   { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming" },
   { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries" },
   { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries" },
+  { pattern: /\bled\s*me\s*on\b/i, category: "dismissing boundaries" },
+  { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries" },
+  { pattern: /\bteasing\s*me\b/i, category: "dismissing boundaries" },
+  { pattern: /\bwanting\s*it\b/i, category: "dismissing boundaries" },
+  
+  // Secrecy/manipulation
   { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation" },
   { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation" },
+  { pattern: /\bout\s*of\s*(your|her)\s*league\b/i, category: "manipulation" },
+  
+  // Coercion/pressure
   { pattern: /\bjust\s*let\s*me\b/i, category: "coercion" },
   { pattern: /\bcome\s*on\b/i, category: "pressure" },
+  { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure" },
 ];
 
 // Detect flag words in additional context
