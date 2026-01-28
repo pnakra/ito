@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 import { Card } from "@/components/ui/card";
 import {
   Accordion,
@@ -16,6 +17,7 @@ const About = () => {
       <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-2xl mx-auto space-y-8">
           <div>
+            <BackButton to="/" />
             <h1 className="text-3xl sm:text-4xl font-bold mb-4">About</h1>
             <div className="space-y-4 text-muted-foreground">
               <p>

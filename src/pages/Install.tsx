@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackButton from "@/components/BackButton";
 import { Card } from "@/components/ui/card";
 import { Share, MoreVertical, PlusSquare, Download, Smartphone } from "lucide-react";
 
@@ -10,6 +11,7 @@ const Install = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-xl mx-auto space-y-6">
+          <BackButton to="/" />
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4">
               <Smartphone className="w-8 h-8 text-primary" />
