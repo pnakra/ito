@@ -166,6 +166,7 @@ const CrossedLine = () => {
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
+            <BackButton to="/" />
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">What happened?</h1>
             
             <div className="space-y-4">
@@ -226,6 +227,7 @@ const CrossedLine = () => {
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-4xl">
           <div className="space-y-6 sm:space-y-8">
+            <BackButton to="/" />
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">
               Reflection Steps
             </h1>
