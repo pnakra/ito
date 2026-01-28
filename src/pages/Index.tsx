@@ -11,78 +11,87 @@ const Index = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 py-10 sm:py-16 text-center">
-          <div className="inline-block mb-4 px-4 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-full">
+        <section className="container mx-auto px-4 py-8 sm:py-16 text-center">
+          <div className="inline-block mb-3 sm:mb-4 px-3 sm:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-xs sm:text-sm font-medium rounded-full">
             No accounts · No tracking · Just clarity
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-foreground">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-foreground px-2">
             Know the vibe. Know the line.
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground mb-10 max-w-lg mx-auto">
+          <p className="text-sm sm:text-lg text-muted-foreground mb-8 sm:mb-10 max-w-lg mx-auto px-2">
             A quick check-in when you're not sure what's happening — or what happened.
           </p>
           
           {/* Three Main Tiles */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 max-w-3xl mx-auto px-1 sm:px-0">
             
             {/* Tile 1 - Reality Check */}
             <Link 
               to="/avoid-line"
-              className="group bg-white border-2 border-transparent rounded-2xl p-5 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
-              <div className="bg-primary w-11 h-11 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0">
-                <Eye className="w-5 h-5 text-white" />
+              <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
+              <div className="bg-primary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+                <Eye className="w-5 h-5 text-primary-foreground" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold mb-2 text-foreground text-center sm:text-left">
-                Reality Check
-              </h2>
-              <p className="text-muted-foreground text-sm mb-4 flex-1 text-center sm:text-left">
-                Not sure if something's okay? Think it through first.
-              </p>
-              <div className="flex items-center justify-center sm:justify-start text-primary text-sm font-medium">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+                  Reality Check
+                </h2>
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                  Not sure if something's okay? Think it through first.
+                </p>
+              </div>
+              <div className="hidden sm:flex items-center justify-center text-primary text-sm font-medium">
                 Start <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
+              <ArrowRight className="w-5 h-5 text-primary sm:hidden flex-shrink-0 ml-2" />
             </Link>
 
             {/* Tile 2 - Second Thoughts */}
             <Link 
               to="/crossed-line"
-              className="group bg-white border-2 border-transparent rounded-2xl p-5 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-bl-full" />
-              <div className="bg-secondary w-11 h-11 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0">
-                <MessageCircle className="w-5 h-5 text-white" />
+              <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-bl-full" />
+              <div className="bg-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+                <MessageCircle className="w-5 h-5 text-secondary-foreground" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold mb-2 text-foreground text-center sm:text-left">
-                Second Thoughts
-              </h2>
-              <p className="text-muted-foreground text-sm mb-4 flex-1 text-center sm:text-left">
-                Something already happened? Reflect on it here.
-              </p>
-              <div className="flex items-center justify-center sm:justify-start text-secondary text-sm font-medium">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+                  Second Thoughts
+                </h2>
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                  Something already happened? Reflect on it here.
+                </p>
+              </div>
+              <div className="hidden sm:flex items-center justify-center text-secondary text-sm font-medium">
                 Reflect <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
+              <ArrowRight className="w-5 h-5 text-secondary sm:hidden flex-shrink-0 ml-2" />
             </Link>
 
             {/* Tile 3 - Need to Talk */}
             <Link 
               to="/someone-crossed"
-              className="group bg-white border-2 border-transparent rounded-2xl p-5 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-transparent rounded-bl-full" />
-              <div className="bg-gradient-to-br from-primary to-secondary w-11 h-11 rounded-xl flex items-center justify-center mb-4 mx-auto sm:mx-0">
-                <Heart className="w-5 h-5 text-white" />
+              <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-transparent rounded-bl-full" />
+              <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+                <Heart className="w-5 h-5 text-primary-foreground" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold mb-2 text-foreground text-center sm:text-left">
-                Need to Talk
-              </h2>
-              <p className="text-muted-foreground text-sm mb-4 flex-1 text-center sm:text-left">
-                Something happened to you? Process it at your pace.
-              </p>
-              <div className="flex items-center justify-center sm:justify-start text-primary text-sm font-medium">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+                  Need to Talk
+                </h2>
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                  Something happened to you? Process it at your pace.
+                </p>
+              </div>
+              <div className="hidden sm:flex items-center justify-center text-primary text-sm font-medium">
                 Talk <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
+              <ArrowRight className="w-5 h-5 text-primary sm:hidden flex-shrink-0 ml-2" />
             </Link>
           </div>
         </section>
