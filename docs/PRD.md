@@ -1,6 +1,6 @@
 # Vibecheck — Product Requirements Document (PRD)
 
-**Version:** 3.0  
+**Version:** 4.0  
 **Last Updated:** January 2026  
 **Status:** Early Prototype / Exploratory
 
@@ -20,12 +20,18 @@ To reduce sexual harm by providing accessible, non-judgmental guidance that help
 ### 1.3 Core Operating Principle: Behavioral Interruption
 The product's core operating principle is **behavioral interruption**, not advice-giving. The system is designed to pause risky behavior in the moment and provide reality checks, not to mimic a chatbot or therapist. The Stop Moment is a non-negotiable pattern: it must feel like a brake, not guidance. All UI decisions (buttons over text, enforced pauses over suggestions, system rules over model judgment) reflect this philosophy.
 
+**Key Design Tenets:**
+- Observation before intention
+- Structure before narrative
+- System rules before AI output
+
 ### 1.4 Core Principles
 1. **Anonymity First** — No accounts, no data storage, no tracking
 2. **Non-Judgmental** — Supportive guidance without shame or lectures
 3. **Harm Reduction** — Practical, actionable advice over moralizing
 4. **User Autonomy** — Users define their own experiences; we don't label for them
 5. **Behavioral Interruption** — Create friction before risky behavior, not guidance after
+6. **Non-Permissive Stance** — The system never gives a "green light" or permission
 
 ---
 
@@ -99,17 +105,21 @@ The product's core operating principle is **behavioral interruption**, not advic
 
 ### 3.2 Data Flow
 
-**Prevention Flow (Decision-First):**
-1. User answers 3 guided questions via buttons (Intent, Signals, Context)
-2. User optionally adds free-text context
-3. Dual-layer detection: Static patterns + AI analysis scan free text
-4. Frontend deterministically calculates risk level
-5. If RED/YELLOW: Mandatory "Stop Moment" displayed
-6. User acknowledges → Edge function called with pre-computed risk
-7. AI explains (does not assess) the risk level, directly addressing any flagged language
-8. Post-explanation choice: "I'm done" or "I want to talk more"
-9. Optional follow-up chat if user chooses to continue
-10. Outcome check: User self-reports what they did
+**Prevention Flow (Decision-First, Observation-Centered):**
+1. User selects orientation (where they are in the situation)
+2. User describes observed consent signals (what the other person is doing/saying)
+3. User selects context factors that might affect consent clarity
+4. User selects momentum direction (where things are heading)
+5. User optionally adds free-text context
+6. Dual-layer detection: Static patterns + AI analysis scan free text
+7. Frontend deterministically calculates risk level
+8. If RED/YELLOW: Mandatory "Stop Moment" displayed
+9. User acknowledges → Edge function called with pre-computed risk
+10. AI explains (does not assess) the risk level, directly addressing any flagged language
+11. Post-explanation choice: "I'm done" or "I want to talk more"
+12. Optional follow-up chat if user chooses to continue
+13. Outcome check: User self-reports what they did
+14. One-line reflective feedback (no storage)
 
 **Accountability & Survivor Flows:**
 1. User inputs scenario/message in frontend
@@ -123,6 +133,7 @@ The product's core operating principle is **behavioral interruption**, not advic
 - **No authentication** — Fully anonymous access
 - **No analytics tracking** — No user behavior logging
 - **Stateless conversations** — Context maintained only in-session via frontend state
+- **Session-only tracking** — Pattern awareness via sessionStorage (cleared on tab close)
 - **Outcome check** — Self-reported, local-only, no storage
 
 ---
@@ -137,25 +148,25 @@ The product's core operating principle is **behavioral interruption**, not advic
 ### Purpose
 Interrupt risky behavior in the moment. Help users recognize consent signals and make better decisions BEFORE acting.
 
-### Interaction Model (v3.0 — Decision-First with Dual-Layer Detection)
-**Guided decision sequence → Stop Moment → AI Explanation → Post-Explanation Choice → Optional Follow-up → Outcome Check**
+### Interaction Model (v4.0 — Observation-First with Behavioral Interruption)
+**Orientation → Observed Consent Signals → Context Factors → Momentum Check → Free Text → Stop Moment → AI Explanation → Post-Explanation Choice → Optional Follow-up → Outcome Check → Reflective Feedback**
 
 This is NOT a chatbot. It is a consent risk assessment and behavioral interruption tool.
 
 ### Target Persona
 Primarily teenage boys (14-18) navigating dating/hookup situations for the first time.
 
-### User Journey
+### User Journey (v4.0)
 
 ```
-┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
-│  Step 1:       │     │  Step 2:       │     │  Step 3:       │     │  Step 4:       │
-│  INTENT CHECK  │ ──► │  CONSENT       │ ──► │  CONTEXT       │ ──► │  FREE TEXT     │
-│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │     │  (optional)    │
-│                │     │  (buttons)     │     │  (multi-select)│     │                │
-└────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘
-                                                                            │
-                                                                            ▼
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│  Step 0:       │     │  Step 1:       │     │  Step 2:       │     │  Step 3:       │     │  Step 4:       │
+│  ORIENTATION   │ ──► │  CONSENT       │ ──► │  CONTEXT       │ ──► │  MOMENTUM      │ ──► │  FREE TEXT     │
+│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │     │  CHECK         │     │  (optional)    │
+│                │     │  (buttons)     │     │  (multi-select)│     │  (buttons)     │     │                │
+└────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘
+                                                                                                   │
+                                                                                                   ▼
                               ┌───────────────────────────────────────────────────────┐
                               │              DUAL-LAYER DETECTION                      │
                               │  1. Static patterns (instant)                          │
@@ -170,11 +181,11 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
                                                       │
                     ┌───────────────────────┬─────────┴─────────────┐
                     ▼                       ▼                       ▼
-              ┌──────────┐           ┌──────────┐            ┌──────────┐
-              │   RED    │           │  YELLOW  │            │  GREEN   │
-              │   STOP   │           │  PAUSE   │            │   ───►   │
-              │  MOMENT  │           │  MOMENT  │            │ Explain  │
-              └────┬─────┘           └────┬─────┘            └──────────┘
+              ┌──────────┐           ┌──────────┐            ┌──────────────────┐
+              │   RED    │           │  YELLOW  │            │  "No hard stop"  │
+              │   STOP   │           │  PAUSE   │            │  (internal GREEN)│
+              │  MOMENT  │           │  MOMENT  │            │   ───► Explain   │
+              └────┬─────┘           └────┬─────┘            └──────────────────┘
                    │                      │
                    └──────────┬───────────┘
                               ▼
@@ -200,40 +211,47 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
         ┌─────────────┐          ┌─────────────────┐
         │ OUTCOME     │          │ FOLLOW-UP CHAT  │
         │ CHECK       │          │ (multi-turn)    │
-        └─────────────┘          └────────┬────────┘
-                                          │
-                                          ▼
-                                  ┌─────────────────┐
-                                  │  OUTCOME CHECK  │
-                                  └─────────────────┘
+        └──────┬──────┘          └────────┬────────┘
+               │                          │
+               ▼                          ▼
+        ┌─────────────┐          ┌─────────────────┐
+        │ REFLECTIVE  │          │  OUTCOME CHECK  │
+        │ FEEDBACK    │          └────────┬────────┘
+        └─────────────┘                   ▼
+                                 ┌─────────────────┐
+                                 │ REFLECTIVE      │
+                                 │ FEEDBACK        │
+                                 └─────────────────┘
 ```
 
-### Decision Step Options
+### Decision Step Options (v4.0)
 
-**Step 1: Intent Check**
-> "What are you thinking about doing next?"
-
-| ID | Label | Risk Weight |
-|----|-------|-------------|
-| `go-to-their-place` | Go to their place | Physical intent |
-| `invite-to-mine` | Invite them to mine | Physical intent |
-| `keep-texting` | Keep texting / messaging | Non-physical |
-| `physical-move` | Make a physical move | Physical intent |
-| `not-sure` | I'm not sure yet | Non-physical |
-
-**Step 2: Consent Signal Check**
-> "What signals have you gotten from them?"
+**Step 0: Orientation (NEW)**
+> "Where are you in this situation right now?"
 
 | ID | Label | Description |
 |----|-------|-------------|
-| `clear-yes` | Clear yes in words | They explicitly said yes |
-| `enthusiastic-actions` | Enthusiastic actions | Initiating, leaning in, reciprocating |
-| `mixed-signals` | Mixed / unclear signals | Sometimes interested, sometimes pulling back |
-| `no-response` | No response | They haven't replied or acknowledged |
-| `said-no` | They said no or pulled away | Verbal refusal or physical withdrawal |
+| `texting` | We're texting or messaging | Remote/async context |
+| `in-person` | We're together in person | Physical proximity |
+| `party-group` | We're at a party or group setting | Social context with others |
+| `already-happened` | Something already happened and I'm unsure | Post-event reflection |
+| `not-sure` | I'm not sure how to describe it | Unclear context |
 
-**Step 3: Context Risk Factors**
-> "Anything here that might complicate consent?" (Multi-select)
+**Step 1: Observed Consent Signals (RENAMED - was Step 2)**
+> "What have they been doing or saying?"
+
+This step prioritizes OBSERVATION of the other person's behavior before asking about the user's intentions.
+
+| ID | Label | Description |
+|----|-------|-------------|
+| `clear-yes` | Clearly saying yes or expressing interest in words | Explicit verbal consent |
+| `enthusiastic-actions` | Actively initiating or reciprocating | Non-verbal but active consent |
+| `mixed-signals` | Mixed or hard to read | Ambiguous signals |
+| `no-response` | Quiet or not responding | Absence of response |
+| `said-no` | Said no or pulled away | Clear refusal |
+
+**Step 2: Context Risk Factors (RENAMED - was Step 3)**
+> "Anything here that might affect how clear consent is?" (Multi-select)
 
 | ID | Label |
 |----|-------|
@@ -242,6 +260,18 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 | `age-imbalance` | Age or power imbalance |
 | `emotional-pressure` | Emotional pressure |
 | `none` | None of these |
+
+**Step 3: Momentum Check (NEW - replaces Intent)**
+> "What direction does this feel like it's heading?"
+
+This replaces the intent-first question to reduce moral hazard. The user describes momentum, not plans.
+
+| ID | Label | Risk Mapping |
+|----|-------|--------------|
+| `toward-physical` | Toward something physical | Maps to physical intent risk weights |
+| `staying-flirty` | Staying flirty or emotional | Non-physical |
+| `slow-down` | I want to slow things down | Non-physical |
+| `dont-know` | I don't know | Non-physical |
 
 **Step 4: Additional Context (Optional)**
 > "Anything else you want to add?"
@@ -287,22 +317,45 @@ Located in: `src/lib/riskClassification.ts`
 
 | Condition | Result |
 |-----------|--------|
-| `said-no` (any intent) | 🔴 RED |
-| Flag words + physical intent | 🔴 RED |
-| `no-response` + physical intent | 🔴 RED |
-| `mixed-signals` + physical intent | 🔴 RED |
+| `said-no` (any momentum) | 🔴 RED |
+| Flag words + physical momentum | 🔴 RED |
+| `no-response` + physical momentum | 🔴 RED |
+| `mixed-signals` + physical momentum | 🔴 RED |
 | Flag words + mixed signals | 🔴 RED |
-| `alcohol` + physical intent | 🔴 RED |
+| `alcohol` + physical momentum | 🔴 RED |
 | 2+ context factors | 🔴 RED |
-| `no-response` + other intent | 🟡 YELLOW |
-| `mixed-signals` + other intent | 🟡 YELLOW |
-| 1 context factor + physical intent | 🟡 YELLOW |
+| `no-response` + other momentum | 🟡 YELLOW |
+| `mixed-signals` + other momentum | 🟡 YELLOW |
+| 1 context factor + physical momentum | 🟡 YELLOW |
 | Clear positive + 1 factor | 🟡 YELLOW |
 | Flag words alone | 🟡 YELLOW |
 | Default uncertainty | 🟡 YELLOW |
-| Clear positive signals + no factors | 🟢 GREEN |
+| Clear positive signals + no factors | 🟢 GREEN (internal only) |
 
-*Physical intent = `go-to-their-place`, `invite-to-mine`, or `physical-move`*
+*Physical momentum = `toward-physical`*
+
+### GREEN State Semantics (v4.0 — Non-Permissive)
+
+**CRITICAL: GREEN is an internal classification state, NOT a user-facing approval.**
+
+When risk is internally classified as GREEN:
+- Do NOT display the word "GREEN" or any green color
+- Display neutral header: "No hard stop detected right now"
+- Use neutral colors (gray/muted)
+- Explanation is SHORTER than YELLOW/RED
+- No expanded "what to do instead" lists
+- No reassurance or validation of intent
+
+**Required copy elements for GREEN:**
+- "Consent is ongoing and reversible"
+- "This is not approval or permission"
+- "If they hesitate, go quiet, or pull back at any point, that's your cue to stop"
+
+**Forbidden language:**
+- "You're good"
+- "Safe to proceed"
+- "Okay to proceed"
+- Any language that could be interpreted as permission
 
 ### Stop Moment Component
 
@@ -324,6 +377,48 @@ For RED and YELLOW risk levels, a full-screen modal appears:
 - Button: "I understand" (required to proceed)
 - Footer: "Clear communication protects both of you."
 
+### Session-Level Pattern Awareness (v4.0)
+
+Located in: `src/hooks/useSessionRiskTracking.ts`
+
+**Tracked within sessionStorage (browser session only):**
+- Number of completed `/avoid-line` runs
+- Count of YELLOW or RED outcomes
+- Count of runs with detected coercive/flagged language
+
+**Pattern Warning Display:**
+If ≥2 YELLOW or RED outcomes in a session, display neutral observation at welcome screen:
+> "You've run into a few situations like this. That's often a sign it's time to slow things way down."
+
+This is informational, not corrective. No persistence across sessions.
+
+### Refusal State (v4.0)
+
+**Trigger conditions (ALL must be true):**
+1. Repeated coercive/dehumanizing language detected (coercivePatternCount ≥ 1)
+2. User continues seeking reassurance or ways to continue
+3. Risk level is RED
+
+**Refusal behavior:**
+- Display RefusalCard component
+- Header: "I can't help with continuing this."
+- Copy: "The situation you described involves clear boundaries that need to be respected. The safest move is to stop."
+- No further guidance provided
+- Only option: Start over
+
+### Soft Handoff to /crossed-line (v4.0)
+
+**Trigger conditions (ANY):**
+- Orientation = "already-happened"
+- ≥2 YELLOW or RED outcomes in session
+
+**Display after explanation:**
+- Title: "If something already happened"
+- Copy: "If you're realizing this may have crossed a line already, there's another path focused on reflection and accountability."
+- Button: "Reflect on what happened"
+
+Never force navigation.
+
 ### Post-Explanation Choice
 
 After AI explanation, users see a binary choice:
@@ -343,6 +438,32 @@ Only accessible if user explicitly chooses "I want to talk more."
 - Same "older brother" tone as initial explanation
 - User can exit to Outcome Check at any time
 
+### Outcome Check
+
+After the flow concludes:
+> "What did you end up doing?"
+
+| ID | Label | Icon |
+|----|-------|------|
+| `stopped` | I stopped | ✓ (green) |
+| `checked-in` | I checked in verbally | 💬 (green) |
+| `didnt-proceed` | I didn't go through with it | ✗ (neutral) |
+| `not-sure` | I'm not sure / I ignored this | ? (muted) |
+
+**Privacy:** No data is stored. Purely for user self-reflection.
+
+### Outcome Feedback (v4.0)
+
+After outcome selection, display one-line reflective feedback:
+
+| Outcome | Feedback |
+|---------|----------|
+| `stopped` or `checked-in` | "Clear pauses and verbal check-ins are what actually prevent harm." |
+| `didnt-proceed` | "Choosing not to proceed is always a valid way to keep things safe." |
+| `not-sure` | "If a situation feels confusing, earlier pauses usually make things clearer." |
+
+No storage. Flow resets after display.
+
 ### Edge Functions
 
 **`analyze-vibecheck`** — Main explanation AI
@@ -353,7 +474,7 @@ Accepts pre-computed risk level and user selections. Explains why the risk level
 
 Analyzes free text for nuanced problematic patterns. Returns categories and explanation for AI to address.
 
-### AI System Prompt (Explanation Mode)
+### AI System Prompt (Explanation Mode — RED/YELLOW)
 
 ```
 You are vibecheck - you help teenage boys (14-18) understand consent.
@@ -390,11 +511,37 @@ CRITICAL RULES:
 - Keep it brief and actionable
 ```
 
+### AI System Prompt (Explanation Mode — GREEN/Neutral)
+
+```
+You are vibecheck - you help teenage boys (14-18) understand consent.
+
+IMPORTANT: The system has determined there are no immediate red flags, 
+but this is NOT approval or permission to proceed.
+
+TONE:
+- Brief and neutral. Not celebratory.
+- No reassurance that they're "good to go"
+
+YOUR ROLE:
+1. Acknowledge that no hard stop was detected
+2. Briefly summarize what's happening
+3. Remind that consent is ongoing and reversible
+4. Do NOT provide extensive guidance or encouragement
+
+CRITICAL RULES:
+- NEVER imply permission or approval
+- NEVER say "you're good" or "safe to proceed"
+- Keep response SHORT - shorter than red/yellow explanations
+- Always include reminder that consent can be withdrawn
+- Return empty arrays for whatNotToDo and whatToDoInstead
+```
+
 ### Request Format
 
 ```json
 {
-  "scenario": "What they're thinking about doing: Going to their place\nSignals from the other person: No response\nComplicating factors: Alcohol or drugs are involved\n\nAdditional context from the user:\n\"...\"\n\nFLAGGED: entitlement, dismissing boundaries",
+  "scenario": "Orientation: We're together in person\nSignals from the other person: Mixed or hard to read\nContext factors: Alcohol or drugs involved\nMomentum: Toward something physical\n\nAdditional context from the user:\n\"...\"\n\nFLAGGED: entitlement, dismissing boundaries",
   "precomputedRiskLevel": "red"
 }
 ```
@@ -411,21 +558,7 @@ CRITICAL RULES:
 }
 ```
 
-### Outcome Check
-
-After the flow concludes:
-> "What did you end up doing?"
-
-| ID | Label | Icon |
-|----|-------|------|
-| `stopped` | I stopped | ✓ (green) |
-| `checked-in` | I checked in verbally | 💬 (green) |
-| `didnt-proceed` | I didn't go through with it | ✗ (neutral) |
-| `not-sure` | I'm not sure / I ignored this | ? (muted) |
-
-**Privacy:** No data is stored. Purely for user self-reflection. Flow resets after selection.
-
-### UI Components (v3.0)
+### UI Components (v4.0)
 
 | Component | Path | Purpose |
 |-----------|------|---------|
@@ -433,10 +566,15 @@ After the flow concludes:
 | `DecisionStep` | `src/components/prevention/DecisionStep.tsx` | Reusable button-based step |
 | `ContextInput` | `src/components/prevention/ContextInput.tsx` | Optional free text input |
 | `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
-| `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display |
+| `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display (RED/YELLOW) |
+| `NeutralExplanationCard` | `src/components/prevention/NeutralExplanationCard.tsx` | Neutral response display (GREEN) |
 | `PostExplanationChoice` | `src/components/prevention/PostExplanationChoice.tsx` | Done/Talk more binary choice |
 | `FollowUpChat` | `src/components/prevention/FollowUpChat.tsx` | Multi-turn follow-up |
 | `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
+| `OutcomeFeedback` | `src/components/prevention/OutcomeFeedback.tsx` | One-line reflective feedback |
+| `SessionPatternWarning` | `src/components/prevention/SessionPatternWarning.tsx` | Pattern awareness display |
+| `RefusalCard` | `src/components/prevention/RefusalCard.tsx` | Adversarial use refusal |
+| `CrossedLineHandoff` | `src/components/prevention/CrossedLineHandoff.tsx` | Soft redirect to accountability flow |
 
 ---
 
@@ -702,6 +840,7 @@ All prompts must include these restrictions:
 - ❌ No pressure to report or take specific actions (survivor flow)
 - ❌ No blaming victims
 - ❌ No suggesting manipulation tactics
+- ❌ No permission or approval language (prevention flow)
 
 ### 5.4 Softening Language
 
@@ -716,7 +855,8 @@ For accountability and survivor flows, always use epistemic softening:
 
 | Flow | Format | Rationale |
 |------|--------|-----------|
-| Prevention | JSON with arrays | Scannable bullet points for quick reading |
+| Prevention (RED/YELLOW) | JSON with arrays | Scannable bullet points for quick reading |
+| Prevention (GREEN) | JSON with minimal content | Reduced surface area for self-justification |
 | Accountability (initial) | JSON with long-form strings | Thoughtful paragraphs for reflection |
 | Accountability (follow-up) | Plain text | Conversational flow |
 | Survivor (initial) | JSON with structured sections | Organized support without overwhelming |
@@ -808,10 +948,11 @@ These resources should be accessible from all flows:
 | **Survivor-led repair** | Accountability process guided by the person who was harmed |
 | **Red flag** | Clear indicator of absent or withdrawn consent |
 | **Yellow flag** | Ambiguous situation requiring clarification |
-| **Green flag** | Clear indicators of enthusiastic consent |
+| **Green flag** | Internal classification only — NOT displayed as approval |
 | **Flag words** | Problematic language patterns indicating concerning attitudes |
 | **Behavioral interruption** | Deliberate friction to pause risky behavior before it happens |
 | **Stop Moment** | Full-screen acknowledgment requirement for RED/YELLOW risk |
+| **Refusal state** | System refusal to continue helping when adversarial use is detected |
 
 ---
 
@@ -836,9 +977,16 @@ vibecheck/
 │   │       ├── ContextInput.tsx
 │   │       ├── StopMoment.tsx
 │   │       ├── ExplanationCard.tsx
+│   │       ├── NeutralExplanationCard.tsx
 │   │       ├── PostExplanationChoice.tsx
 │   │       ├── FollowUpChat.tsx
-│   │       └── OutcomeCheck.tsx
+│   │       ├── OutcomeCheck.tsx
+│   │       ├── OutcomeFeedback.tsx
+│   │       ├── SessionPatternWarning.tsx
+│   │       ├── RefusalCard.tsx
+│   │       └── CrossedLineHandoff.tsx
+│   ├── hooks/
+│   │   └── useSessionRiskTracking.ts
 │   └── lib/
 │       ├── riskClassification.ts   # Deterministic rules + static flags
 │       └── aiLanguageAnalysis.ts   # AI detection integration
@@ -851,8 +999,37 @@ vibecheck/
 │       └── analyze-someone-crossed/index.ts
 └── docs/
     ├── PRD.md                      # This document
-    └── AVOID_LINE_USER_JOURNEY.md  # Detailed flow walkthrough
+    ├── AVOID_LINE_USER_JOURNEY.md  # Detailed flow walkthrough
+    └── ONE_PAGER.md                # Shareable overview
 ```
+
+---
+
+## 11. Changelog
+
+### v4.0 (January 2026)
+- **Observation-First Flow**: Reordered steps to prioritize observed consent signals before momentum/intent
+- **Orientation Step**: Added Step 0 to orient user in time/context before structured questions
+- **Momentum Check**: Replaced "intent" question with "momentum" framing to reduce moral hazard
+- **Non-Permissive GREEN**: GREEN is now internal-only; displays as "No hard stop detected" with neutral styling
+- **Session Pattern Awareness**: Added local-only tracking of repeated risk patterns within browser session
+- **Refusal State**: System now refuses to continue when adversarial use patterns are detected
+- **Outcome Feedback**: One-line reflective feedback after outcome selection (no storage)
+- **Soft Handoff**: Optional redirect to accountability flow when appropriate
+- **Updated Components**: Added NeutralExplanationCard, OutcomeFeedback, SessionPatternWarning, RefusalCard, CrossedLineHandoff
+
+### v3.0 (January 2026)
+- Dual-layer flag detection (static + AI)
+- Post-explanation choice gating follow-up chat
+- Outcome check for self-reflection
+
+### v2.0 (December 2025)
+- Decision-first architecture replacing free-text-first
+- Deterministic risk classification
+- Stop Moment component
+
+### v1.0 (November 2025)
+- Initial prototype with chat-based flows
 
 ---
 
