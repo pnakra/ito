@@ -125,30 +125,28 @@ const CrossedLine = () => {
 
   if (screen === "intro") {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/5">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
-          <div className="space-y-6 sm:space-y-8">
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center">
+        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
+          <div className="space-y-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center">
               Let's figure out what happened — calmly.
             </h1>
 
-            <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center">
-              This tool does not provide legal advice or mental health treatment. It's a reflective guide — not a substitute for speaking with a professional.
-            </div>
-            
-            <div className="prose prose-lg max-w-none text-foreground space-y-4">
-              <p className="text-base sm:text-xl text-center text-muted-foreground px-2">
-                Sometimes you realize afterward that a moment felt off — or you worry you crossed a boundary. 
-                You're not alone. This space helps you slow down, reflect, and understand next steps without judgment.
-              </p>
+            <p className="text-center text-muted-foreground">
+              Sometimes you realize afterward that a moment felt off — or you worry you crossed a boundary. 
+              This space helps you slow down and reflect.
+            </p>
+
+            <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 text-sm text-muted-foreground">
+              <strong className="text-foreground">Note:</strong> This is a reflective guide — not legal advice or therapy.
             </div>
 
-            <div className="flex justify-center pt-6 sm:pt-8">
+            <div className="flex justify-center pt-4">
               <Button 
                 onClick={() => setScreen("input")} 
                 size="lg" 
-                className="px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg rounded-full w-full sm:w-auto"
+                className="px-8 py-5 text-base rounded-full"
               >
                 Start reflecting
               </Button>
@@ -162,9 +160,9 @@ const CrossedLine = () => {
 
   if (screen === "input") {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/5">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-3xl">
+        <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">What happened?</h1>
             

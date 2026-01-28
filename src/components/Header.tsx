@@ -17,13 +17,13 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="border-b border-border bg-card shadow-sm">
-      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border/50 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link 
           to="/" 
-          className="text-xl sm:text-2xl font-bold text-primary hover:opacity-80 transition-opacity"
+          className="text-xl font-bold text-primary hover:opacity-80 transition-opacity"
         >
-          vibecheck
+          vibe check
         </Link>
         
         {/* Desktop Navigation */}
@@ -32,9 +32,9 @@ const Header = () => {
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
                 isActive(link.to)
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
@@ -57,13 +57,13 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border bg-card">
+        <div className="md:hidden border-t border-border/50 bg-white">
           <div className="container mx-auto px-4 py-2 flex flex-col">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`py-3 px-3 rounded-lg font-medium transition-colors ${
+                className={`py-3 px-4 rounded-xl font-medium transition-colors ${
                   isActive(link.to)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"

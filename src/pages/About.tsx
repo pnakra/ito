@@ -10,89 +10,86 @@ import {
 
 const About = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto space-y-12">
+      <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
+        <div className="max-w-2xl mx-auto space-y-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">About Vibecheck</h1>
-            <div className="space-y-4 text-lg text-muted-foreground">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">About</h1>
+            <div className="space-y-4 text-muted-foreground">
               <p>
-                vibecheck is an exploratory harm-reduction tool designed to help young people understand consent, boundaries, and accountability. It is not legal advice, therapy, or a substitute for professional help. All content is anonymous and designed for early prototyping.
+                <strong className="text-foreground">vibe check</strong> is a harm-reduction tool designed to help young people think through consent, boundaries, and accountability. It's not legal advice, therapy, or a substitute for professional help.
               </p>
               <p>
-                The internet is full of terrible advice that teaches young people to be manipulative, disrespectful, or straight-up creepy. We're here to cut through that noise with real talk about what actually makes healthy relationships work and what causes harm.
+                The internet is full of terrible advice. We're here to cut through that with real talk about what actually makes healthy relationships work.
               </p>
               <p>
-                Our goal is simple: help you understand healthy boundaries, recognize when you're crossing lines, and learn what genuine consent and respect look like. We're not here to judge—we're here to give you honest, supportive guidance.
+                Our goal: help you understand boundaries, recognize when lines might be crossed, and learn what respect looks like. No judgment — just honest, supportive guidance.
               </p>
             </div>
           </div>
 
-          <Card className="p-6 bg-card border-border rounded-2xl">
-            <h2 className="text-2xl font-bold mb-4">Privacy</h2>
-            <div className="space-y-3 text-muted-foreground">
+          <Card className="p-5 sm:p-6 bg-white border-border/50 rounded-2xl">
+            <h2 className="text-xl font-bold mb-4">Privacy</h2>
+            <div className="space-y-3 text-muted-foreground text-sm">
               <p>
-                <strong className="text-foreground">No login required.</strong> You don't need to create an account or provide any personal information.
+                <strong className="text-foreground">No login required.</strong> No account, no personal info needed.
               </p>
               <p>
-                <strong className="text-foreground">No identifying information stored.</strong> We don't track who you are, where you're from, or any details that could identify you.
+                <strong className="text-foreground">No tracking.</strong> We don't know who you are, where you're from, or anything about you.
               </p>
               <p>
-                <strong className="text-foreground">Anonymous usage.</strong> Every vibecheck is completely anonymous. Your scenarios aren't linked to you in any way.
-              </p>
-              <p>
-                <strong className="text-foreground">What we collect.</strong> We only store anonymized scenarios to improve our feedback system. No names, no locations, no identifying details—just the situations you describe.
+                <strong className="text-foreground">Completely anonymous.</strong> Close the tab and it's gone.
               </p>
             </div>
           </Card>
 
           <div>
-            <h2 className="text-3xl font-bold mb-6">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mb-4">FAQs</h2>
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger className="text-left">
+              <AccordionItem value="item-1" className="border-border/50">
+                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
                   Is this really anonymous?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  Yes, completely. We don't ask for any personal information, we don't track IP addresses in a way that identifies you, and we don't require you to log in. Your scenarios are stored anonymously to help improve our system, but there's no way to connect them back to you.
+                <AccordionContent className="text-muted-foreground text-sm">
+                  Yes. No personal info, no IP tracking, no login. There's no way to connect anything back to you.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-2">
-                <AccordionTrigger className="text-left">
+              <AccordionItem value="item-2" className="border-border/50">
+                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
                   Will anyone know I used this?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  No. There's no account, no history, no record that connects to you personally. Unless you tell someone you used vibecheck, nobody will know.
+                <AccordionContent className="text-muted-foreground text-sm">
+                  No. Unless you tell someone, nobody will know.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-3">
-                <AccordionTrigger className="text-left">
-                  What if I already messed up?
+              <AccordionItem value="item-3" className="border-border/50">
+                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                  What if something already happened?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  Then this is even more important. Submit what happened and get feedback on how to handle it moving forward. If you're worried you've seriously crossed a line, the resources page has crisis support numbers where you can talk to someone trained to help.
+                <AccordionContent className="text-muted-foreground text-sm">
+                  Use "Second Thoughts" to reflect on it. If you're worried you seriously crossed a line, the resources page has support options.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-left">
-                  Can I use this for my friend?
+              <AccordionItem value="item-4" className="border-border/50">
+                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                  Can I use this for a friend?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  Absolutely. If your friend is doing something concerning and won't listen to you, get a vibecheck on their situation and show it to them. Sometimes seeing it written out by someone else makes it click.
+                <AccordionContent className="text-muted-foreground text-sm">
+                  Yes. Sometimes seeing something written out by someone else makes it click.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-5">
-                <AccordionTrigger className="text-left">
+              <AccordionItem value="item-5" className="border-border/50">
+                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
                   Is this going to lecture me?
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
-                  No. We're not here to preach at you or make you feel bad. We're here to give you real talk about what works and what doesn't. We frame things in terms of what's in your best interest—because being respectful and having boundaries is actually better for you, not just "the right thing to do."
+                <AccordionContent className="text-muted-foreground text-sm">
+                  No. We're not here to preach. Just real talk about what works and what doesn't.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
