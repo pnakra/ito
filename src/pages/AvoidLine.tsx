@@ -7,10 +7,15 @@ import DecisionStep, { type StepOption } from "@/components/prevention/DecisionS
 import ContextInput from "@/components/prevention/ContextInput";
 import StopMoment from "@/components/prevention/StopMoment";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
+import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import ExplanationCard from "@/components/prevention/ExplanationCard";
+import NeutralExplanationCard from "@/components/prevention/NeutralExplanationCard";
 import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
 import FollowUpChat from "@/components/prevention/FollowUpChat";
+import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
+import RefusalCard from "@/components/prevention/RefusalCard";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
+import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, RotateCcw, Shield } from "lucide-react";
 import type { RiskLevel } from "@/data/scenarios";
@@ -25,7 +30,9 @@ type FlowPhase =
   | "explanation"
   | "post-explanation-choice"
   | "follow-up-chat"
-  | "outcome";
+  | "outcome"
+  | "outcome-feedback"
+  | "refusal";
 
 interface AnalysisData {
   riskLevel: RiskLevel;
@@ -72,6 +79,14 @@ const AvoidLine = () => {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<string[]>([]);
+  const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
+
+  const { 
+    shouldShowPatternWarning, 
+    shouldRefuse, 
+    recordRun,
+    coercivePatternCount 
+  } = useSessionRiskTracking();
 
   const handleIntentSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, intent: id }));
@@ -114,6 +129,20 @@ const AvoidLine = () => {
     // Calculate risk and proceed
     const result = classifyRisk(decisions);
     setRiskResult(result);
+    
+    const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
+    
+    // Check for refusal condition: repeated coercive language + RED + seeking reassurance
+    // We check coercivePatternCount from previous runs + current flagged words
+    if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
+      // This is their 2nd+ time with coercive language at RED - refuse
+      recordRun(result.level, hasFlaggedWords);
+      setPhase("refusal");
+      return;
+    }
+    
+    // Record this run for session tracking
+    recordRun(result.level, hasFlaggedWords);
     
     if (result.level === "red" || result.level === "yellow") {
       setPhase("stop-moment");
@@ -230,11 +259,13 @@ const AvoidLine = () => {
     setAnalysis(null);
     setIsLoading(false);
     setConversationHistory([]);
+    setSelectedOutcome(null);
   };
 
   const handleOutcomeSelect = (outcome: string) => {
     console.log("Outcome selected (not stored):", outcome);
-    resetFlow();
+    setSelectedOutcome(outcome);
+    setPhase("outcome-feedback");
   };
 
   const canProceed = useCallback(() => {
@@ -244,12 +275,20 @@ const AvoidLine = () => {
     return false;
   }, [phase, decisions]);
 
+  // Determine which explanation card to show based on risk level
+  const isNeutralRisk = riskResult?.level === "green";
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
+          {/* Session Pattern Warning */}
+          {shouldShowPatternWarning && phase === "welcome" && (
+            <SessionPatternWarning />
+          )}
+
           {/* Welcome */}
           {phase === "welcome" && (
             <Card className="p-8 text-center animate-in fade-in duration-300">
@@ -336,9 +375,18 @@ const AvoidLine = () => {
             />
           )}
 
-          {/* Explanation Card */}
+          {/* Refusal Card */}
+          {phase === "refusal" && (
+            <RefusalCard onReset={resetFlow} />
+          )}
+
+          {/* Explanation Card - use neutral card for green, full card for yellow/red */}
           {phase === "explanation" && (
-            <ExplanationCard analysis={analysis} isLoading={isLoading} />
+            isNeutralRisk ? (
+              <NeutralExplanationCard analysis={analysis} isLoading={isLoading} />
+            ) : (
+              <ExplanationCard analysis={analysis} isLoading={isLoading} />
+            )
           )}
 
           {/* Post-Explanation Choice */}
@@ -374,6 +422,11 @@ const AvoidLine = () => {
                 </Button>
               </div>
             </>
+          )}
+
+          {/* Outcome Feedback */}
+          {phase === "outcome-feedback" && selectedOutcome && (
+            <OutcomeFeedback outcomeId={selectedOutcome} onReset={resetFlow} />
           )}
         </div>
       </main>

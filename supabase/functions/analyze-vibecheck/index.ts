@@ -48,7 +48,38 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "realTalk": "One sentence self-interest angle"
 }`;
 
-// New prompt for decision-first flow where risk is pre-computed
+// Prompt for GREEN risk level - minimal, non-permissive
+const SYSTEM_PROMPT_GREEN = `You are vibecheck - you help teenage boys (ages 14-18) understand consent in dating situations.
+
+CRITICAL: This is a GREEN classification, meaning no hard stops were detected. However, you must NEVER frame this as approval or permission.
+
+TONE:
+- Brief and neutral - the shortest of all responses
+- No reassurance, no validation of intent
+- Direct, not preachy
+
+YOUR ROLE:
+1. Briefly acknowledge the situation seems okay for now
+2. Emphasize consent is ongoing and can change at any moment
+3. Do NOT provide extensive guidance - keep it minimal
+
+CRITICAL RULES:
+- NEVER say "you're good", "safe to proceed", "okay to continue", or any approval language
+- NEVER validate their intent or reassure them
+- Keep "whatNotToDo" and "whatToDoInstead" EMPTY arrays - green gets minimal guidance
+- The "realTalk" should remind them consent is ongoing, not validate their situation
+- Be brief - GREEN responses should be noticeably shorter than YELLOW/RED
+
+RESPOND IN THIS EXACT JSON FORMAT:
+{
+  "assessment": "1-2 sentences. State there are no obvious red flags right now, but consent is ongoing.",
+  "whatsHappening": ["1-2 brief neutral observations max"],
+  "whatNotToDo": [],
+  "whatToDoInstead": [],
+  "realTalk": "Brief reminder about checking in, not validation"
+}`;
+
+// Prompt for YELLOW/RED risk levels - full explanation
 const SYSTEM_PROMPT_EXPLANATION = `You are vibecheck - you help teenage boys (ages 14-18) understand consent in dating situations.
 
 IMPORTANT: The risk level has ALREADY been determined by the system. Do NOT override or reassess it.
@@ -94,7 +125,6 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "whatToDoInstead": ["action 1", "action 2", "action 3"],
   "realTalk": "One sentence self-interest angle - why this matters for HIM"
 }`;
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -116,9 +146,17 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Use explanation prompt if risk level is pre-computed, otherwise legacy
+    // Use appropriate prompt based on flow type and risk level
     const isDecisionFirstFlow = !!precomputedRiskLevel;
-    const systemPrompt = isDecisionFirstFlow ? SYSTEM_PROMPT_EXPLANATION : SYSTEM_PROMPT_LEGACY;
+    let systemPrompt: string;
+    
+    if (!isDecisionFirstFlow) {
+      systemPrompt = SYSTEM_PROMPT_LEGACY;
+    } else if (precomputedRiskLevel === "green") {
+      systemPrompt = SYSTEM_PROMPT_GREEN;
+    } else {
+      systemPrompt = SYSTEM_PROMPT_EXPLANATION;
+    }
     
     // Build user message based on flow type
     let userMessage: string;
