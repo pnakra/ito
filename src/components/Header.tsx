@@ -8,9 +8,9 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/avoid-line", label: "Check In" },
+    { to: "/avoid-line", label: "Reality Check" },
     { to: "/crossed-line", label: "Second Thoughts" },
-    { to: "/someone-crossed", label: "Something Happened to Me" },
+    { to: "/someone-crossed", label: "Need to Talk" },
     { to: "/resources", label: "Resources" },
   ];
 
