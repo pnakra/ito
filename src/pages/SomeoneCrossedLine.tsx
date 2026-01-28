@@ -184,6 +184,11 @@ const SomeoneCrossedLine = () => {
       
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col">
         <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
+          {/* Persistent back button */}
+          <div className="mb-4">
+            <BackButton to="/" />
+          </div>
+          
           {/* Welcome message when no messages yet */}
           {messages.length === 0 && (
             <div className="flex-1 flex items-center justify-center">

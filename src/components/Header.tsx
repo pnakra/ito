@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -11,7 +11,13 @@ const Header = () => {
     { to: "/avoid-line", label: "Reality Check" },
     { to: "/crossed-line", label: "Second Thoughts" },
     { to: "/someone-crossed", label: "Need to Talk" },
+    { to: "/scenarios", label: "Scenarios" },
     { to: "/resources", label: "Resources" },
+  ];
+
+  const secondaryLinks = [
+    { to: "/about", label: "About" },
+    { to: "/install", label: "Add to Home Screen", icon: Smartphone },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -59,6 +65,7 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden border-t border-border/50 bg-white">
           <div className="container mx-auto px-4 py-2 flex flex-col">
+            {/* Primary nav links */}
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -73,6 +80,29 @@ const Header = () => {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Divider */}
+            <div className="border-t border-border/50 my-2" />
+            
+            {/* Secondary links */}
+            {secondaryLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`py-3 px-4 rounded-xl font-medium transition-colors flex items-center gap-2 ${
+                    isActive(link.to)
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {Icon && <Icon className="w-4 h-4" />}
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

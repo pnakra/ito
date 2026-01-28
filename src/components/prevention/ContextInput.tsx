@@ -21,7 +21,7 @@ const ContextInput = ({ value, onChange, onContinue, isActive }: ContextInputPro
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">
-            4
+            5
           </span>
           <h2 className="text-xl md:text-2xl font-bold">Anything else we should know?</h2>
         </div>

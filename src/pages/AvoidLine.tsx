@@ -304,8 +304,8 @@ const AvoidLine = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Back button - show only on welcome screen */}
-          {phase === "welcome" && <BackButton to="/" />}
+          {/* Back button - persistent throughout the flow */}
+          <BackButton to="/" />
           
           {/* Session Pattern Warning */}
           {shouldShowPatternWarning && phase === "welcome" && (
@@ -335,7 +335,7 @@ const AvoidLine = () => {
             </Card>
           )}
 
-          {/* Step 0: Orientation */}
+          {/* Step 1: Orientation */}
           <DecisionStep
             stepNumber={1}
             title="Where are you in this situation right now?"
@@ -377,7 +377,7 @@ const AvoidLine = () => {
             isActive={phase === "momentum"}
           />
 
-          {/* Step 4: Additional Context (free text) */}
+          {/* Step 5: Additional Context (free text) */}
           <ContextInput
             value={decisions.additionalContext}
             onChange={(value) => setDecisions(prev => ({ ...prev, additionalContext: value }))}
