@@ -31,7 +31,7 @@ const Index = () => {
                 <Eye className="w-6 h-6 text-primary-foreground" />
               </div>
               <h2 className="text-lg font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
-                Check In
+                Reality Check
               </h2>
               <p className="text-muted-foreground text-sm mb-4 flex-1">
                 Not sure if something's okay? Get a quick reality check before you act.
@@ -69,7 +69,7 @@ const Index = () => {
                 <Heart className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-lg font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
-                Something Happened to Me
+                Need to Talk
               </h2>
               <p className="text-muted-foreground text-sm mb-4 flex-1">
                 Need to process something that felt off? Talk through it at your own pace.
