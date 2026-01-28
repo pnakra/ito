@@ -50,7 +50,7 @@ const Index = () => {
                 <MessageCircle className="w-6 h-6 text-secondary-foreground" />
               </div>
               <h2 className="text-lg font-bold mb-2 text-foreground group-hover:text-secondary transition-colors">
-                I Messed Up
+                Second Thoughts
               </h2>
               <p className="text-muted-foreground text-sm mb-4 flex-1">
                 Think you might have crossed a line? Reflect on what happened — no judgment.
