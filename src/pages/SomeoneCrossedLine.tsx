@@ -101,9 +101,9 @@ const SomeoneCrossedLine = () => {
 
   if (showIntro) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-3xl">
+        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center">
               Something felt off. Let's figure it out — at your pace.
@@ -177,7 +177,7 @@ const SomeoneCrossedLine = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col">
