@@ -10,10 +10,12 @@
 
 This is a **decision-first consent assessment tool**, NOT a chatbot. Users answer structured questions via button selections, receive a deterministic risk classification, and then get AI-powered explanation and guidance.
 
+**Core Philosophy:** Observation before intention, structure before narrative, system rules before AI output.
+
 ```
-Welcome → Intent → Signals → Context Factors → Free Text → Stop Moment* → AI Explanation → Done/Follow-up → Outcome Check
-                                                              ↑
-                                               *Only for RED/YELLOW risk
+Welcome → Orientation → Consent Signals → Context Factors → Momentum → Free Text → Stop Moment* → AI Explanation → Done/Follow-up → Outcome Check
+                                                                                          ↑
+                                                                         *Only for RED/YELLOW risk
 ```
 
 ---
@@ -26,57 +28,63 @@ Welcome → Intent → Signals → Context Factors → Free Text → Stop Moment
 - Subtext: "Answer a few quick questions. Get a reality check. No judgment, no data stored."
 - Button: "Start →"
 
+**Session Pattern Warning:**
+If user has encountered 2+ YELLOW/RED outcomes in this browser session, a neutral warning is displayed:
+> "You've run into a few situations like this. That's often a sign it's time to slow things way down."
+
 **User action:** Click "Start" to begin.
 
 ---
 
-## Phase 2: Intent Check (Step 1/3)
+## Phase 2: Orientation (Step 1/4) — NEW
 
-**Prompt:** "What are you thinking about doing next?"
+**Prompt:** "Where are you in this situation right now?"
 
 **Options (single select):**
 
 | ID | Label |
 |----|-------|
-| `go-to-their-place` | Go to their place |
-| `invite-to-mine` | Invite them to mine |
-| `keep-texting` | Keep texting / messaging |
-| `physical-move` | Make a physical move |
-| `not-sure` | I'm not sure yet |
+| `texting` | We're texting or messaging |
+| `in-person` | We're together in person |
+| `party-group` | We're at a party or group setting |
+| `already-happened` | Something already happened and I'm unsure |
+| `not-sure` | I'm not sure how to describe it |
 
 **User action:** Select one option, click "Continue →"
 
 **Internal notes:**
-- Options marked as "physical intent" (`go-to-their-place`, `invite-to-mine`, `physical-move`) carry higher risk weight in classification.
+- Selection is stored but does not yet trigger branching
+- `already-happened` triggers optional handoff to `/crossed-line` after explanation
 
 ---
 
-## Phase 3: Consent Signal Check (Step 2/3)
+## Phase 3: Consent Signal Check (Step 2/4)
 
-**Prompt:** "What signals have you gotten from them?"
+**Prompt:** "What have they been doing or saying?"
 
 **Options (single select):**
 
-| ID | Label | Description |
-|----|-------|-------------|
-| `clear-yes` | Clear yes in words | They explicitly said yes or expressed clear interest verbally |
-| `enthusiastic-actions` | Enthusiastic actions | They're initiating, leaning in, reciprocating |
-| `mixed-signals` | Mixed / unclear signals | Sometimes interested, sometimes pulling back |
-| `no-response` | No response | They haven't replied or acknowledged |
-| `said-no` | They said no or pulled away | Verbal refusal or physical withdrawal |
+| ID | Label |
+|----|-------|
+| `clear-yes` | Clearly saying yes or expressing interest in words |
+| `enthusiastic-actions` | Actively initiating or reciprocating |
+| `mixed-signals` | Mixed or hard to read |
+| `no-response` | Quiet or not responding |
+| `said-no` | Said no or pulled away |
 
 **User action:** Select one option, click "Continue →"
 
 **Internal notes:**
 - `said-no` = automatic RED (hard stop)
-- `no-response` + physical intent = RED
-- `mixed-signals` + physical intent = RED
+- `no-response` + physical momentum = RED
+- `mixed-signals` + physical momentum = RED
+- This step comes BEFORE momentum/intent to center observation over intention
 
 ---
 
-## Phase 4: Context Factors (Step 3/3)
+## Phase 4: Context Factors (Step 3/4)
 
-**Prompt:** "Anything here that might complicate consent?"  
+**Prompt:** "Anything here that might affect how clear consent is?"  
 **Subtitle:** "Select all that apply"
 
 **Options (multi-select):**
@@ -93,13 +101,35 @@ Welcome → Intent → Signals → Context Factors → Free Text → Stop Moment
 
 **Internal notes:**
 - Selecting "None of these" deselects all others (exclusive)
-- `alcohol` + physical intent = always RED
+- `alcohol` + physical momentum = always RED
 - 2+ risk factors = RED
-- 1 risk factor + physical intent = YELLOW
+- 1 risk factor + physical momentum = YELLOW
 
 ---
 
-## Phase 5: Additional Context (Optional Free Text)
+## Phase 5: Momentum Check (Step 4/4) — REPLACES INTENT
+
+**Prompt:** "What direction does this feel like it's heading?"
+
+**Options (single select):**
+
+| ID | Label | Risk Weight |
+|----|-------|-------------|
+| `toward-physical` | Toward something physical | Physical momentum (higher risk) |
+| `staying-flirty` | Staying flirty or emotional | Low risk |
+| `slow-down` | I want to slow things down | Low risk |
+| `dont-know` | I don't know | Neutral |
+
+**User action:** Select one option, click "Continue →"
+
+**Internal notes:**
+- Only `toward-physical` carries "physical momentum" risk weight
+- This reframes the question from planning ("what are you going to do?") to observation ("where is this heading?")
+- Reduces moral hazard by not endorsing future action
+
+---
+
+## Phase 6: Additional Context (Optional Free Text)
 
 **Prompt:** "Anything else you want to add?"  
 **Subtext:** "Optional – share more context if you want more specific feedback."
@@ -130,14 +160,15 @@ Detects nuanced patterns that keywords miss:
 - Treating consent as obstacle vs. requirement
 
 **Flag word impact:**
-- Flag words + physical intent = automatic RED
+- Flag words + physical momentum = automatic RED
 - Flag words + mixed signals = RED
 - Flag words alone = YELLOW minimum
+- Free text can only escalate risk, never lower it
 - AI explanation will directly address the problematic language
 
 ---
 
-## Phase 6: Risk Classification (Internal)
+## Phase 7: Risk Classification (Internal)
 
 **This is NOT shown to the user directly — it determines what happens next.**
 
@@ -148,23 +179,25 @@ Risk level is calculated **deterministically by frontend code**, NOT by the AI.
 | Condition | Risk Level |
 |-----------|------------|
 | `said-no` (any context) | 🔴 RED |
-| `no-response` + physical intent | 🔴 RED |
-| `mixed-signals` + physical intent | 🔴 RED |
-| `alcohol` + physical intent | 🔴 RED |
-| Flag words + physical intent | 🔴 RED |
+| `no-response` + physical momentum | 🔴 RED |
+| `mixed-signals` + physical momentum | 🔴 RED |
+| `alcohol` + physical momentum | 🔴 RED |
+| Flag words + physical momentum | 🔴 RED |
 | Flag words + mixed signals | 🔴 RED |
 | 2+ context factors | 🔴 RED |
-| `no-response` (non-physical intent) | 🟡 YELLOW |
-| `mixed-signals` (non-physical intent) | 🟡 YELLOW |
-| 1 context factor + physical intent | 🟡 YELLOW |
+| `no-response` (non-physical momentum) | 🟡 YELLOW |
+| `mixed-signals` (non-physical momentum) | 🟡 YELLOW |
+| 1 context factor + physical momentum | 🟡 YELLOW |
 | Clear positive + 1 context factor | 🟡 YELLOW |
 | Flag words alone | 🟡 YELLOW |
 | Uncertainty/default | 🟡 YELLOW |
-| Clear positive signals + no factors | 🟢 GREEN |
+| Clear positive signals + no factors | ⚪ NEUTRAL (internal "green") |
+
+**Risk level is locked after calculation and cannot be lowered by follow-up.**
 
 ---
 
-## Phase 7: Stop Moment (RED/YELLOW only)
+## Phase 8: Stop Moment (RED/YELLOW only)
 
 **For RED risk:**
 - Full-screen overlay
@@ -184,15 +217,15 @@ Risk level is calculated **deterministically by frontend code**, NOT by the AI.
 - Button: "I understand"
 - Footer: "Clear communication protects both of you."
 
-**For GREEN risk:** Skip directly to AI Explanation.
+**For NEUTRAL (green) risk:** Skip directly to AI Explanation.
 
 **User action:** Must click "I understand" to proceed. No way to bypass.
 
 ---
 
-## Phase 8: AI Explanation
+## Phase 9: AI Explanation
 
-**What the user sees:**
+### For RED/YELLOW (Full Explanation Card)
 
 A card with structured sections:
 
@@ -209,42 +242,64 @@ A card with structured sections:
    - Specific, actionable alternatives
    
 5. **Real talk** (1 sentence)
-   - Self-interest angle (e.g., "Even if you don't care about their experience, doing this wrong could ruin your reputation or worse.")
+   - Self-interest angle
 
-**AI Behavior:**
-- The AI does NOT determine risk level — it explains the pre-computed level
-- If flag words were detected, the AI directly addresses the problematic language
-- Tone: Direct, not preachy. Like an older brother, not a teacher.
-- No lectures, no moralizing
-- Focus on practical guidance
+### For NEUTRAL (Minimal Explanation Card) — NON-PERMISSIVE
 
-**Example AI response for RED (said-no):**
+**Critical: GREEN is an internal state, NOT approval.**
 
-```json
-{
-  "assessment": "They gave you a clear 'no' — either with words or by pulling away physically. That's not ambiguous, and it's not something to try to work around.",
-  "whatsHappening": [
-    "They communicated a boundary directly",
-    "This is actually the clearest signal someone can give",
-    "Continuing to push after this point is not a gray area"
-  ],
-  "whatNotToDo": [
-    "Don't try to convince them to change their mind",
-    "Don't wait and try again later hoping they'll be 'in a different mood'",
-    "Don't assume they didn't really mean it"
-  ],
-  "whatToDoInstead": [
-    "Accept the 'no' as final for tonight",
-    "Say something like 'Okay, no problem' and actually mean it",
-    "Give them space without making it weird"
-  ],
-  "realTalk": "Respecting a 'no' the first time is what separates you from someone who makes people feel unsafe."
-}
-```
+A minimal card with:
+- Title: **"No hard stop detected right now"**
+- Neutral colors (gray/blue, NOT green)
+- Brief assessment (1-2 sentences)
+- Mandatory disclaimer: "That doesn't mean consent is guaranteed or that things can't change. If they hesitate, go quiet, or pull back at any point, that's your cue to stop."
+- **Empty** "what not to do" and "what to do instead" lists (minimal guidance)
+- Brief reminder about checking in (NOT validation)
+
+**NEUTRAL explanations must be noticeably shorter than YELLOW/RED.**
+
+**Prohibited language for NEUTRAL:**
+- "You're good"
+- "Safe to proceed"
+- "Okay to continue"
+- Any approval or permission framing
 
 ---
 
-## Phase 9: Post-Explanation Choice
+## Phase 9.5: Crossed-Line Handoff (Conditional)
+
+**Shown after explanation when:**
+- Orientation = "Something already happened and I'm unsure" OR
+- User has encountered 2+ RED outcomes in session
+
+**Card content:**
+- Title: "If something already happened"
+- Copy: "If you're realizing this may have crossed a line already, there's another path focused on reflection and accountability."
+- Button: "Reflect on what happened" → navigates to `/crossed-line`
+
+**Navigation is NEVER forced.**
+
+---
+
+## Phase 10: Refusal State (Adversarial Use)
+
+**Triggered when ALL of the following are true:**
+- Repeated coercive/dehumanizing language detected (flag words in 2+ runs)
+- Risk level is RED
+- User continues seeking guidance
+
+**What the user sees:**
+- Card with firm boundary
+- Title: "I can't help with this"
+- Copy: "The situation you described involves clear boundaries that need to be respected. The safest move is to stop."
+- Copy: "If you're struggling with patterns of behavior, talking to a counselor or trusted adult is a better path forward."
+- Button: "Start over" (resets flow)
+
+**No further guidance is provided beyond this.**
+
+---
+
+## Phase 11: Post-Explanation Choice
 
 **What the user sees:**
 - Two buttons side by side
@@ -255,7 +310,7 @@ A card with structured sections:
 
 ---
 
-## Phase 10a: Follow-up Chat (Optional)
+## Phase 12a: Follow-up Chat (Optional)
 
 **Only shown if user clicked "I want to talk more"**
 
@@ -276,7 +331,7 @@ A card with structured sections:
 
 ---
 
-## Phase 10b: Outcome Check (Final)
+## Phase 12b: Outcome Check (Final)
 
 **What the user sees:**
 
@@ -294,50 +349,70 @@ Subtext: "This helps you reflect. Nothing is stored or tracked."
 
 **User action:** Select one option.
 
-**After selection:** Flow resets to welcome screen. User can start over if desired.
+---
 
-**Privacy:** No data is stored. This is purely for user self-reflection.
+## Phase 13: Outcome Feedback
+
+**One-line reflective feedback based on selection (NOT stored):**
+
+| Outcome | Feedback |
+|---------|----------|
+| `stopped` or `checked-in` | "Clear pauses and verbal check-ins are what actually prevent harm." |
+| `didnt-proceed` | "Choosing not to proceed is always a valid way to keep things safe." |
+| `not-sure` | "If a situation feels confusing, earlier pauses usually make things clearer." |
+
+**After feedback:** Button to "Start over" and reset flow.
 
 ---
 
 ## Complete Example Scenarios
 
-### Scenario A: GREEN Path
+### Scenario A: NEUTRAL Path (No Hard Stop)
 
-1. **Intent:** Keep texting / messaging
-2. **Signals:** Enthusiastic actions
+1. **Orientation:** We're texting or messaging
+2. **Signals:** Actively initiating or reciprocating
 3. **Context:** None of these
-4. **Free text:** (empty)
-5. **Result:** GREEN → No stop moment → AI explanation (positive reinforcement)
-6. **Outcome:** User selects what they did
+4. **Momentum:** Staying flirty or emotional
+5. **Free text:** (empty)
+6. **Result:** NEUTRAL → No stop moment → Minimal explanation (NOT approval)
+7. **Outcome:** User selects what they did → Reflective feedback
 
 ### Scenario B: YELLOW Path
 
-1. **Intent:** Invite them to mine
-2. **Signals:** Clear yes in words
+1. **Orientation:** We're together in person
+2. **Signals:** Clearly saying yes or expressing interest in words
 3. **Context:** Alcohol or drugs involved
-4. **Free text:** "We've been drinking at a party"
-5. **Result:** YELLOW → Pause moment appears → User acknowledges → AI explanation (caution)
-6. **Outcome:** User selects what they did
+4. **Momentum:** Toward something physical
+5. **Free text:** "We've been drinking at a party"
+6. **Result:** RED (alcohol + physical momentum) → Stop moment → Full explanation
+7. **Outcome:** User selects what they did → Reflective feedback
 
 ### Scenario C: RED Path (Explicit No)
 
-1. **Intent:** Make a physical move
-2. **Signals:** They said no or pulled away
+1. **Orientation:** We're at a party or group setting
+2. **Signals:** Said no or pulled away
 3. **Context:** None of these
-4. **Free text:** (empty)
-5. **Result:** RED → Stop moment appears → User acknowledges → AI explanation (hard stop)
-6. **Outcome:** User selects what they did
+4. **Momentum:** Toward something physical
+5. **Free text:** (empty)
+6. **Result:** RED → Stop moment appears → Full explanation
+7. **Outcome:** User selects what they did → Reflective feedback
 
-### Scenario D: RED Path (Flag Words)
+### Scenario D: RED Path with Crossed-Line Handoff
 
-1. **Intent:** Go to their place
-2. **Signals:** Mixed / unclear signals
+1. **Orientation:** Something already happened and I'm unsure
+2. **Signals:** Mixed or hard to read
 3. **Context:** Alcohol or drugs involved
-4. **Free text:** "She's been leading me on all night, she's kind of a slut"
-5. **Flag detection:** "leading me on" (dismissing boundaries), "slut" (derogatory label)
-6. **Result:** RED → Stop moment → AI explanation directly addresses the problematic language
-7. **Outcome:** User selects what they did
+4. **Momentum:** I don't know
+5. **Free text:** (empty)
+6. **Result:** YELLOW → Pause moment → Explanation → Crossed-Line Handoff card shown
+7. **User may navigate to /crossed-line for accountability flow**
+
+### Scenario E: Refusal (Adversarial Use)
+
+1. **First run:** RED + flag words ("she was leading me on")
+2. **Resets and tries again**
+3. **Second run:** RED + flag words ("she owes me")
+4. **Result:** Refusal card shown, no further guidance provided
 
 ---
 
@@ -348,14 +423,20 @@ Frontend (React)
 ├── src/pages/AvoidLine.tsx           — Main flow orchestrator
 ├── src/lib/riskClassification.ts     — Deterministic risk rules
 ├── src/lib/aiLanguageAnalysis.ts     — AI-powered flag detection
+├── src/hooks/useSessionRiskTracking.ts — Session-level pattern awareness
 └── src/components/prevention/
     ├── DecisionStep.tsx              — Reusable button step
     ├── ContextInput.tsx              — Free text input
     ├── StopMoment.tsx                — Full-screen brake
-    ├── ExplanationCard.tsx           — AI response display
+    ├── ExplanationCard.tsx           — AI response display (RED/YELLOW)
+    ├── NeutralExplanationCard.tsx    — Minimal display (NEUTRAL)
     ├── PostExplanationChoice.tsx     — Done/Continue buttons
     ├── FollowUpChat.tsx              — Multi-turn chat
-    └── OutcomeCheck.tsx              — Self-report buttons
+    ├── OutcomeCheck.tsx              — Self-report buttons
+    ├── OutcomeFeedback.tsx           — Reflective one-liner
+    ├── SessionPatternWarning.tsx     — Session-level observation
+    ├── RefusalCard.tsx               — Adversarial use boundary
+    └── CrossedLineHandoff.tsx        — Soft navigation to accountability
 
 Edge Functions (Supabase/Deno)
 ├── analyze-vibecheck                 — Main AI explanation
@@ -366,30 +447,63 @@ Edge Functions (Supabase/Deno)
 
 ## Key Design Decisions
 
-1. **Risk is deterministic, not AI-determined**
+1. **Observation before intention**
+   - Consent signals asked BEFORE momentum/intent
+   - Centers what the other person is communicating
+   - Reduces moral hazard of planning-first framing
+
+2. **Risk is deterministic, not AI-determined**
    - Frontend code enforces hard rules
    - AI explains, does not assess
    - Ensures consistent safety enforcement
 
-2. **Stop Moment is mandatory**
+3. **GREEN is not approval**
+   - Internal state only, never displayed as "green"
+   - Neutral styling and language
+   - Explicitly states this is not permission
+   - Minimal guidance (less is more)
+
+4. **Stop Moment is mandatory**
    - Cannot skip or dismiss
    - Creates deliberate friction before risky behavior
    - User must acknowledge understanding
 
-3. **Flag word detection is dual-layer**
-   - Fast static matching for obvious patterns
-   - AI catches nuanced problematic attitudes
-   - Both feed into risk classification AND AI response
+5. **Session-level pattern awareness**
+   - Tracks run counts and risk outcomes in sessionStorage only
+   - Surfaces neutral observation for repeat risky encounters
+   - No persistence across sessions
 
-4. **No data storage**
+6. **Explicit refusal for adversarial use**
+   - System can say "I can't help with this"
+   - Triggered by repeated coercive language at RED
+   - Redirects to appropriate resources
+
+7. **Soft handoff to accountability**
+   - If user indicates something already happened
+   - Optional navigation to /crossed-line
+   - Never forces transition
+
+8. **No data storage**
    - Full anonymity
    - Outcome check is for user reflection only
    - Removes barriers to honest engagement
 
-5. **Tone is peer-like, not authoritative**
+9. **Tone is peer-like, not authoritative**
    - "Older brother" not "teacher"
    - Direct without lecturing
    - Self-interest angles alongside ethical guidance
+
+---
+
+## Success Criteria
+
+This flow is successful if:
+
+1. ✅ Users feel oriented before being asked to describe their situation
+2. ✅ Stop Moments feel inevitable, not advisory
+3. ✅ The system cannot be used to extract permission
+4. ✅ An outside observer would describe this as a safety system, not a chatbot
+5. ✅ GREEN cannot be interpreted as approval
 
 ---
 

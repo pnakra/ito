@@ -1,9 +1,10 @@
 import type { RiskLevel } from "@/data/scenarios";
 
 export interface DecisionState {
-  intent: string | null;
+  orientation: string | null;
   consentSignal: string | null;
   contextFactors: string[];
+  momentum: string | null;
   additionalContext: string;
 }
 
@@ -71,13 +72,20 @@ export function detectFlagWords(text: string): string[] {
   return flagged;
 }
 
+// Check if momentum indicates physical intent
+function hasPhysicalMomentum(momentum: string | null): boolean {
+  return momentum === "toward-physical";
+}
+
 // Hard-coded rules for risk classification - the LLM does NOT determine this
 export function classifyRisk(decisions: DecisionState): RiskClassification {
-  const { intent, consentSignal, contextFactors, additionalContext } = decisions;
+  const { consentSignal, contextFactors, momentum, additionalContext } = decisions;
   
   // Check for flag words in free text
   const flaggedWords = detectFlagWords(additionalContext);
   const hasFlagWords = flaggedWords.length > 0;
+  
+  const isPhysicalMomentum = hasPhysicalMomentum(momentum);
   
   // RED FLAG conditions - immediate stop
   if (consentSignal === "said-no") {
@@ -89,8 +97,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     };
   }
   
-  // Flag words with physical intent = automatic red
-  if (hasFlagWords && (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move")) {
+  // Flag words with physical momentum = automatic red
+  if (hasFlagWords && isPhysicalMomentum) {
     return {
       level: "red",
       stopMessage: "Stop. The way you're thinking about this situation is a problem.",
@@ -99,9 +107,9 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     };
   }
   
-  // No response escalates based on intent
+  // No response escalates based on momentum
   if (consentSignal === "no-response") {
-    if (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move") {
+    if (isPhysicalMomentum) {
       return {
         level: "red",
         stopMessage: "Do not proceed. No response is not consent.",
@@ -111,18 +119,18 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     }
     return {
       level: "yellow",
-      stopMessage: "Pause. No response means you don't have a green light yet.",
+      stopMessage: "Pause. No response means you don't have a clear signal yet.",
       reasoning: "Without a clear positive signal, continuing risks crossing a boundary.",
       flaggedWords
     };
   }
   
-  // Mixed signals + escalating intent = red
+  // Mixed signals + physical momentum = red
   if (consentSignal === "mixed-signals") {
-    if (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move") {
+    if (isPhysicalMomentum) {
       return {
         level: "red",
-        stopMessage: "Do not make a physical move with mixed signals. Check in verbally first.",
+        stopMessage: "Do not escalate physically with mixed signals. Check in verbally first.",
         reasoning: "Mixed signals require verbal clarification before any physical escalation.",
         flaggedWords
       };
@@ -148,8 +156,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
   const hasAlcohol = contextFactors.includes("alcohol");
   const riskFactorCount = contextFactors.filter(f => f !== "none").length;
   
-  // Alcohol + physical intent = always red
-  if (hasAlcohol && (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move")) {
+  // Alcohol + physical momentum = always red
+  if (hasAlcohol && isPhysicalMomentum) {
     return {
       level: "red",
       stopMessage: "Do not proceed when alcohol is involved. Consent requires clear judgment.",
@@ -178,8 +186,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     };
   }
   
-  // Single risk factor with physical intent = yellow
-  if (riskFactorCount === 1 && (intent === "go-to-their-place" || intent === "invite-to-mine" || intent === "physical-move")) {
+  // Single risk factor with physical momentum = yellow
+  if (riskFactorCount === 1 && isPhysicalMomentum) {
     return {
       level: "yellow",
       stopMessage: "This situation has complications. Check in verbally before proceeding.",
@@ -219,19 +227,19 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
 
 // Format user selections for the AI explanation
 export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: string[]): string {
-  const intentLabels: Record<string, string> = {
-    "go-to-their-place": "Going to their place",
-    "invite-to-mine": "Inviting them to my place",
-    "keep-texting": "Continuing to text/message",
-    "physical-move": "Making a physical move",
-    "not-sure": "Unsure what to do next"
+  const orientationLabels: Record<string, string> = {
+    "texting": "We're texting or messaging",
+    "in-person": "We're together in person",
+    "party-group": "We're at a party or group setting",
+    "already-happened": "Something already happened and I'm unsure",
+    "not-sure": "I'm not sure how to describe it"
   };
-  
+
   const signalLabels: Record<string, string> = {
-    "clear-yes": "They gave a clear verbal yes",
-    "enthusiastic-actions": "Enthusiastic body language/actions",
-    "mixed-signals": "Mixed or unclear signals",
-    "no-response": "No response from them",
+    "clear-yes": "They gave a clear verbal yes or expressed interest in words",
+    "enthusiastic-actions": "They're actively initiating or reciprocating",
+    "mixed-signals": "Mixed or hard to read signals",
+    "no-response": "Quiet or not responding",
     "said-no": "They said no or pulled away"
   };
   
@@ -243,13 +251,21 @@ export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: s
     "power-imbalance": "Power dynamic at play",
     "none": "No complicating factors"
   };
+
+  const momentumLabels: Record<string, string> = {
+    "toward-physical": "Heading toward something physical",
+    "staying-flirty": "Staying flirty or emotional",
+    "slow-down": "Wanting to slow things down",
+    "dont-know": "Not sure where this is heading"
+  };
   
   const lines = [
-    `What they're thinking about doing: ${intentLabels[decisions.intent || ""] || "Not specified"}`,
-    `Signals from the other person: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
+    `Current situation: ${orientationLabels[decisions.orientation || ""] || "Not specified"}`,
+    `What they're doing/saying: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
     `Complicating factors: ${decisions.contextFactors.length > 0 
       ? decisions.contextFactors.map(f => factorLabels[f] || f).join(", ")
-      : "None selected"}`
+      : "None selected"}`,
+    `Direction this feels like it's heading: ${momentumLabels[decisions.momentum || ""] || "Not specified"}`
   ];
   
   if (decisions.additionalContext?.trim()) {

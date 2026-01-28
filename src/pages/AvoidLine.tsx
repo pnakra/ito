@@ -14,6 +14,7 @@ import PostExplanationChoice from "@/components/prevention/PostExplanationChoice
 import FollowUpChat from "@/components/prevention/FollowUpChat";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
+import CrossedLineHandoff from "@/components/prevention/CrossedLineHandoff";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,9 +23,10 @@ import type { RiskLevel } from "@/data/scenarios";
 
 type FlowPhase = 
   | "welcome"
-  | "intent"
+  | "orientation"
   | "consent-signal"
   | "context-factors"
+  | "momentum"
   | "additional-context"
   | "stop-moment"
   | "explanation"
@@ -43,22 +45,25 @@ interface AnalysisData {
   realTalk: string;
 }
 
-const intentOptions: StepOption[] = [
-  { id: "go-to-their-place", label: "Go to their place" },
-  { id: "invite-to-mine", label: "Invite them to mine" },
-  { id: "keep-texting", label: "Keep texting / messaging" },
-  { id: "physical-move", label: "Make a physical move" },
-  { id: "not-sure", label: "I'm not sure yet" }
+// STEP 0: Orientation options
+const orientationOptions: StepOption[] = [
+  { id: "texting", label: "We're texting or messaging" },
+  { id: "in-person", label: "We're together in person" },
+  { id: "party-group", label: "We're at a party or group setting" },
+  { id: "already-happened", label: "Something already happened and I'm unsure" },
+  { id: "not-sure", label: "I'm not sure how to describe it" }
 ];
 
+// STEP 1: Consent signal options (observation-first)
 const consentSignalOptions: StepOption[] = [
-  { id: "clear-yes", label: "Clear yes in words", description: "They explicitly said yes or expressed clear interest verbally" },
-  { id: "enthusiastic-actions", label: "Enthusiastic actions", description: "They're initiating, leaning in, reciprocating" },
-  { id: "mixed-signals", label: "Mixed / unclear signals", description: "Sometimes interested, sometimes pulling back" },
-  { id: "no-response", label: "No response", description: "They haven't replied or acknowledged" },
-  { id: "said-no", label: "They said no or pulled away", description: "Verbal refusal or physical withdrawal" }
+  { id: "clear-yes", label: "Clearly saying yes or expressing interest in words" },
+  { id: "enthusiastic-actions", label: "Actively initiating or reciprocating" },
+  { id: "mixed-signals", label: "Mixed or hard to read" },
+  { id: "no-response", label: "Quiet or not responding" },
+  { id: "said-no", label: "Said no or pulled away" }
 ];
 
+// STEP 2: Context factors
 const contextFactorOptions: StepOption[] = [
   { id: "alcohol", label: "Alcohol or drugs involved" },
   { id: "experience-gap", label: "One of us is much more experienced" },
@@ -67,12 +72,21 @@ const contextFactorOptions: StepOption[] = [
   { id: "none", label: "None of these" }
 ];
 
+// STEP 3: Momentum check (replaces intent)
+const momentumOptions: StepOption[] = [
+  { id: "toward-physical", label: "Toward something physical" },
+  { id: "staying-flirty", label: "Staying flirty or emotional" },
+  { id: "slow-down", label: "I want to slow things down" },
+  { id: "dont-know", label: "I don't know" }
+];
+
 const AvoidLine = () => {
   const [phase, setPhase] = useState<FlowPhase>("welcome");
   const [decisions, setDecisions] = useState<DecisionState>({
-    intent: null,
+    orientation: null,
     consentSignal: null,
     contextFactors: [],
+    momentum: null,
     additionalContext: ""
   });
   const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string; flaggedWords?: string[] } | null>(null);
@@ -85,11 +99,12 @@ const AvoidLine = () => {
     shouldShowPatternWarning, 
     shouldRefuse, 
     recordRun,
-    coercivePatternCount 
+    coercivePatternCount,
+    yellowOrRedCount
   } = useSessionRiskTracking();
 
-  const handleIntentSelect = (id: string) => {
-    setDecisions(prev => ({ ...prev, intent: id }));
+  const handleOrientationSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, orientation: id }));
   };
 
   const handleConsentSignalSelect = (id: string) => {
@@ -114,13 +129,18 @@ const AvoidLine = () => {
     });
   };
 
+  const handleMomentumSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, momentum: id }));
+  };
+
   const proceedToNextStep = () => {
-    if (phase === "intent" && decisions.intent) {
+    if (phase === "orientation" && decisions.orientation) {
       setPhase("consent-signal");
     } else if (phase === "consent-signal" && decisions.consentSignal) {
       setPhase("context-factors");
     } else if (phase === "context-factors" && decisions.contextFactors.length > 0) {
-      // Go to additional context step
+      setPhase("momentum");
+    } else if (phase === "momentum" && decisions.momentum) {
       setPhase("additional-context");
     }
   };
@@ -133,9 +153,7 @@ const AvoidLine = () => {
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     
     // Check for refusal condition: repeated coercive language + RED + seeking reassurance
-    // We check coercivePatternCount from previous runs + current flagged words
     if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
-      // This is their 2nd+ time with coercive language at RED - refuse
       recordRun(result.level, hasFlaggedWords);
       setPhase("refusal");
       return;
@@ -165,7 +183,6 @@ const AvoidLine = () => {
     try {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
       
-      // Add to conversation history
       setConversationHistory(prev => [...prev, formattedSelections]);
       
       const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
@@ -178,7 +195,7 @@ const AvoidLine = () => {
       if (error) throw error;
 
       setAnalysis({
-        riskLevel: riskLevel, // Use our computed level, not the AI's
+        riskLevel: riskLevel,
         assessment: data.assessment,
         whatsHappening: data.whatsHappening,
         whatNotToDo: data.whatNotToDo,
@@ -187,7 +204,6 @@ const AvoidLine = () => {
       });
     } catch (error) {
       console.error("Error fetching explanation:", error);
-      // Provide fallback
       setAnalysis({
         riskLevel: riskLevel,
         assessment: "We couldn't process this right now, but the risk level still applies.",
@@ -213,7 +229,6 @@ const AvoidLine = () => {
     setIsLoading(true);
     
     try {
-      // Build context from conversation history
       const fullContext = [
         ...conversationHistory,
         `\nFollow-up from user: "${message}"`
@@ -239,7 +254,6 @@ const AvoidLine = () => {
         realTalk: data.realTalk
       });
       
-      // Go back to explanation to show updated response
       setPhase("explanation");
     } catch (error) {
       console.error("Error in follow-up:", error);
@@ -254,7 +268,7 @@ const AvoidLine = () => {
 
   const resetFlow = () => {
     setPhase("welcome");
-    setDecisions({ intent: null, consentSignal: null, contextFactors: [], additionalContext: "" });
+    setDecisions({ orientation: null, consentSignal: null, contextFactors: [], momentum: null, additionalContext: "" });
     setRiskResult(null);
     setAnalysis(null);
     setIsLoading(false);
@@ -269,11 +283,16 @@ const AvoidLine = () => {
   };
 
   const canProceed = useCallback(() => {
-    if (phase === "intent") return !!decisions.intent;
+    if (phase === "orientation") return !!decisions.orientation;
     if (phase === "consent-signal") return !!decisions.consentSignal;
     if (phase === "context-factors") return decisions.contextFactors.length > 0;
+    if (phase === "momentum") return !!decisions.momentum;
     return false;
   }, [phase, decisions]);
+
+  // Determine if we should show the crossed-line handoff
+  const shouldShowCrossedLineHandoff = 
+    decisions.orientation === "already-happened" || yellowOrRedCount >= 2;
 
   // Determine which explanation card to show based on risk level
   const isNeutralRisk = riskResult?.level === "green";
@@ -304,7 +323,7 @@ const AvoidLine = () => {
               </p>
               <Button 
                 size="lg" 
-                onClick={() => setPhase("intent")}
+                onClick={() => setPhase("orientation")}
                 className="px-8"
               >
                 Start <ArrowRight className="ml-2 w-5 h-5" />
@@ -312,36 +331,46 @@ const AvoidLine = () => {
             </Card>
           )}
 
-          {/* Step 1: Intent */}
+          {/* Step 0: Orientation */}
           <DecisionStep
             stepNumber={1}
-            title="What are you thinking about doing next?"
-            options={intentOptions}
-            selectedValues={decisions.intent ? [decisions.intent] : []}
-            onSelect={handleIntentSelect}
-            isActive={phase === "intent"}
+            title="Where are you in this situation right now?"
+            options={orientationOptions}
+            selectedValues={decisions.orientation ? [decisions.orientation] : []}
+            onSelect={handleOrientationSelect}
+            isActive={phase === "orientation"}
           />
 
-          {/* Step 2: Consent Signal */}
+          {/* Step 1: Consent Signals */}
           <DecisionStep
             stepNumber={2}
-            title="What signals have you gotten from them?"
+            title="What have they been doing or saying?"
             options={consentSignalOptions}
             selectedValues={decisions.consentSignal ? [decisions.consentSignal] : []}
             onSelect={handleConsentSignalSelect}
             isActive={phase === "consent-signal"}
           />
 
-          {/* Step 3: Context Factors */}
+          {/* Step 2: Context Factors */}
           <DecisionStep
             stepNumber={3}
-            title="Anything here that might complicate consent?"
+            title="Anything here that might affect how clear consent is?"
             subtitle="Select all that apply"
             options={contextFactorOptions}
             selectedValues={decisions.contextFactors}
             multiSelect={true}
             onSelect={handleContextFactorSelect}
             isActive={phase === "context-factors"}
+          />
+
+          {/* Step 3: Momentum Check */}
+          <DecisionStep
+            stepNumber={4}
+            title="What direction does this feel like it's heading?"
+            options={momentumOptions}
+            selectedValues={decisions.momentum ? [decisions.momentum] : []}
+            onSelect={handleMomentumSelect}
+            isActive={phase === "momentum"}
           />
 
           {/* Step 4: Additional Context (free text) */}
@@ -353,7 +382,7 @@ const AvoidLine = () => {
           />
 
           {/* Continue Button (for button steps only) */}
-          {(phase === "intent" || phase === "consent-signal" || phase === "context-factors") && (
+          {(phase === "orientation" || phase === "consent-signal" || phase === "context-factors" || phase === "momentum") && (
             <div className="flex justify-center pt-4">
               <Button
                 size="lg"
@@ -387,6 +416,11 @@ const AvoidLine = () => {
             ) : (
               <ExplanationCard analysis={analysis} isLoading={isLoading} />
             )
+          )}
+
+          {/* Crossed Line Handoff - shown after explanation when applicable */}
+          {phase === "explanation" && !isLoading && analysis && (
+            <CrossedLineHandoff isActive={shouldShowCrossedLineHandoff} />
           )}
 
           {/* Post-Explanation Choice */}
