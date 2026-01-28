@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { MessageCircle, Eye, Heart, ArrowRight } from "lucide-react";
+import { MessageCircle, Eye, Heart, ArrowRight, Smartphone } from "lucide-react";
 
 const Index = () => {
   return (
@@ -117,7 +117,14 @@ const Index = () => {
         </section>
 
         {/* Footer note */}
-        <section className="container mx-auto px-4 py-6 text-center">
+        <section className="container mx-auto px-4 py-6 text-center space-y-2">
+          <Link 
+            to="/install" 
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-2"
+          >
+            <Smartphone className="w-4 h-4" />
+            Add to home screen
+          </Link>
           <p className="text-xs text-muted-foreground">
             Built for early exploration — not a finished product.
           </p>
