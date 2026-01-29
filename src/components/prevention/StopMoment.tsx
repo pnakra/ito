@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AlertOctagon, AlertTriangle } from "lucide-react";
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 interface StopMomentProps {
   riskLevel: RiskLevel;

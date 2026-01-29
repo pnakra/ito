@@ -20,7 +20,7 @@ import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/r
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, RotateCcw, Shield } from "lucide-react";
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 type FlowPhase = 
   | "welcome"
