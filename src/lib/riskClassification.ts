@@ -1,4 +1,4 @@
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 export interface DecisionState {
   orientation: string | null;

@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import RiskBadge from "@/components/RiskBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Send, Eye, X, Check, MessageCircle } from "lucide-react";
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 interface Message {
   role: "user" | "assistant";

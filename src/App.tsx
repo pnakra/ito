@@ -7,7 +7,6 @@ import Index from "./pages/Index";
 import AvoidLine from "./pages/AvoidLine";
 import CrossedLine from "./pages/CrossedLine";
 import SomeoneCrossedLine from "./pages/SomeoneCrossedLine";
-import Scenarios from "./pages/Scenarios";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Install from "./pages/Install";
@@ -26,7 +25,6 @@ const App = () => (
           <Route path="/avoid-line" element={<AvoidLine />} />
           <Route path="/crossed-line" element={<CrossedLine />} />
           <Route path="/someone-crossed" element={<SomeoneCrossedLine />} />
-          <Route path="/scenarios" element={<Scenarios />} />
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/install" element={<Install />} />

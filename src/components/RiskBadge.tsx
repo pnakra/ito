@@ -1,4 +1,4 @@
-import { RiskLevel } from "@/data/scenarios";
+import { RiskLevel } from "@/types/risk";
 import { AlertTriangle, AlertCircle, CheckCircle } from "lucide-react";
 
 interface RiskBadgeProps {

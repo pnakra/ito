@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Loader2, Eye, X, Check, MessageCircle } from "lucide-react";
 import RiskBadge from "@/components/RiskBadge";
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 interface AnalysisData {
   riskLevel: RiskLevel;

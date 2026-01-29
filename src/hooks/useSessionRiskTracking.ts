@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { RiskLevel } from "@/data/scenarios";
+import type { RiskLevel } from "@/types/risk";
 
 interface SessionRiskState {
   runCount: number;

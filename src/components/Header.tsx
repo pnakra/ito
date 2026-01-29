@@ -11,7 +11,6 @@ const Header = () => {
     { to: "/avoid-line", label: "Reality Check" },
     { to: "/crossed-line", label: "Second Thoughts" },
     { to: "/someone-crossed", label: "Need to Talk" },
-    { to: "/scenarios", label: "Scenarios" },
     { to: "/resources", label: "Resources" },
   ];
 
