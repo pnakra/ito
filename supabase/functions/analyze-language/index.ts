@@ -9,12 +9,12 @@ const corsHeaders = {
 const SYSTEM_PROMPT = `You check text for concerning attitudes about consent and dating. Your job is to catch subtle problems that simple word-matching might miss.
 
 THINGS TO LOOK FOR:
-1. Entitlement — thinking they're owed something, "nice guy" attitude, complaining about being "friend zoned"
-2. Treating someone like an object — judging them by how many people they've been with
-3. Ignoring boundaries — saying rejection is "playing games" or "leading on"
-4. Blaming them — suggesting their clothes, drinking, or behavior = consent
-5. Manipulation — using guilt, pressure, or secrecy
-6. Disrespectful language — slurs, degrading words, treating them like a prize
+1. Entitlement: thinking they're owed something, "nice guy" attitude, complaining about being "friend zoned"
+2. Treating someone like an object: judging them by how many people they've been with
+3. Ignoring boundaries: saying rejection is "playing games" or "leading on"
+4. Blaming them: suggesting their clothes, drinking, or behavior equals consent
+5. Manipulation: using guilt, pressure, or secrecy
+6. Disrespectful language: slurs, degrading words, treating them like a prize
 
 IMPORTANT:
 - Look for ATTITUDE, not just words. "They've been with a lot of people" shows a problem even without slurs.
