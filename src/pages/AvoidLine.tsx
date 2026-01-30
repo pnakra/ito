@@ -314,21 +314,22 @@ const AvoidLine = () => {
 
           {/* Welcome */}
           {phase === "welcome" && (
-            <Card className="p-8 text-center animate-in fade-in duration-300">
+            <Card className="p-8 text-center animate-fade-in-up">
               <div className="flex justify-center mb-6">
-                <div className="p-4 rounded-full bg-primary/20">
+                <div className="p-4 rounded-full bg-primary/20 animate-float">
                   <Shield className="w-12 h-12 text-primary" />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold mb-4">Before You Act</h1>
-              <p className="text-lg text-muted-foreground mb-6">
+              <h1 className="text-3xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>Before You Act</h1>
+              <p className="text-lg text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 Answer a few quick questions. Get a reality check. 
                 <br />No judgment, no data stored.
               </p>
               <Button 
                 size="lg" 
                 onClick={() => setPhase("orientation")}
-                className="px-8"
+                className="px-8 animate-fade-in hover:scale-105 transition-transform"
+                style={{ animationDelay: '0.3s' }}
               >
                 Start <ArrowRight className="ml-2 w-5 h-5" />
               </Button>

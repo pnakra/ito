@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
+import ShredButton from "@/components/ShredButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Send, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -131,24 +132,24 @@ const CrossedLine = () => {
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center animate-fade-in-up">
               Let's figure out what happened — calmly.
             </h1>
 
-            <p className="text-center text-muted-foreground">
+            <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               Sometimes you realize afterward that a moment felt off — or you worry you crossed a boundary. 
               This space helps you slow down and reflect.
             </p>
 
-            <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 text-sm text-muted-foreground">
+            <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <strong className="text-foreground">Note:</strong> This is a reflective guide — not legal advice or therapy.
             </div>
 
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-center pt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               <Button 
                 onClick={() => setScreen("input")} 
                 size="lg" 
-                className="px-8 py-5 text-base rounded-full"
+                className="px-8 py-5 text-base rounded-full hover:scale-105 transition-transform"
               >
                 Start reflecting
               </Button>
@@ -355,7 +356,8 @@ const CrossedLine = () => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-6 sm:pt-8">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6 sm:pt-8">
+              <ShredButton onShred={handleStartOver} />
               <Button variant="outline" onClick={handleStartOver} size="lg" className="w-full sm:w-auto">
                 Start Over
               </Button>

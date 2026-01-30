@@ -5,9 +5,11 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
+import ShredButton from "@/components/ShredButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Send, Heart, Shield, HelpCircle, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   role: "user" | "assistant";
@@ -23,6 +25,7 @@ interface Message {
 }
 
 const SomeoneCrossedLine = () => {
+  const navigate = useNavigate();
   const [showIntro, setShowIntro] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -30,6 +33,12 @@ const SomeoneCrossedLine = () => {
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const maxLength = 2000;
+
+  const handleShred = () => {
+    setMessages([]);
+    setInput("");
+    navigate("/");
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -107,15 +116,15 @@ const SomeoneCrossedLine = () => {
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center animate-fade-in-up">
               Something felt off. Let's figure it out — at your pace.
             </h1>
 
-            <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               This is a safe, anonymous space. Nothing you share is stored or logged. This tool does not provide legal advice or therapy — it's a supportive guide.
             </div>
             
-            <div className="prose prose-lg max-w-none text-foreground space-y-4">
+            <div className="prose prose-lg max-w-none text-foreground space-y-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <p className="text-base sm:text-xl text-center text-muted-foreground px-2">
                 Sometimes things happen that leave us confused, uncomfortable, or unsure. 
                 You might not have words for it yet — and that's okay. 
@@ -124,7 +133,7 @@ const SomeoneCrossedLine = () => {
             </div>
 
             <div className="grid gap-4 sm:gap-6 mt-6">
-              <Card className="p-4 sm:p-6 border-2 border-primary/20">
+              <Card className="p-4 sm:p-6 border-2 border-primary/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.3s' }}>
                 <div className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                   <div>
@@ -136,7 +145,7 @@ const SomeoneCrossedLine = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-6 border-2 border-secondary/20">
+              <Card className="p-4 sm:p-6 border-2 border-secondary/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.4s' }}>
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 text-secondary flex-shrink-0 mt-1" />
                   <div>
@@ -148,7 +157,7 @@ const SomeoneCrossedLine = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-6 border-2 border-accent/20">
+              <Card className="p-4 sm:p-6 border-2 border-accent/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-start gap-3">
                   <HelpCircle className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
                   <div>
@@ -161,7 +170,7 @@ const SomeoneCrossedLine = () => {
               </Card>
             </div>
 
-            <div className="flex justify-center pt-6 sm:pt-8">
+            <div className="flex justify-center pt-6 sm:pt-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <Button 
                 onClick={() => setShowIntro(false)} 
                 size="lg" 
@@ -285,16 +294,21 @@ const SomeoneCrossedLine = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Support Resources - always visible */}
+          {/* Support Resources and Shred - always visible */}
           {messages.length > 0 && (
-            <Card className="p-3 sm:p-4 mb-4 border-primary/30">
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                <span className="font-semibold">Need support?</span>{" "}
-                <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">RAINN</a> · 
-                <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Crisis Text Line</a> · 
-                <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Love Is Respect</a>
-              </p>
-            </Card>
+            <div className="space-y-3 mb-4">
+              <Card className="p-3 sm:p-4 border-primary/30">
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  <span className="font-semibold">Need support?</span>{" "}
+                  <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">RAINN</a> · 
+                  <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Crisis Text Line</a> · 
+                  <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Love Is Respect</a>
+                </p>
+              </Card>
+              <div className="flex justify-center">
+                <ShredButton onShred={handleShred} />
+              </div>
+            </div>
           )}
 
           {/* Input form */}

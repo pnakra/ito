@@ -12,13 +12,13 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-8 sm:py-16 text-center">
-          <div className="inline-block mb-3 sm:mb-4 px-3 sm:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-xs sm:text-sm font-medium rounded-full">
+          <div className="inline-block mb-3 sm:mb-4 px-3 sm:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-xs sm:text-sm font-medium rounded-full animate-fade-in">
             No accounts · No tracking · Just clarity
           </div>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-foreground px-2">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-foreground px-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             Know the vibe. Know the line.
           </h1>
-          <p className="text-sm sm:text-lg text-muted-foreground mb-8 sm:mb-10 max-w-lg mx-auto px-2">
+          <p className="text-sm sm:text-lg text-muted-foreground mb-8 sm:mb-10 max-w-lg mx-auto px-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             A quick check-in when you're not sure what's happening — or what happened.
           </p>
           
@@ -28,10 +28,11 @@ const Index = () => {
             {/* Tile 1 - Reality Check */}
             <Link 
               to="/avoid-line"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              style={{ animationDelay: '0.3s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
-              <div className="bg-primary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+              <div className="bg-primary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
                 <Eye className="w-5 h-5 text-primary-foreground" />
               </div>
               <div className="flex-1 min-w-0">
@@ -51,10 +52,11 @@ const Index = () => {
             {/* Tile 2 - Second Thoughts */}
             <Link 
               to="/crossed-line"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              style={{ animationDelay: '0.4s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-bl-full" />
-              <div className="bg-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+              <div className="bg-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
                 <MessageCircle className="w-5 h-5 text-secondary-foreground" />
               </div>
               <div className="flex-1 min-w-0">
@@ -74,10 +76,11 @@ const Index = () => {
             {/* Tile 3 - Need to Talk */}
             <Link 
               to="/someone-crossed"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              style={{ animationDelay: '0.5s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-transparent rounded-bl-full" />
-              <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0">
+              <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
                 <Heart className="w-5 h-5 text-primary-foreground" />
               </div>
               <div className="flex-1 min-w-0">
@@ -99,7 +102,7 @@ const Index = () => {
         {/* What this is */}
         <section className="container mx-auto px-4 py-8 sm:py-12">
           <div className="max-w-xl mx-auto">
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-border/50">
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-border/50 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <h2 className="text-lg font-bold mb-4 text-center">What is this?</h2>
               <div className="space-y-3 text-muted-foreground text-sm">
                 <p>
@@ -117,7 +120,7 @@ const Index = () => {
         </section>
 
         {/* Footer note */}
-        <section className="container mx-auto px-4 py-6 text-center space-y-2">
+        <section className="container mx-auto px-4 py-6 text-center space-y-2 animate-fade-in" style={{ animationDelay: '0.7s' }}>
           <Link 
             to="/install" 
             className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-2"
