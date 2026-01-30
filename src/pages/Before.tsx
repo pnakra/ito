@@ -297,19 +297,18 @@ const Before = () => {
           )}
 
           {phase === "welcome" && (
-            <Card className="p-8 text-center animate-fade-in-up border-border/50">
-              <h1 className="text-2xl font-semibold mb-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <Card className="p-8 text-center border-border/50 animate-fade-in">
+              <h1 className="text-2xl font-semibold mb-3">
                 Before anything happens
               </h1>
-              <p className="text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <p className="text-muted-foreground mb-6">
                 Answer a few questions. See what comes up.
                 <br />Nothing is saved.
               </p>
               <Button 
                 size="lg" 
                 onClick={() => setPhase("orientation")}
-                className="px-8 animate-fade-in"
-                style={{ animationDelay: '0.3s' }}
+                className="px-8"
               >
                 Continue <ArrowRight className="ml-2 w-4 h-4" />
               </Button>

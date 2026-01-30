@@ -131,23 +131,23 @@ const After = () => {
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in-up">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in">
               Let's think through what happened.
             </h1>
 
-            <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Sometimes you look back and realize something felt off — or you're worried you went too far. 
+            <p className="text-center text-muted-foreground animate-fade-in" style={{ animationDelay: '0.05s' }}>
+              Sometimes you look back and realize something felt off, or you're worried you went too far. 
               This is a space to slow down and figure it out.
             </p>
 
-            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
               This is a guide to help you think things through.
             </div>
 
-            <div className="flex justify-center pt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <div className="flex justify-center pt-4 animate-fade-in" style={{ animationDelay: '0.15s' }}>
               <Button 
                 onClick={() => setScreen("input")} 
-                size="lg" 
+                size="lg"
                 className="px-8"
               >
                 Continue
