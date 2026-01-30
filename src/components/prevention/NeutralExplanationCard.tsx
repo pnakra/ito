@@ -32,7 +32,7 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
       <div className="flex justify-center">
         <div className="bg-muted text-muted-foreground py-3 px-5 rounded-lg font-medium flex items-center justify-center gap-2">
           <Info className="w-5 h-5" />
-          No hard stop detected right now
+          Nothing jumped out as a problem
         </div>
       </div>
       
@@ -53,11 +53,11 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
       <div className="bg-muted/50 border border-border p-4 rounded-lg">
         <div className="flex items-center gap-2 mb-2">
           <MessageCircle className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Remember</span>
+          <span className="text-sm font-medium text-muted-foreground">Keep in mind</span>
         </div>
         <p className="text-sm text-muted-foreground">
-          Consent is ongoing and reversible. This is not approval or permission to proceed.
-          If they hesitate, go quiet, or pull back at any point, that's your cue to stop.
+          This doesn't mean "go ahead." It just means nothing obvious came up.
+          People can change their mind at any time. If they pull back, go quiet, or seem unsure — stop.
         </p>
       </div>
 

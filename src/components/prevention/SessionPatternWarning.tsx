@@ -7,7 +7,7 @@ const SessionPatternWarning = () => {
       <div className="flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
         <p className="text-muted-foreground text-sm">
-          You've run into a few situations like this. That's often a sign it's time to slow things way down.
+          You've been here a few times now. That might mean it's time to slow things down for a bit.
         </p>
       </div>
     </Card>

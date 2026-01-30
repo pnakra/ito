@@ -14,16 +14,16 @@ const CrossedLineHandoff = ({ isActive }: CrossedLineHandoffProps) => {
 
   return (
     <Card className="p-6 border-muted bg-muted/30 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h3 className="text-lg font-semibold mb-2">If something already happened</h3>
+      <h3 className="text-lg font-semibold mb-2">Did something already happen?</h3>
       <p className="text-muted-foreground mb-4">
-        If you're realizing this may have crossed a line already, there's another path focused on reflection and accountability.
+        If you're thinking you might have already gone too far, there's a different space for that.
       </p>
       <Button
         variant="outline"
         onClick={() => navigate("/crossed-line")}
         className="w-full sm:w-auto"
       >
-        Reflect on what happened
+        Think through what happened
         <ArrowRight className="ml-2 w-4 h-4" />
       </Button>
     </Card>

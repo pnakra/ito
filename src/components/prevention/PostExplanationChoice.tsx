@@ -26,9 +26,9 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
           <div className="flex items-center gap-4">
             <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
             <div>
-              <span className="font-medium block">I understand — I'm done</span>
+              <span className="font-medium block">I get it — I'm done</span>
               <span className="text-sm text-muted-foreground">
-                End here and reflect on what you learned
+                Finish here
               </span>
             </div>
           </div>
@@ -42,9 +42,9 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
           <div className="flex items-center gap-4">
             <MessageSquare className="w-6 h-6 text-primary flex-shrink-0" />
             <div>
-              <span className="font-medium block">I want to talk more</span>
+              <span className="font-medium block">I have more questions</span>
               <span className="text-sm text-muted-foreground">
-                Share more context or ask questions
+                Keep talking
               </span>
             </div>
           </div>

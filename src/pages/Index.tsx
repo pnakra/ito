@@ -13,19 +13,19 @@ const Index = () => {
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-8 sm:py-16 text-center">
           <div className="inline-block mb-3 sm:mb-4 px-3 sm:px-4 py-1 sm:py-1.5 bg-primary/10 text-primary text-xs sm:text-sm font-medium rounded-full animate-fade-in">
-            No accounts · No tracking · Just clarity
+            Private · Anonymous · No sign-up
           </div>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 text-foreground px-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            Know the vibe. Know the line.
+            Not sure what's okay?
           </h1>
           <p className="text-sm sm:text-lg text-muted-foreground mb-8 sm:mb-10 max-w-lg mx-auto px-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            A quick check-in when you're not sure what's happening — or what happened.
+            A quick way to think through what's happening — before or after.
           </p>
           
           {/* Three Main Tiles */}
           <div className="grid grid-cols-1 gap-3 sm:gap-4 max-w-3xl mx-auto px-1 sm:px-0">
             
-            {/* Tile 1 - Reality Check */}
+            {/* Tile 1 - Before */}
             <Link 
               to="/avoid-line"
               className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
@@ -37,10 +37,10 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
-                  Reality Check
+                  Before Something Happens
                 </h2>
                 <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
-                  Not sure if something's okay? Think it through first.
+                  Not sure if you should keep going? Check here first.
                 </p>
               </div>
               <div className="hidden sm:flex items-center justify-center text-primary text-sm font-medium">
@@ -49,7 +49,7 @@ const Index = () => {
               <ArrowRight className="w-5 h-5 text-primary sm:hidden flex-shrink-0 ml-2" />
             </Link>
 
-            {/* Tile 2 - Second Thoughts */}
+            {/* Tile 2 - After */}
             <Link 
               to="/crossed-line"
               className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
@@ -61,19 +61,19 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
-                  Second Thoughts
+                  After Something Happened
                 </h2>
                 <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
-                  Something already happened? Reflect on it here.
+                  Worried you went too far? Think it through here.
                 </p>
               </div>
               <div className="hidden sm:flex items-center justify-center text-secondary text-sm font-medium">
-                Reflect <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                Start <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
               <ArrowRight className="w-5 h-5 text-secondary sm:hidden flex-shrink-0 ml-2" />
             </Link>
 
-            {/* Tile 3 - Need to Talk */}
+            {/* Tile 3 - Something happened to me */}
             <Link 
               to="/someone-crossed"
               className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
@@ -85,14 +85,14 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
-                  Need to Talk
+                  Something Happened to Me
                 </h2>
                 <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
-                  Something happened to you? Process it at your pace.
+                  Not sure how you feel about something? Talk through it.
                 </p>
               </div>
               <div className="hidden sm:flex items-center justify-center text-primary text-sm font-medium">
-                Talk <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                Start <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
               <ArrowRight className="w-5 h-5 text-primary sm:hidden flex-shrink-0 ml-2" />
             </Link>
@@ -106,13 +106,13 @@ const Index = () => {
               <h2 className="text-lg font-bold mb-4 text-center">What is this?</h2>
               <div className="space-y-3 text-muted-foreground text-sm">
                 <p>
-                  <strong className="text-foreground">A reality check, not a lecture.</strong> You already know what consent is. This is for when things feel unclear.
+                  <strong className="text-foreground">A way to slow down and think.</strong> Sometimes it's hard to tell what's okay. This helps you figure it out.
                 </p>
                 <p>
-                  <strong className="text-foreground">Completely anonymous.</strong> No accounts, no tracking. Close the tab and it's gone.
+                  <strong className="text-foreground">Totally private.</strong> No accounts. Nothing saved. Close the tab and it's gone.
                 </p>
                 <p>
-                  <strong className="text-foreground">Not a replacement for real help.</strong> If you need support, check the <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">resources</Link>.
+                  <strong className="text-foreground">Not a replacement for real help.</strong> If you need to talk to someone, check out the <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">resources</Link>.
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ const Index = () => {
             Add to home screen
           </Link>
           <p className="text-xs text-muted-foreground">
-            Built for early exploration — not a finished product.
+            This is an early version — still being improved.
           </p>
         </section>
       </main>

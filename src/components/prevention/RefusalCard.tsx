@@ -16,11 +16,11 @@ const RefusalCard = ({ onReset }: RefusalCardProps) => {
       </div>
       
       <div className="text-center space-y-4">
-        <h2 className="text-xl font-bold">I can't help with continuing this.</h2>
+        <h2 className="text-xl font-bold">This isn't something I can help with.</h2>
         
         <p className="text-muted-foreground">
-          The situation you described involves clear boundaries that need to be respected. 
-          The safest move is to stop.
+          Based on what you shared, the right move here is to stop. 
+          Respecting someone's boundaries is always the answer.
         </p>
         
         <div className="pt-4">

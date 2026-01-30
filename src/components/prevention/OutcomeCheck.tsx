@@ -15,19 +15,19 @@ const outcomes = [
   },
   {
     id: "checked-in",
-    label: "I checked in verbally",
+    label: "I asked if they were okay",
     icon: MessageCircle,
     className: "hover:border-success hover:bg-success/10"
   },
   {
     id: "didnt-proceed",
-    label: "I didn't go through with it",
+    label: "I decided not to do it",
     icon: XCircle,
     className: "hover:border-primary hover:bg-primary/10"
   },
   {
     id: "not-sure",
-    label: "I'm not sure / I ignored this",
+    label: "I'm not sure / I didn't follow this",
     icon: HelpCircle,
     className: "hover:border-muted-foreground hover:bg-muted"
   }
@@ -38,10 +38,10 @@ const OutcomeCheck = ({ onSelect }: OutcomeCheckProps) => {
     <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="text-center mb-6">
         <h2 className="text-xl md:text-2xl font-bold mb-2">
-          What did you end up doing?
+          What did you do?
         </h2>
         <p className="text-muted-foreground">
-          This helps you reflect. Nothing is stored or tracked.
+          Just for you to think about. Nothing is saved.
         </p>
       </div>
       

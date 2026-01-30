@@ -43,7 +43,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Eye className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-lg">What's Actually Happening</h3>
+          <h3 className="font-bold text-lg">What's going on</h3>
         </div>
         <ul className="space-y-2 ml-7">
           {analysis.whatsHappening.map((point, i) => (
@@ -59,7 +59,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <X className="w-5 h-5 text-destructive" />
-          <h3 className="font-bold text-lg">What NOT to Do</h3>
+          <h3 className="font-bold text-lg">Don't do this</h3>
         </div>
         <div className="space-y-2 ml-7">
           {analysis.whatNotToDo.map((point, i) => (
@@ -75,7 +75,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Check className="w-5 h-5 text-success" />
-          <h3 className="font-bold text-lg">What to Do Instead</h3>
+          <h3 className="font-bold text-lg">Try this instead</h3>
         </div>
         <div className="space-y-2 ml-7">
           {analysis.whatToDoInstead.map((point, i) => (
@@ -91,7 +91,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
       <div className="bg-accent/20 border border-accent p-4 rounded-lg">
         <div className="flex items-center gap-2 mb-2">
           <MessageCircle className="w-5 h-5" />
-          <h3 className="font-bold">Real Talk</h3>
+          <h3 className="font-bold">The main thing</h3>
         </div>
         <p>{analysis.realTalk}</p>
       </div>

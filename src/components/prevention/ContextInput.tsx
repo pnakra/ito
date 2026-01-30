@@ -23,17 +23,17 @@ const ContextInput = ({ value, onChange, onContinue, isActive }: ContextInputPro
           <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">
             5
           </span>
-          <h2 className="text-xl md:text-2xl font-bold">Anything else we should know?</h2>
+          <h2 className="text-xl md:text-2xl font-bold">Anything else?</h2>
         </div>
         <p className="text-muted-foreground ml-11">
-          Optional — but the more context you give, the better the feedback.
+          Optional — but more details can help.
         </p>
       </div>
 
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
-        placeholder="What else is going on? How are you feeling? What's making you unsure?"
+        placeholder="What else is going on? How are you feeling?"
         className="min-h-[120px] resize-none mb-4"
       />
 

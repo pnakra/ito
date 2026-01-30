@@ -9,10 +9,10 @@ interface OutcomeFeedbackProps {
 }
 
 const feedbackMap: Record<string, string> = {
-  stopped: "Clear pauses and verbal check-ins are what actually prevent harm.",
-  "checked-in": "Clear pauses and verbal check-ins are what actually prevent harm.",
-  "didnt-proceed": "Choosing not to proceed is always a valid way to keep things safe.",
-  "not-sure": "If a situation feels confusing, earlier pauses usually make things clearer.",
+  stopped: "Stopping or asking is how you make sure everyone's okay.",
+  "checked-in": "Stopping or asking is how you make sure everyone's okay.",
+  "didnt-proceed": "Not going through with it is always an okay choice.",
+  "not-sure": "When things feel confusing, it usually helps to slow down sooner.",
 };
 
 const OutcomeFeedback = ({ outcomeId, onReset }: OutcomeFeedbackProps) => {
