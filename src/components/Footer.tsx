@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-card mt-auto">
+    <footer className="border-t border-border/30 bg-background mt-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
           <Link to="/about" className="hover:text-foreground transition-colors">
@@ -21,7 +21,7 @@ const Footer = () => {
           </a>
         </div>
         <p className="text-center text-xs text-muted-foreground mt-4">
-          100% anonymous · No accounts · No data stored
+          This isn't permission. It's a pause.
         </p>
       </div>
     </footer>

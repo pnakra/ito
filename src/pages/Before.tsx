@@ -15,11 +15,11 @@ import PostExplanationChoice from "@/components/prevention/PostExplanationChoice
 import FollowUpChat from "@/components/prevention/FollowUpChat";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
-import CrossedLineHandoff from "@/components/prevention/CrossedLineHandoff";
+import AfterHandoff from "@/components/prevention/AfterHandoff";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, RotateCcw, Shield } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
 type FlowPhase = 
@@ -81,7 +81,7 @@ const momentumOptions: StepOption[] = [
   { id: "dont-know", label: "I don't know" }
 ];
 
-const AvoidLine = () => {
+const Before = () => {
   const [phase, setPhase] = useState<FlowPhase>("welcome");
   const [decisions, setDecisions] = useState<DecisionState>({
     orientation: null,
@@ -98,7 +98,6 @@ const AvoidLine = () => {
 
   const { 
     shouldShowPatternWarning, 
-    shouldRefuse, 
     recordRun,
     coercivePatternCount,
     yellowOrRedCount
@@ -114,15 +113,10 @@ const AvoidLine = () => {
 
   const handleContextFactorSelect = (id: string) => {
     setDecisions(prev => {
-      // "None" is exclusive
       if (id === "none") {
         return { ...prev, contextFactors: ["none"] };
       }
-      
-      // Remove "none" if selecting another option
       const withoutNone = prev.contextFactors.filter(f => f !== "none");
-      
-      // Toggle the selection
       if (withoutNone.includes(id)) {
         return { ...prev, contextFactors: withoutNone.filter(f => f !== id) };
       }
@@ -147,26 +141,22 @@ const AvoidLine = () => {
   };
 
   const handleContextInputContinue = () => {
-    // Calculate risk and proceed
     const result = classifyRisk(decisions);
     setRiskResult(result);
     
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     
-    // Check for refusal condition: repeated coercive language + RED + seeking reassurance
     if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(result.level, hasFlaggedWords);
       setPhase("refusal");
       return;
     }
     
-    // Record this run for session tracking
     recordRun(result.level, hasFlaggedWords);
     
     if (result.level === "red" || result.level === "yellow") {
       setPhase("stop-moment");
     } else {
-      // Green - go straight to explanation
       fetchExplanation(result.level, result.flaggedWords);
     }
   };
@@ -183,7 +173,6 @@ const AvoidLine = () => {
     
     try {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
-      
       setConversationHistory(prev => [...prev, formattedSelections]);
       
       const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
@@ -207,11 +196,11 @@ const AvoidLine = () => {
       console.error("Error fetching explanation:", error);
       setAnalysis({
         riskLevel: riskLevel,
-        assessment: "We couldn't process this right now, but the risk level still applies.",
-        whatsHappening: ["The system encountered an error processing your situation"],
-        whatNotToDo: ["Don't proceed if you're uncertain about consent"],
-        whatToDoInstead: ["Check in verbally with clear, direct questions"],
-        realTalk: "When in doubt, slow down and communicate."
+        assessment: "We couldn't check this right now.",
+        whatsHappening: ["Something went wrong on our end"],
+        whatNotToDo: ["Don't keep going if you're not sure"],
+        whatToDoInstead: ["Ask them directly how they're feeling"],
+        realTalk: "When in doubt, slow down."
       });
     } finally {
       setIsLoading(false);
@@ -278,7 +267,6 @@ const AvoidLine = () => {
   };
 
   const handleOutcomeSelect = (outcome: string) => {
-    console.log("Outcome selected (not stored):", outcome);
     setSelectedOutcome(outcome);
     setPhase("outcome-feedback");
   };
@@ -291,52 +279,43 @@ const AvoidLine = () => {
     return false;
   }, [phase, decisions]);
 
-  // Determine if we should show the crossed-line handoff
-  const shouldShowCrossedLineHandoff = 
+  const shouldShowAfterHandoff = 
     decisions.orientation === "already-happened" || yellowOrRedCount >= 2;
 
-  // Determine which explanation card to show based on risk level
   const isNeutralRisk = riskResult?.level === "green";
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Back button - persistent throughout the flow */}
           <BackButton to="/" />
           
-          {/* Session Pattern Warning */}
           {shouldShowPatternWarning && phase === "welcome" && (
             <SessionPatternWarning />
           )}
 
-          {/* Welcome */}
           {phase === "welcome" && (
-            <Card className="p-8 text-center animate-fade-in-up">
-              <div className="flex justify-center mb-6">
-                <div className="p-4 rounded-full bg-primary/20 animate-float">
-                  <Shield className="w-12 h-12 text-primary" />
-                </div>
-              </div>
-              <h1 className="text-3xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>Quick Check</h1>
-              <p className="text-lg text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                Answer a few questions. See what to do next.
+            <Card className="p-8 text-center animate-fade-in-up border-border/50">
+              <h1 className="text-2xl font-semibold mb-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                Before anything happens
+              </h1>
+              <p className="text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                Answer a few questions. See what comes up.
                 <br />Nothing is saved.
               </p>
               <Button 
                 size="lg" 
                 onClick={() => setPhase("orientation")}
-                className="px-8 animate-fade-in hover:scale-105 transition-transform"
+                className="px-8 animate-fade-in"
                 style={{ animationDelay: '0.3s' }}
               >
-                Start <ArrowRight className="ml-2 w-5 h-5" />
+                Continue <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Card>
           )}
 
-          {/* Step 1: Orientation */}
           <DecisionStep
             stepNumber={1}
             title="What's the situation?"
@@ -346,7 +325,6 @@ const AvoidLine = () => {
             isActive={phase === "orientation"}
           />
 
-          {/* Step 2: Consent Signals */}
           <DecisionStep
             stepNumber={2}
             title="What are they doing or saying?"
@@ -356,7 +334,6 @@ const AvoidLine = () => {
             isActive={phase === "consent-signal"}
           />
 
-          {/* Step 3: Context Factors */}
           <DecisionStep
             stepNumber={3}
             title="Is anything else going on?"
@@ -368,7 +345,6 @@ const AvoidLine = () => {
             isActive={phase === "context-factors"}
           />
 
-          {/* Step 4: Momentum Check */}
           <DecisionStep
             stepNumber={4}
             title="Where is this going?"
@@ -378,7 +354,6 @@ const AvoidLine = () => {
             isActive={phase === "momentum"}
           />
 
-          {/* Step 5: Additional Context (free text) */}
           <ContextInput
             value={decisions.additionalContext}
             onChange={(value) => setDecisions(prev => ({ ...prev, additionalContext: value }))}
@@ -386,7 +361,6 @@ const AvoidLine = () => {
             isActive={phase === "additional-context"}
           />
 
-          {/* Continue Button (for button steps only) */}
           {(phase === "orientation" || phase === "consent-signal" || phase === "context-factors" || phase === "momentum") && (
             <div className="flex justify-center pt-4">
               <Button
@@ -395,12 +369,11 @@ const AvoidLine = () => {
                 disabled={!canProceed()}
                 className="px-8"
               >
-                Continue <ArrowRight className="ml-2 w-5 h-5" />
+                Continue <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
           )}
 
-          {/* Stop Moment Overlay */}
           {phase === "stop-moment" && riskResult && (
             <StopMoment
               riskLevel={riskResult.level}
@@ -409,12 +382,10 @@ const AvoidLine = () => {
             />
           )}
 
-          {/* Refusal Card */}
           {phase === "refusal" && (
             <RefusalCard onReset={resetFlow} />
           )}
 
-          {/* Explanation Card - use neutral card for green, full card for yellow/red */}
           {phase === "explanation" && (
             isNeutralRisk ? (
               <NeutralExplanationCard analysis={analysis} isLoading={isLoading} />
@@ -423,12 +394,10 @@ const AvoidLine = () => {
             )
           )}
 
-          {/* Crossed Line Handoff - shown after explanation when applicable */}
           {phase === "explanation" && !isLoading && analysis && (
-            <CrossedLineHandoff isActive={shouldShowCrossedLineHandoff} />
+            <AfterHandoff isActive={shouldShowAfterHandoff} />
           )}
 
-          {/* Post-Explanation Choice */}
           {phase === "explanation" && !isLoading && analysis && (
             <PostExplanationChoice
               onDone={handlePostExplanationDone}
@@ -437,7 +406,6 @@ const AvoidLine = () => {
             />
           )}
 
-          {/* Follow-up Chat */}
           <FollowUpChat
             onSubmit={handleFollowUpSubmit}
             onDone={handleFollowUpDone}
@@ -445,7 +413,6 @@ const AvoidLine = () => {
             isActive={phase === "follow-up-chat"}
           />
 
-          {/* Outcome Check */}
           {phase === "outcome" && (
             <>
               <OutcomeCheck onSelect={handleOutcomeSelect} />
@@ -463,7 +430,6 @@ const AvoidLine = () => {
             </>
           )}
 
-          {/* Outcome Feedback */}
           {phase === "outcome-feedback" && selectedOutcome && (
             <OutcomeFeedback outcomeId={selectedOutcome} onReset={resetFlow} />
           )}
@@ -475,4 +441,4 @@ const AvoidLine = () => {
   );
 };
 
-export default AvoidLine;
+export default Before;

@@ -25,13 +25,12 @@ interface FollowUpMessage {
   content: string;
 }
 
-const CrossedLine = () => {
+const After = () => {
   const [screen, setScreen] = useState<Screen>("intro");
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<ReflectionResult | null>(null);
   
-  // Follow-up chat state
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([]);
   const [followUpInput, setFollowUpInput] = useState("");
@@ -66,7 +65,7 @@ const CrossedLine = () => {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to process reflection. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -103,12 +102,12 @@ const CrossedLine = () => {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to send message. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
       const errorMessage: FollowUpMessage = {
         role: "assistant",
-        content: "I'm having trouble responding right now. Please try again."
+        content: "I'm having trouble right now. Please try again."
       };
       setFollowUpMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -127,31 +126,31 @@ const CrossedLine = () => {
 
   if (screen === "intro") {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/5">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-center animate-fade-in-up">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in-up">
               Let's think through what happened.
             </h1>
 
             <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
               Sometimes you look back and realize something felt off — or you're worried you went too far. 
-              This is a space to slow down and think it through.
+              This is a space to slow down and figure it out.
             </p>
 
-            <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <strong className="text-foreground">Note:</strong> This is just a thinking tool — not legal or medical advice.
+            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              This is a guide to help you think things through.
             </div>
 
             <div className="flex justify-center pt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
               <Button 
                 onClick={() => setScreen("input")} 
                 size="lg" 
-                className="px-8 py-5 text-base rounded-full hover:scale-105 transition-transform"
+                className="px-8"
               >
-                Start
+                Continue
               </Button>
             </div>
           </div>
@@ -163,15 +162,15 @@ const CrossedLine = () => {
 
   if (screen === "input") {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-secondary/5">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">What happened?</h1>
+            <h1 className="text-2xl sm:text-3xl font-semibold">What happened?</h1>
             
             <div className="space-y-4">
-              <p className="text-base sm:text-lg text-muted-foreground">
+              <p className="text-muted-foreground">
                 Describe what happened in your own words. You don't have to share every detail — 
                 just the parts that matter.
               </p>
@@ -179,7 +178,7 @@ const CrossedLine = () => {
               <Textarea
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value.slice(0, maxLength))}
-                placeholder="Take your time to describe what happened..."
+                placeholder="Take your time..."
                 className="min-h-[200px] sm:min-h-[250px] text-base"
                 disabled={isLoading}
               />
@@ -207,7 +206,7 @@ const CrossedLine = () => {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
+                      Taking a moment...
                     </>
                   ) : (
                     "Continue"
@@ -224,69 +223,67 @@ const CrossedLine = () => {
 
   if (screen === "results" && results) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-4xl">
+        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-3xl">
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 sm:mb-8">
-              Reflection Steps
+            <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-6 sm:mb-8">
+              Here's what came up
             </h1>
 
-            <Card className="p-4 sm:p-6 border-2 border-primary/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What might have happened</h2>
+            <Card className="p-4 sm:p-6 border-border/50">
+              <h2 className="text-lg font-medium mb-3">What might have happened</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.clarityCheck}</p>
             </Card>
 
-            <Card className="p-4 sm:p-6 border-2 border-secondary/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How they might have felt</h2>
+            <Card className="p-4 sm:p-6 border-border/50">
+              <h2 className="text-lg font-medium mb-3">How they might have felt</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.otherPersonPerspective}</p>
             </Card>
 
-            <Card className="p-4 sm:p-6 border-2 border-accent/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Your patterns</h2>
+            <Card className="p-4 sm:p-6 border-border/50">
+              <h2 className="text-lg font-medium mb-3">Patterns to notice</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.yourPatterns}</p>
             </Card>
 
-            <Card className="p-4 sm:p-6 border-2 border-warning/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What you can do now</h2>
+            <Card className="p-4 sm:p-6 border-border/50">
+              <h2 className="text-lg font-medium mb-3">What you can do now</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.accountabilitySteps}</p>
             </Card>
 
-            <Card className="p-4 sm:p-6 border-2 border-success/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How to do better</h2>
+            <Card className="p-4 sm:p-6 border-border/50">
+              <h2 className="text-lg font-medium mb-3">Going forward</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.avoidingRepetition}</p>
             </Card>
 
-            {/* Follow-up Chat Section */}
             {!showFollowUp ? (
-              <Card className="p-4 sm:p-6 border-2 border-primary/50 bg-primary/5">
+              <Card className="p-4 sm:p-6 border-border/50 bg-accent/30">
                 <div className="text-center space-y-4">
-                  <MessageCircle className="w-8 h-8 mx-auto text-primary" />
-                  <h3 className="text-lg sm:text-xl font-semibold">Have questions?</h3>
-                  <p className="text-muted-foreground text-sm sm:text-base">
+                  <MessageCircle className="w-6 h-6 mx-auto text-muted-foreground" />
+                  <h3 className="text-base font-medium">Have questions?</h3>
+                  <p className="text-muted-foreground text-sm">
                     If you want to talk through anything else, you can keep going.
                   </p>
-                  <Button onClick={() => setShowFollowUp(true)} variant="outline" size="lg">
+                  <Button onClick={() => setShowFollowUp(true)} variant="outline">
                     Keep talking
                   </Button>
                 </div>
               </Card>
             ) : (
-              <Card className="p-4 sm:p-6 border-2 border-primary/50">
-                <h3 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5" />
-                  Follow-up Conversation
+              <Card className="p-4 sm:p-6 border-border/50">
+                <h3 className="text-base font-medium mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  Keep talking
                 </h3>
                 
-                {/* Follow-up Messages */}
                 <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto">
                   {followUpMessages.map((message, index) => (
                     <div
                       key={index}
                       className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-[85%] p-3 rounded-lg text-sm sm:text-base ${
+                      <div className={`max-w-[85%] p-3 rounded-lg text-sm ${
                         message.role === "user" 
                           ? "bg-primary text-primary-foreground" 
                           : "bg-muted"
@@ -305,17 +302,16 @@ const CrossedLine = () => {
                   )}
                 </div>
 
-                {/* Follow-up Input */}
                 <form onSubmit={handleFollowUpSubmit} className="space-y-3">
                   <Textarea
                     value={followUpInput}
                     onChange={(e) => setFollowUpInput(e.target.value.slice(0, maxLength))}
                     placeholder="Ask a question or share more..."
-                    className="min-h-[80px] resize-none text-sm sm:text-base"
+                    className="min-h-[80px] resize-none text-sm"
                     disabled={isFollowUpLoading}
                   />
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {followUpInput.length} / {maxLength}
                     </span>
                     <Button 
@@ -337,31 +333,30 @@ const CrossedLine = () => {
               </Card>
             )}
 
-            <div className="bg-card border-2 border-primary/30 rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
-              <h3 className="text-base sm:text-lg font-semibold mb-3">If someone was hurt</h3>
-              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 sm:p-6">
+              <h3 className="text-base font-medium mb-3">If someone was hurt</h3>
+              <p className="text-muted-foreground mb-4 text-sm">
                 If the other person was hurt or uncomfortable, they might need support too.
               </p>
-              <ul className="space-y-2 text-muted-foreground text-sm sm:text-base">
+              <ul className="space-y-2 text-muted-foreground text-sm">
                 <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
-                <li>• 1in6 — <a href="https://1in6.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">1in6.org</a></li>
                 <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
                 <li>• Love Is Respect — <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">loveisrespect.org</a></li>
               </ul>
             </div>
 
-            <div className="text-center py-4 sm:py-6">
-              <p className="text-base sm:text-lg text-muted-foreground italic px-2">
+            <div className="text-center py-4">
+              <p className="text-muted-foreground italic text-sm">
                 Thinking about this doesn't make you a bad person. It means you're trying to do better.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6 sm:pt-8">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-6">
               <ShredButton onShred={handleStartOver} />
-              <Button variant="outline" onClick={handleStartOver} size="lg" className="w-full sm:w-auto">
+              <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto">
                 Start Over
               </Button>
-              <Button asChild size="lg" className="w-full sm:w-auto">
+              <Button asChild className="w-full sm:w-auto">
                 <a href="/">Return Home</a>
               </Button>
             </div>
@@ -376,4 +371,4 @@ const CrossedLine = () => {
   return null;
 };
 
-export default CrossedLine;
+export default After;
