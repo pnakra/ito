@@ -37,15 +37,23 @@
     --muted: 250 20% 94%;
     --muted-foreground: 250 15% 45%;
 
-    /* Status colors */
-    --destructive: 0 72% 51%;
+    /* Status colors - softer, friendlier versions */
+    --destructive: 0 65% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 60% 45%;
+    --success: 152 50% 50%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 80% 55%;
     --warning-foreground: 250 25% 15%;
+
+    /* Signal colors - gentler alternatives for the vibe check */
+    --signal-stop: 0 55% 60%;
+    --signal-stop-foreground: 0 0% 100%;
+    --signal-pause: 38 70% 58%;
+    --signal-pause-foreground: 250 25% 15%;
+    --signal-clear: 152 45% 55%;
+    --signal-clear-foreground: 0 0% 100%;
 
     /* Borders and inputs */
     --border: 250 20% 90%;

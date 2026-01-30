@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AlertOctagon, AlertTriangle } from "lucide-react";
+import { Hand, Pause } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
 interface StopMomentProps {
@@ -13,57 +13,58 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge }: StopMomentProps) 
   const isRed = riskLevel === "red";
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-sm animate-in fade-in duration-300">
-      <Card className={`max-w-lg w-full p-8 border-4 ${
-        isRed ? "border-destructive" : "border-warning"
-      } animate-in zoom-in-95 duration-300`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md animate-fade-in">
+      <Card className={`max-w-lg w-full p-8 border-2 ${
+        isRed ? "border-signal-stop/40" : "border-signal-pause/40"
+      } animate-scale-in shadow-xl`}>
         <div className="flex flex-col items-center text-center space-y-6">
-          {/* Icon */}
-          <div className={`p-4 rounded-full ${
-            isRed ? "bg-destructive/20" : "bg-warning/20"
-          }`}>
+          {/* Icon - softer, friendlier */}
+          <div className={`p-5 rounded-2xl ${
+            isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"
+          } animate-float`}>
             {isRed ? (
-              <AlertOctagon className={`w-16 h-16 text-destructive`} strokeWidth={2.5} />
+              <Hand className={`w-12 h-12 text-signal-stop`} strokeWidth={1.5} />
             ) : (
-              <AlertTriangle className={`w-16 h-16 text-warning`} strokeWidth={2.5} />
+              <Pause className={`w-12 h-12 text-signal-pause`} strokeWidth={1.5} />
             )}
           </div>
           
-          {/* Header */}
+          {/* Header - friendlier language */}
           <div>
-            <h2 className={`text-3xl font-bold mb-2 ${
-              isRed ? "text-destructive" : "text-warning"
+            <h2 className={`text-2xl font-bold mb-2 ${
+              isRed ? "text-signal-stop" : "text-signal-pause"
             }`}>
-              {isRed ? "STOP" : "PAUSE"}
+              {isRed ? "Hold up" : "Let's pause here"}
             </h2>
-            <p className="text-muted-foreground">
-              {isRed ? "This is a hard stop." : "Take a moment before continuing."}
+            <p className="text-muted-foreground text-sm">
+              {isRed ? "This needs your attention." : "Just want to make sure you see this."}
             </p>
           </div>
           
           {/* Message */}
-          <p className="text-xl font-medium leading-relaxed">
+          <p className="text-lg leading-relaxed text-foreground/90">
             {stopMessage}
           </p>
           
-          {/* Acknowledge Button */}
+          {/* Acknowledge Button - softer language */}
           <Button
             onClick={onAcknowledge}
             size="lg"
-            className={`mt-4 w-full py-6 text-lg font-semibold ${
+            variant="outline"
+            className={`mt-4 w-full py-6 text-base font-medium border-2 transition-all ${
               isRed 
-                ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" 
-                : "bg-warning hover:bg-warning/90 text-warning-foreground"
+                ? "border-signal-stop/50 text-signal-stop hover:bg-signal-stop/10" 
+                : "border-signal-pause/50 text-signal-pause hover:bg-signal-pause/10"
             }`}
           >
-            I understand
+            Got it, show me more
           </Button>
           
-          {/* Subtext */}
-          <p className="text-sm text-muted-foreground">
+          {/* Subtext - less scary */}
+          <p className="text-sm text-muted-foreground max-w-xs">
             {isRed 
-              ? "Proceeding without consent can cause serious harm."
-              : "Clear communication protects both of you."
+              ? "Taking a moment to think is a good thing."
+              : "Clear communication helps everyone."
             }
           </p>
         </div>

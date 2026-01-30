@@ -1,5 +1,5 @@
 import { RiskLevel } from "@/types/risk";
-import { AlertTriangle, AlertCircle, CheckCircle } from "lucide-react";
+import { Circle, Hand, Pause, ThumbsUp } from "lucide-react";
 
 interface RiskBadgeProps {
   level: RiskLevel;
@@ -9,28 +9,30 @@ interface RiskBadgeProps {
 const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
   const config = {
     red: {
-      label: "RED FLAG",
-      icon: AlertTriangle,
-      className: "bg-destructive text-destructive-foreground"
+      label: "Hard Stop",
+      icon: Hand,
+      className: "bg-signal-stop/15 text-signal-stop border border-signal-stop/30"
     },
     yellow: {
-      label: "YELLOW FLAG",
-      icon: AlertCircle,
-      className: "bg-warning text-warning-foreground"
+      label: "Pause & Check",
+      icon: Pause,
+      className: "bg-signal-pause/15 text-signal-pause border border-signal-pause/30"
     },
     green: {
-      label: "GREEN FLAG",
-      icon: CheckCircle,
-      className: "bg-success text-success-foreground"
+      label: "No flags yet",
+      icon: ThumbsUp,
+      className: "bg-signal-clear/15 text-signal-clear border border-signal-clear/30"
     }
   };
 
   const { label, icon: Icon, className } = config[level];
-  const sizeClasses = size === "lg" ? "text-2xl py-4 px-6" : "text-sm py-2 px-3";
+  const sizeClasses = size === "lg" 
+    ? "text-lg py-3 px-5" 
+    : "text-sm py-1.5 px-3";
 
   return (
-    <div className={`${className} ${sizeClasses} rounded-lg font-bold flex items-center justify-center gap-2`}>
-      <Icon className={size === "lg" ? "w-6 h-6" : "w-4 h-4"} />
+    <div className={`${className} ${sizeClasses} rounded-full font-medium flex items-center justify-center gap-2 animate-scale-in`}>
+      <Icon className={size === "lg" ? "w-5 h-5" : "w-4 h-4"} />
       {label}
     </div>
   );
