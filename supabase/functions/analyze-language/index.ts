@@ -50,39 +50,41 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not configured");
     }
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 512,
+        system: SYSTEM_PROMPT,
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: `Analyze this text for concerning attitudes:\n\n"${text}"` },
         ],
       }),
     });
 
     if (!resp.ok) {
-      if (resp.status === 429 || resp.status === 402) {
-        // On rate limit or payment issues, fail gracefully - let static detection handle it
+      if (resp.status === 429) {
+        // On rate limit, fail gracefully - let static detection handle it
         return new Response(
           JSON.stringify({ hasConcerningLanguage: false, categories: [], explanation: null, fallback: true }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      throw new Error(`AI gateway error: ${resp.status}`);
+      throw new Error(`Anthropic API error: ${resp.status}`);
     }
 
     const data = await resp.json();
-    const raw = data?.choices?.[0]?.message?.content ?? "";
+    const raw = data?.content?.[0]?.text ?? "";
 
     const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
     if (!match) {
