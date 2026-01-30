@@ -13,55 +13,55 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge }: StopMomentProps) 
   const isRed = riskLevel === "red";
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-md animate-fade-in">
-      <Card className={`max-w-lg w-full p-8 border-2 ${
-        isRed ? "border-signal-stop/40" : "border-signal-pause/40"
-      } animate-scale-in shadow-xl`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-sm animate-fade-in">
+      <Card className={`max-w-lg w-full p-8 border ${
+        isRed ? "border-signal-stop/30" : "border-signal-pause/30"
+      } animate-scale-in shadow-lg`}>
         <div className="flex flex-col items-center text-center space-y-6">
-          {/* Icon - softer, friendlier */}
-          <div className={`p-5 rounded-2xl ${
+          {/* Icon */}
+          <div className={`p-4 rounded-xl ${
             isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"
-          } animate-float`}>
+          }`}>
             {isRed ? (
-              <Hand className={`w-12 h-12 text-signal-stop`} strokeWidth={1.5} />
+              <Hand className={`w-10 h-10 text-signal-stop`} strokeWidth={1.5} />
             ) : (
-              <Pause className={`w-12 h-12 text-signal-pause`} strokeWidth={1.5} />
+              <Pause className={`w-10 h-10 text-signal-pause`} strokeWidth={1.5} />
             )}
           </div>
           
-          {/* Header - friendlier language */}
+          {/* Header */}
           <div>
-            <h2 className={`text-2xl font-bold mb-2 ${
+            <h2 className={`text-xl font-medium mb-2 ${
               isRed ? "text-signal-stop" : "text-signal-pause"
             }`}>
               {isRed ? "Wait" : "One second"}
             </h2>
             <p className="text-muted-foreground text-sm">
-              {isRed ? "Read this before you do anything." : "Take a look at this first."}
+              {isRed ? "Read this first." : "Take a look at this."}
             </p>
           </div>
           
           {/* Message */}
-          <p className="text-lg leading-relaxed text-foreground/90">
+          <p className="text-foreground/90">
             {stopMessage}
           </p>
           
-          {/* Acknowledge Button - softer language */}
+          {/* Acknowledge Button */}
           <Button
             onClick={onAcknowledge}
             size="lg"
             variant="outline"
-            className={`mt-4 w-full py-6 text-base font-medium border-2 transition-all ${
+            className={`mt-4 w-full py-5 font-medium border transition-all ${
               isRed 
-                ? "border-signal-stop/50 text-signal-stop hover:bg-signal-stop/10" 
-                : "border-signal-pause/50 text-signal-pause hover:bg-signal-pause/10"
+                ? "border-signal-stop/30 text-signal-stop hover:bg-signal-stop/5" 
+                : "border-signal-pause/30 text-signal-pause hover:bg-signal-pause/5"
             }`}
           >
-            Got it, show me more
+            I understand, continue
           </Button>
           
-          {/* Subtext - less scary */}
-          <p className="text-sm text-muted-foreground max-w-xs">
+          {/* Subtext */}
+          <p className="text-sm text-muted-foreground">
             {isRed 
               ? "Stopping to think is always the right move."
               : "Checking in is a good thing."

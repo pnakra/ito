@@ -2,96 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* vibecheck design system
-   Inspired by tbh app: light, approachable, purple/pink palette
-   Friendly for high schoolers but not cheesy
+/* is this ok? design system
+   Quiet, calm, minimal - feels like a pause
+   Muted palette, soft transitions, lots of whitespace
    All colors MUST be HSL
 */
 
 @layer base {
   :root {
-    /* Light, approachable base */
-    --background: 250 30% 98%;
-    --foreground: 250 25% 15%;
+    /* Soft, quiet base - very light warm gray */
+    --background: 40 20% 98%;
+    --foreground: 220 15% 20%;
 
-    /* Clean white cards */
+    /* Clean white cards with subtle warmth */
     --card: 0 0% 100%;
-    --card-foreground: 250 25% 15%;
+    --card-foreground: 220 15% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 250 25% 15%;
+    --popover-foreground: 220 15% 20%;
 
-    /* Primary: Purple (tbh-inspired) */
-    --primary: 262 80% 55%;
+    /* Primary: Soft slate blue - calm, not urgent */
+    --primary: 220 25% 45%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Pink/Magenta */
-    --secondary: 330 75% 55%;
+    /* Secondary: Warm muted rose */
+    --secondary: 350 20% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent: Soft teal for variety */
-    --accent: 262 60% 95%;
-    --accent-foreground: 262 80% 45%;
+    /* Accent: Very soft blue-gray */
+    --accent: 220 20% 95%;
+    --accent-foreground: 220 25% 40%;
 
-    /* Muted: Light gray-purple */
-    --muted: 250 20% 94%;
-    --muted-foreground: 250 15% 45%;
+    /* Muted: Warm gray */
+    --muted: 40 10% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    /* Status colors - softer, friendlier versions */
-    --destructive: 0 65% 58%;
+    /* Status colors - very muted, non-alarming */
+    --destructive: 0 45% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 50% 50%;
+    --success: 160 30% 45%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 80% 55%;
-    --warning-foreground: 250 25% 15%;
+    --warning: 35 50% 50%;
+    --warning-foreground: 220 15% 20%;
 
-    /* Signal colors - gentler alternatives for the vibe check */
-    --signal-stop: 0 55% 60%;
+    /* Signal colors - calm, not alarming */
+    --signal-stop: 0 35% 50%;
     --signal-stop-foreground: 0 0% 100%;
-    --signal-pause: 38 70% 58%;
-    --signal-pause-foreground: 250 25% 15%;
-    --signal-clear: 152 45% 55%;
+    --signal-pause: 35 40% 50%;
+    --signal-pause-foreground: 220 15% 20%;
+    --signal-clear: 160 25% 50%;
     --signal-clear-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 250 20% 90%;
-    --input: 250 20% 90%;
-    --ring: 262 80% 55%;
+    /* Borders and inputs - very subtle */
+    --border: 40 15% 90%;
+    --input: 40 15% 90%;
+    --ring: 220 25% 45%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
     /* Sidebar (keeping for shadcn compatibility) */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 262 80% 55%;
+    --sidebar-foreground: 220 15% 30%;
+    --sidebar-primary: 220 25% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 262 60% 95%;
-    --sidebar-accent-foreground: 262 80% 45%;
-    --sidebar-border: 250 20% 90%;
-    --sidebar-ring: 262 80% 55%;
+    --sidebar-accent: 220 20% 95%;
+    --sidebar-accent-foreground: 220 25% 40%;
+    --sidebar-border: 40 15% 90%;
+    --sidebar-ring: 220 25% 45%;
   }
 
-  /* Optional dark mode - keeping it subtle */
+  /* Dark mode - keeping it very subtle */
   .dark {
-    --background: 250 25% 10%;
-    --foreground: 250 20% 95%;
+    --background: 220 15% 10%;
+    --foreground: 220 10% 90%;
     
-    --card: 250 25% 14%;
-    --card-foreground: 250 20% 95%;
+    --card: 220 15% 13%;
+    --card-foreground: 220 10% 90%;
     
-    --popover: 250 25% 14%;
-    --popover-foreground: 250 20% 95%;
+    --popover: 220 15% 13%;
+    --popover-foreground: 220 10% 90%;
     
-    --muted: 250 20% 20%;
-    --muted-foreground: 250 15% 65%;
+    --muted: 220 10% 18%;
+    --muted-foreground: 220 10% 60%;
     
-    --accent: 262 60% 20%;
-    --accent-foreground: 262 60% 80%;
+    --accent: 220 15% 18%;
+    --accent-foreground: 220 15% 75%;
     
-    --border: 250 20% 22%;
-    --input: 250 20% 22%;
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
   }
 }
 
@@ -110,7 +110,7 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold;
+    @apply font-semibold;
   }
 }
 

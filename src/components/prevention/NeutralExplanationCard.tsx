@@ -15,10 +15,10 @@ interface NeutralExplanationCardProps {
 const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardProps) => {
   if (isLoading) {
     return (
-      <Card className="p-8 animate-in fade-in duration-300">
+      <Card className="p-8 animate-in fade-in duration-300 border-border/50">
         <div className="flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Checking this through...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <p className="text-muted-foreground text-sm">Taking a moment...</p>
         </div>
       </Card>
     );
@@ -27,17 +27,17 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
   if (!analysis) return null;
 
   return (
-    <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 border-border/50">
       {/* Neutral header - no green, no approval */}
       <div className="flex justify-center">
-        <div className="bg-muted text-muted-foreground py-3 px-5 rounded-lg font-medium flex items-center justify-center gap-2">
-          <Info className="w-5 h-5" />
-          Nothing jumped out as a problem
+        <div className="bg-muted text-muted-foreground py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
+          <Info className="w-4 h-4" />
+          No clear red flags right now
         </div>
       </div>
       
       {/* Core message - deliberately minimal */}
-      <p className="text-lg text-center text-muted-foreground">{analysis.assessment}</p>
+      <p className="text-center text-muted-foreground">{analysis.assessment}</p>
 
       {/* Key points - brief */}
       <div className="space-y-2">
@@ -50,14 +50,13 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
       </div>
 
       {/* Consent reminder - always present */}
-      <div className="bg-muted/50 border border-border p-4 rounded-lg">
+      <div className="bg-muted/50 border border-border/50 p-4 rounded-lg">
         <div className="flex items-center gap-2 mb-2">
           <MessageCircle className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium text-muted-foreground">Keep in mind</span>
         </div>
         <p className="text-sm text-muted-foreground">
-          This doesn't mean "go ahead." It just means nothing obvious came up.
-          People can change their mind at any time. If they pull back, go quiet, or seem unsure — stop.
+          Consent can change at any time. This isn't permission to keep going. If they hesitate, go quiet, or pull back, that's your cue to stop.
         </p>
       </div>
 

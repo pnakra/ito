@@ -11,29 +11,26 @@ import {
 
 const About = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         <div className="max-w-2xl mx-auto space-y-8">
           <div>
             <BackButton to="/" />
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">About</h1>
-            <div className="space-y-4 text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-4">About</h1>
+            <div className="space-y-4 text-muted-foreground text-sm">
               <p>
-                <strong className="text-foreground">vibe check</strong> is a harm-reduction tool designed to help young people think through consent, boundaries, and accountability. It's not legal advice, therapy, or a substitute for professional help.
+                <strong className="text-foreground">is this ok?</strong> is a tool to help you pause and think through what's happening. It's not legal advice, therapy, or a substitute for talking to someone you trust.
               </p>
               <p>
-                The internet is full of terrible advice. We're here to cut through that with real talk about what actually makes healthy relationships work.
-              </p>
-              <p>
-                Our goal: help you understand boundaries, recognize when lines might be crossed, and learn what respect looks like. No judgment — just honest, supportive guidance.
+                Sometimes it's hard to tell what's okay in the moment. This is a space to slow down and figure it out.
               </p>
             </div>
           </div>
 
-          <Card className="p-5 sm:p-6 bg-white border-border/50 rounded-2xl">
-            <h2 className="text-xl font-bold mb-4">Privacy</h2>
+          <Card className="p-5 sm:p-6 border-border/50">
+            <h2 className="text-lg font-medium mb-4">Privacy</h2>
             <div className="space-y-3 text-muted-foreground text-sm">
               <p>
                 <strong className="text-foreground">No login required.</strong> No account, no personal info needed.
@@ -48,10 +45,10 @@ const About = () => {
           </Card>
 
           <div>
-            <h2 className="text-2xl font-bold mb-4">FAQs</h2>
+            <h2 className="text-xl font-medium mb-4">FAQs</h2>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="border-border/50">
-                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                <AccordionTrigger className="text-left text-sm hover:no-underline">
                   Is this really anonymous?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm">
@@ -60,7 +57,7 @@ const About = () => {
               </AccordionItem>
 
               <AccordionItem value="item-2" className="border-border/50">
-                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                <AccordionTrigger className="text-left text-sm hover:no-underline">
                   Will anyone know I used this?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm">
@@ -69,16 +66,16 @@ const About = () => {
               </AccordionItem>
 
               <AccordionItem value="item-3" className="border-border/50">
-                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                <AccordionTrigger className="text-left text-sm hover:no-underline">
                   What if something already happened?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm">
-                  Use "Second Thoughts" to reflect on it. If you're worried you seriously crossed a line, the resources page has support options.
+                  Use "After something happened" to think it through. If you're worried you went too far, the resources page has support options.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="border-border/50">
-                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                <AccordionTrigger className="text-left text-sm hover:no-underline">
                   Can I use this for a friend?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm">
@@ -87,11 +84,11 @@ const About = () => {
               </AccordionItem>
 
               <AccordionItem value="item-5" className="border-border/50">
-                <AccordionTrigger className="text-left text-sm sm:text-base hover:no-underline">
+                <AccordionTrigger className="text-left text-sm hover:no-underline">
                   Is this going to lecture me?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm">
-                  No. We're not here to preach. Just real talk about what works and what doesn't.
+                  No. This isn't about telling you what to do. It's about helping you think.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -8,9 +8,9 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/avoid-line", label: "Reality Check" },
-    { to: "/crossed-line", label: "Second Thoughts" },
-    { to: "/someone-crossed", label: "Need to Talk" },
+    { to: "/before", label: "Before" },
+    { to: "/after", label: "After" },
+    { to: "/happened-to-me", label: "Happened to me" },
     { to: "/resources", label: "Resources" },
   ];
 
@@ -22,13 +22,13 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="border-b border-border/50 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
+    <header className="border-b border-border/30 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link 
           to="/" 
-          className="text-xl font-bold text-primary hover:opacity-80 transition-opacity"
+          className="text-lg font-medium text-foreground hover:text-primary transition-colors"
         >
-          vibe check
+          is this ok?
         </Link>
         
         {/* Desktop Navigation */}
@@ -37,10 +37,10 @@ const Header = () => {
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive(link.to)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-accent text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
             >
               {link.label}
@@ -62,17 +62,17 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border/50 bg-white">
+        <div className="md:hidden border-t border-border/30 bg-background">
           <div className="container mx-auto px-4 py-2 flex flex-col">
             {/* Primary nav links */}
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`py-3 px-4 rounded-xl font-medium transition-colors ${
+                className={`py-3 px-4 rounded-lg transition-colors ${
                   isActive(link.to)
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "bg-accent text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -81,7 +81,7 @@ const Header = () => {
             ))}
             
             {/* Divider */}
-            <div className="border-t border-border/50 my-2" />
+            <div className="border-t border-border/30 my-2" />
             
             {/* Secondary links */}
             {secondaryLinks.map((link) => {
@@ -90,10 +90,10 @@ const Header = () => {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`py-3 px-4 rounded-xl font-medium transition-colors flex items-center gap-2 ${
+                  className={`py-3 px-4 rounded-lg transition-colors flex items-center gap-2 ${
                     isActive(link.to)
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

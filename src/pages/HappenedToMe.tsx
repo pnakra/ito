@@ -24,7 +24,7 @@ interface Message {
   };
 }
 
-const SomeoneCrossedLine = () => {
+const HappenedToMe = () => {
   const navigate = useNavigate();
   const [showIntro, setShowIntro] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,7 +58,6 @@ const SomeoneCrossedLine = () => {
     setIsLoading(true);
 
     try {
-      // Build conversation history (excluding the message we just added)
       const conversationHistory = messages.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -78,7 +77,6 @@ const SomeoneCrossedLine = () => {
         content: data.response || "",
       };
 
-      // If it's the first message, include structured response
       if (data.isFirstMessage && data.acknowledgment) {
         assistantMessage.structuredResponse = {
           acknowledgment: data.acknowledgment,
@@ -96,12 +94,12 @@ const SomeoneCrossedLine = () => {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to process. Please try again.",
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
       const errorMessage: Message = {
         role: "assistant",
-        content: "I'm having trouble right now. Please try again, or reach out to a trusted person for support.",
+        content: "I'm having trouble right now. Please try again, or reach out to someone you trust.",
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
@@ -111,58 +109,56 @@ const SomeoneCrossedLine = () => {
 
   if (showIntro) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
+      <div className="min-h-screen flex flex-col bg-background">
         <Header />
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center animate-fade-in-up">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in-up">
               Something happened. Let's talk through it.
             </h1>
 
-            <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              This is private. Nothing is saved. This isn't legal or medical advice — just a place to think.
+            <div className="bg-muted/50 border border-border/50 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              This is a private, anonymous space. Nothing you share is saved. This isn't therapy or legal advice — it's here to help you think and feel things through.
             </div>
             
-            <div className="prose prose-lg max-w-none text-foreground space-y-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <p className="text-base sm:text-xl text-center text-muted-foreground px-2">
-                Sometimes things happen that leave you confused or unsure how to feel. 
-                You might not know what to call it. That's okay. 
-                This is a space to figure it out at your own pace.
-              </p>
-            </div>
+            <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              Sometimes things happen that leave you confused or unsure how to feel. 
+              You might not know what to call it. That's okay. 
+              This is a space to figure it out at your own pace.
+            </p>
 
-            <div className="grid gap-4 sm:gap-6 mt-6">
-              <Card className="p-4 sm:p-6 border-2 border-primary/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.3s' }}>
+            <div className="grid gap-4 mt-6">
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                 <div className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                  <Heart className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold mb-1">Your feelings make sense</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-medium text-sm mb-1">Your feelings make sense</h3>
+                    <p className="text-xs text-muted-foreground">
                       Being confused, upset, or not sure what to feel is totally normal.
                     </p>
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-6 border-2 border-secondary/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.4s' }}>
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-secondary flex-shrink-0 mt-1" />
+                  <Shield className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold mb-1">No pressure, no labels</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-medium text-sm mb-1">No pressure, no labels</h3>
+                    <p className="text-xs text-muted-foreground">
                       You get to decide what to call it. We're not going to tell you.
                     </p>
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-6 border-2 border-accent/20 animate-fade-in-up hover:scale-[1.02] transition-transform" style={{ animationDelay: '0.5s' }}>
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-start gap-3">
-                  <HelpCircle className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
+                  <HelpCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-semibold mb-1">You're in control</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-medium text-sm mb-1">You're in control</h3>
+                    <p className="text-xs text-muted-foreground">
                       Share as much or as little as you want. You can ask questions anytime.
                     </p>
                   </div>
@@ -170,14 +166,14 @@ const SomeoneCrossedLine = () => {
               </Card>
             </div>
 
-            <div className="flex justify-center pt-6 sm:pt-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <div className="flex justify-center pt-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
               <Button 
                 onClick={() => setShowIntro(false)} 
                 size="lg" 
-                className="px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg rounded-full w-full sm:w-auto"
+                className="px-8 w-full sm:w-auto"
               >
-                Start
-                <ArrowRight className="w-5 h-5 ml-2" />
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </div>
@@ -188,92 +184,83 @@ const SomeoneCrossedLine = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-primary/5">
+    <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-6 flex flex-col">
-        <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
-          {/* Persistent back button */}
+        <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col">
           <div className="mb-4">
             <BackButton to="/" />
           </div>
           
-          {/* Welcome message when no messages yet */}
           {messages.length === 0 && (
             <div className="flex-1 flex items-center justify-center">
-              <Card className="p-6 sm:p-8 text-center max-w-2xl">
-                <h2 className="text-xl sm:text-2xl font-bold mb-4">Share what happened</h2>
-                <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+              <Card className="p-6 sm:p-8 text-center max-w-2xl border-border/50">
+                <h2 className="text-lg font-medium mb-3">Share what happened</h2>
+                <p className="text-muted-foreground mb-4 text-sm">
                   Describe what happened in your own words. You don't have to share every detail — 
                   just the parts that feel important.
                 </p>
-                <p className="text-xs sm:text-sm text-muted-foreground italic">
+                <p className="text-xs text-muted-foreground italic">
                   Take your time.
                 </p>
               </Card>
             </div>
           )}
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-6">
+          <div className="flex-1 overflow-y-auto space-y-4 mb-6">
             {messages.map((message, index) => (
               <div
                 key={index}
                 className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {message.role === "user" ? (
-                  <Card className="p-3 sm:p-4 max-w-[85%] sm:max-w-[80%] bg-primary text-primary-foreground">
-                    <p className="whitespace-pre-wrap text-sm sm:text-base">{message.content}</p>
+                  <Card className="p-3 sm:p-4 max-w-[85%] sm:max-w-[80%] bg-primary text-primary-foreground border-0">
+                    <p className="whitespace-pre-wrap text-sm">{message.content}</p>
                   </Card>
                 ) : (
-                  <Card className="p-4 sm:p-6 max-w-[95%] sm:max-w-[90%] space-y-4">
+                  <Card className="p-4 sm:p-5 max-w-[95%] sm:max-w-[90%] space-y-4 border-border/50">
                     {message.structuredResponse ? (
                       <>
-                        {/* Acknowledgment */}
-                        <div className="border-l-4 border-primary pl-4">
-                          <p className="text-sm sm:text-base">{message.structuredResponse.acknowledgment}</p>
+                        <div className="border-l-2 border-primary/50 pl-4">
+                          <p className="text-sm">{message.structuredResponse.acknowledgment}</p>
                         </div>
 
-                        {/* What You Experienced */}
                         <div className="space-y-2">
-                          <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
-                            <Shield className="w-4 h-4" />
+                          <h3 className="font-medium text-sm flex items-center gap-2">
+                            <Shield className="w-3.5 h-3.5" />
                             What happened
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.whatYouExperienced}</p>
                         </div>
 
-                        {/* Your Feelings Are Valid */}
                         <div className="space-y-2">
-                          <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
-                            <Heart className="w-4 h-4" />
+                          <h3 className="font-medium text-sm flex items-center gap-2">
+                            <Heart className="w-3.5 h-3.5" />
                             Your feelings make sense
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.yourFeelingsAreValid}</p>
                         </div>
 
-                        {/* Understanding Consent */}
                         <div className="space-y-2">
-                          <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
-                            <HelpCircle className="w-4 h-4" />
+                          <h3 className="font-medium text-sm flex items-center gap-2">
+                            <HelpCircle className="w-3.5 h-3.5" />
                             About consent
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.understandingConsent}</p>
                         </div>
 
-                        {/* What You Can Do */}
-                        <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
-                          <h3 className="font-semibold text-sm sm:text-base mb-2">What you can do</h3>
+                        <div className="bg-accent/30 border border-border/50 rounded-lg p-4">
+                          <h3 className="font-medium text-sm mb-2">What you can do</h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.whatYouCanDo}</p>
                         </div>
 
-                        {/* Follow-up Prompt */}
-                        <div className="pt-2 border-t border-border">
-                          <p className="text-sm sm:text-base italic">{message.structuredResponse.followUpPrompt}</p>
+                        <div className="pt-2 border-t border-border/50">
+                          <p className="text-sm italic">{message.structuredResponse.followUpPrompt}</p>
                         </div>
                       </>
                     ) : (
-                      <p className="whitespace-pre-wrap text-sm sm:text-base">{message.content}</p>
+                      <p className="whitespace-pre-wrap text-sm">{message.content}</p>
                     )}
                   </Card>
                 )}
@@ -282,10 +269,10 @@ const SomeoneCrossedLine = () => {
             
             {isLoading && (
               <div className="flex justify-start">
-                <Card className="p-4 sm:p-6 max-w-[90%]">
+                <Card className="p-4 sm:p-5 border-border/50">
                   <div className="flex items-center gap-3">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-muted-foreground text-sm sm:text-base">Thinking...</span>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-muted-foreground text-sm">Taking a moment...</span>
                   </div>
                 </Card>
               </div>
@@ -294,12 +281,11 @@ const SomeoneCrossedLine = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Support Resources and Shred - always visible */}
           {messages.length > 0 && (
             <div className="space-y-3 mb-4">
-              <Card className="p-3 sm:p-4 border-primary/30">
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  <span className="font-semibold">Need support?</span>{" "}
+              <Card className="p-3 sm:p-4 border-border/50">
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-medium">Need support?</span>{" "}
                   <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">RAINN</a> · 
                   <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Crisis Text Line</a> · 
                   <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline ml-1">Love Is Respect</a>
@@ -311,25 +297,23 @@ const SomeoneCrossedLine = () => {
             </div>
           )}
 
-          {/* Input form */}
           <form onSubmit={handleSubmit} className="sticky bottom-0 bg-background pb-4">
-            <Card className="p-3 sm:p-4">
+            <Card className="p-3 sm:p-4 border-border/50">
               <div className="space-y-3">
                 <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
                   placeholder={messages.length === 0 ? "Share what happened..." : "Ask a question or share more..."}
-                  className="min-h-[80px] sm:min-h-[100px] resize-none text-sm sm:text-base"
+                  className="min-h-[80px] sm:min-h-[100px] resize-none text-sm"
                   disabled={isLoading}
                 />
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {input.length} / {maxLength}
                   </span>
                   <Button 
                     type="submit" 
                     disabled={!input.trim() || isLoading}
-                    className="rounded-full"
                   >
                     {isLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -352,4 +336,4 @@ const SomeoneCrossedLine = () => {
   );
 };
 
-export default SomeoneCrossedLine;
+export default HappenedToMe;
