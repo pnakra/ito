@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TypewriterText from "@/components/TypewriterText";
 import { ArrowRight, Smartphone, CircleDot, MessageCircle, HeartHandshake } from "lucide-react";
 
 const Index = () => {
+  const [headlineComplete, setHeadlineComplete] = useState(false);
+  const [subtitleComplete, setSubtitleComplete] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -11,24 +16,35 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 sm:py-20 text-center">
-          <div className="inline-block mb-4 px-3 py-1.5 bg-accent text-muted-foreground text-xs font-medium rounded-full animate-fade-in">
+          <div 
+            className={`inline-block mb-4 px-3 py-1.5 bg-accent text-muted-foreground text-xs font-medium rounded-full transition-opacity duration-500 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}
+          >
             No accounts · No tracking · Just answers
           </div>
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold mb-3 text-foreground px-2 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
-            is this ok?
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold mb-3 text-foreground px-2 min-h-[1.2em]">
+            <TypewriterText 
+              text="is this ok?" 
+              delay={80}
+              onComplete={() => setHeadlineComplete(true)}
+            />
           </h1>
-          <p className="text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            When things get physical or confusing.
+          <p className={`text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 min-h-[1.5em] transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
+            {headlineComplete && (
+              <TypewriterText 
+                text="When things get physical or confusing."
+                delay={40}
+                onComplete={() => setSubtitleComplete(true)}
+              />
+            )}
           </p>
           
           {/* Three Main Tiles */}
-          <div className="grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0">
+          <div className={`grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 transition-all duration-500 ${subtitleComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             
             {/* Tile 1 - Before */}
             <Link 
               to="/before"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left animate-fade-in-up"
-              style={{ animationDelay: '0.15s' }}
+              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary/15 transition-colors">
                 <CircleDot className="w-5 h-5 text-primary" />
@@ -47,8 +63,7 @@ const Index = () => {
             {/* Tile 2 - After */}
             <Link 
               to="/after"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left animate-fade-in-up"
-              style={{ animationDelay: '0.2s' }}
+              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
             >
               <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-secondary/15 transition-colors">
                 <MessageCircle className="w-5 h-5 text-secondary" />
@@ -67,8 +82,7 @@ const Index = () => {
             {/* Tile 3 - Something happened to me */}
             <Link 
               to="/happened-to-me"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left animate-fade-in-up"
-              style={{ animationDelay: '0.25s' }}
+              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
             >
               <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-accent/80 transition-colors">
                 <HeartHandshake className="w-5 h-5 text-accent-foreground" />
@@ -87,9 +101,9 @@ const Index = () => {
         </section>
 
         {/* What this is */}
-        <section className="container mx-auto px-4 py-8 sm:py-12">
+        <section className={`container mx-auto px-4 py-8 sm:py-12 transition-all duration-500 delay-200 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}>
           <div className="max-w-md mx-auto">
-            <div className="rounded-xl p-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <div className="rounded-xl p-6">
               <h2 className="text-base font-medium mb-4 text-center text-foreground">What is this?</h2>
               <div className="space-y-3 text-muted-foreground text-sm">
                 <p>
@@ -107,7 +121,7 @@ const Index = () => {
         </section>
 
         {/* Footer note */}
-        <section className="container mx-auto px-4 py-6 text-center space-y-2 animate-fade-in" style={{ animationDelay: '0.35s' }}>
+        <section className={`container mx-auto px-4 py-6 text-center space-y-2 transition-all duration-500 delay-300 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}>
           <Link 
             to="/install" 
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
