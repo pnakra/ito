@@ -17,8 +17,8 @@ CONCERNING PATTERNS TO DETECT:
 6. Dehumanizing language - slurs, degrading terms, treating as conquest
 
 IMPORTANT:
-- Look for ATTITUDE, not just words. "She's been with a lot of guys" implies objectification even without slurs.
-- Detect REFRAMING of rejection. "She says no but..." is concerning even without explicit flag words.
+- Look for ATTITUDE, not just words. "They've been with a lot of people" implies objectification even without slurs.
+- Detect REFRAMING of rejection. "They said no but..." is concerning even without explicit flag words.
 - Catch ENTITLEMENT patterns. Frustration about being "friend zoned" or "led on" suggests problematic thinking.
 
 RESPOND IN THIS EXACT JSON FORMAT:
