@@ -32,6 +32,7 @@ RULES:
 - Don't shame or lecture
 - Keep it calm and practical
 - Use short sentences (8th grade reading level)
+- Avoid em dashes
 - Suggest talking to a trusted adult if it seems serious
 
 Answer conversationally but thoughtfully.`;
@@ -71,7 +72,7 @@ serve(async (req) => {
     if (originalReflection) {
       messages.push({
         role: "assistant",
-        content: `Here's what we discussed earlier:\n\n**Clarity Check:** ${originalReflection.clarityCheck}\n\n**Understanding Others' Boundaries:** ${originalReflection.otherPersonPerspective}\n\n**Understanding Your Patterns:** ${originalReflection.yourPatterns}\n\n**Accountability:** ${originalReflection.accountabilitySteps}\n\n**Doing Better:** ${originalReflection.avoidingRepetition}`
+        content: `Here's what we discussed earlier:\n\n**Clarity Check:** ${originalReflection.clarityCheck}\n\n**Understanding Others' Boundaries:** ${originalReflection.otherPersonPerspective}\n\n**Understanding Your Patterns:** ${originalReflection.yourPatterns}\n\n**Taking Responsibility:** ${originalReflection.accountabilitySteps}\n\n**Doing Better:** ${originalReflection.avoidingRepetition}`
       });
     }
 
