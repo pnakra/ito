@@ -28,18 +28,18 @@ const Index = () => {
             {/* Tile 1 - Before */}
             <Link 
               to="/avoid-line"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col sm:items-center sm:justify-center text-left sm:text-center relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
               style={{ animationDelay: '0.3s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full" />
-              <div className="bg-primary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
+              <div className="bg-primary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 flex-shrink-0 group-hover:animate-float">
                 <Eye className="w-5 h-5 text-primary-foreground" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+              <div className="flex-1 min-w-0 sm:flex-none">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground">
                   Before Something Happens
                 </h2>
-                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                   Not sure if you should keep going? Check here first.
                 </p>
               </div>
@@ -52,18 +52,18 @@ const Index = () => {
             {/* Tile 2 - After */}
             <Link 
               to="/crossed-line"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-secondary hover:shadow-xl hover:shadow-secondary/10 transition-all flex items-center sm:flex-col sm:items-center sm:justify-center text-left sm:text-center relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
               style={{ animationDelay: '0.4s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-secondary/10 to-transparent rounded-bl-full" />
-              <div className="bg-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
+              <div className="bg-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 flex-shrink-0 group-hover:animate-float">
                 <MessageCircle className="w-5 h-5 text-secondary-foreground" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+              <div className="flex-1 min-w-0 sm:flex-none">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground">
                   After Something Happened
                 </h2>
-                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                   Worried you went too far? Think it through here.
                 </p>
               </div>
@@ -76,18 +76,18 @@ const Index = () => {
             {/* Tile 3 - Something happened to me */}
             <Link 
               to="/someone-crossed"
-              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col text-left relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
+              className="group bg-card border-2 border-transparent rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 transition-all flex items-center sm:flex-col sm:items-center sm:justify-center text-left sm:text-center relative overflow-hidden animate-fade-in-up hover:scale-[1.02]"
               style={{ animationDelay: '0.5s' }}
             >
               <div className="hidden sm:block absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/5 via-secondary/5 to-transparent rounded-bl-full" />
-              <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 sm:mx-auto flex-shrink-0 group-hover:animate-float">
+              <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center mr-4 sm:mr-0 sm:mb-4 flex-shrink-0 group-hover:animate-float">
                 <Heart className="w-5 h-5 text-primary-foreground" />
               </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground sm:text-center">
+              <div className="flex-1 min-w-0 sm:flex-none">
+                <h2 className="text-base sm:text-lg font-bold mb-1 sm:mb-2 text-foreground">
                   Something Happened to Me
                 </h2>
-                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 sm:text-center line-clamp-2 sm:line-clamp-none">
+                <p className="text-muted-foreground text-sm mb-0 sm:mb-4 line-clamp-2 sm:line-clamp-none">
                   Not sure how you feel about something? Talk through it.
                 </p>
               </div>
