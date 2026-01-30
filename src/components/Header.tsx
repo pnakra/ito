@@ -8,14 +8,12 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/before", label: "Before" },
-    { to: "/after", label: "After" },
-    { to: "/happened-to-me", label: "Happened to me" },
+    { to: "/about", label: "About" },
     { to: "/resources", label: "Resources" },
+    { to: "https://rainn.org", label: "Crisis Support", external: true },
   ];
 
-  const secondaryLinks = [
-    { to: "/about", label: "About" },
+  const mobileOnlyLinks = [
     { to: "/install", label: "Add to Home Screen", icon: Smartphone },
   ];
 
@@ -34,17 +32,29 @@ const Header = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex gap-1">
           {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
-                isActive(link.to)
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              }`}
-            >
-              {link.label}
-            </Link>
+            link.external ? (
+              <a
+                key={link.to}
+                href={link.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                  isActive(link.to)
+                    ? "bg-accent text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
+              >
+                {link.label}
+              </Link>
+            )
           ))}
         </div>
 
@@ -66,25 +76,38 @@ const Header = () => {
           <div className="container mx-auto px-4 py-2 flex flex-col">
             {/* Primary nav links */}
             {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`py-3 px-4 rounded-lg transition-colors ${
-                  isActive(link.to)
-                    ? "bg-accent text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
+              link.external ? (
+                <a
+                  key={link.to}
+                  href={link.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-3 px-4 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`py-3 px-4 rounded-lg transition-colors ${
+                    isActive(link.to)
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
             
             {/* Divider */}
             <div className="border-t border-border/30 my-2" />
             
-            {/* Secondary links */}
-            {secondaryLinks.map((link) => {
+            {/* Mobile-only links */}
+            {mobileOnlyLinks.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
