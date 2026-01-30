@@ -19,6 +19,7 @@ import AfterHandoff from "@/components/prevention/AfterHandoff";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
+import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
@@ -105,27 +106,35 @@ const Before = () => {
 
   const handleOrientationSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, orientation: id }));
+    logChoice("before", "orientation", id);
   };
 
   const handleConsentSignalSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, consentSignal: id }));
+    logChoice("before", "consent-signal", id);
   };
 
   const handleContextFactorSelect = (id: string) => {
     setDecisions(prev => {
+      let newFactors: string[];
       if (id === "none") {
-        return { ...prev, contextFactors: ["none"] };
+        newFactors = ["none"];
+      } else {
+        const withoutNone = prev.contextFactors.filter(f => f !== "none");
+        if (withoutNone.includes(id)) {
+          newFactors = withoutNone.filter(f => f !== id);
+        } else {
+          newFactors = [...withoutNone, id];
+        }
       }
-      const withoutNone = prev.contextFactors.filter(f => f !== "none");
-      if (withoutNone.includes(id)) {
-        return { ...prev, contextFactors: withoutNone.filter(f => f !== id) };
-      }
-      return { ...prev, contextFactors: [...withoutNone, id] };
+      logChoice("before", "context-factors", newFactors);
+      return { ...prev, contextFactors: newFactors };
     });
   };
 
   const handleMomentumSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, momentum: id }));
+    logChoice("before", "momentum", id);
   };
 
   const proceedToNextStep = () => {
@@ -141,6 +150,11 @@ const Before = () => {
   };
 
   const handleContextInputContinue = () => {
+    // Log freetext if provided
+    if (decisions.additionalContext.trim()) {
+      logFreetext("before", "additional-context", decisions.additionalContext);
+    }
+    
     const result = classifyRisk(decisions);
     setRiskResult(result);
     
@@ -192,6 +206,9 @@ const Before = () => {
         whatToDoInstead: data.whatToDoInstead,
         realTalk: data.realTalk
       });
+      
+      // Log AI response summary
+      logAIResponse("before", "explanation", `Risk: ${riskLevel} - ${data.assessment?.slice(0, 100) || "Response generated"}`);
     } catch (error) {
       console.error("Error fetching explanation:", error);
       setAnalysis({
@@ -217,6 +234,9 @@ const Before = () => {
 
   const handleFollowUpSubmit = async (message: string) => {
     setIsLoading(true);
+    
+    // Log the follow-up message
+    logFreetext("before", "follow-up", message);
     
     try {
       const fullContext = [
@@ -244,6 +264,8 @@ const Before = () => {
         realTalk: data.realTalk
       });
       
+      logAIResponse("before", "follow-up-response", data.assessment?.slice(0, 100) || "Follow-up response");
+      
       setPhase("explanation");
     } catch (error) {
       console.error("Error in follow-up:", error);
@@ -264,10 +286,12 @@ const Before = () => {
     setIsLoading(false);
     setConversationHistory([]);
     setSelectedOutcome(null);
+    resetSessionId(); // Start new session on reset
   };
 
   const handleOutcomeSelect = (outcome: string) => {
     setSelectedOutcome(outcome);
+    logChoice("before", "outcome", outcome);
     setPhase("outcome-feedback");
   };
 
