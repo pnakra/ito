@@ -28,7 +28,7 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
     <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <h2 className="text-xl md:text-2xl font-bold mb-2">What else is on your mind?</h2>
       <p className="text-muted-foreground mb-6">
-        Share more context, ask questions, or tell me what you're still unsure about.
+        You can share more or ask questions.
       </p>
 
       <Textarea

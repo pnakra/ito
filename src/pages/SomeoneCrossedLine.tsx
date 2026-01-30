@@ -117,18 +117,18 @@ const SomeoneCrossedLine = () => {
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-center animate-fade-in-up">
-              Something felt off. Let's figure it out — at your pace.
+              Something happened. Let's talk through it.
             </h1>
 
             <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground italic text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              This is a safe, anonymous space. Nothing you share is stored or logged. This tool does not provide legal advice or therapy — it's a supportive guide.
+              This is private. Nothing is saved. This isn't legal or medical advice — just a place to think.
             </div>
             
             <div className="prose prose-lg max-w-none text-foreground space-y-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
               <p className="text-base sm:text-xl text-center text-muted-foreground px-2">
-                Sometimes things happen that leave us confused, uncomfortable, or unsure. 
-                You might not have words for it yet — and that's okay. 
-                This space is here to help you process what happened.
+                Sometimes things happen that leave you confused or unsure how to feel. 
+                You might not know what to call it. That's okay. 
+                This is a space to figure it out at your own pace.
               </p>
             </div>
 
@@ -137,9 +137,9 @@ const SomeoneCrossedLine = () => {
                 <div className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-1">Your feelings are valid</h3>
+                    <h3 className="font-semibold mb-1">Your feelings make sense</h3>
                     <p className="text-sm text-muted-foreground">
-                      Confusion, mixed emotions, and self-doubt are all normal responses.
+                      Being confused, upset, or not sure what to feel is totally normal.
                     </p>
                   </div>
                 </div>
@@ -151,7 +151,7 @@ const SomeoneCrossedLine = () => {
                   <div>
                     <h3 className="font-semibold mb-1">No pressure, no labels</h3>
                     <p className="text-sm text-muted-foreground">
-                      We won't tell you what to call your experience. That's your decision.
+                      You get to decide what to call it. We're not going to tell you.
                     </p>
                   </div>
                 </div>
@@ -163,7 +163,7 @@ const SomeoneCrossedLine = () => {
                   <div>
                     <h3 className="font-semibold mb-1">You're in control</h3>
                     <p className="text-sm text-muted-foreground">
-                      Share as much or as little as you want. Ask follow-up questions anytime.
+                      Share as much or as little as you want. You can ask questions anytime.
                     </p>
                   </div>
                 </div>
@@ -176,7 +176,7 @@ const SomeoneCrossedLine = () => {
                 size="lg" 
                 className="px-8 sm:px-12 py-5 sm:py-6 text-base sm:text-lg rounded-full w-full sm:w-auto"
               >
-                Start talking
+                Start
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -204,11 +204,11 @@ const SomeoneCrossedLine = () => {
               <Card className="p-6 sm:p-8 text-center max-w-2xl">
                 <h2 className="text-xl sm:text-2xl font-bold mb-4">Share what happened</h2>
                 <p className="text-muted-foreground mb-4 text-sm sm:text-base">
-                  In your own words, describe what happened. You don't need to share every detail — 
-                  just the parts that feel important to you.
+                  Describe what happened in your own words. You don't have to share every detail — 
+                  just the parts that feel important.
                 </p>
                 <p className="text-xs sm:text-sm text-muted-foreground italic">
-                  Take your time. There's no rush.
+                  Take your time.
                 </p>
               </Card>
             </div>
@@ -238,7 +238,7 @@ const SomeoneCrossedLine = () => {
                         <div className="space-y-2">
                           <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
                             <Shield className="w-4 h-4" />
-                            Understanding What Happened
+                            What happened
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.whatYouExperienced}</p>
                         </div>
@@ -247,7 +247,7 @@ const SomeoneCrossedLine = () => {
                         <div className="space-y-2">
                           <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
                             <Heart className="w-4 h-4" />
-                            Your Feelings Are Valid
+                            Your feelings make sense
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.yourFeelingsAreValid}</p>
                         </div>
@@ -256,14 +256,14 @@ const SomeoneCrossedLine = () => {
                         <div className="space-y-2">
                           <h3 className="font-semibold text-sm sm:text-base flex items-center gap-2">
                             <HelpCircle className="w-4 h-4" />
-                            About Consent
+                            About consent
                           </h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.understandingConsent}</p>
                         </div>
 
                         {/* What You Can Do */}
                         <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
-                          <h3 className="font-semibold text-sm sm:text-base mb-2">What You Can Do</h3>
+                          <h3 className="font-semibold text-sm sm:text-base mb-2">What you can do</h3>
                           <p className="text-muted-foreground text-sm">{message.structuredResponse.whatYouCanDo}</p>
                         </div>
 
@@ -285,7 +285,7 @@ const SomeoneCrossedLine = () => {
                 <Card className="p-4 sm:p-6 max-w-[90%]">
                   <div className="flex items-center gap-3">
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-muted-foreground text-sm sm:text-base">Taking a moment...</span>
+                    <span className="text-muted-foreground text-sm sm:text-base">Thinking...</span>
                   </div>
                 </Card>
               </div>

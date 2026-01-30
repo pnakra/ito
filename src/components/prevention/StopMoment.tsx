@@ -34,10 +34,10 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge }: StopMomentProps) 
             <h2 className={`text-2xl font-bold mb-2 ${
               isRed ? "text-signal-stop" : "text-signal-pause"
             }`}>
-              {isRed ? "Hold up" : "Let's pause here"}
+              {isRed ? "Wait" : "One second"}
             </h2>
             <p className="text-muted-foreground text-sm">
-              {isRed ? "This needs your attention." : "Just want to make sure you see this."}
+              {isRed ? "Read this before you do anything." : "Take a look at this first."}
             </p>
           </div>
           
@@ -63,8 +63,8 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge }: StopMomentProps) 
           {/* Subtext - less scary */}
           <p className="text-sm text-muted-foreground max-w-xs">
             {isRed 
-              ? "Taking a moment to think is a good thing."
-              : "Clear communication helps everyone."
+              ? "Stopping to think is always the right move."
+              : "Checking in is a good thing."
             }
           </p>
         </div>

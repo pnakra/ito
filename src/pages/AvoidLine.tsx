@@ -50,34 +50,34 @@ interface AnalysisData {
 const orientationOptions: StepOption[] = [
   { id: "texting", label: "We're texting or messaging" },
   { id: "in-person", label: "We're together in person" },
-  { id: "party-group", label: "We're at a party or group setting" },
-  { id: "already-happened", label: "Something already happened and I'm unsure" },
-  { id: "not-sure", label: "I'm not sure how to describe it" }
+  { id: "party-group", label: "We're at a party or with other people" },
+  { id: "already-happened", label: "Something already happened" },
+  { id: "not-sure", label: "I'm not sure" }
 ];
 
 // STEP 1: Consent signal options (observation-first)
 const consentSignalOptions: StepOption[] = [
-  { id: "clear-yes", label: "Clearly saying yes or expressing interest in words" },
-  { id: "enthusiastic-actions", label: "Actively initiating or reciprocating" },
-  { id: "mixed-signals", label: "Mixed or hard to read" },
-  { id: "no-response", label: "Quiet or not responding" },
-  { id: "said-no", label: "Said no or pulled away" }
+  { id: "clear-yes", label: "They said yes or told me they want to" },
+  { id: "enthusiastic-actions", label: "They're starting things or going along with it" },
+  { id: "mixed-signals", label: "Hard to tell" },
+  { id: "no-response", label: "They're quiet or not really responding" },
+  { id: "said-no", label: "They said no or moved away" }
 ];
 
 // STEP 2: Context factors
 const contextFactorOptions: StepOption[] = [
-  { id: "alcohol", label: "Alcohol or drugs involved" },
-  { id: "experience-gap", label: "One of us is much more experienced" },
-  { id: "age-imbalance", label: "Age or power imbalance" },
-  { id: "emotional-pressure", label: "Emotional pressure" },
+  { id: "alcohol", label: "Alcohol or drugs are involved" },
+  { id: "experience-gap", label: "One of us has done this more than the other" },
+  { id: "age-imbalance", label: "One of us is older or in charge" },
+  { id: "emotional-pressure", label: "Someone feels pressured" },
   { id: "none", label: "None of these" }
 ];
 
 // STEP 3: Momentum check (replaces intent)
 const momentumOptions: StepOption[] = [
-  { id: "toward-physical", label: "Toward something physical" },
-  { id: "staying-flirty", label: "Staying flirty or emotional" },
-  { id: "slow-down", label: "I want to slow things down" },
+  { id: "toward-physical", label: "Heading toward something physical" },
+  { id: "staying-flirty", label: "Just flirting or talking" },
+  { id: "slow-down", label: "I want to slow down" },
   { id: "dont-know", label: "I don't know" }
 ];
 
@@ -320,10 +320,10 @@ const AvoidLine = () => {
                   <Shield className="w-12 h-12 text-primary" />
                 </div>
               </div>
-              <h1 className="text-3xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>Before You Act</h1>
+              <h1 className="text-3xl font-bold mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>Quick Check</h1>
               <p className="text-lg text-muted-foreground mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                Answer a few quick questions. Get a reality check. 
-                <br />No judgment, no data stored.
+                Answer a few questions. See what to do next.
+                <br />Nothing is saved.
               </p>
               <Button 
                 size="lg" 
@@ -339,28 +339,28 @@ const AvoidLine = () => {
           {/* Step 1: Orientation */}
           <DecisionStep
             stepNumber={1}
-            title="Where are you in this situation right now?"
+            title="What's the situation?"
             options={orientationOptions}
             selectedValues={decisions.orientation ? [decisions.orientation] : []}
             onSelect={handleOrientationSelect}
             isActive={phase === "orientation"}
           />
 
-          {/* Step 1: Consent Signals */}
+          {/* Step 2: Consent Signals */}
           <DecisionStep
             stepNumber={2}
-            title="What have they been doing or saying?"
+            title="What are they doing or saying?"
             options={consentSignalOptions}
             selectedValues={decisions.consentSignal ? [decisions.consentSignal] : []}
             onSelect={handleConsentSignalSelect}
             isActive={phase === "consent-signal"}
           />
 
-          {/* Step 2: Context Factors */}
+          {/* Step 3: Context Factors */}
           <DecisionStep
             stepNumber={3}
-            title="Anything here that might affect how clear consent is?"
-            subtitle="Select all that apply"
+            title="Is anything else going on?"
+            subtitle="Pick all that apply"
             options={contextFactorOptions}
             selectedValues={decisions.contextFactors}
             multiSelect={true}
@@ -368,10 +368,10 @@ const AvoidLine = () => {
             isActive={phase === "context-factors"}
           />
 
-          {/* Step 3: Momentum Check */}
+          {/* Step 4: Momentum Check */}
           <DecisionStep
             stepNumber={4}
-            title="What direction does this feel like it's heading?"
+            title="Where is this going?"
             options={momentumOptions}
             selectedValues={decisions.momentum ? [decisions.momentum] : []}
             onSelect={handleMomentumSelect}

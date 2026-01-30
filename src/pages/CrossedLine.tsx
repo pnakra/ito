@@ -133,16 +133,16 @@ const CrossedLine = () => {
           <div className="space-y-6">
             <BackButton to="/" />
             <h1 className="text-2xl sm:text-3xl font-bold text-center animate-fade-in-up">
-              Let's figure out what happened — calmly.
+              Let's think through what happened.
             </h1>
 
             <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Sometimes you realize afterward that a moment felt off — or you worry you crossed a boundary. 
-              This space helps you slow down and reflect.
+              Sometimes you look back and realize something felt off — or you're worried you went too far. 
+              This is a space to slow down and think it through.
             </p>
 
             <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 text-sm text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <strong className="text-foreground">Note:</strong> This is a reflective guide — not legal advice or therapy.
+              <strong className="text-foreground">Note:</strong> This is just a thinking tool — not legal or medical advice.
             </div>
 
             <div className="flex justify-center pt-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
@@ -151,7 +151,7 @@ const CrossedLine = () => {
                 size="lg" 
                 className="px-8 py-5 text-base rounded-full hover:scale-105 transition-transform"
               >
-                Start reflecting
+                Start
               </Button>
             </div>
           </div>
@@ -172,8 +172,8 @@ const CrossedLine = () => {
             
             <div className="space-y-4">
               <p className="text-base sm:text-lg text-muted-foreground">
-                Can you describe what happened, in your own words? You don't need to share details — 
-                just the parts that feel important to understand.
+                Describe what happened in your own words. You don't have to share every detail — 
+                just the parts that matter.
               </p>
               
               <Textarea
@@ -234,27 +234,27 @@ const CrossedLine = () => {
             </h1>
 
             <Card className="p-4 sm:p-6 border-2 border-primary/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Clarity Check</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What might have happened</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.clarityCheck}</p>
             </Card>
 
             <Card className="p-4 sm:p-6 border-2 border-secondary/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Understanding Others' Boundaries</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How they might have felt</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.otherPersonPerspective}</p>
             </Card>
 
             <Card className="p-4 sm:p-6 border-2 border-accent/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Understanding Your Patterns</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Your patterns</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.yourPatterns}</p>
             </Card>
 
             <Card className="p-4 sm:p-6 border-2 border-warning/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What Accountability Could Look Like</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">What you can do now</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.accountabilitySteps}</p>
             </Card>
 
             <Card className="p-4 sm:p-6 border-2 border-success/30">
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How to Do Better Next Time</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">How to do better</h2>
               <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.avoidingRepetition}</p>
             </Card>
 
@@ -265,10 +265,10 @@ const CrossedLine = () => {
                   <MessageCircle className="w-8 h-8 mx-auto text-primary" />
                   <h3 className="text-lg sm:text-xl font-semibold">Have questions?</h3>
                   <p className="text-muted-foreground text-sm sm:text-base">
-                    If you'd like to explore any of these topics further or ask follow-up questions, you can continue the conversation.
+                    If you want to talk through anything else, you can keep going.
                   </p>
                   <Button onClick={() => setShowFollowUp(true)} variant="outline" size="lg">
-                    Continue the conversation
+                    Keep talking
                   </Button>
                 </div>
               </Card>
@@ -338,9 +338,9 @@ const CrossedLine = () => {
             )}
 
             <div className="bg-card border-2 border-primary/30 rounded-lg p-4 sm:p-6 mt-6 sm:mt-8">
-              <h3 className="text-base sm:text-lg font-semibold mb-3">If someone was harmed</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-3">If someone was hurt</h3>
               <p className="text-muted-foreground mb-4 text-sm sm:text-base">
-                If someone was hurt or uncomfortable, they may also need support. Everyone deserves safety.
+                If the other person was hurt or uncomfortable, they might need support too.
               </p>
               <ul className="space-y-2 text-muted-foreground text-sm sm:text-base">
                 <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
@@ -352,7 +352,7 @@ const CrossedLine = () => {
 
             <div className="text-center py-4 sm:py-6">
               <p className="text-base sm:text-lg text-muted-foreground italic px-2">
-                Acknowledging harm doesn't make you a bad person — it means you're taking responsibility for learning and doing better.
+                Thinking about this doesn't make you a bad person. It means you're trying to do better.
               </p>
             </div>
 

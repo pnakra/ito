@@ -89,7 +89,7 @@ const DecisionStep = ({
       
       {multiSelect && selectedValues.length > 0 && (
         <p className="text-sm text-muted-foreground mt-4 text-center">
-          Tap options to toggle • Select all that apply
+          Tap to add or remove
         </p>
       )}
     </Card>
