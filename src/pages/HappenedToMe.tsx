@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import ShredButton from "@/components/ShredButton";
 import { supabase } from "@/integrations/supabase/client";
+import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { Loader2, Send, Heart, Shield, HelpCircle, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,7 @@ const HappenedToMe = () => {
   const handleShred = () => {
     setMessages([]);
     setInput("");
+    resetSessionId(); // Start new session
     navigate("/");
   };
 
@@ -51,6 +53,10 @@ const HappenedToMe = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
+
+    // Log user message
+    const isFirstMessage = messages.length === 0;
+    logFreetext("after-someone-crossed", isFirstMessage ? "initial-message" : "follow-up", input);
 
     const userMessage: Message = { role: "user", content: input };
     setMessages(prev => [...prev, userMessage]);
@@ -90,6 +96,10 @@ const HappenedToMe = () => {
       }
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Log AI response
+      const responseSummary = data.acknowledgment?.slice(0, 100) || data.response?.slice(0, 100) || "Response generated";
+      logAIResponse("after-someone-crossed", isFirstMessage ? "initial-response" : "follow-up-response", responseSummary);
     } catch (error: any) {
       console.error("Error:", error);
       toast({

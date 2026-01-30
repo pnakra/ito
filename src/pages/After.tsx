@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import ShredButton from "@/components/ShredButton";
 import { supabase } from "@/integrations/supabase/client";
+import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { Loader2, Send, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -51,6 +52,9 @@ const After = () => {
   const handleSubmit = async () => {
     if (!userInput.trim()) return;
 
+    // Log the initial scenario input
+    logFreetext("after-crossed", "scenario", userInput);
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-crossed-line", {
@@ -61,6 +65,9 @@ const After = () => {
 
       setResults(data as ReflectionResult);
       setScreen("results");
+      
+      // Log AI response
+      logAIResponse("after-crossed", "reflection", data.clarityCheck?.slice(0, 100) || "Reflection generated");
     } catch (error: any) {
       console.error("Error:", error);
       toast({
@@ -76,6 +83,9 @@ const After = () => {
   const handleFollowUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!followUpInput.trim() || isFollowUpLoading) return;
+
+    // Log follow-up message
+    logFreetext("after-crossed", "follow-up", followUpInput);
 
     const userMessage: FollowUpMessage = { role: "user", content: followUpInput };
     setFollowUpMessages(prev => [...prev, userMessage]);
@@ -98,6 +108,9 @@ const After = () => {
         content: data.response
       };
       setFollowUpMessages(prev => [...prev, assistantMessage]);
+      
+      // Log AI follow-up response
+      logAIResponse("after-crossed", "follow-up-response", data.response?.slice(0, 100) || "Follow-up response");
     } catch (error: any) {
       console.error("Error:", error);
       toast({
@@ -122,6 +135,7 @@ const After = () => {
     setShowFollowUp(false);
     setFollowUpMessages([]);
     setFollowUpInput("");
+    resetSessionId(); // Start new session on reset
   };
 
   if (screen === "intro") {

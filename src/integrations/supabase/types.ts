@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      submissions: {
+        Row: {
+          ai_response_summary: string | null
+          choice_value: string | null
+          created_at: string
+          flow_type: string
+          freetext_value: string | null
+          id: string
+          metadata: Json | null
+          session_id: string
+          step_name: string
+          step_type: string
+        }
+        Insert: {
+          ai_response_summary?: string | null
+          choice_value?: string | null
+          created_at?: string
+          flow_type: string
+          freetext_value?: string | null
+          id?: string
+          metadata?: Json | null
+          session_id?: string
+          step_name: string
+          step_type: string
+        }
+        Update: {
+          ai_response_summary?: string | null
+          choice_value?: string | null
+          created_at?: string
+          flow_type?: string
+          freetext_value?: string | null
+          id?: string
+          metadata?: Json | null
+          session_id?: string
+          step_name?: string
+          step_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
