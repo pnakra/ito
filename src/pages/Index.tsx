@@ -7,7 +7,6 @@ import { ArrowRight, Smartphone, CircleDot, MessageCircle, HeartHandshake } from
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
-  const [subtitleComplete, setSubtitleComplete] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -17,7 +16,7 @@ const Index = () => {
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 sm:py-20 text-center">
           <div 
-            className={`inline-block mb-4 px-3 py-1.5 bg-accent text-muted-foreground text-xs font-medium rounded-full transition-opacity duration-500 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}
+            className={`inline-block mb-4 px-3 py-1.5 bg-accent text-muted-foreground text-xs font-medium rounded-full transition-opacity duration-500 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}
           >
             No accounts · No tracking · Just answers
           </div>
@@ -28,18 +27,12 @@ const Index = () => {
               onComplete={() => setHeadlineComplete(true)}
             />
           </h1>
-          <p className={`text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 min-h-[1.5em] transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
-            {headlineComplete && (
-              <TypewriterText 
-                text="When things get physical or confusing."
-                delay={40}
-                onComplete={() => setSubtitleComplete(true)}
-              />
-            )}
+          <p className={`text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
+            When things get physical or confusing.
           </p>
           
           {/* Three Main Tiles */}
-          <div className={`grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 transition-all duration-500 ${subtitleComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className={`grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 transition-all duration-500 ${headlineComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             
             {/* Tile 1 - Before */}
             <Link 
@@ -101,7 +94,7 @@ const Index = () => {
         </section>
 
         {/* What this is */}
-        <section className={`container mx-auto px-4 py-8 sm:py-12 transition-all duration-500 delay-200 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}>
+        <section className={`container mx-auto px-4 py-8 sm:py-12 transition-all duration-500 delay-200 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
           <div className="max-w-md mx-auto">
             <div className="rounded-xl p-6">
               <h2 className="text-base font-medium mb-4 text-center text-foreground">What is this?</h2>
@@ -121,7 +114,7 @@ const Index = () => {
         </section>
 
         {/* Footer note */}
-        <section className={`container mx-auto px-4 py-6 text-center space-y-2 transition-all duration-500 delay-300 ${subtitleComplete ? 'opacity-100' : 'opacity-0'}`}>
+        <section className={`container mx-auto px-4 py-6 text-center space-y-2 transition-all duration-500 delay-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
           <Link 
             to="/install" 
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
