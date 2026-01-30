@@ -21,17 +21,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 20%;
 
-    /* Primary: Soft slate blue - calm, not urgent */
-    --primary: 220 25% 45%;
+    /* Primary: Soft teal - calm, inviting */
+    --primary: 180 35% 42%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Warm muted rose */
-    --secondary: 350 20% 55%;
+    /* Secondary: Warm coral */
+    --secondary: 12 50% 60%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent: Very soft blue-gray */
-    --accent: 220 20% 95%;
-    --accent-foreground: 220 25% 40%;
+    /* Accent: Soft lavender-gray */
+    --accent: 240 15% 94%;
+    --accent-foreground: 220 25% 35%;
 
     /* Muted: Warm gray */
     --muted: 40 10% 94%;
@@ -47,12 +47,12 @@
     --warning: 35 50% 50%;
     --warning-foreground: 220 15% 20%;
 
-    /* Signal colors - calm, not alarming */
-    --signal-stop: 0 35% 50%;
+    /* Signal colors - visible but not alarming */
+    --signal-stop: 0 55% 55%;
     --signal-stop-foreground: 0 0% 100%;
-    --signal-pause: 35 40% 50%;
-    --signal-pause-foreground: 220 15% 20%;
-    --signal-clear: 160 25% 50%;
+    --signal-pause: 40 70% 50%;
+    --signal-pause-foreground: 220 15% 15%;
+    --signal-clear: 160 40% 45%;
     --signal-clear-foreground: 0 0% 100%;
 
     /* Borders and inputs - very subtle */

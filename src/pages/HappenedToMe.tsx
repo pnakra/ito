@@ -114,24 +114,24 @@ const HappenedToMe = () => {
         <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
           <div className="space-y-6 sm:space-y-8">
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in-up">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in">
               Something happened. Let's talk through it.
             </h1>
 
-            <div className="bg-muted/50 border border-border/50 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground text-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              This is a private, anonymous space. Nothing you share is saved. This isn't therapy or legal advice — it's here to help you think and feel things through.
+            <div className="bg-muted/50 border border-border/50 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-muted-foreground text-center animate-fade-in" style={{ animationDelay: '0.05s' }}>
+              This is a private, anonymous space. Nothing you share is saved. This isn't therapy or legal advice. It's here to help you think and feel things through.
             </div>
             
-            <p className="text-center text-muted-foreground animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <p className="text-center text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Sometimes things happen that leave you confused or unsure how to feel. 
               You might not know what to call it. That's okay. 
               This is a space to figure it out at your own pace.
             </p>
 
             <div className="grid gap-4 mt-6">
-              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in" style={{ animationDelay: '0.15s' }}>
                 <div className="flex items-start gap-3">
-                  <Heart className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <Heart className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-medium text-sm mb-1">Your feelings make sense</h3>
                     <p className="text-xs text-muted-foreground">
@@ -141,9 +141,9 @@ const HappenedToMe = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <div className="flex items-start gap-3">
-                  <Shield className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-medium text-sm mb-1">No pressure, no labels</h3>
                     <p className="text-xs text-muted-foreground">
@@ -153,9 +153,9 @@ const HappenedToMe = () => {
                 </div>
               </Card>
 
-              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+              <Card className="p-4 sm:p-5 border-border/50 animate-fade-in" style={{ animationDelay: '0.25s' }}>
                 <div className="flex items-start gap-3">
-                  <HelpCircle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <HelpCircle className="w-4 h-4 text-accent-foreground flex-shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-medium text-sm mb-1">You're in control</h3>
                     <p className="text-xs text-muted-foreground">
@@ -166,7 +166,7 @@ const HappenedToMe = () => {
               </Card>
             </div>
 
-            <div className="flex justify-center pt-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <div className="flex justify-center pt-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Button 
                 onClick={() => setShowIntro(false)} 
                 size="lg" 

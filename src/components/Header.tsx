@@ -26,9 +26,9 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link 
           to="/" 
-          className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+          className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors tracking-tight"
         >
-          is this ok?
+          ito
         </Link>
         
         {/* Desktop Navigation */}

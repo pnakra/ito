@@ -65,7 +65,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -86,11 +86,11 @@ export default {
           "100%": { opacity: "1" },
         },
         "fade-in-up": {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "0%": { opacity: "0", transform: "translateY(4px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "scale-in": {
-          "0%": { transform: "scale(0.98)", opacity: "0" },
+          "0%": { transform: "scale(0.99)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
         "shred": {
@@ -108,9 +108,9 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out",
-        "fade-in-up": "fade-in-up 0.6s ease-out",
-        "scale-in": "scale-in 0.4s ease-out",
+        "fade-in": "fade-in 0.4s ease-out",
+        "fade-in-up": "fade-in-up 0.4s ease-out",
+        "scale-in": "scale-in 0.3s ease-out",
         "shred": "shred 0.8s ease-in forwards",
         "shred-particle": "shred-particle 0.6s ease-in forwards",
       },
