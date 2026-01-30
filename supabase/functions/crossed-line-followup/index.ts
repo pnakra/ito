@@ -60,15 +60,13 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not configured");
     }
 
-    // Build messages array
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
-    ];
+    // Build messages array for Anthropic format
+    const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
     // Include original reflection context if provided
     if (originalReflection) {
@@ -91,16 +89,19 @@ serve(async (req) => {
     // Add current message
     messages.push({ role: "user", content: message });
 
-    console.log("Calling Lovable AI Gateway for crossed-line followup...");
+    console.log("Calling Anthropic API for crossed-line followup...");
     
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
         messages,
       }),
     });
@@ -112,22 +113,16 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Service requires payment. Please contact support." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       
       const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      console.error("Anthropic API error:", response.status, errorText);
+      throw new Error(`Anthropic API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("Received response from AI Gateway");
+    console.log("Received response from Anthropic API");
 
-    const content = data.choices[0].message.content;
+    const content = data.content[0].text;
 
     return new Response(
       JSON.stringify({ response: content }),
