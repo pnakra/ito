@@ -47,7 +47,7 @@ const FLAG_WORDS: { pattern: RegExp; category: string }[] = [
   // Secrecy/manipulation
   { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation" },
   { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation" },
-  { pattern: /\bout\s*of\s*(your|her)\s*league\b/i, category: "manipulation" },
+  { pattern: /\bout\s*of\s*(your|her|his|their)\s*league\b/i, category: "manipulation" },
   
   // Coercion/pressure
   { pattern: /\bjust\s*let\s*me\b/i, category: "coercion" },
