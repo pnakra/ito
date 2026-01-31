@@ -16,6 +16,8 @@ import ConversationalChat from "@/components/prevention/ConversationalChat";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
+import MoveSelection, { type MoveType, MOVE_OPTIONS } from "@/components/prevention/MoveSelection";
+import MutualityGrounding from "@/components/prevention/MutualityGrounding";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +27,7 @@ import type { RiskLevel } from "@/types/risk";
 
 type FlowPhase = 
   | "welcome"
+  | "move-selection"
   | "orientation"
   | "consent-signal"
   | "context-factors"
@@ -32,6 +35,7 @@ type FlowPhase =
   | "additional-context"
   | "stop-moment"
   | "explanation"
+  | "grounding"
   | "post-explanation-choice"
   | "follow-up-chat"
   | "outcome"
@@ -56,14 +60,17 @@ const orientationOptions: StepOption[] = [
   { id: "not-sure", label: "I'm not sure" }
 ];
 
-// STEP 1: Consent signal options (observation-first)
-const consentSignalOptions: StepOption[] = [
-  { id: "clear-yes", label: "They said yes or told me they want to" },
-  { id: "enthusiastic-actions", label: "They're starting things or going along with it" },
-  { id: "mixed-signals", label: "Hard to tell" },
-  { id: "no-response", label: "They're quiet or not really responding" },
-  { id: "said-no", label: "They said no or moved away" }
-];
+// STEP 1: Consent signal options (observation-first) - contextualized with selected move
+const getConsentSignalOptions = (move: MoveType | null): StepOption[] => {
+  const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "this";
+  return [
+    { id: "clear-yes", label: `They've said they want to ${moveLabel}` },
+    { id: "enthusiastic-actions", label: "They seem actually into it, not just going along" },
+    { id: "mixed-signals", label: "Hard to tell what they want" },
+    { id: "no-response", label: "They're quiet or haven't really said anything" },
+    { id: "said-no", label: "They said no or pulled away" }
+  ];
+};
 
 // STEP 2: Context factors
 const contextFactorOptions: StepOption[] = [
@@ -74,16 +81,20 @@ const contextFactorOptions: StepOption[] = [
   { id: "none", label: "None of these" }
 ];
 
-// STEP 3: Momentum check (replaces intent)
-const momentumOptions: StepOption[] = [
-  { id: "toward-physical", label: "Heading toward something physical" },
-  { id: "staying-flirty", label: "Just flirting or talking" },
-  { id: "slow-down", label: "I want to slow down" },
-  { id: "dont-know", label: "I don't know" }
-];
+// STEP 3: Momentum check - contextualized
+const getMomentumOptions = (move: MoveType | null): StepOption[] => {
+  const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "something";
+  return [
+    { id: "toward-physical", label: `Moving toward ${moveLabel}` },
+    { id: "staying-flirty", label: "Just flirting or vibing" },
+    { id: "slow-down", label: "I want to slow down" },
+    { id: "dont-know", label: "I'm not sure" }
+  ];
+};
 
 const Before = () => {
   const [phase, setPhase] = useState<FlowPhase>("welcome");
+  const [selectedMove, setSelectedMove] = useState<MoveType | null>(null);
   const [decisions, setDecisions] = useState<DecisionState>({
     orientation: null,
     consentSignal: null,
@@ -99,12 +110,25 @@ const Before = () => {
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [explanationComplete, setExplanationComplete] = useState(false);
 
+  // Contextualized options based on selected move
+  const consentSignalOptions = getConsentSignalOptions(selectedMove);
+  const momentumOptions = getMomentumOptions(selectedMove);
+
   const { 
     shouldShowPatternWarning, 
     recordRun,
     coercivePatternCount,
     yellowOrRedCount
   } = useSessionRiskTracking();
+
+  const handleMoveSelect = (move: MoveType) => {
+    setSelectedMove(move);
+    logChoice("before", "move-selection", move);
+  };
+
+  const handleMoveContinue = () => {
+    setPhase("orientation");
+  };
 
   const handleOrientationSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, orientation: id }));
@@ -189,7 +213,9 @@ const Before = () => {
     setExplanationComplete(false); // Reset for new explanation
     
     try {
-      const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
+      // Include selected move in the context for AI
+      const moveLabel = selectedMove ? MOVE_OPTIONS.find(m => m.id === selectedMove)?.label : null;
+      const formattedSelections = formatSelectionsForAI(decisions, flaggedWords, moveLabel);
       setInitialContext(formattedSelections);
       
       const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
@@ -281,6 +307,7 @@ const Before = () => {
 
   const resetFlow = () => {
     setPhase("welcome");
+    setSelectedMove(null);
     setDecisions({ orientation: null, consentSignal: null, contextFactors: [], momentum: null, additionalContext: "" });
     setRiskResult(null);
     setAnalysis(null);
@@ -299,12 +326,16 @@ const Before = () => {
   };
 
   const canProceed = useCallback(() => {
+    if (phase === "move-selection") return !!selectedMove;
     if (phase === "orientation") return !!decisions.orientation;
     if (phase === "consent-signal") return !!decisions.consentSignal;
     if (phase === "context-factors") return decisions.contextFactors.length > 0;
     if (phase === "momentum") return !!decisions.momentum;
     return false;
-  }, [phase, decisions]);
+  }, [phase, decisions, selectedMove]);
+
+  // Determine if we should show uncertainty options (yellow/red risk or user selected "not sure")
+  const showUncertaintyOptions = riskResult?.level === "yellow" || riskResult?.level === "red" || selectedMove === "not-sure";
 
   const shouldShowAfterHandoff = 
     decisions.orientation === "already-happened" || yellowOrRedCount >= 2;
@@ -329,18 +360,25 @@ const Before = () => {
                 Before anything happens
               </h1>
               <p className="text-muted-foreground mb-6">
-                Answer a few questions. See what comes up.
-                <br />Nothing is saved.
+                Answer a few quick questions. See what comes up.
               </p>
               <Button 
                 size="lg" 
-                onClick={() => setPhase("orientation")}
+                onClick={() => setPhase("move-selection")}
                 className="px-8"
               >
                 Continue <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </Card>
           )}
+
+          {/* Phase 1: Name the Move */}
+          <MoveSelection
+            selectedMove={selectedMove}
+            onSelect={handleMoveSelect}
+            onContinue={handleMoveContinue}
+            isActive={phase === "move-selection"}
+          />
 
           <DecisionStep
             stepNumber={1}
@@ -426,6 +464,15 @@ const Before = () => {
 
           {phase === "explanation" && !isLoading && analysis && explanationComplete && (
             <AfterHandoff isActive={shouldShowAfterHandoff} />
+          )}
+
+          {/* Phase 3: Grounding Output - shows after explanation */}
+          {phase === "explanation" && !isLoading && analysis && explanationComplete && (
+            <MutualityGrounding
+              selectedMove={selectedMove}
+              showUncertaintyOptions={showUncertaintyOptions}
+              isActive={true}
+            />
           )}
 
           {phase === "explanation" && !isLoading && analysis && explanationComplete && (
