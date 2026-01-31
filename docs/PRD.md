@@ -1,15 +1,16 @@
-# Vibecheck — Product Requirements Document (PRD)
+# ito ("is this ok?") — Product Requirements Document (PRD)
 
-**Version:** 4.0  
+**Version:** 5.0  
 **Last Updated:** January 2026  
-**Status:** Early Prototype / Exploratory
+**Status:** Early Prototype / Exploratory  
+**Live URL:** https://ito.lovable.app
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 Product Vision
-Vibecheck is an anonymous, harm-reduction tool designed to help young people navigate consent, boundaries, and accountability in intimate situations. It provides three distinct pathways for users depending on their relationship to a situation: prevention, self-reflection, and processing experiences.
+ito is an anonymous, harm-reduction tool designed to help young people navigate consent, boundaries, and accountability in intimate situations. It provides three distinct pathways for users depending on their relationship to a situation: prevention, self-reflection, and processing experiences.
 
 ### 1.2 Mission Statement
 To reduce sexual harm by providing accessible, non-judgmental guidance that helps people:
@@ -33,6 +34,22 @@ The product's core operating principle is **behavioral interruption**, not advic
 5. **Behavioral Interruption** — Create friction before risky behavior, not guidance after
 6. **Non-Permissive Stance** — The system never gives a "green light" or permission
 
+### 1.5 Why This Is More Than a Chatbot
+
+ito is fundamentally different from a "chatbot with a nice UI":
+
+| Aspect | Typical AI Chatbot | ito |
+|--------|-------------------|-----|
+| **Risk Assessment** | AI decides risk level | Deterministic rules in frontend code |
+| **AI Role** | Assesses and advises | Explains pre-computed decisions |
+| **User Flow** | Open-ended conversation | Structured decision points with gates |
+| **Safety Guardrails** | Prompt-based only | Multi-layer: code rules + prompts + UI gates |
+| **Escalation Handling** | AI judgment | Hard-coded refusal states |
+| **GREEN Signal** | "You're good to go!" | Never displays approval; internal-only state |
+| **Session Awareness** | None | Pattern tracking for repeat risk behaviors |
+
+**The AI cannot override the system's safety rules.** If a user selects "They said no," the system displays RED regardless of what the AI might "think."
+
 ---
 
 ## 2. Target Users
@@ -46,9 +63,9 @@ The product's core operating principle is **behavioral interruption**, not advic
 
 | Mindset | Route | User State |
 |---------|-------|------------|
-| Uncertain | `/avoid-line` | "I'm not sure if what I'm about to do is okay" |
-| Reflective | `/crossed-line` | "I think I may have done something wrong" |
-| Processing | `/someone-crossed` | "Something happened to me that felt off" |
+| Uncertain | `/before` | "I'm thinking about making a move" |
+| Reflective | `/after` | "I think I may have done something wrong" |
+| Processing | `/happened-to-me` | "Something happened to me that felt off" |
 
 ---
 
@@ -58,15 +75,16 @@ The product's core operating principle is **behavioral interruption**, not advic
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     VIBECHECK FRONTEND                       │
+│                        ITO FRONTEND                          │
 │                    (React + TypeScript)                      │
 ├─────────────────────────────────────────────────────────────┤
 │  /                    │  Landing page with 3 pathways       │
-│  /avoid-line          │  Prevention DECISION-FIRST flow     │
-│  /crossed-line        │  Accountability reflection + chat   │
-│  /someone-crossed     │  Survivor support chat (multi-turn) │
+│  /before              │  Prevention: Moves + Ladder flow    │
+│  /after               │  Accountability reflection + chat   │
+│  /happened-to-me      │  Survivor support chat (multi-turn) │
 │  /about               │  Product information                │
 │  /resources           │  Crisis resources                   │
+│  /demo                │  Internal demo/documentation        │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -88,145 +106,238 @@ The product's core operating principle is **behavioral interruption**, not advic
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    EDGE FUNCTIONS (Deno)                     │
+│                  Deployed on Lovable Cloud                   │
 ├─────────────────────────────────────────────────────────────┤
 │  analyze-vibecheck        │  Prevention EXPLANATION AI      │
 │  analyze-language         │  AI-powered language detection  │
 │  analyze-crossed-line     │  Initial accountability AI      │
 │  crossed-line-followup    │  Accountability follow-up AI    │
 │  analyze-someone-crossed  │  Survivor support AI            │
+│  vibecheck-followup       │  Prevention follow-up chat      │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              LOVABLE AI GATEWAY                              │
-│         (google/gemini-2.5-flash model)                      │
+│                    ANTHROPIC CLAUDE API                      │
+│              Model: claude-sonnet-4-20250514                 │
+│              (Claude 3.5 Sonnet equivalent)                  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Data Flow
+### 3.2 Technical Stack
 
-**Prevention Flow (Decision-First, Observation-Centered):**
-1. User selects orientation (where they are in the situation)
-2. User describes observed consent signals (what the other person is doing/saying)
-3. User selects context factors that might affect consent clarity
-4. User selects momentum direction (where things are heading)
-5. User optionally adds free-text context
-6. Dual-layer detection: Static patterns + AI analysis scan free text
-7. Frontend deterministically calculates risk level
-8. If RED/YELLOW: Mandatory "Stop Moment" displayed
-9. User acknowledges → Edge function called with pre-computed risk
-10. AI explains (does not assess) the risk level, directly addressing any flagged language
-11. Post-explanation choice: "I'm done" or "I want to talk more"
-12. Optional follow-up chat if user chooses to continue
-13. Outcome check: User self-reports what they did
-14. One-line reflective feedback (no storage)
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS, shadcn/ui components |
+| State Management | React useState/useReducer (no global state) |
+| Routing | React Router v6 |
+| Backend | Lovable Cloud (Supabase-powered) |
+| Edge Functions | Deno runtime |
+| AI Model | Anthropic Claude 3.5 Sonnet (claude-sonnet-4-20250514) |
+| Database | PostgreSQL (minimal use - submissions logging only) |
+
+### 3.3 Secret Management
+
+**Storage Location:** Supabase Edge Function Secrets (server-side only)
+
+| Secret Name | Purpose | Access |
+|-------------|---------|--------|
+| `ANTHROPIC_API_KEY` | Authenticates with Claude API | Edge functions only |
+| `SUPABASE_URL` | Database connection | Auto-provided |
+| `SUPABASE_ANON_KEY` | Public client access | Auto-provided |
+| `SUPABASE_SERVICE_ROLE_KEY` | Admin database access | Edge functions only |
+| `LOVABLE_API_KEY` | Lovable AI Gateway (backup) | Edge functions only |
+
+**Security Model:**
+- API keys NEVER exposed to frontend code
+- All AI calls go through edge functions
+- Edge functions validate input before calling external APIs
+- No client-side environment variables contain secrets
+
+### 3.4 Data Flow
+
+**Prevention Flow (Moves + Ladder Architecture):**
+1. **Phase 1 - Name the Move:** User selects specific action they're considering
+2. User sees visual "ladder" showing intimacy spectrum
+3. User selects orientation (where they are in the situation)
+4. User describes observed consent signals (what the other person is doing/saying)
+5. User selects context factors that might affect consent clarity
+6. User selects momentum direction (where things are heading)
+7. User optionally adds free-text context
+8. Dual-layer detection: Static patterns + AI analysis scan free text
+9. Frontend deterministically calculates risk level
+10. If RED/YELLOW: Mandatory "Stop Moment" displayed
+11. User acknowledges → Edge function called with pre-computed risk
+12. AI explains (does not assess) the risk level, directly addressing any flagged language
+13. **Phase 3 - Grounding Output:** Mutuality signals + in-between options displayed
+14. Post-explanation choice: "I'm done" or "I want to talk more"
+15. Optional follow-up chat if user chooses to continue
+16. Outcome check: User self-reports what they did
+17. One-line reflective feedback (no storage)
 
 **Accountability & Survivor Flows:**
 1. User inputs scenario/message in frontend
 2. Frontend sends request to edge function
 3. Edge function constructs prompt with system instructions
-4. AI Gateway returns structured response
+4. Claude API returns structured response
 5. Frontend renders response with appropriate UI
 
-### 3.3 Privacy Architecture
-- **No database** — Zero persistence of user inputs
+### 3.5 Privacy Architecture
+- **Minimal database use** — Only anonymous session submissions logged (for product improvement)
 - **No authentication** — Fully anonymous access
 - **No analytics tracking** — No user behavior logging
 - **Stateless conversations** — Context maintained only in-session via frontend state
 - **Session-only tracking** — Pattern awareness via sessionStorage (cleared on tab close)
 - **Outcome check** — Self-reported, local-only, no storage
 
+### 3.6 Database Schema
+
+```sql
+-- Submissions table (anonymous logging for product improvement)
+CREATE TABLE public.submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id TEXT NOT NULL DEFAULT gen_random_uuid()::text,
+  flow_type TEXT NOT NULL,           -- 'before', 'after', 'happened-to-me'
+  step_name TEXT NOT NULL,           -- 'move-selection', 'orientation', etc.
+  step_type TEXT NOT NULL,           -- 'choice', 'freetext', 'ai-response'
+  choice_value TEXT,                 -- Selected option ID
+  freetext_value TEXT,               -- User's free text (if any)
+  ai_response_summary TEXT,          -- Brief AI response summary
+  metadata JSONB,                    -- Additional context
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS: Anonymous insert only, no read access
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anonymous inserts" ON submissions FOR INSERT WITH CHECK (true);
+-- SELECT restricted to service_role for admin review only
+```
+
 ---
 
 ## 4. Flow Specifications
 
-## 4.1 Flow A: Prevention ("I want to avoid crossing a line")
+## 4.1 Flow A: Prevention ("I'm thinking about making a move")
 
 ### Route
-`/avoid-line`
+`/before`
 
 ### Purpose
-Interrupt risky behavior in the moment. Help users recognize consent signals and make better decisions BEFORE acting.
+Interrupt risky behavior in the moment. Help users name what they're considering, recognize consent signals, and understand their options before acting.
 
-### Interaction Model (v4.0 — Observation-First with Behavioral Interruption)
-**Orientation → Observed Consent Signals → Context Factors → Momentum Check → Free Text → Stop Moment → AI Explanation → Post-Explanation Choice → Optional Follow-up → Outcome Check → Reflective Feedback**
+### Core Insight
+Many teens feel "I want to do something more" but lack a shared language for:
+- What "a move" actually is
+- What options exist between kissing and sex
+- How to recognize when a move is mutual
+
+### Interaction Model (v5.0 — Moves + Ladder Architecture)
+
+**Phase 1: Name the Move → Phase 2: Contextual Reflection → Phase 3: Grounding Output**
 
 This is NOT a chatbot. It is a consent risk assessment and behavioral interruption tool.
 
 ### Target Persona
 Primarily teenage boys (14-18) navigating dating/hookup situations for the first time.
 
-### User Journey (v4.0)
+### User Journey (v5.0)
 
 ```
-┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐     ┌────────────────┐
-│  Step 0:       │     │  Step 1:       │     │  Step 2:       │     │  Step 3:       │     │  Step 4:       │
-│  ORIENTATION   │ ──► │  CONSENT       │ ──► │  CONTEXT       │ ──► │  MOMENTUM      │ ──► │  FREE TEXT     │
-│  (buttons)     │     │  SIGNALS       │     │  FACTORS       │     │  CHECK         │     │  (optional)    │
-│                │     │  (buttons)     │     │  (multi-select)│     │  (buttons)     │     │                │
-└────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘     └────────────────┘
-                                                                                                   │
-                                                                                                   ▼
-                              ┌───────────────────────────────────────────────────────┐
-                              │              DUAL-LAYER DETECTION                      │
-                              │  1. Static patterns (instant)                          │
-                              │  2. AI analysis (async, graceful fallback)             │
-                              └───────────────────────────────────────────────────────┘
-                                                      │
-                                                      ▼
-                              ┌───────────────────────────────────────────────────────┐
-                              │         DETERMINISTIC RISK CALCULATION                 │
-                              │         (Frontend: riskClassification.ts)              │
-                              └───────────────────────────────────────────────────────┘
-                                                      │
-                    ┌───────────────────────┬─────────┴─────────────┐
-                    ▼                       ▼                       ▼
-              ┌──────────┐           ┌──────────┐            ┌──────────────────┐
-              │   RED    │           │  YELLOW  │            │  "No hard stop"  │
-              │   STOP   │           │  PAUSE   │            │  (internal GREEN)│
-              │  MOMENT  │           │  MOMENT  │            │   ───► Explain   │
-              └────┬─────┘           └────┬─────┘            └──────────────────┘
-                   │                      │
-                   └──────────┬───────────┘
-                              ▼
-                      ┌───────────────┐
-                      │ "I understand"│
-                      │   (required)  │
-                      └───────┬───────┘
-                              ▼
-                     ┌─────────────────┐
-                     │  AI EXPLANATION │
-                     │  (addresses     │
-                     │  flagged lang)  │
-                     └────────┬────────┘
-                              ▼
-                   ┌────────────────────┐
-                   │ POST-EXPLANATION   │
-                   │ "I'm done" OR      │
-                   │ "Talk more"        │
-                   └────────┬───────────┘
-                            │
-               ┌────────────┴────────────┐
-               ▼                         ▼
-        ┌─────────────┐          ┌─────────────────┐
-        │ OUTCOME     │          │ FOLLOW-UP CHAT  │
-        │ CHECK       │          │ (multi-turn)    │
-        └──────┬──────┘          └────────┬────────┘
-               │                          │
-               ▼                          ▼
-        ┌─────────────┐          ┌─────────────────┐
-        │ REFLECTIVE  │          │  OUTCOME CHECK  │
-        │ FEEDBACK    │          └────────┬────────┘
-        └─────────────┘                   ▼
-                                 ┌─────────────────┐
-                                 │ REFLECTIVE      │
-                                 │ FEEDBACK        │
-                                 └─────────────────┘
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         PHASE 1: NAME THE MOVE                              │
+├────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐                                                        │
+│  │ Privacy Banner  │  "Nothing is saved. This is just for you."            │
+│  └─────────────────┘                                                        │
+│                                                                              │
+│  "What kind of move are you thinking about?"                                │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  THE LADDER (Visual Spectrum)                                        │   │
+│  │  ────────────────────────────                                        │   │
+│  │  ○ Sit closer                                                        │   │
+│  │  ○ Hold hands                                                        │   │
+│  │  ● Kiss  ◄── Selected                                                │   │
+│  │  ○ Make out                                                          │   │
+│  │  ○ Touch over clothes                                                │   │
+│  │  ○ Touch under clothes                                               │   │
+│  │  ○ Go somewhere private                                              │   │
+│  │  ○ Have sex                                                          │   │
+│  │  ○ Not sure yet                                                      │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                    PHASE 2: CONTEXTUAL REFLECTION                           │
+│                    (Existing ito questions, contextualized)                 │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Step 0: Orientation                                                        │
+│  Step 1: Observed Consent Signals                                           │
+│  Step 2: Context Risk Factors                                               │
+│  Step 3: Momentum Check                                                     │
+│  Step 4: Free Text (optional)                                               │
+│                                                                              │
+│  ↓ Dual-layer detection + Deterministic risk calculation ↓                 │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │ STOP MOMENT (if RED/YELLOW)                                          │   │
+│  │ "I understand" button required to proceed                            │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ↓ AI Explanation (references selected move) ↓                             │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                       PHASE 3: GROUNDING OUTPUT                             │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  A) MUTUALITY SIGNALS (always shown)                                        │
+│  "What [selected move] usually looks like when it's mutual:"               │
+│  • Both people initiate or lean in                                          │
+│  • Bodies are relaxed, not stiff or pulling away                            │
+│  • You can pause or stop without it being weird                             │
+│  • They're actively participating, not just allowing                        │
+│                                                                              │
+│  B) IN-BETWEEN OPTIONS (shown for yellow/red or uncertainty)                │
+│  "If you're unsure, you don't have to jump ahead:"                         │
+│  • Longer hug                                                               │
+│  • Sitting closer                                                           │
+│  • Hand on their back                                                       │
+│  • Ask what they want                                                       │
+│                                                                              │
+│  ↓ Post-explanation choice → Optional follow-up → Outcome check ↓          │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Decision Step Options (v4.0)
+### Phase 1: Move Selection Options
 
-**Step 0: Orientation (NEW)**
+| ID | Label | Ladder Position |
+|----|-------|-----------------|
+| `sit-closer` | Sit closer | 1 (least intimate) |
+| `hold-hands` | Hold hands | 2 |
+| `kiss` | Kiss | 3 |
+| `make-out` | Make out | 4 |
+| `touch-over-clothes` | Touch over clothes | 5 |
+| `touch-under-clothes` | Touch under clothes | 6 |
+| `go-somewhere-private` | Go somewhere private | 7 |
+| `have-sex` | Have sex | 8 (most intimate) |
+| `not-sure` | Not sure yet | N/A |
+
+**The Ladder Mental Model:**
+- Visual orientation aid, NOT a required progression
+- Shows user where their selected move sits in the spectrum
+- Helps them see "in-between" options they might not have considered
+- NOT gamified, NOT a checklist, NOT a "level up" system
+
+### Phase 2: Contextual Reflection Steps
+
+**Step 0: Orientation**
 > "Where are you in this situation right now?"
 
 | ID | Label | Description |
@@ -237,10 +348,12 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 | `already-happened` | Something already happened and I'm unsure | Post-event reflection |
 | `not-sure` | I'm not sure how to describe it | Unclear context |
 
-**Step 1: Observed Consent Signals (RENAMED - was Step 2)**
+**Step 1: Observed Consent Signals**
 > "What have they been doing or saying?"
 
-This step prioritizes OBSERVATION of the other person's behavior before asking about the user's intentions.
+Questions are dynamically contextualized with the selected move. Example:
+- Generic: "Are you confident the other person is comfortable?"
+- Contextualized: "Do they seem actually into this, or just going along with it?"
 
 | ID | Label | Description |
 |----|-------|-------------|
@@ -250,7 +363,7 @@ This step prioritizes OBSERVATION of the other person's behavior before asking a
 | `no-response` | Quiet or not responding | Absence of response |
 | `said-no` | Said no or pulled away | Clear refusal |
 
-**Step 2: Context Risk Factors (RENAMED - was Step 3)**
+**Step 2: Context Risk Factors**
 > "Anything here that might affect how clear consent is?" (Multi-select)
 
 | ID | Label |
@@ -261,10 +374,8 @@ This step prioritizes OBSERVATION of the other person's behavior before asking a
 | `emotional-pressure` | Emotional pressure |
 | `none` | None of these |
 
-**Step 3: Momentum Check (NEW - replaces Intent)**
+**Step 3: Momentum Check**
 > "What direction does this feel like it's heading?"
-
-This replaces the intent-first question to reduce moral hazard. The user describes momentum, not plans.
 
 | ID | Label | Risk Mapping |
 |----|-------|--------------|
@@ -277,6 +388,30 @@ This replaces the intent-first question to reduce moral hazard. The user describ
 > "Anything else you want to add?"
 
 Free text input (max 800 characters). Subject to dual-layer flag detection.
+
+### Phase 3: Grounding Output
+
+**A) Mutuality Signals (Always Shown)**
+Move-specific indicators that a move is mutual:
+
+| Move | Mutuality Signals |
+|------|-------------------|
+| `kiss` | Both people lean in, eye contact, relaxed body language, easy to pause |
+| `make-out` | Active participation from both, hands moving naturally, comfortable pauses |
+| `touch-over-clothes` | They guide your hand or touch back, relaxed not tense |
+| `touch-under-clothes` | Clear verbal yes, they help with clothing, ongoing enthusiasm |
+| `have-sex` | Explicit conversation, both actively participating, can stop anytime |
+
+**B) In-Between Options (Shown for Yellow/Red or Uncertainty)**
+Low-pressure alternatives based on selected move:
+
+| Selected Move | In-Between Options |
+|---------------|-------------------|
+| `kiss` | Longer hug, sitting closer, hand on their back |
+| `make-out` | Gentle kiss, holding hands, asking what they want |
+| `touch-over-clothes` | Making out with clothes on, holding them close |
+| `touch-under-clothes` | Touching over clothes only, asking what feels good |
+| `have-sex` | Everything else on the ladder, explicit conversation about what they want |
 
 ### Dual-Layer Flag Word Detection
 
@@ -296,7 +431,7 @@ Regex-based detection in `riskClassification.ts`:
 | Coercion/pressure | "just let me", "come on", "don't be a tease" |
 
 **Layer 2: AI-Powered Analysis (async)**
-Edge function `analyze-language` using Gemini detects nuanced patterns:
+Edge function `analyze-language` using Claude detects nuanced patterns:
 
 | Pattern | Description |
 |---------|-------------|
@@ -334,22 +469,22 @@ Located in: `src/lib/riskClassification.ts`
 
 *Physical momentum = `toward-physical`*
 
-### GREEN State Semantics (v4.0 — Non-Permissive)
+### GREEN State Semantics (Non-Permissive)
 
 **CRITICAL: GREEN is an internal classification state, NOT a user-facing approval.**
 
 When risk is internally classified as GREEN:
 - Do NOT display the word "GREEN" or any green color
-- Display neutral header: "No hard stop detected right now"
+- Display neutral header: "No clear red flags right now"
 - Use neutral colors (gray/muted)
 - Explanation is SHORTER than YELLOW/RED
-- No expanded "what to do instead" lists
+- Still show mutuality signals
 - No reassurance or validation of intent
 
 **Required copy elements for GREEN:**
-- "Consent is ongoing and reversible"
-- "This is not approval or permission"
-- "If they hesitate, go quiet, or pull back at any point, that's your cue to stop"
+- "Consent is ongoing and can change"
+- "This isn't permission—it's just that nothing here is a hard stop"
+- "If they hesitate, go quiet, or seem off, that's your cue to pause"
 
 **Forbidden language:**
 - "You're good"
@@ -363,26 +498,266 @@ For RED and YELLOW risk levels, a full-screen modal appears:
 
 **RED Stop Moment:**
 - Large octagon icon
-- Header: "STOP"
+- Header: "Wait"
 - Subtext: "This is a hard stop."
-- Message: Specific action to NOT take (generated from classification reasoning)
+- Message: Specific concern based on classification
 - Button: "I understand" (required to proceed)
-- Footer: "Proceeding without consent can cause serious harm."
+- Footer: "Proceeding without clear consent can cause serious harm."
 
 **YELLOW Pause Moment:**
 - Large triangle warning icon
-- Header: "PAUSE"
+- Header: "Pause & Check"
 - Subtext: "Take a moment before continuing."
-- Message: Specific caution (generated from classification reasoning)
+- Message: Specific caution based on classification
 - Button: "I understand" (required to proceed)
-- Footer: "Clear communication protects both of you."
+- Footer: "When things are unclear, a simple check-in helps."
 
-### Session-Level Pattern Awareness (v4.0)
+---
+
+## 5. API Integration
+
+### 5.1 AI Model Selection
+
+**Primary Model:** Anthropic Claude 3.5 Sonnet (`claude-sonnet-4-20250514`)
+
+**Rationale:**
+- Superior reasoning for nuanced consent scenarios
+- Better tone alignment with peer-to-peer philosophy
+- Strong safety guardrails built into the model
+- Consistent JSON output formatting
+
+### 5.2 API Request Format (Prevention Flow)
+
+**Endpoint:** `https://api.anthropic.com/v1/messages`
+
+**Request Structure:**
+```javascript
+{
+  method: "POST",
+  headers: {
+    "x-api-key": ANTHROPIC_API_KEY,  // Server-side only
+    "anthropic-version": "2023-06-01",
+    "Content-Type": "application/json"
+  },
+  body: {
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 1024,
+    system: SYSTEM_PROMPT,  // See below
+    messages: [
+      { 
+        role: "user", 
+        content: formatSelectionsForAI(selections, moveLabel)
+      }
+    ]
+  }
+}
+```
+
+**Input Formatting (`formatSelectionsForAI`):**
+```
+Selected Move: Kiss
+
+Orientation: We're together in person
+Signals from the other person: Mixed or hard to read
+Context factors: Alcohol or drugs involved
+Momentum: Toward something physical
+
+Additional context from the user:
+"[user's free text if provided]"
+
+FLAGGED: entitlement, dismissing boundaries
+
+System-computed risk level: red
+Reasoning: No response + physical intent, Flag words detected
+```
+
+### 5.3 System Prompts
+
+**Prevention Explanation (RED/YELLOW):**
+```
+You are ito - you help teenage boys (14-18) understand consent.
+
+IMPORTANT: The risk level has ALREADY been determined by the system. 
+Do NOT override or reassess it. Your job is to EXPLAIN why this risk 
+level applies, not to judge it.
+
+CONTEXT: The user is thinking about making a move: [SELECTED_MOVE]
+
+TONE:
+- Direct, not preachy. Like an older brother, not a teacher.
+- No lectures. Keep it real and conversational.
+- Use normal capitalization and punctuation.
+- 8th grade reading level
+- Avoid em dashes
+
+YOUR ROLE:
+1. Accept the pre-computed risk level as fact
+2. Explain what's happening in this specific situation
+3. Reference the specific move they're considering
+4. Describe why the signals/context led to this classification
+5. Offer concrete alternatives that would be safer
+
+CRITICAL - FLAGGED LANGUAGE:
+When flagged language is detected, you MUST:
+- Directly call out the specific problematic word or attitude
+- Reference what they actually said, not system labels
+- Explain WHY this framing is harmful
+- Do NOT be preachy - be direct and matter-of-fact
+- NEVER output phrases like "FLAGGED CONCERNING LANGUAGE"
+
+CRITICAL RULES:
+- Do NOT say "I would classify this as..." or "This seems like..."
+- Do NOT override the system's risk assessment
+- Focus on explanation, not judgment
+- Never blame the other person
+- Never suggest manipulation tactics
+- Keep it brief and actionable
+```
+
+**Prevention Explanation (GREEN/Neutral):**
+```
+You are ito - you help teenage boys (14-18) understand consent.
+
+IMPORTANT: The system has determined there are no immediate red flags, 
+but this is NOT approval or permission to proceed.
+
+CONTEXT: The user is thinking about making a move: [SELECTED_MOVE]
+
+TONE:
+- Brief and neutral. Not celebratory.
+- No reassurance that they're "good to go"
+- 8th grade reading level
+
+YOUR ROLE:
+1. Acknowledge that no hard stop was detected
+2. Briefly summarize what's happening
+3. Remind that consent is ongoing and can change
+4. Do NOT provide extensive guidance
+
+CRITICAL RULES:
+- NEVER imply permission or approval
+- NEVER say "you're good" or "safe to proceed"
+- Keep response SHORT
+- Always include reminder about ongoing consent
+- Return empty arrays for whatNotToDo and whatToDoInstead
+```
+
+### 5.4 Response Schema (Prevention)
+
+```json
+{
+  "assessment": "2-3 sentence explanation (addresses flagged language if present)",
+  "whatsHappening": ["bullet 1", "bullet 2", "bullet 3"],
+  "whatNotToDo": ["action 1", "action 2"],
+  "whatToDoInstead": ["action 1", "action 2"],
+  "realTalk": "One sentence self-interest angle"
+}
+```
+
+### 5.5 Edge Function Security
+
+**Input Validation (all edge functions):**
+```typescript
+// Server-side validation
+if (!text?.trim()) {
+  return new Response(
+    JSON.stringify({ error: "Input is required" }),
+    { status: 400, headers: corsHeaders }
+  );
+}
+
+if (text.length > 5000) {
+  return new Response(
+    JSON.stringify({ error: "Input is too long" }),
+    { status: 400, headers: corsHeaders }
+  );
+}
+```
+
+**Error Handling (generic messages to client):**
+```typescript
+catch (error) {
+  console.error("Error in function:", error);
+  // Generic message - no stack traces or internal details
+  return new Response(
+    JSON.stringify({ error: "Service temporarily unavailable" }),
+    { status: 500, headers: corsHeaders }
+  );
+}
+```
+
+**Rate Limit Handling:**
+```typescript
+if (response.status === 429) {
+  return new Response(
+    JSON.stringify({ error: "Rate limit exceeded. Please try again." }),
+    { status: 429, headers: corsHeaders }
+  );
+}
+```
+
+---
+
+## 6. Non-Bot Guardrails
+
+### 6.1 Multi-Layer Safety Architecture
+
+ito uses **defense in depth** - multiple independent safety layers that don't rely solely on AI judgment:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  LAYER 1: FRONTEND DETERMINISTIC RULES                      │
+│  - Hard-coded risk classification                           │
+│  - "said-no" ALWAYS = RED, regardless of AI output         │
+│  - Static flag word detection (regex patterns)              │
+│  - Session pattern tracking                                 │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  LAYER 2: UI GATES                                          │
+│  - Stop Moment requires explicit "I understand" click       │
+│  - Cannot skip or dismiss without acknowledgment            │
+│  - Follow-up chat gated behind explicit choice              │
+│  - Refusal state blocks further assistance                  │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  LAYER 3: AI PROMPT CONSTRAINTS                             │
+│  - AI receives pre-computed risk level as INPUT             │
+│  - System prompt forbids overriding risk assessment         │
+│  - Required phrases ensure consistent messaging             │
+│  - Forbidden language list prevents permission-granting     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│  LAYER 4: EDGE FUNCTION VALIDATION                          │
+│  - Input length limits (5000 chars max)                     │
+│  - Generic error messages (no information leakage)          │
+│  - Rate limiting to prevent abuse                           │
+│  - Graceful fallback if AI fails                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 6.2 What the AI Cannot Do
+
+| Action | Prevented By |
+|--------|-------------|
+| Override RED classification | Frontend calculates risk before AI is called |
+| Grant permission to proceed | GREEN state is internal-only, never displayed as approval |
+| Skip Stop Moment | UI requires explicit click to proceed |
+| Access user data | No authentication, no persistent storage |
+| Change its own prompt | Prompts are server-side in edge functions |
+| See conversation across sessions | Stateless architecture, session-only memory |
+
+### 6.3 Session Pattern Awareness
 
 Located in: `src/hooks/useSessionRiskTracking.ts`
 
 **Tracked within sessionStorage (browser session only):**
-- Number of completed `/avoid-line` runs
+- Number of completed `/before` runs
 - Count of YELLOW or RED outcomes
 - Count of runs with detected coercive/flagged language
 
@@ -392,389 +767,54 @@ If ≥2 YELLOW or RED outcomes in a session, display neutral observation at welc
 
 This is informational, not corrective. No persistence across sessions.
 
-### Refusal State (v4.0)
+### 6.4 Refusal State
 
 **Trigger conditions (ALL must be true):**
-1. Repeated coercive/dehumanizing language detected (coercivePatternCount ≥ 1)
+1. Repeated coercive/dehumanizing language detected
 2. User continues seeking reassurance or ways to continue
 3. Risk level is RED
 
 **Refusal behavior:**
 - Display RefusalCard component
-- Header: "I can't help with continuing this."
-- Copy: "The situation you described involves clear boundaries that need to be respected. The safest move is to stop."
+- Header: "I can't help with this."
+- Copy: "The situation you're describing has clear signs that the other person isn't comfortable. The only move here is to stop."
 - No further guidance provided
 - Only option: Start over
 
-### Soft Handoff to /crossed-line (v4.0)
-
-**Trigger conditions (ANY):**
-- Orientation = "already-happened"
-- ≥2 YELLOW or RED outcomes in session
-
-**Display after explanation:**
-- Title: "If something already happened"
-- Copy: "If you're realizing this may have crossed a line already, there's another path focused on reflection and accountability."
-- Button: "Reflect on what happened"
-
-Never force navigation.
-
-### Post-Explanation Choice
-
-After AI explanation, users see a binary choice:
-- **"I'm done"** — Proceeds to Outcome Check
-- **"I want to talk more"** — Opens follow-up chat
-
-This gates access to follow-up chat rather than automatically proceeding.
-
-### Follow-Up Chat (Optional)
-
-Only accessible if user explicitly chooses "I want to talk more."
-
-**Characteristics:**
-- Multi-turn conversation
-- Maintains context from original selections
-- Risk level remains fixed (doesn't change based on follow-up)
-- Same "older brother" tone as initial explanation
-- User can exit to Outcome Check at any time
-
-### Outcome Check
-
-After the flow concludes:
-> "What did you end up doing?"
-
-| ID | Label | Icon |
-|----|-------|------|
-| `stopped` | I stopped | ✓ (green) |
-| `checked-in` | I checked in verbally | 💬 (green) |
-| `didnt-proceed` | I didn't go through with it | ✗ (neutral) |
-| `not-sure` | I'm not sure / I ignored this | ? (muted) |
-
-**Privacy:** No data is stored. Purely for user self-reflection.
-
-### Outcome Feedback (v4.0)
-
-After outcome selection, display one-line reflective feedback:
-
-| Outcome | Feedback |
-|---------|----------|
-| `stopped` or `checked-in` | "Clear pauses and verbal check-ins are what actually prevent harm." |
-| `didnt-proceed` | "Choosing not to proceed is always a valid way to keep things safe." |
-| `not-sure` | "If a situation feels confusing, earlier pauses usually make things clearer." |
-
-No storage. Flow resets after display.
-
-### Edge Functions
-
-**`analyze-vibecheck`** — Main explanation AI
-
-Accepts pre-computed risk level and user selections. Explains why the risk level applies without reassessing it.
-
-**`analyze-language`** — AI-powered flag detection
-
-Analyzes free text for nuanced problematic patterns. Returns categories and explanation for AI to address.
-
-### AI System Prompt (Explanation Mode — RED/YELLOW)
-
-```
-You are vibecheck - you help teenage boys (14-18) understand consent.
-
-IMPORTANT: The risk level has ALREADY been determined by the system. 
-Do NOT override or reassess it. Your job is to EXPLAIN why this risk 
-level applies, not to judge it.
-
-TONE:
-- Direct, not preachy. Like an older brother, not a teacher.
-- No lectures. Keep it real and conversational.
-- Use normal capitalization and punctuation.
-
-YOUR ROLE:
-1. Accept the pre-computed risk level as fact
-2. Explain what's happening in this specific situation
-3. Describe why the signals/context led to this classification
-4. Offer concrete alternatives that would be safer
-
-CRITICAL - FLAGGED LANGUAGE:
-When flagged language is detected, you MUST:
-- Directly call out the specific problematic word or attitude
-- Reference what they actually said, not system labels
-- Explain WHY this framing is harmful (to the other person AND to him)
-- Do NOT be preachy - be direct and matter-of-fact
-- NEVER output phrases like "FLAGGED CONCERNING LANGUAGE"
-
-CRITICAL RULES:
-- Do NOT say "I would classify this as..." or "This seems like..."
-- Do NOT override the system's risk assessment
-- Focus on explanation and education, not judgment
-- Never blame the other person
-- Never suggest manipulation tactics
-- Keep it brief and actionable
-```
-
-### AI System Prompt (Explanation Mode — GREEN/Neutral)
-
-```
-You are vibecheck - you help teenage boys (14-18) understand consent.
-
-IMPORTANT: The system has determined there are no immediate red flags, 
-but this is NOT approval or permission to proceed.
-
-TONE:
-- Brief and neutral. Not celebratory.
-- No reassurance that they're "good to go"
-
-YOUR ROLE:
-1. Acknowledge that no hard stop was detected
-2. Briefly summarize what's happening
-3. Remind that consent is ongoing and reversible
-4. Do NOT provide extensive guidance or encouragement
-
-CRITICAL RULES:
-- NEVER imply permission or approval
-- NEVER say "you're good" or "safe to proceed"
-- Keep response SHORT - shorter than red/yellow explanations
-- Always include reminder that consent can be withdrawn
-- Return empty arrays for whatNotToDo and whatToDoInstead
-```
-
-### Request Format
-
-```json
-{
-  "scenario": "Orientation: We're together in person\nSignals from the other person: Mixed or hard to read\nContext factors: Alcohol or drugs involved\nMomentum: Toward something physical\n\nAdditional context from the user:\n\"...\"\n\nFLAGGED: entitlement, dismissing boundaries",
-  "precomputedRiskLevel": "red"
-}
-```
-
-### Response Schema
-
-```json
-{
-  "assessment": "2-3 sentence explanation of what's happening (addresses flagged language if present)",
-  "whatsHappening": ["bullet 1", "bullet 2", "bullet 3"],
-  "whatNotToDo": ["action 1", "action 2", "action 3"],
-  "whatToDoInstead": ["action 1", "action 2", "action 3"],
-  "realTalk": "One sentence self-interest angle"
-}
-```
-
-### UI Components (v4.0)
-
-| Component | Path | Purpose |
-|-----------|------|---------|
-| `AvoidLine` | `src/pages/AvoidLine.tsx` | Main page orchestrator |
-| `DecisionStep` | `src/components/prevention/DecisionStep.tsx` | Reusable button-based step |
-| `ContextInput` | `src/components/prevention/ContextInput.tsx` | Optional free text input |
-| `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
-| `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display (RED/YELLOW) |
-| `NeutralExplanationCard` | `src/components/prevention/NeutralExplanationCard.tsx` | Neutral response display (GREEN) |
-| `PostExplanationChoice` | `src/components/prevention/PostExplanationChoice.tsx` | Done/Talk more binary choice |
-| `FollowUpChat` | `src/components/prevention/FollowUpChat.tsx` | Multi-turn follow-up |
-| `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
-| `OutcomeFeedback` | `src/components/prevention/OutcomeFeedback.tsx` | One-line reflective feedback |
-| `SessionPatternWarning` | `src/components/prevention/SessionPatternWarning.tsx` | Pattern awareness display |
-| `RefusalCard` | `src/components/prevention/RefusalCard.tsx` | Adversarial use refusal |
-| `CrossedLineHandoff` | `src/components/prevention/CrossedLineHandoff.tsx` | Soft redirect to accountability flow |
-
 ---
 
-## 4.2 Flow B: Accountability ("I think I crossed a line")
+## 7. Other Flows
 
-### Route
-`/crossed-line`
+### 7.1 Flow B: Accountability ("I think I crossed a line")
 
-### Purpose
-Help users who believe they may have harmed someone to reflect, understand impact, and consider accountability.
+**Route:** `/after`
 
-### Interaction Model
-**Hybrid: Structured reflection → Optional multi-turn chat**
+**Purpose:** Help users who believe they may have harmed someone to reflect, understand impact, and consider accountability.
 
-1. Intro screen with framing
-2. Single text input for describing what happened
-3. Structured reflection cards
-4. Optional follow-up conversation
-
-### Target Persona
-Anyone (primarily young men) who suspects they crossed a boundary and wants to understand what happened.
-
-### UI Components
-1. Intro screen with disclaimer
-2. Input screen for scenario
-3. Results screen with 5 reflection cards:
-   - Clarity Check
-   - Understanding Others' Boundaries
-   - Understanding Your Patterns
-   - What Accountability Could Look Like
-   - How to Do Better Next Time
-4. Follow-up chat section (expandable)
-5. Support resources card
-
-### Edge Functions
+**Edge Functions:**
 - `analyze-crossed-line` — Initial structured reflection
 - `crossed-line-followup` — Follow-up conversation
 
-### AI System Prompt (Initial Reflection)
-
-```
-You are a reflective guide helping a young person process a situation where they 
-think they may have crossed a boundary or hurt someone.
-
-Your goal is to help them:
-- Understand what likely happened
-- Recognize signs of discomfort or non-consent
-- Reflect on their own mindset, assumptions, impulses
-- Identify specific moments where they could have slowed down or paused
-- Consider accountability steps
-- Learn healthier behavior going forward
-
-You MUST follow these rules:
-- Do NOT provide legal advice
-- Do NOT encourage confessions to crimes
-- Do NOT ask for sexual details
-- Do NOT describe sexual acts
-- Do NOT roleplay
-- Do NOT moralize, shame, or scold
-- Keep tone neutral, steady, practical
-- Use reflection, not judgment
-- Emphasize accountability, safety, and empathy
-- Encourage seeking a trusted adult or professional if needed
-- Recognize that the user may be distressed, confused, or afraid
-
-Your output format should be a JSON object with these exact keys:
-
-1. "clarityCheck": Help them understand what happened. MUST include this exact 
-   sentence: "It's possible the other person did not feel comfortable continuing, 
-   even if they didn't say so directly."
-
-2. "otherPersonPerspective": Explain how the other person may have experienced 
-   the situation. MUST include: "Some people freeze up or go quiet—not because 
-   they want something to continue, but because they feel uncomfortable, 
-   overwhelmed, or unsure how to stop it. A lack of active participation is 
-   not consent."
-
-3. "yourPatterns": Help them reflect on their own behavior and emotional state. 
-   MUST include: "Part of reflection is recognizing what you tend to do when you 
-   feel nervous, excited, pressured, or strongly attracted. Learning to pause, 
-   breathe, and check in verbally is a key skill — especially if you tend to 
-   move quickly or focus more on your own cues than the other person's."
-
-4. "accountabilitySteps": Explain what accountability looks like. MUST include: 
-   "Accountability starts with respecting their space and not seeking contact 
-   unless they clearly want it. Repair must be survivor-led..."
-
-5. "avoidingRepetition": Provide guidance on how to do better. MUST include: 
-   "Practice checking in verbally — even during non-verbal interactions like 
-   kissing — with phrases like 'Is this okay?' or 'Do you want to keep going?'..."
-
-Never imply certainty — always use softening language ("it's possible…", 
-"one interpretation is…").
-```
-
-### Response Schema (Initial)
-
+**Response Schema:**
 ```json
 {
   "clarityCheck": "string",
-  "otherPersonPerspective": "string",
+  "otherPersonPerspective": "string", 
   "yourPatterns": "string",
   "accountabilitySteps": "string",
   "avoidingRepetition": "string"
 }
 ```
 
-### AI System Prompt (Follow-up)
+### 7.2 Flow C: Survivor Support ("Something happened to me")
 
-```
-You are a reflective guide continuing a conversation with a young person who has 
-already received structured reflection about a situation where they may have 
-crossed a boundary.
+**Route:** `/happened-to-me`
 
-[Previous reflection context is injected here]
+**Purpose:** Provide a safe, anonymous space for someone to process an experience where they feel a boundary may have been crossed WITH them.
 
-Your role is to:
-- Continue the supportive, non-judgmental tone
-- Answer their questions thoughtfully
-- Provide additional perspective when helpful
-- Reinforce healthy relationship concepts
-- Encourage continued reflection and growth
+**Edge Function:** `analyze-someone-crossed`
 
-[Same critical rules as initial prompt]
-
-Respond conversationally but thoughtfully.
-```
-
----
-
-## 4.3 Flow C: Survivor Support ("I think someone crossed a line with me")
-
-### Route
-`/someone-crossed`
-
-### Purpose
-Provide a safe, anonymous space for someone to process an experience where they feel a boundary may have been crossed WITH them.
-
-### Interaction Model
-**Multi-turn chat** — Conversational support with optional structured first response.
-
-### Target Persona
-Anyone processing a confusing, uncomfortable, or potentially harmful experience.
-
-### UI Components
-1. Intro screen with supportive framing and 3 value props:
-   - "Your feelings are valid"
-   - "No pressure, no labels"
-   - "You're in control"
-2. Chat interface
-3. First response: Structured support cards
-4. Follow-up responses: Conversational
-5. Persistent support resources bar
-
-### Edge Function
-`analyze-someone-crossed`
-
-### AI System Prompt
-
-```
-You are a supportive, non-judgmental guide helping someone process an experience 
-where they feel a boundary may have been crossed with them.
-
-Your role is to:
-- Help them understand what happened from their perspective
-- Validate their feelings without labeling their experience for them
-- Explain consent concepts clearly and gently
-- Provide balanced support: validation, information, and options
-- Empower them to make their own decisions about next steps
-
-You MUST follow these rules:
-- Do NOT label their experience as rape, assault, abuse, etc. — let them come 
-  to their own understanding
-- Do NOT provide legal advice
-- Do NOT pressure them to report or take any specific action
-- Do NOT minimize their experience or feelings
-- Do NOT ask for unnecessary details
-- Keep tone warm, steady, and supportive
-- Validate confusion, mixed feelings, freeze responses, and self-doubt as normal
-- Emphasize their safety and autonomy
-- Recognize that processing takes time
-
-For multi-turn conversations, remember context from previous messages and provide 
-thoughtful, personalized follow-up responses.
-
-If this is the FIRST message in a conversation, provide a structured response 
-with these sections:
-1. "acknowledgment": A warm acknowledgment of what they shared (2-3 sentences)
-2. "whatYouExperienced": Help them understand what happened without labeling it
-3. "yourFeelingsAreValid": Validate their emotional response, including confusion
-4. "understandingConsent": Gently explain relevant consent concepts
-5. "whatYouCanDo": Present options without pressure
-6. "followUpPrompt": A gentle, open-ended question inviting them to share more
-
-For FOLLOW-UP messages, respond conversationally while maintaining the same 
-supportive, validating tone. Return: { "response": "your conversational response" }
-```
-
-### Response Schema (First Message)
-
+**Response Schema (First Message):**
 ```json
 {
   "acknowledgment": "string",
@@ -787,88 +827,82 @@ supportive, validating tone. Return: { "response": "your conversational response
 }
 ```
 
-### Response Schema (Follow-up)
+---
 
-```json
-{
-  "response": "string",
-  "isFirstMessage": false
-}
+## 8. Technical Specifications
+
+### 8.1 Input Validation
+
+| Parameter | Client-side | Server-side |
+|-----------|------------|-------------|
+| Max length | 800 chars (free text) | 5000 chars (edge function) |
+| Min length | Non-empty (for required steps) | Non-empty |
+| Encoding | UTF-8 | UTF-8 |
+
+### 8.2 Error Handling
+
+| Error Type | User Message |
+|------------|--------------|
+| Rate limit (429) | "Rate limit exceeded. Please try again in a moment." |
+| Service error (500) | "Service temporarily unavailable" |
+| AI parse error | Graceful fallback with generic supportive message |
+| Network error | "Having trouble connecting. Please try again." |
+| Language analysis failure | Graceful fallback to static detection only |
+
+### 8.3 Edge Function Configuration
+
+```toml
+# supabase/config.toml
+project_id = "ochulsnvnqcbzqnlkazu"
+
+[functions.analyze-vibecheck]
+verify_jwt = false
+
+[functions.analyze-crossed-line]
+verify_jwt = false
+
+[functions.analyze-someone-crossed]
+verify_jwt = false
+
+[functions.crossed-line-followup]
+verify_jwt = false
+
+[functions.vibecheck-followup]
+verify_jwt = false
+
+[functions.analyze-language]
+verify_jwt = false
 ```
 
----
-
-## 5. Prompt Engineering Guidelines
-
-### 5.1 Tone Calibration by Flow
-
-| Flow | Tone | Voice Metaphor |
-|------|------|----------------|
-| Prevention | Direct, casual | "Older brother" |
-| Accountability | Neutral, steady | "Calm counselor" |
-| Survivor Support | Warm, validating | "Trusted friend" |
-
-### 5.2 Required Phrases (Accountability Flow)
-
-These phrases MUST appear in the accountability flow to ensure ethical grounding:
-
-1. **Clarity Check:**
-   > "It's possible the other person did not feel comfortable continuing, even if they didn't say so directly."
-
-2. **Understanding Others' Boundaries:**
-   > "Some people freeze up or go quiet—not because they want something to continue, but because they feel uncomfortable, overwhelmed, or unsure how to stop it. A lack of active participation is not consent."
-
-3. **Understanding Your Patterns:**
-   > "Part of reflection is recognizing what you tend to do when you feel nervous, excited, pressured, or strongly attracted. Learning to pause, breathe, and check in verbally is a key skill..."
-
-4. **Accountability:**
-   > "Accountability starts with respecting their space and not seeking contact unless they clearly want it. Repair must be survivor-led."
-
-5. **Doing Better:**
-   > "Practice checking in verbally — even during non-verbal interactions like kissing — with phrases like 'Is this okay?' or 'Do you want to keep going?'"
-
-### 5.3 Universal Guardrails
-
-All prompts must include these restrictions:
-- ❌ No legal advice
-- ❌ No encouraging confessions to crimes
-- ❌ No asking for sexual details
-- ❌ No describing sexual acts
-- ❌ No roleplay
-- ❌ No moralizing, shaming, or scolding
-- ❌ No labeling experiences for users (survivor flow)
-- ❌ No pressure to report or take specific actions (survivor flow)
-- ❌ No blaming victims
-- ❌ No suggesting manipulation tactics
-- ❌ No permission or approval language (prevention flow)
-
-### 5.4 Softening Language
-
-For accountability and survivor flows, always use epistemic softening:
-- "It's possible that..."
-- "One interpretation is..."
-- "It sounds like..."
-- "You might be feeling..."
-- "Some people experience..."
-
-### 5.5 Response Format Strategy
-
-| Flow | Format | Rationale |
-|------|--------|-----------|
-| Prevention (RED/YELLOW) | JSON with arrays | Scannable bullet points for quick reading |
-| Prevention (GREEN) | JSON with minimal content | Reduced surface area for self-justification |
-| Accountability (initial) | JSON with long-form strings | Thoughtful paragraphs for reflection |
-| Accountability (follow-up) | Plain text | Conversational flow |
-| Survivor (initial) | JSON with structured sections | Organized support without overwhelming |
-| Survivor (follow-up) | Plain text | Natural conversation |
+**Note:** `verify_jwt = false` is intentional for anonymous access. No user authentication required.
 
 ---
 
-## 6. Support Resources
+## 9. UI Components (v5.0)
 
-### 6.1 Always-Available Resources
+| Component | Path | Purpose |
+|-----------|------|---------|
+| `Before` | `src/pages/Before.tsx` | Main page orchestrator |
+| `MoveSelection` | `src/components/prevention/MoveSelection.tsx` | Phase 1: Move picker + ladder |
+| `MutualityGrounding` | `src/components/prevention/MutualityGrounding.tsx` | Phase 3: Signals + in-between options |
+| `DecisionStep` | `src/components/prevention/DecisionStep.tsx` | Reusable button-based step |
+| `ContextInput` | `src/components/prevention/ContextInput.tsx` | Optional free text input |
+| `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
+| `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display (RED/YELLOW) |
+| `NeutralExplanationCard` | `src/components/prevention/NeutralExplanationCard.tsx` | Neutral response display (GREEN) |
+| `PostExplanationChoice` | `src/components/prevention/PostExplanationChoice.tsx` | Done/Talk more binary choice |
+| `FollowUpChat` | `src/components/prevention/FollowUpChat.tsx` | Multi-turn follow-up |
+| `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
+| `OutcomeFeedback` | `src/components/prevention/OutcomeFeedback.tsx` | One-line reflective feedback |
+| `SessionPatternWarning` | `src/components/prevention/SessionPatternWarning.tsx` | Pattern awareness display |
+| `RefusalCard` | `src/components/prevention/RefusalCard.tsx` | Adversarial use refusal |
+| `AfterHandoff` | `src/components/prevention/AfterHandoff.tsx` | Soft redirect to accountability flow |
 
-These resources should be accessible from all flows:
+---
+
+## 10. Support Resources
+
+### 10.1 Always-Available Resources
 
 | Resource | URL | Use Case |
 |----------|-----|----------|
@@ -877,102 +911,33 @@ These resources should be accessible from all flows:
 | Crisis Text Line | crisistextline.org | General crisis support |
 | Love Is Respect | loveisrespect.org | Healthy relationships |
 
-### 6.2 Display Guidelines
+### 10.2 Display Guidelines
 - Show resources non-intrusively (footer or collapsible card)
 - Never require clicking resources before using the tool
 - Include resources in accountability flow for the OTHER person who may need support
 
 ---
 
-## 7. Technical Specifications
-
-### 7.1 Input Validation
-
-| Parameter | Client-side | Server-side |
-|-----------|------------|-------------|
-| Max length | 800 chars (free text) | 5000 chars (edge function) |
-| Min length | Non-empty (for required steps) | Non-empty |
-| Encoding | UTF-8 | UTF-8 |
-
-### 7.2 Error Handling
-
-| Error Type | User Message |
-|------------|--------------|
-| Rate limit (429) | "Rate limit exceeded. Please try again in a moment." |
-| Payment required (402) | "Service requires payment. Please contact support." |
-| AI parse error | Graceful fallback with generic supportive message |
-| Network error | "Having trouble connecting. Please try again." |
-| Language analysis failure | Graceful fallback to static detection only |
-
-### 7.3 AI Model Configuration
-
-```javascript
-{
-  model: "google/gemini-2.5-flash",
-  response_format: { type: "json_object" }  // For structured responses
-}
-```
-
----
-
-## 8. Future Considerations
-
-### 8.1 Potential Enhancements
-- [ ] Multi-language support
-- [ ] Scenario library with curated examples
-- [ ] Educator/parent resources section
-- [ ] More inclusive language for LGBTQ+ situations
-- [ ] Audio input option for accessibility
-- [ ] Offline capability via PWA
-- [ ] Analytics/logging for detection frequency (privacy-preserving)
-
-### 8.2 Prompt Engineering Opportunities
-- Fine-tune tone per demographic
-- Add cultural context awareness
-- Improve handling of edge cases (e.g., long-term relationships, power dynamics)
-- Better handling of users who may be in crisis
-
-### 8.3 Safety Considerations
-- Add crisis detection for users expressing self-harm ideation
-- Consider mandatory resource display for high-severity situations
-- Review prompts with subject matter experts (counselors, educators)
-
----
-
-## 9. Glossary
-
-| Term | Definition |
-|------|------------|
-| **Consent** | Freely given, reversible, informed, enthusiastic, specific agreement |
-| **Freeze response** | A trauma response where someone becomes unable to speak or move |
-| **Survivor-led repair** | Accountability process guided by the person who was harmed |
-| **Red flag** | Clear indicator of absent or withdrawn consent |
-| **Yellow flag** | Ambiguous situation requiring clarification |
-| **Green flag** | Internal classification only — NOT displayed as approval |
-| **Flag words** | Problematic language patterns indicating concerning attitudes |
-| **Behavioral interruption** | Deliberate friction to pause risky behavior before it happens |
-| **Stop Moment** | Full-screen acknowledgment requirement for RED/YELLOW risk |
-| **Refusal state** | System refusal to continue helping when adversarial use is detected |
-
----
-
-## 10. Appendix: File Structure
+## 11. File Structure
 
 ```
-vibecheck/
+ito/
 ├── src/
 │   ├── pages/
 │   │   ├── Index.tsx               # Landing page
-│   │   ├── AvoidLine.tsx           # Prevention flow (decision-first)
-│   │   ├── CrossedLine.tsx         # Accountability flow
-│   │   ├── SomeoneCrossedLine.tsx  # Survivor flow
+│   │   ├── Before.tsx              # Prevention flow (Moves + Ladder)
+│   │   ├── After.tsx               # Accountability flow
+│   │   ├── HappenedToMe.tsx        # Survivor flow
 │   │   ├── About.tsx
-│   │   └── Resources.tsx
+│   │   ├── Resources.tsx
+│   │   └── Demo.tsx                # Internal documentation
 │   ├── components/
 │   │   ├── Header.tsx
 │   │   ├── Footer.tsx
 │   │   ├── RiskBadge.tsx
 │   │   └── prevention/
+│   │       ├── MoveSelection.tsx        # NEW: Phase 1
+│   │       ├── MutualityGrounding.tsx   # NEW: Phase 3
 │   │       ├── DecisionStep.tsx
 │   │       ├── ContextInput.tsx
 │   │       ├── StopMoment.tsx
@@ -984,39 +949,53 @@ vibecheck/
 │   │       ├── OutcomeFeedback.tsx
 │   │       ├── SessionPatternWarning.tsx
 │   │       ├── RefusalCard.tsx
-│   │       └── CrossedLineHandoff.tsx
+│   │       └── AfterHandoff.tsx
 │   ├── hooks/
 │   │   └── useSessionRiskTracking.ts
-│   └── lib/
-│       ├── riskClassification.ts   # Deterministic rules + static flags
-│       └── aiLanguageAnalysis.ts   # AI detection integration
+│   ├── lib/
+│   │   ├── riskClassification.ts   # Deterministic rules + static flags
+│   │   └── aiLanguageAnalysis.ts   # AI detection integration
+│   └── types/
+│       └── risk.ts                 # RiskLevel type definitions
 ├── supabase/
+│   ├── config.toml                 # Edge function configuration
 │   └── functions/
 │       ├── analyze-vibecheck/index.ts
 │       ├── analyze-language/index.ts
 │       ├── analyze-crossed-line/index.ts
 │       ├── crossed-line-followup/index.ts
+│       ├── vibecheck-followup/index.ts
 │       └── analyze-someone-crossed/index.ts
 └── docs/
     ├── PRD.md                      # This document
-    ├── AVOID_LINE_USER_JOURNEY.md  # Detailed flow walkthrough
+    ├── COPY_AUDIT.md               # UI text inventory
     └── ONE_PAGER.md                # Shareable overview
 ```
 
 ---
 
-## 11. Changelog
+## 12. Changelog
+
+### v5.0 (January 2026)
+- **Moves + Ladder Architecture**: Three-phase flow replacing linear decision steps
+- **Phase 1 Move Selection**: Users name specific action before assessment
+- **Visual Ladder**: Orientation aid showing intimacy spectrum
+- **Phase 3 Grounding Output**: Mutuality signals + in-between options
+- **Rebranding**: "Vibecheck" → "ito" (is this ok?)
+- **Route Updates**: `/avoid-line` → `/before`, `/crossed-line` → `/after`, `/someone-crossed` → `/happened-to-me`
+- **AI Model Migration**: Gemini → Claude 3.5 Sonnet for better reasoning
+- **Security Hardening**: Input validation, generic error messages across all edge functions
+- **Privacy Banner**: Prominent "Nothing is saved" at flow start
+- **New Components**: MoveSelection, MutualityGrounding
 
 ### v4.0 (January 2026)
-- **Observation-First Flow**: Reordered steps to prioritize observed consent signals before momentum/intent
-- **Orientation Step**: Added Step 0 to orient user in time/context before structured questions
-- **Momentum Check**: Replaced "intent" question with "momentum" framing to reduce moral hazard
-- **Non-Permissive GREEN**: GREEN is now internal-only; displays as "No hard stop detected" with neutral styling
-- **Session Pattern Awareness**: Added local-only tracking of repeated risk patterns within browser session
-- **Refusal State**: System now refuses to continue when adversarial use patterns are detected
-- **Outcome Feedback**: One-line reflective feedback after outcome selection (no storage)
-- **Soft Handoff**: Optional redirect to accountability flow when appropriate
-- **Updated Components**: Added NeutralExplanationCard, OutcomeFeedback, SessionPatternWarning, RefusalCard, CrossedLineHandoff
+- **Observation-First Flow**: Reordered steps to prioritize observed consent signals
+- **Orientation Step**: Added Step 0 to orient user in time/context
+- **Momentum Check**: Replaced "intent" question with "momentum" framing
+- **Non-Permissive GREEN**: GREEN is internal-only; displays as neutral
+- **Session Pattern Awareness**: Local-only tracking of repeated risk patterns
+- **Refusal State**: System refuses when adversarial use detected
+- **Outcome Feedback**: One-line reflective feedback after outcome selection
 
 ### v3.0 (January 2026)
 - Dual-layer flag detection (static + AI)
@@ -1033,6 +1012,27 @@ vibecheck/
 
 ---
 
-*This document is intended for internal development and prompt engineering reference. Vibecheck is an exploratory prototype and not a substitute for professional support.*
+## 13. Glossary
 
-*Live preview: https://approach-coach.lovable.app*
+| Term | Definition |
+|------|------------|
+| **Consent** | Freely given, reversible, informed, enthusiastic, specific agreement |
+| **The Ladder** | Visual spectrum of physical intimacy levels, used as orientation aid |
+| **Move** | A specific physical action the user is considering |
+| **Mutuality Signals** | Observable behaviors indicating both people want the same thing |
+| **In-Between Options** | Lower-pressure alternatives to the user's selected move |
+| **Freeze response** | A trauma response where someone becomes unable to speak or move |
+| **Survivor-led repair** | Accountability process guided by the person who was harmed |
+| **Red flag** | Clear indicator of absent or withdrawn consent |
+| **Yellow flag** | Ambiguous situation requiring clarification |
+| **Green flag** | Internal classification only — NOT displayed as approval |
+| **Flag words** | Problematic language patterns indicating concerning attitudes |
+| **Behavioral interruption** | Deliberate friction to pause risky behavior before it happens |
+| **Stop Moment** | Full-screen acknowledgment requirement for RED/YELLOW risk |
+| **Refusal state** | System refusal to continue helping when adversarial use is detected |
+
+---
+
+*This document is intended for internal development and prompt engineering reference. ito is an exploratory prototype and not a substitute for professional support.*
+
+*Live: https://ito.lovable.app*
