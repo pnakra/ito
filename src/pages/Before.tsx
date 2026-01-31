@@ -218,7 +218,7 @@ const Before = () => {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords, moveLabel);
       setInitialContext(formattedSelections);
       
-      const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
+      const { data, error } = await supabase.functions.invoke("analyze-ito", {
         body: { 
           scenario: formattedSelections,
           precomputedRiskLevel: riskLevel
@@ -273,7 +273,7 @@ const Before = () => {
     
     try {
       // Use the new conversational follow-up function
-      const { data, error } = await supabase.functions.invoke("vibecheck-followup", {
+      const { data, error } = await supabase.functions.invoke("ito-followup", {
         body: { 
           message,
           conversationHistory: chatMessages,
