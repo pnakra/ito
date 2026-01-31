@@ -149,9 +149,18 @@ serve(async (req) => {
       });
     }
 
+    // Server-side input validation
+    if (scenario.length > 5000) {
+      return new Response(
+        JSON.stringify({ error: "Input is too long. Please keep it under 5000 characters." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("Service configuration error");
     }
 
     // Use appropriate prompt based on flow type and risk level
@@ -229,7 +238,7 @@ Explain why this risk level applies to their situation. Respond with ONLY the JS
     console.error("Error in analyze-vibecheck function:", error);
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Service temporarily unavailable",
         riskLevel: "yellow",
         assessment: "We're having trouble analyzing this right now. Please try again.",
         whatsHappening: ["The system is temporarily unavailable"],

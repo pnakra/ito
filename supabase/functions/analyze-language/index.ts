@@ -50,9 +50,18 @@ serve(async (req) => {
       );
     }
 
+    // Server-side input validation
+    if (text.length > 5000) {
+      return new Response(
+        JSON.stringify({ hasConcerningLanguage: false, categories: [], explanation: null, error: "Input too long" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("Service configuration error");
     }
 
     const resp = await fetch("https://api.anthropic.com/v1/messages", {

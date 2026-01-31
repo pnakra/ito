@@ -68,9 +68,18 @@ serve(async (req) => {
       });
     }
 
+    // Server-side input validation
+    if (message.length > 5000) {
+      return new Response(
+        JSON.stringify({ error: "Message is too long. Please keep it under 5000 characters." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("Service configuration error");
     }
 
     // Build messages array for Claude
@@ -136,7 +145,7 @@ serve(async (req) => {
     console.error("Error in vibecheck-followup function:", error);
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Service temporarily unavailable",
         response: "I'm having trouble right now. Can you try again?",
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

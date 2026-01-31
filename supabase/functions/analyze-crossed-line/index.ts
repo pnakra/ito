@@ -57,9 +57,18 @@ serve(async (req) => {
       );
     }
 
+    // Server-side input validation
+    if (scenario.length > 5000) {
+      return new Response(
+        JSON.stringify({ error: "Input is too long. Please keep it under 5000 characters." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("Service configuration error");
     }
 
     console.log("Calling Anthropic API...");
@@ -116,7 +125,7 @@ serve(async (req) => {
     console.error("Error in analyze-crossed-line:", error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "An error occurred",
+        error: "Service temporarily unavailable",
         clarityCheck: "We're having trouble processing this right now.",
         otherPersonPerspective: "Please try again in a moment.",
         yourPatterns: "",
