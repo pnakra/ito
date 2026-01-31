@@ -15,11 +15,6 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-12 sm:py-20 text-center">
-          <div 
-            className={`inline-block mb-4 px-3 py-1.5 bg-accent text-muted-foreground text-xs font-medium rounded-full transition-opacity duration-500 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}
-          >
-            No accounts · No tracking · Just answers
-          </div>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold mb-3 text-foreground px-2 min-h-[1.2em]">
             <TypewriterText 
               text="is this ok?" 
