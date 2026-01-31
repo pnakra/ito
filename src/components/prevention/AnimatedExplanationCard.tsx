@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Eye, X, Check, MessageCircle, ArrowRight } from "lucide-react";
@@ -22,10 +22,20 @@ interface AnimatedExplanationCardProps {
 
 type RevealStep = "assessment" | "whatsHappening" | "whatNotToDo" | "whatToDoInstead" | "realTalk" | "complete";
 
-const STEP_ORDER: RevealStep[] = ["assessment", "whatsHappening", "whatNotToDo", "whatToDoInstead", "realTalk", "complete"];
+const ALL_STEPS: RevealStep[] = ["assessment", "whatsHappening", "whatNotToDo", "whatToDoInstead", "realTalk", "complete"];
 
 const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("assessment");
+
+  // Calculate which steps are actually available (skip empty sections)
+  const availableSteps = useMemo(() => {
+    if (!analysis) return ALL_STEPS;
+    return ALL_STEPS.filter(step => {
+      if (step === "whatNotToDo") return analysis.whatNotToDo.length > 0;
+      if (step === "whatToDoInstead") return analysis.whatToDoInstead.length > 0;
+      return true;
+    });
+  }, [analysis]);
 
   if (isLoading) {
     return (
@@ -40,13 +50,17 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
 
   if (!analysis) return null;
 
-  const currentStepIndex = STEP_ORDER.indexOf(currentStep);
+  const currentStepIndex = ALL_STEPS.indexOf(currentStep);
+  const currentAvailableIndex = availableSteps.indexOf(currentStep);
+  // Don't count "complete" as a step in progress
+  const totalVisibleSteps = availableSteps.length - 1;
+  const completedSteps = Math.min(currentAvailableIndex, totalVisibleSteps);
   
   // Skip empty sections
   const getNextStep = (from: RevealStep): RevealStep => {
-    const fromIndex = STEP_ORDER.indexOf(from);
-    for (let i = fromIndex + 1; i < STEP_ORDER.length; i++) {
-      const step = STEP_ORDER[i];
+    const fromIndex = ALL_STEPS.indexOf(from);
+    for (let i = fromIndex + 1; i < ALL_STEPS.length; i++) {
+      const step = ALL_STEPS[i];
       if (step === "whatNotToDo" && analysis.whatNotToDo.length === 0) continue;
       if (step === "whatToDoInstead" && analysis.whatToDoInstead.length === 0) continue;
       return step;
@@ -84,11 +98,27 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       <div className="flex justify-center">
         <RiskBadge level={analysis.riskLevel} size="lg" />
       </div>
+
+      {/* Progress indicator */}
+      {!isComplete && (
+        <div className="flex justify-center gap-1.5">
+          {availableSteps.slice(0, -1).map((step, i) => (
+            <div
+              key={step}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i <= completedSteps 
+                  ? "w-6 bg-primary" 
+                  : "w-1.5 bg-muted-foreground/30"
+              }`}
+            />
+          ))}
+        </div>
+      )}
       
       <p className="text-lg font-medium text-center">{analysis.assessment}</p>
 
       {/* What's Happening - show if step >= whatsHappening */}
-      {currentStepIndex >= STEP_ORDER.indexOf("whatsHappening") && (
+      {currentStepIndex >= ALL_STEPS.indexOf("whatsHappening") && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
             <Eye className="w-5 h-5 text-primary" />
@@ -106,7 +136,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* What NOT to Do - show if step >= whatNotToDo and has content */}
-      {currentStepIndex >= STEP_ORDER.indexOf("whatNotToDo") && analysis.whatNotToDo.length > 0 && (
+      {currentStepIndex >= ALL_STEPS.indexOf("whatNotToDo") && analysis.whatNotToDo.length > 0 && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
             <X className="w-5 h-5 text-destructive" />
@@ -124,7 +154,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* What to Do Instead - show if step >= whatToDoInstead and has content */}
-      {currentStepIndex >= STEP_ORDER.indexOf("whatToDoInstead") && analysis.whatToDoInstead.length > 0 && (
+      {currentStepIndex >= ALL_STEPS.indexOf("whatToDoInstead") && analysis.whatToDoInstead.length > 0 && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
             <Check className="w-5 h-5 text-success" />
@@ -142,7 +172,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* Real Talk - show if step >= realTalk */}
-      {currentStepIndex >= STEP_ORDER.indexOf("realTalk") && (
+      {currentStepIndex >= ALL_STEPS.indexOf("realTalk") && (
         <div className="bg-accent/20 border border-accent p-4 rounded-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-2">
             <MessageCircle className="w-5 h-5" />
