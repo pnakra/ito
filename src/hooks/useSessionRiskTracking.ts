@@ -7,7 +7,7 @@ interface SessionRiskState {
   coercivePatternCount: number;
 }
 
-const SESSION_KEY = "vibecheck_session_risk";
+const SESSION_KEY = "ito_session_risk";
 
 // Get initial state from sessionStorage (survives refreshes within session)
 function getInitialState(): SessionRiskState {
