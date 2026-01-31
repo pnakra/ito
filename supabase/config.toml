@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.crossed-line-followup]
 verify_jwt = false
+
+[functions.vibecheck-followup]
+verify_jwt = false

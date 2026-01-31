@@ -9,10 +9,10 @@ import ContextInput from "@/components/prevention/ContextInput";
 import StopMoment from "@/components/prevention/StopMoment";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
-import ExplanationCard from "@/components/prevention/ExplanationCard";
+import AnimatedExplanationCard from "@/components/prevention/AnimatedExplanationCard";
 import NeutralExplanationCard from "@/components/prevention/NeutralExplanationCard";
 import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
-import FollowUpChat from "@/components/prevention/FollowUpChat";
+import ConversationalChat from "@/components/prevention/ConversationalChat";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
@@ -94,7 +94,8 @@ const Before = () => {
   const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string; flaggedWords?: string[] } | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState<string[]>([]);
+  const [initialContext, setInitialContext] = useState<string>("");
+  const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
 
   const { 
@@ -187,7 +188,7 @@ const Before = () => {
     
     try {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
-      setConversationHistory(prev => [...prev, formattedSelections]);
+      setInitialContext(formattedSelections);
       
       const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
         body: { 
@@ -229,46 +230,44 @@ const Before = () => {
   };
 
   const handlePostExplanationContinue = () => {
+    setChatMessages([]); // Reset chat for new conversation
     setPhase("follow-up-chat");
   };
 
   const handleFollowUpSubmit = async (message: string) => {
+    // Add user message to chat immediately
+    const userMessage = { role: "user" as const, content: message };
+    setChatMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
     // Log the follow-up message
     logFreetext("before", "follow-up", message);
     
     try {
-      const fullContext = [
-        ...conversationHistory,
-        `\nFollow-up from user: "${message}"`
-      ].join("\n\n---\n\n");
-      
-      setConversationHistory(prev => [...prev, `User follow-up: ${message}`]);
-      
-      const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
+      // Use the new conversational follow-up function
+      const { data, error } = await supabase.functions.invoke("vibecheck-followup", {
         body: { 
-          scenario: fullContext,
-          precomputedRiskLevel: riskResult?.level || "yellow"
+          message,
+          conversationHistory: chatMessages,
+          initialContext,
+          riskLevel: riskResult?.level || "yellow"
         }
       });
 
       if (error) throw error;
 
-      setAnalysis({
-        riskLevel: riskResult?.level || "yellow",
-        assessment: data.assessment,
-        whatsHappening: data.whatsHappening,
-        whatNotToDo: data.whatNotToDo,
-        whatToDoInstead: data.whatToDoInstead,
-        realTalk: data.realTalk
-      });
+      // Add assistant response to chat
+      const assistantMessage = { role: "assistant" as const, content: data.response };
+      setChatMessages(prev => [...prev, assistantMessage]);
       
-      logAIResponse("before", "follow-up-response", data.assessment?.slice(0, 100) || "Follow-up response");
-      
-      setPhase("explanation");
+      logAIResponse("before", "follow-up-response", data.response?.slice(0, 100) || "Follow-up response");
     } catch (error) {
       console.error("Error in follow-up:", error);
+      // Add error message to chat
+      setChatMessages(prev => [...prev, { 
+        role: "assistant" as const, 
+        content: "I'm having trouble right now. Can you try again?" 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -284,7 +283,8 @@ const Before = () => {
     setRiskResult(null);
     setAnalysis(null);
     setIsLoading(false);
-    setConversationHistory([]);
+    setInitialContext("");
+    setChatMessages([]);
     setSelectedOutcome(null);
     resetSessionId(); // Start new session on reset
   };
@@ -413,7 +413,7 @@ const Before = () => {
             isNeutralRisk ? (
               <NeutralExplanationCard analysis={analysis} isLoading={isLoading} />
             ) : (
-              <ExplanationCard analysis={analysis} isLoading={isLoading} />
+              <AnimatedExplanationCard analysis={analysis} isLoading={isLoading} />
             )
           )}
 
@@ -429,8 +429,9 @@ const Before = () => {
             />
           )}
 
-          <FollowUpChat
-            onSubmit={handleFollowUpSubmit}
+          <ConversationalChat
+            messages={chatMessages}
+            onSendMessage={handleFollowUpSubmit}
             onDone={handleFollowUpDone}
             isLoading={isLoading}
             isActive={phase === "follow-up-chat"}
