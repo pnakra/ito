@@ -71,7 +71,8 @@ serve(async (req) => {
 
     const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
     if (!ANTHROPIC_API_KEY) {
-      throw new Error("ANTHROPIC_API_KEY is not configured");
+      console.error("ANTHROPIC_API_KEY is not configured");
+      throw new Error("Service configuration error");
     }
 
     // Build messages array for Anthropic format
@@ -150,7 +151,7 @@ serve(async (req) => {
     console.error("Error in analyze-someone-crossed:", error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "An error occurred",
+        error: "Service temporarily unavailable",
         response: "I'm having trouble processing this right now. Please try again in a moment, or reach out to a trusted person for support."
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
