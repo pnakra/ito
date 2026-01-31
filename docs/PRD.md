@@ -889,9 +889,11 @@ verify_jwt = false
 | `ContextInput` | `src/components/prevention/ContextInput.tsx` | Optional free text input |
 | `StopMoment` | `src/components/prevention/StopMoment.tsx` | Full-screen brake |
 | `ExplanationCard` | `src/components/prevention/ExplanationCard.tsx` | AI response display (RED/YELLOW) |
+| `AnimatedExplanationCard` | `src/components/prevention/AnimatedExplanationCard.tsx` | Animated wrapper for explanations |
 | `NeutralExplanationCard` | `src/components/prevention/NeutralExplanationCard.tsx` | Neutral response display (GREEN) |
 | `PostExplanationChoice` | `src/components/prevention/PostExplanationChoice.tsx` | Done/Talk more binary choice |
 | `FollowUpChat` | `src/components/prevention/FollowUpChat.tsx` | Multi-turn follow-up |
+| `ConversationalChat` | `src/components/prevention/ConversationalChat.tsx` | Chat UI wrapper component |
 | `OutcomeCheck` | `src/components/prevention/OutcomeCheck.tsx` | Self-report buttons |
 | `OutcomeFeedback` | `src/components/prevention/OutcomeFeedback.tsx` | One-line reflective feedback |
 | `SessionPatternWarning` | `src/components/prevention/SessionPatternWarning.tsx` | Pattern awareness display |
