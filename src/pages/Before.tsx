@@ -97,6 +97,7 @@ const Before = () => {
   const [initialContext, setInitialContext] = useState<string>("");
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
+  const [explanationComplete, setExplanationComplete] = useState(false);
 
   const { 
     shouldShowPatternWarning, 
@@ -185,6 +186,7 @@ const Before = () => {
   const fetchExplanation = async (riskLevel: RiskLevel, flaggedWords?: string[]) => {
     setPhase("explanation");
     setIsLoading(true);
+    setExplanationComplete(false); // Reset for new explanation
     
     try {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords);
@@ -286,6 +288,7 @@ const Before = () => {
     setInitialContext("");
     setChatMessages([]);
     setSelectedOutcome(null);
+    setExplanationComplete(false);
     resetSessionId(); // Start new session on reset
   };
 
@@ -413,15 +416,19 @@ const Before = () => {
             isNeutralRisk ? (
               <NeutralExplanationCard analysis={analysis} isLoading={isLoading} />
             ) : (
-              <AnimatedExplanationCard analysis={analysis} isLoading={isLoading} />
+              <AnimatedExplanationCard 
+                analysis={analysis} 
+                isLoading={isLoading} 
+                onComplete={() => setExplanationComplete(true)}
+              />
             )
           )}
 
-          {phase === "explanation" && !isLoading && analysis && (
+          {phase === "explanation" && !isLoading && analysis && explanationComplete && (
             <AfterHandoff isActive={shouldShowAfterHandoff} />
           )}
 
-          {phase === "explanation" && !isLoading && analysis && (
+          {phase === "explanation" && !isLoading && analysis && explanationComplete && (
             <PostExplanationChoice
               onDone={handlePostExplanationDone}
               onContinue={handlePostExplanationContinue}
