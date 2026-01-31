@@ -439,7 +439,8 @@ Frontend (React)
     └── CrossedLineHandoff.tsx        — Soft navigation to accountability
 
 Edge Functions (Supabase/Deno)
-├── analyze-vibecheck                 — Main AI explanation
+├── analyze-ito                       — Main AI explanation
+├── ito-followup                      — Prevention follow-up chat
 └── analyze-language                  — AI-powered flag detection
 ```
 

@@ -1,6 +1,6 @@
 project_id = "ochulsnvnqcbzqnlkazu"
 
-[functions.analyze-vibecheck]
+[functions.analyze-ito]
 verify_jwt = false
 
 [functions.analyze-crossed-line]
@@ -12,7 +12,7 @@ verify_jwt = false
 [functions.crossed-line-followup]
 verify_jwt = false
 
-[functions.vibecheck-followup]
+[functions.ito-followup]
 verify_jwt = false
 
 [functions.analyze-language]

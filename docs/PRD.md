@@ -108,12 +108,12 @@ ito is fundamentally different from a "chatbot with a nice UI":
 │                    EDGE FUNCTIONS (Deno)                     │
 │                  Deployed on Lovable Cloud                   │
 ├─────────────────────────────────────────────────────────────┤
-│  analyze-vibecheck        │  Prevention EXPLANATION AI      │
+│  analyze-ito              │  Prevention EXPLANATION AI      │
 │  analyze-language         │  AI-powered language detection  │
 │  analyze-crossed-line     │  Initial accountability AI      │
 │  crossed-line-followup    │  Accountability follow-up AI    │
 │  analyze-someone-crossed  │  Survivor support AI            │
-│  vibecheck-followup       │  Prevention follow-up chat      │
+│  ito-followup             │  Prevention follow-up chat      │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -855,7 +855,7 @@ This is informational, not corrective. No persistence across sessions.
 # supabase/config.toml
 project_id = "ochulsnvnqcbzqnlkazu"
 
-[functions.analyze-vibecheck]
+[functions.analyze-ito]
 verify_jwt = false
 
 [functions.analyze-crossed-line]
@@ -867,7 +867,7 @@ verify_jwt = false
 [functions.crossed-line-followup]
 verify_jwt = false
 
-[functions.vibecheck-followup]
+[functions.ito-followup]
 verify_jwt = false
 
 [functions.analyze-language]
@@ -962,11 +962,11 @@ ito/
 ├── supabase/
 │   ├── config.toml                 # Edge function configuration
 │   └── functions/
-│       ├── analyze-vibecheck/index.ts
+│       ├── analyze-ito/index.ts
 │       ├── analyze-language/index.ts
 │       ├── analyze-crossed-line/index.ts
 │       ├── crossed-line-followup/index.ts
-│       ├── vibecheck-followup/index.ts
+│       ├── ito-followup/index.ts
 │       └── analyze-someone-crossed/index.ts
 └── docs/
     ├── PRD.md                      # This document

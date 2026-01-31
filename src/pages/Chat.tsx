@@ -48,7 +48,7 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("analyze-vibecheck", {
+      const { data, error } = await supabase.functions.invoke("analyze-ito", {
         body: { scenario: input }
       });
 
