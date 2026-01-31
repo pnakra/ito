@@ -90,7 +90,7 @@ const Chat = () => {
           {messages.length === 0 && (
             <div className="flex-1 flex items-center justify-center">
               <Card className="p-8 text-center max-w-2xl">
-                <h1 className="text-3xl font-bold mb-4">Chat with Vibecheck</h1>
+                <h1 className="text-3xl font-bold mb-4">Chat with ito</h1>
                 <p className="text-muted-foreground mb-6">
                   Describe your situation and I'll give you honest feedback. You can ask follow-up questions and we'll have a real conversation about it.
                 </p>
