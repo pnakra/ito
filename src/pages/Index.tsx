@@ -23,7 +23,7 @@ const Index = () => {
             />
           </h1>
           <p className={`text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
-            When things get physical or confusing.
+            When you're not sure if you should make a move.
           </p>
           
           {/* Three Main Tiles */}
@@ -39,10 +39,10 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  Before anything happens
+                  I'm thinking about making a move
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                  Not sure if something's okay? Pause and check.
+                  Not sure if it's okay? Pause and check.
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
@@ -58,10 +58,10 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  After something happened
+                  I already made a move
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                  Something already happened? Let's figure it out.
+                  Not sure if it was okay? Let's figure it out.
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
@@ -77,10 +77,10 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  Something happened to me
+                  Someone made a move on me
                 </h2>
                 <p className="text-muted-foreground text-sm">
-                  Something happened to you? Talk it through at your pace.
+                  Not sure how you feel about it? Talk it through.
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
