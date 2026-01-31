@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Loader2, Eye, X, Check, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Eye, X, Check, MessageCircle, ArrowRight } from "lucide-react";
 import RiskBadge from "@/components/RiskBadge";
 import type { RiskLevel } from "@/types/risk";
 
@@ -16,88 +17,15 @@ interface AnalysisData {
 interface AnimatedExplanationCardProps {
   analysis: AnalysisData | null;
   isLoading: boolean;
+  onComplete?: () => void;
 }
 
-// Typewriter effect for text
-const TypewriterSpan = ({ 
-  text, 
-  delay = 20, 
-  onComplete 
-}: { 
-  text: string; 
-  delay?: number; 
-  onComplete?: () => void;
-}) => {
-  const [displayedText, setDisplayedText] = useState("");
-  const [isComplete, setIsComplete] = useState(false);
+type RevealStep = "assessment" | "whatsHappening" | "whatNotToDo" | "whatToDoInstead" | "realTalk" | "complete";
 
-  useEffect(() => {
-    setDisplayedText("");
-    setIsComplete(false);
-    let index = 0;
-    
-    const interval = setInterval(() => {
-      if (index < text.length) {
-        setDisplayedText(text.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(interval);
-        setIsComplete(true);
-        onComplete?.();
-      }
-    }, delay);
+const STEP_ORDER: RevealStep[] = ["assessment", "whatsHappening", "whatNotToDo", "whatToDoInstead", "realTalk", "complete"];
 
-    return () => clearInterval(interval);
-  }, [text, delay, onComplete]);
-
-  return (
-    <span>
-      {displayedText}
-      {!isComplete && <span className="animate-pulse">|</span>}
-    </span>
-  );
-};
-
-// Section that fades in
-const FadeInSection = ({ 
-  children, 
-  show, 
-  delay = 0 
-}: { 
-  children: React.ReactNode; 
-  show: boolean; 
-  delay?: number;
-}) => {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (show) {
-      const timeout = setTimeout(() => setVisible(true), delay);
-      return () => clearTimeout(timeout);
-    }
-  }, [show, delay]);
-
-  if (!visible) return null;
-
-  return (
-    <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-      {children}
-    </div>
-  );
-};
-
-const AnimatedExplanationCard = ({ analysis, isLoading }: AnimatedExplanationCardProps) => {
-  const [revealStage, setRevealStage] = useState(0);
-  
-  // Reset reveal stage when new analysis comes in
-  useEffect(() => {
-    if (analysis && !isLoading) {
-      setRevealStage(0);
-      // Start the reveal sequence
-      const timer = setTimeout(() => setRevealStage(1), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [analysis, isLoading]);
+const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedExplanationCardProps) => {
+  const [currentStep, setCurrentStep] = useState<RevealStep>("assessment");
 
   if (isLoading) {
     return (
@@ -112,100 +40,126 @@ const AnimatedExplanationCard = ({ analysis, isLoading }: AnimatedExplanationCar
 
   if (!analysis) return null;
 
+  const currentStepIndex = STEP_ORDER.indexOf(currentStep);
+  
+  // Skip empty sections
+  const getNextStep = (from: RevealStep): RevealStep => {
+    const fromIndex = STEP_ORDER.indexOf(from);
+    for (let i = fromIndex + 1; i < STEP_ORDER.length; i++) {
+      const step = STEP_ORDER[i];
+      if (step === "whatNotToDo" && analysis.whatNotToDo.length === 0) continue;
+      if (step === "whatToDoInstead" && analysis.whatToDoInstead.length === 0) continue;
+      return step;
+    }
+    return "complete";
+  };
+
+  const handleNext = () => {
+    const next = getNextStep(currentStep);
+    setCurrentStep(next);
+    if (next === "complete" && onComplete) {
+      onComplete();
+    }
+  };
+
+  const isComplete = currentStep === "complete";
+  const showNext = !isComplete;
+
+  // Get label for next button
+  const getNextLabel = (): string => {
+    const next = getNextStep(currentStep);
+    switch (next) {
+      case "whatsHappening": return "What's going on";
+      case "whatNotToDo": return "What not to do";
+      case "whatToDoInstead": return "What to try instead";
+      case "realTalk": return "The main thing";
+      case "complete": return "Got it";
+      default: return "Next";
+    }
+  };
+
   return (
     <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Stage 1: Risk Badge */}
-      <FadeInSection show={revealStage >= 1} delay={0}>
-        <div className="flex justify-center">
-          <RiskBadge level={analysis.riskLevel} size="lg" />
-        </div>
-      </FadeInSection>
+      {/* Always show: Risk Badge + Assessment */}
+      <div className="flex justify-center">
+        <RiskBadge level={analysis.riskLevel} size="lg" />
+      </div>
       
-      {/* Stage 2: Assessment - typewriter effect */}
-      <FadeInSection show={revealStage >= 1} delay={300}>
-        <p className="text-lg font-medium text-center">
-          <TypewriterSpan 
-            text={analysis.assessment} 
-            delay={25}
-            onComplete={() => setRevealStage(2)}
-          />
-        </p>
-      </FadeInSection>
+      <p className="text-lg font-medium text-center">{analysis.assessment}</p>
 
-      {/* Stage 3: What's Happening */}
-      <FadeInSection show={revealStage >= 2} delay={200}>
-        <div className="space-y-3">
+      {/* What's Happening - show if step >= whatsHappening */}
+      {currentStepIndex >= STEP_ORDER.indexOf("whatsHappening") && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
             <Eye className="w-5 h-5 text-primary" />
             <h3 className="font-bold text-lg">What's going on</h3>
           </div>
           <ul className="space-y-2 ml-7">
             {analysis.whatsHappening.map((point, i) => (
-              <FadeInSection key={i} show={revealStage >= 2} delay={100 * (i + 1)}>
-                <li className="flex gap-2">
-                  <span className="text-muted-foreground">•</span>
-                  <span>{point}</span>
-                </li>
-              </FadeInSection>
+              <li key={i} className="flex gap-2">
+                <span className="text-muted-foreground">•</span>
+                <span>{point}</span>
+              </li>
             ))}
           </ul>
         </div>
-      </FadeInSection>
-
-      {/* Stage 4: What NOT to Do - only if not empty */}
-      {analysis.whatNotToDo.length > 0 && (
-        <FadeInSection show={revealStage >= 2} delay={600}>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <X className="w-5 h-5 text-destructive" />
-              <h3 className="font-bold text-lg">Don't do this</h3>
-            </div>
-            <div className="space-y-2 ml-7">
-              {analysis.whatNotToDo.map((point, i) => (
-                <FadeInSection key={i} show={revealStage >= 2} delay={700 + 100 * i}>
-                  <div className="flex gap-2 items-start bg-destructive/10 p-3 rounded-lg">
-                    <X className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
-                    <span>{point}</span>
-                  </div>
-                </FadeInSection>
-              ))}
-            </div>
-          </div>
-        </FadeInSection>
       )}
 
-      {/* Stage 5: What to Do Instead - only if not empty */}
-      {analysis.whatToDoInstead.length > 0 && (
-        <FadeInSection show={revealStage >= 2} delay={1000}>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-success" />
-              <h3 className="font-bold text-lg">Try this instead</h3>
-            </div>
-            <div className="space-y-2 ml-7">
-              {analysis.whatToDoInstead.map((point, i) => (
-                <FadeInSection key={i} show={revealStage >= 2} delay={1100 + 100 * i}>
-                  <div className="flex gap-2 items-start bg-success/10 p-3 rounded-lg">
-                    <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                    <span>{point}</span>
-                  </div>
-                </FadeInSection>
-              ))}
-            </div>
+      {/* What NOT to Do - show if step >= whatNotToDo and has content */}
+      {currentStepIndex >= STEP_ORDER.indexOf("whatNotToDo") && analysis.whatNotToDo.length > 0 && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex items-center gap-2">
+            <X className="w-5 h-5 text-destructive" />
+            <h3 className="font-bold text-lg">Don't do this</h3>
           </div>
-        </FadeInSection>
+          <div className="space-y-2 ml-7">
+            {analysis.whatNotToDo.map((point, i) => (
+              <div key={i} className="flex gap-2 items-start bg-destructive/10 p-3 rounded-lg">
+                <X className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-      {/* Stage 6: Real Talk */}
-      <FadeInSection show={revealStage >= 2} delay={1400}>
-        <div className="bg-accent/20 border border-accent p-4 rounded-lg">
+      {/* What to Do Instead - show if step >= whatToDoInstead and has content */}
+      {currentStepIndex >= STEP_ORDER.indexOf("whatToDoInstead") && analysis.whatToDoInstead.length > 0 && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex items-center gap-2">
+            <Check className="w-5 h-5 text-success" />
+            <h3 className="font-bold text-lg">Try this instead</h3>
+          </div>
+          <div className="space-y-2 ml-7">
+            {analysis.whatToDoInstead.map((point, i) => (
+              <div key={i} className="flex gap-2 items-start bg-success/10 p-3 rounded-lg">
+                <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Real Talk - show if step >= realTalk */}
+      {currentStepIndex >= STEP_ORDER.indexOf("realTalk") && (
+        <div className="bg-accent/20 border border-accent p-4 rounded-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-2">
             <MessageCircle className="w-5 h-5" />
             <h3 className="font-bold">The main thing</h3>
           </div>
           <p>{analysis.realTalk}</p>
         </div>
-      </FadeInSection>
+      )}
+
+      {/* Next button */}
+      {showNext && (
+        <div className="flex justify-center pt-2">
+          <Button onClick={handleNext} className="px-6">
+            {getNextLabel()} <ArrowRight className="ml-2 w-4 h-4" />
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
