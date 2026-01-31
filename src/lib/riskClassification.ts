@@ -226,7 +226,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
 }
 
 // Format user selections for the AI explanation
-export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: string[]): string {
+export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: string[], moveLabel?: string | null): string {
   const orientationLabels: Record<string, string> = {
     "texting": "We're texting or messaging",
     "in-person": "We're together in person",
@@ -259,14 +259,21 @@ export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: s
     "dont-know": "Not sure where this is heading"
   };
   
-  const lines = [
+  const lines = [];
+  
+  // Add the move context at the top if provided
+  if (moveLabel) {
+    lines.push(`Move being considered: ${moveLabel}`);
+  }
+  
+  lines.push(
     `Current situation: ${orientationLabels[decisions.orientation || ""] || "Not specified"}`,
     `What they're doing/saying: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
     `Complicating factors: ${decisions.contextFactors.length > 0 
       ? decisions.contextFactors.map(f => factorLabels[f] || f).join(", ")
       : "None selected"}`,
     `Direction this feels like it's heading: ${momentumLabels[decisions.momentum || ""] || "Not specified"}`
-  ];
+  );
   
   if (decisions.additionalContext?.trim()) {
     lines.push(`\nAdditional context from the user:\n"${decisions.additionalContext.trim()}"`);
