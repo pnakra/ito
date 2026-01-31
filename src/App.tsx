@@ -10,6 +10,7 @@ import HappenedToMe from "./pages/HappenedToMe";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Install from "./pages/Install";
+import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/install" element={<Install />} />
+          <Route path="/demo" element={<Demo />} />
           {/* Legacy routes for backwards compatibility */}
           <Route path="/avoid-line" element={<Before />} />
           <Route path="/crossed-line" element={<After />} />
