@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit, getClientIP, createRateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -137,6 +138,14 @@ serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Rate limiting check
+  const clientIP = getClientIP(req);
+  const rateLimit = checkRateLimit(clientIP, { maxRequests: 5, windowMs: 60000 });
+  if (!rateLimit.allowed) {
+    console.log(`Rate limit exceeded for IP: ${clientIP}`);
+    return createRateLimitResponse(rateLimit.resetIn);
   }
 
   try {
