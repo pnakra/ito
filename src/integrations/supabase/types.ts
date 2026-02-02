@@ -22,6 +22,7 @@ export type Database = {
           flow_type: string
           freetext_value: string | null
           id: string
+          message_index: number | null
           metadata: Json | null
           session_id: string
           step_name: string
@@ -34,6 +35,7 @@ export type Database = {
           flow_type: string
           freetext_value?: string | null
           id?: string
+          message_index?: number | null
           metadata?: Json | null
           session_id?: string
           step_name: string
@@ -46,6 +48,7 @@ export type Database = {
           flow_type?: string
           freetext_value?: string | null
           id?: string
+          message_index?: number | null
           metadata?: Json | null
           session_id?: string
           step_name?: string
