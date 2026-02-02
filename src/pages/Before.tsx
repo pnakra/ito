@@ -288,7 +288,7 @@ const Before = () => {
       const assistantMessage = { role: "assistant" as const, content: data.response };
       setChatMessages(prev => [...prev, assistantMessage]);
       
-      logAIResponse("before", "follow-up-response", data.response?.slice(0, 100) || "Follow-up response");
+      logAIResponse("before", "follow-up-response", data.response || "Follow-up response");
     } catch (error) {
       console.error("Error in follow-up:", error);
       // Add error message to chat

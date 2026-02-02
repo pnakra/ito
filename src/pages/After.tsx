@@ -110,7 +110,7 @@ const After = () => {
       setFollowUpMessages(prev => [...prev, assistantMessage]);
       
       // Log AI follow-up response
-      logAIResponse("after-crossed", "follow-up-response", data.response?.slice(0, 100) || "Follow-up response");
+      logAIResponse("after-crossed", "follow-up-response", data.response || "Follow-up response");
     } catch (error: any) {
       console.error("Error:", error);
       toast({

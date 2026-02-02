@@ -6,16 +6,23 @@ type StepType = "choice" | "freetext" | "ai_response";
 
 // Generate a session ID that persists for the current page session
 let currentSessionId: string | null = null;
+let currentMessageIndex = 0;
 
 function getSessionId(): string {
   if (!currentSessionId) {
     currentSessionId = crypto.randomUUID();
+    currentMessageIndex = 0; // Reset index for new session
   }
   return currentSessionId;
 }
 
 export function resetSessionId(): void {
   currentSessionId = null;
+  currentMessageIndex = 0;
+}
+
+function getNextMessageIndex(): number {
+  return currentMessageIndex++;
 }
 
 interface LogSubmissionParams {
@@ -50,7 +57,8 @@ export async function logSubmission({
       choice_value: choiceString || null,
       freetext_value: freetextValue || null,
       ai_response_summary: aiResponseSummary || null,
-      metadata: metadata ?? {}
+      metadata: metadata ?? {},
+      message_index: getNextMessageIndex()
     }]);
 
     if (error) {
