@@ -4,6 +4,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
 import { ArrowRight, Smartphone, CircleDot, MessageCircle, HeartHandshake } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
@@ -22,9 +28,33 @@ const Index = () => {
               onComplete={() => setHeadlineComplete(true)}
             />
           </h1>
-          <p className={`text-base sm:text-lg text-muted-foreground mb-12 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
+          <p className={`text-base sm:text-lg text-muted-foreground mb-6 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
             When you're not sure if you should make a move.
           </p>
+
+          {/* Collapsible What is this? */}
+          <div className={`max-w-xl mx-auto px-1 sm:px-0 mb-6 transition-all duration-500 ${headlineComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="what-is-this" className="border-none">
+                <AccordionTrigger className="justify-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
+                  What is this?
+                </AccordionTrigger>
+                <AccordionContent className="text-left pb-4">
+                  <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
+                    <p>
+                      You probably know the basics of consent. This is for when things feel unclear.
+                    </p>
+                    <p>
+                      <strong className="text-foreground">Totally private.</strong> No accounts. Nothing saved. Close the tab and it's gone.
+                    </p>
+                    <p>
+                      Not a replacement for real support. If you need to talk to someone, check the <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">resources</Link>.
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
           
           {/* Three Main Tiles */}
           <div className={`grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 transition-all duration-500 ${headlineComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -88,25 +118,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* What this is */}
-        <section className={`container mx-auto px-4 py-8 sm:py-12 transition-all duration-500 delay-200 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="max-w-md mx-auto">
-            <div className="rounded-xl p-6">
-              <h2 className="text-base font-medium mb-4 text-center text-foreground">What is this?</h2>
-              <div className="space-y-3 text-muted-foreground text-sm">
-                <p>
-                  You probably know the basics of consent. This is for when things feel unclear.
-                </p>
-                <p>
-                  <strong className="text-foreground">Totally private.</strong> No accounts. Nothing saved. Close the tab and it's gone.
-                </p>
-                <p>
-                  Not a replacement for support from real people. If you need to talk to someone, check out the <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">resources</Link>.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Footer note */}
         <section className={`container mx-auto px-4 py-6 text-center space-y-2 transition-all duration-500 delay-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
