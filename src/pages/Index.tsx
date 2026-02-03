@@ -33,12 +33,13 @@ const Index = () => {
           </p>
           
           {/* Three Main Tiles */}
-          <div className={`grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 mb-6 transition-all duration-500 ${headlineComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 mb-6">
             
             {/* Tile 1 - Before */}
             <Link 
               to="/before"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
+              style={{ animationDelay: '0ms', animationFillMode: 'both' }}
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary/15 transition-colors">
                 <CircleDot className="w-5 h-5 text-primary" />
@@ -57,7 +58,8 @@ const Index = () => {
             {/* Tile 2 - After */}
             <Link 
               to="/after"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
+              style={{ animationDelay: '150ms', animationFillMode: 'both' }}
             >
               <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-secondary/15 transition-colors">
                 <MessageCircle className="w-5 h-5 text-secondary" />
@@ -76,7 +78,8 @@ const Index = () => {
             {/* Tile 3 - Something happened to me */}
             <Link 
               to="/happened-to-me"
-              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
+              style={{ animationDelay: '300ms', animationFillMode: 'both' }}
             >
               <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-accent/80 transition-colors">
                 <HeartHandshake className="w-5 h-5 text-accent-foreground" />
@@ -94,7 +97,10 @@ const Index = () => {
           </div>
 
           {/* Collapsible What is this? */}
-          <div className={`max-w-xl mx-auto px-1 sm:px-0 transition-all duration-500 delay-100 ${headlineComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div 
+            className={`max-w-xl mx-auto px-1 sm:px-0 ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
+            style={{ animationDelay: '450ms', animationFillMode: 'both' }}
+          >
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="what-is-this" className="border-none">
                 <AccordionTrigger className="justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
@@ -119,7 +125,10 @@ const Index = () => {
         </section>
 
         {/* Footer note */}
-        <section className={`container mx-auto px-4 py-6 text-center space-y-2 transition-all duration-500 delay-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
+        <section 
+          className={`container mx-auto px-4 py-6 text-center space-y-2 ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
+          style={{ animationDelay: '550ms', animationFillMode: 'both' }}
+        >
           <Link 
             to="/install" 
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
