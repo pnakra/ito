@@ -58,7 +58,7 @@ const Index = () => {
             {/* Tile 3 - Something happened to me */}
             <Link
               to="/happened-to-me"
-              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-accent ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-muted-foreground/50 ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "300ms", animationFillMode: "both" }}
             >
               <div className="flex-1 min-w-0">
