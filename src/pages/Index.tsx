@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
-import { ArrowRight, Smartphone, CircleDot, MessageCircle, HeartHandshake } from "lucide-react";
+import { ArrowRight, CircleDot, MessageCircle, HeartHandshake } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -124,8 +124,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Footer note */}
-        <section 
+        {/* PWA install link - commented out for prototype */}
+        {/* <section 
           className={`container mx-auto px-4 py-6 text-center space-y-2 ${headlineComplete ? 'animate-fade-in' : 'opacity-0'}`}
           style={{ animationDelay: '550ms', animationFillMode: 'both' }}
         >
@@ -136,7 +136,7 @@ const Index = () => {
             <Smartphone className="w-4 h-4" />
             Add to home screen
           </Link>
-        </section>
+        </section> */}
       </main>
 
       <Footer />
