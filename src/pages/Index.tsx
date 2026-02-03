@@ -40,7 +40,7 @@ const Index = () => {
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
                   I want to do something with someone
                 </h2>
-                <p className="text-muted-foreground text-sm">Not sure if it's okay? Pause and check.</p>
+                <p className="text-muted-foreground text-sm">Not sure if <strong className="font-semibold text-muted-foreground">it's</strong> okay? Pause and check.</p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
             </Link>
@@ -56,7 +56,7 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">I already did something</h2>
-                <p className="text-muted-foreground text-sm">Not sure if it was okay? Let's figure it out.</p>
+                <p className="text-muted-foreground text-sm">Not sure if it <strong className="font-semibold text-muted-foreground">was</strong> okay? Let's figure it out.</p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
             </Link>
@@ -72,7 +72,7 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">Someone did something to me</h2>
-                <p className="text-muted-foreground text-sm">Not sure how you feel about it? Talk it through.</p>
+                <p className="text-muted-foreground text-sm">Not sure how you <strong className="font-semibold text-muted-foreground">feel</strong> about it? Talk through it.</p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
             </Link>
