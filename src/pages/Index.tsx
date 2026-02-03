@@ -95,7 +95,7 @@ const Index = () => {
                       confusing.
                     </p>
                     <p>
-                      Totally private. No need to create an account. Everything gets deleted when you close the tab.
+                      <strong className="text-foreground">Totally private. No need to create an account.</strong> Everything gets deleted when you close the tab.
                     </p>
                     <p>
                       Not a replacement for real support. If you need to talk to someone, check the{" "}
