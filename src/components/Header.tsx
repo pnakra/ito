@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Smartphone } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Header = () => {
@@ -13,9 +13,10 @@ const Header = () => {
     { to: "https://rainn.org", label: "Crisis Support", external: true },
   ];
 
-  const mobileOnlyLinks = [
-    { to: "/install", label: "Add to Home Screen", icon: Smartphone },
-  ];
+  // PWA install link - commented out for prototype
+  // const mobileOnlyLinks = [
+  //   { to: "/install", label: "Add to Home Screen", icon: Smartphone },
+  // ];
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -104,10 +105,9 @@ const Header = () => {
               )
             ))}
             
-            {/* Divider */}
-            <div className="border-t border-border/30 my-2" />
+            {/* PWA install links - commented out for prototype */}
+            {/* <div className="border-t border-border/30 my-2" />
             
-            {/* Mobile-only links */}
             {mobileOnlyLinks.map((link) => {
               const Icon = link.icon;
               return (
@@ -125,7 +125,7 @@ const Header = () => {
                   {link.label}
                 </Link>
               );
-            })}
+            })} */}
           </div>
         </div>
       )}
