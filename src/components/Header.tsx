@@ -24,9 +24,10 @@ const Header = () => {
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link 
           to="/" 
-          className="text-lg font-semibold text-primary hover:text-primary/80 transition-colors tracking-tight"
+          className="flex flex-col hover:opacity-80 transition-opacity"
         >
-          ito
+          <span className="text-lg font-semibold text-primary tracking-tight leading-none">ito</span>
+          <span className="text-[10px] text-muted-foreground leading-tight">is this ok?</span>
         </Link>
         
         {/* Desktop Navigation */}
