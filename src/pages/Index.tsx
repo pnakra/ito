@@ -91,12 +91,12 @@ const Index = () => {
                 <AccordionContent className="text-left pb-4">
                   <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
                     <p>
-                      This is an AI-powered tool that helps you understand if things are consensual, even when things
-                      are confusing.
+                      ito is an AI-powered tool that helps you understand if things are consensual, even if things are
+                      confusing.
                     </p>
                     <p>
-                      <strong className="text-foreground">Totally private.</strong> No accounts. Close the tab and it's
-                      gone.
+                      <strong className="text-foreground">Totally private.</strong> No accounts. Nothing saved. Close
+                      the tab and it's gone.
                     </p>
                     <p>
                       Not a replacement for real support. If you need to talk to someone, check the{" "}
