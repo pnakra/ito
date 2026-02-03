@@ -88,7 +88,7 @@ const Index = () => {
                 <AccordionTrigger className="justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
                   What is this?
                 </AccordionTrigger>
-                <AccordionContent className="text-left pb-4">
+                <AccordionContent className="text-center pb-4">
                   <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
                     <p>
                       <strong className="text-foreground">ito</strong> is an AI-powered tool that helps you understand if things are consensual, even if things are
