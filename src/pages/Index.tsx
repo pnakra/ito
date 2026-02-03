@@ -35,7 +35,7 @@ const Index = () => {
             >
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  I want to do something with someone
+                  I might do something with someone
                 </h2>
                 <p className="text-muted-foreground text-sm">Not sure if <strong className="font-semibold text-muted-foreground">it's</strong> okay? Pause and check.</p>
               </div>
