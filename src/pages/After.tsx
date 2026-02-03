@@ -8,7 +8,7 @@ import BackButton from "@/components/BackButton";
 import ShredButton from "@/components/ShredButton";
 import { supabase } from "@/integrations/supabase/client";
 import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
-import { Loader2, Send, MessageCircle } from "lucide-react";
+import { Loader2, Send, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Screen = "intro" | "input" | "results";
@@ -274,7 +274,7 @@ const After = () => {
             {!showFollowUp ? (
               <Card className="p-4 sm:p-6 border-border/50 bg-accent/30">
                 <div className="text-center space-y-4">
-                  <MessageCircle className="w-6 h-6 mx-auto text-muted-foreground" />
+                  <MessageSquare className="w-6 h-6 mx-auto text-muted-foreground" />
                   <h3 className="text-base font-medium">Have questions?</h3>
                   <p className="text-muted-foreground text-sm">
                     If you want to talk through anything else, you can keep going.
@@ -287,7 +287,7 @@ const After = () => {
             ) : (
               <Card className="p-4 sm:p-6 border-border/50">
                 <h3 className="text-base font-medium mb-4 flex items-center gap-2">
-                  <MessageCircle className="w-4 h-4" />
+                  <MessageSquare className="w-4 h-4" />
                   Keep talking
                 </h3>
                 
