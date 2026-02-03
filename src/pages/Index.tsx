@@ -29,7 +29,7 @@ const Index = () => {
             />
           </h1>
           <p className={`text-base sm:text-lg text-muted-foreground mb-8 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? 'opacity-100' : 'opacity-0'}`}>
-            When you're not sure if you should make a move.
+            For when you want to stop and think through confusing situations.
           </p>
           
           {/* Three Main Tiles */}
@@ -45,7 +45,7 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  I'm thinking about making a move
+                  I want to do something with someone
                 </h2>
                 <p className="text-muted-foreground text-sm">
                   Not sure if it's okay? Pause and check.
@@ -64,7 +64,7 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  I already made a move
+                  I already did something
                 </h2>
                 <p className="text-muted-foreground text-sm">
                   Not sure if it was okay? Let's figure it out.
@@ -83,7 +83,7 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                  Someone made a move on me
+                  Someone did something to me
                 </h2>
                 <p className="text-muted-foreground text-sm">
                   Not sure how you feel about it? Talk it through.
