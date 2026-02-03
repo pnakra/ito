@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
@@ -40,6 +41,18 @@ interface MoveSelectionProps {
 }
 
 const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSelectionProps) => {
+  const spectrumRef = useRef<HTMLDivElement>(null);
+  
+  // Auto-scroll to spectrum when a move is selected
+  useEffect(() => {
+    if (selectedMove && selectedMove !== "not-sure" && spectrumRef.current) {
+      // Small delay to let the spectrum render
+      setTimeout(() => {
+        spectrumRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [selectedMove]);
+
   if (!isActive) return null;
 
   const selectedOption = MOVE_OPTIONS.find(m => m.id === selectedMove);
@@ -55,10 +68,10 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
 
       <Card className="p-6 border-border/50">
         <h2 className="text-xl font-semibold text-center mb-2">
-          What kind of move are you thinking about?
+          What are you thinking about doing?
         </h2>
         <p className="text-sm text-muted-foreground text-center mb-6">
-          This isn't a commitment. Just helps you name what's on your mind.
+          Start with one — you can always come back for others.
         </p>
 
         <div className="grid gap-2">
@@ -68,13 +81,29 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
               onClick={() => onSelect(option.id)}
               className={cn(
                 "w-full text-left px-4 py-3 rounded-lg border transition-all",
-                "hover:bg-muted/50",
+                "hover:bg-muted/50 flex items-center gap-3",
                 selectedMove === option.id
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border/50 text-foreground"
+                  ? "border-primary bg-primary/10"
+                  : "border-border/50"
               )}
             >
-              {option.label}
+              {/* Radio button indicator */}
+              <div className={cn(
+                "w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors",
+                selectedMove === option.id
+                  ? "border-primary"
+                  : "border-muted-foreground/40"
+              )}>
+                {selectedMove === option.id && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                )}
+              </div>
+              <span className={cn(
+                "transition-colors",
+                selectedMove === option.id ? "text-primary font-medium" : "text-foreground"
+              )}>
+                {option.label}
+              </span>
             </button>
           ))}
         </div>
@@ -82,7 +111,7 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
 
       {/* Ladder visual - shows when a move is selected */}
       {showLadder && selectedOption && (
-        <Card className="p-4 border-border/30 bg-muted/20">
+        <Card ref={spectrumRef} className="p-4 border-border/30 bg-muted/20 animate-fade-in">
           <p className="text-xs text-muted-foreground text-center mb-3">
             There's a whole spectrum between here and there
           </p>
