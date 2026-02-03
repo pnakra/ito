@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
-import { ArrowRight, Circle, RotateCcw, MessageSquare } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Index = () => {
@@ -30,12 +30,9 @@ const Index = () => {
             {/* Tile 1 - Before */}
             <Link
               to="/before"
-              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-primary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "0ms", animationFillMode: "both" }}
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-primary/15 transition-colors">
-                <Circle className="w-5 h-5 text-primary" />
-              </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
                   I want to do something with someone
@@ -48,12 +45,9 @@ const Index = () => {
             {/* Tile 2 - After */}
             <Link
               to="/after"
-              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-secondary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "150ms", animationFillMode: "both" }}
             >
-              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-secondary/15 transition-colors">
-                <RotateCcw className="w-5 h-5 text-secondary" />
-              </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">I already did something</h2>
                 <p className="text-muted-foreground text-sm">Not sure if it <strong className="font-semibold text-muted-foreground">was</strong> okay? Let's figure it out.</p>
@@ -64,12 +58,9 @@ const Index = () => {
             {/* Tile 3 - Something happened to me */}
             <Link
               to="/happened-to-me"
-              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-accent ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "300ms", animationFillMode: "both" }}
             >
-              <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center mr-4 flex-shrink-0 group-hover:bg-accent/80 transition-colors">
-                <MessageSquare className="w-5 h-5 text-accent-foreground" />
-              </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">Someone did something to me</h2>
                 <p className="text-muted-foreground text-sm">Not sure how you <strong className="font-semibold text-muted-foreground">feel</strong> about it? Talk through it.</p>
