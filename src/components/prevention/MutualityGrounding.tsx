@@ -52,37 +52,38 @@ const MUTUALITY_SIGNALS: Partial<Record<MoveType, string[]>> = {
   ],
 };
 
-// "In-between" options when uncertainty is detected
+// Communication-focused options when uncertainty is detected
+// These are about checking in, NOT tactical alternatives to pressure someone
 const IN_BETWEEN_OPTIONS: Partial<Record<MoveType, string[]>> = {
   "kiss": [
-    "Sit closer first",
-    "Hold hands to see how it feels",
-    "Longer hug to test the vibe",
+    "Ask: 'Can I kiss you?'",
+    "Say: 'I'd like to kiss you. How do you feel about that?'",
+    "Check: 'Is this okay?' before leaning in",
   ],
   "make-out": [
-    "Start with a single kiss",
-    "Keep hands in neutral places",
-    "Take a break and talk",
+    "Pause and ask: 'How are you feeling?'",
+    "Say: 'We can slow down anytime'",
+    "Check in: 'Still good?'",
   ],
   "touch-over": [
-    "Stay with making out for now",
-    "Keep hands on their back or arms",
-    "Ask how they're doing",
+    "Ask: 'Is this okay?'",
+    "Say: 'Tell me if you want me to stop'",
+    "Check: 'Do you want this?'",
   ],
   "touch-under": [
-    "Stay over clothes",
-    "Ask before moving anywhere new",
-    "Give them a chance to guide you",
+    "Ask clearly: 'Can I touch you here?'",
+    "Say: 'I want to check in with you'",
+    "Ask: 'What do you want right now?'",
   ],
   "go-private": [
-    "Stay where friends can see you",
-    "Suggest stepping outside briefly instead",
-    "Check in about what they want",
+    "Ask: 'Do you want to go somewhere private?'",
+    "Say: 'We don't have to if you're not sure'",
+    "Check: 'What would you be comfortable with?'",
   ],
   "have-sex": [
-    "More time with clothes on",
-    "Touching that stays above the waist",
-    "Actually talking about what you both want",
+    "Have an actual conversation about what you both want",
+    "Ask: 'Are you sure you want this?'",
+    "Say: 'I need to know you want this too'",
   ],
 };
 
@@ -111,14 +112,14 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
         </Card>
       )}
 
-      {/* In-between options (only if uncertainty detected) */}
+      {/* Communication options (only if uncertainty detected) */}
       {showUncertaintyOptions && inBetweenOptions && inBetweenOptions.length > 0 && (
         <Card className="p-5 border-border/30 bg-warning/5">
           <h3 className="text-sm font-medium text-warning mb-3">
-            If you're unsure, you don't have to jump ahead
+            If you're unsure, ask them
           </h3>
           <p className="text-xs text-muted-foreground mb-3">
-            These are options, not rules. Just ideas if you want to slow down.
+            These are ways to check in. The goal is to hear what they actually want, not to find a workaround.
           </p>
           <ul className="space-y-1.5">
             {inBetweenOptions.map((option, idx) => (
@@ -127,6 +128,9 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
               </li>
             ))}
           </ul>
+          <p className="text-[10px] text-muted-foreground/70 mt-3 italic">
+            If asking feels awkward, that might be a sign you're not ready.
+          </p>
         </Card>
       )}
     </div>

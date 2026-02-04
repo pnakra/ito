@@ -33,6 +33,13 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
 
   return (
     <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      {/* Mandatory consent banner */}
+      <div className="bg-muted/50 border border-border p-3 rounded-lg">
+        <p className="text-xs text-muted-foreground text-center">
+          This is a reflection tool, not a permission slip. Only the other person can give consent.
+        </p>
+      </div>
+
       <div className="flex justify-center">
         <RiskBadge level={analysis.riskLevel} size="lg" />
       </div>
