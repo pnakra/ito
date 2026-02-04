@@ -61,9 +61,12 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Privacy banner at top */}
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/30 py-2 px-4 rounded-lg">
-        <Lock className="w-3.5 h-3.5" />
-        <span>Nothing is saved. This is just for you.</span>
+      <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground bg-muted/30 py-2 px-4 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Lock className="w-3.5 h-3.5" />
+          <span>No data is stored long-term.</span>
+        </div>
+        <span className="text-xs text-muted-foreground/70">Your input is processed for analysis but not retained.</span>
       </div>
 
       <Card className="p-6 border-border/50">
