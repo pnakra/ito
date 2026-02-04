@@ -1,22 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Hand, Pause } from "lucide-react";
+import { Hand, Pause, X } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
 interface StopMomentProps {
   riskLevel: RiskLevel;
   stopMessage: string;
   onAcknowledge: () => void;
+  onDismiss?: () => void;
 }
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMomentProps) => {
   const isRed = riskLevel === "red";
   
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-sm animate-fade-in">
-      <Card className={`max-w-lg w-full p-8 border ${
+      <Card className={`max-w-lg w-full p-8 border relative ${
         isRed ? "border-signal-stop/30" : "border-signal-pause/30"
       } animate-scale-in shadow-lg`}>
+        {/* Yellow-level situations allow dismissal */}
+        {!isRed && onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
         <div className="flex flex-col items-center text-center space-y-6">
           {/* Icon */}
           <div className={`p-4 rounded-xl ${

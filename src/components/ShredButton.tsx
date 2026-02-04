@@ -53,14 +53,19 @@ const ShredButton = ({ onShred, className = "" }: ShredButtonProps) => {
   }
 
   return (
-    <Button
-      variant="ghost"
-      onClick={handleShred}
-      className={`text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors group ${className}`}
-    >
-      <Trash2 className="w-4 h-4 mr-2 group-hover:animate-pulse-soft" />
-      Clear this session
-    </Button>
+    <div className={`flex flex-col items-center gap-1 ${className}`}>
+      <Button
+        variant="ghost"
+        onClick={handleShred}
+        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors group"
+      >
+        <Trash2 className="w-4 h-4 mr-2 group-hover:animate-pulse-soft" />
+        Clear this session
+      </Button>
+      <p className="text-[10px] text-muted-foreground/70 text-center max-w-[200px]">
+        Clears your local view only. Does not delete device cache or any data already sent.
+      </p>
+    </div>
   );
 };
 

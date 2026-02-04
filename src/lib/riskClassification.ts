@@ -17,59 +17,79 @@ export interface RiskClassification {
 
 // Problematic words/phrases that indicate concerning attitudes
 // This is a FAST first-pass - AI-powered detection catches nuanced patterns
-const FLAG_WORDS: { pattern: RegExp; category: string }[] = [
+// CRITICAL SAFETY: These patterns trigger IMMEDIATE risk escalation regardless of AI interpretation
+const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow" }[] = [
+  // === IMMEDIATE RED FLAG (non-consensual indicators) ===
+  { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming", severity: "red" },
+  { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries", severity: "red" },
+  { pattern: /\bwon'?t\s*remember\b/i, category: "exploitation", severity: "red" },
+  { pattern: /\bpassed\s*out\b/i, category: "incapacitation", severity: "red" },
+  { pattern: /\basleep\b/i, category: "incapacitation", severity: "red" },
+  { pattern: /\bunconscious\b/i, category: "incapacitation", severity: "red" },
+  { pattern: /\btoo\s*(drunk|wasted|high)\b/i, category: "incapacitation", severity: "red" },
+  { pattern: /\bforce[d]?\b/i, category: "force", severity: "red" },
+  { pattern: /\bmake\s*(her|him|them)\b.*\b(do|have|give)\b/i, category: "coercion", severity: "red" },
+  { pattern: /\bhold\s*(her|him|them)\s*down\b/i, category: "force", severity: "red" },
+  { pattern: /\bcan'?t\s*say\s*no\b/i, category: "coercion", severity: "red" },
+  { pattern: /\bwon'?t\s*say\s*no\b/i, category: "coercion", severity: "red" },
+  { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red" },
+  { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red" },
+  
+  // === YELLOW FLAG (concerning attitudes) ===
   // Derogatory labels
-  { pattern: /\bslut\b/i, category: "derogatory label" },
-  { pattern: /\bwhore\b/i, category: "derogatory label" },
-  { pattern: /\bho\b/i, category: "derogatory label" },
-  { pattern: /\bthot\b/i, category: "derogatory label" },
-  { pattern: /\bskank\b/i, category: "derogatory label" },
+  { pattern: /\bslut\b/i, category: "derogatory label", severity: "yellow" },
+  { pattern: /\bwhore\b/i, category: "derogatory label", severity: "yellow" },
+  { pattern: /\bho\b/i, category: "derogatory label", severity: "yellow" },
+  { pattern: /\bthot\b/i, category: "derogatory label", severity: "yellow" },
+  { pattern: /\bskank\b/i, category: "derogatory label", severity: "yellow" },
   
   // Objectifying assumptions
-  { pattern: /\beasy\b/i, category: "objectifying assumption" },
-  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption" },
+  { pattern: /\beasy\b/i, category: "objectifying assumption", severity: "yellow" },
+  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption", severity: "yellow" },
   
   // Entitlement
-  { pattern: /\bowes?\s*me\b/i, category: "entitlement" },
-  { pattern: /\bdeserve\b/i, category: "entitlement" },
-  { pattern: /\bfriend\s*zone[d]?\b/i, category: "entitlement" },
-  { pattern: /\bnice\s*guy\b/i, category: "entitlement" },
+  { pattern: /\bowes?\s*me\b/i, category: "entitlement", severity: "red" },
+  { pattern: /\bdeserve\b/i, category: "entitlement", severity: "yellow" },
+  { pattern: /\bfriend\s*zone[d]?\b/i, category: "entitlement", severity: "yellow" },
+  { pattern: /\bnice\s*guy\b/i, category: "entitlement", severity: "yellow" },
   
   // Victim blaming / dismissing boundaries  
-  { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming" },
-  { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries" },
-  { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries" },
-  { pattern: /\bled\s*me\s*on\b/i, category: "dismissing boundaries" },
-  { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries" },
-  { pattern: /\bteasing\s*me\b/i, category: "dismissing boundaries" },
-  { pattern: /\bwanting\s*it\b/i, category: "dismissing boundaries" },
+  { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries", severity: "yellow" },
+  { pattern: /\bled\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow" },
+  { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow" },
+  { pattern: /\bteasing\s*me\b/i, category: "dismissing boundaries", severity: "yellow" },
+  { pattern: /\bwanting\s*it\b/i, category: "dismissing boundaries", severity: "yellow" },
   
   // Secrecy/manipulation
-  { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation" },
-  { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation" },
-  { pattern: /\bout\s*of\s*(your|her|his|their)\s*league\b/i, category: "manipulation" },
+  { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation", severity: "yellow" },
+  { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation", severity: "yellow" },
+  { pattern: /\bout\s*of\s*(your|her|his|their)\s*league\b/i, category: "manipulation", severity: "yellow" },
   
   // Coercion/pressure
-  { pattern: /\bjust\s*let\s*me\b/i, category: "coercion" },
-  { pattern: /\bcome\s*on\b/i, category: "pressure" },
-  { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure" },
+  { pattern: /\bjust\s*let\s*me\b/i, category: "coercion", severity: "yellow" },
+  { pattern: /\bcome\s*on\b/i, category: "pressure", severity: "yellow" },
+  { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure", severity: "yellow" },
 ];
 
 // Detect flag words in additional context
-export function detectFlagWords(text: string): string[] {
-  if (!text?.trim()) return [];
+// Returns both the flagged categories and the highest severity level found
+export function detectFlagWords(text: string): { categories: string[]; hasRedFlag: boolean } {
+  if (!text?.trim()) return { categories: [], hasRedFlag: false };
   
   const flagged: string[] = [];
-  for (const { pattern, category } of FLAG_WORDS) {
+  let hasRedFlag = false;
+  
+  for (const { pattern, category, severity } of FLAG_WORDS) {
     if (pattern.test(text)) {
-      // Extract the matched word
-      const match = text.match(pattern);
-      if (match && !flagged.includes(category)) {
+      if (!flagged.includes(category)) {
         flagged.push(category);
+      }
+      if (severity === "red") {
+        hasRedFlag = true;
       }
     }
   }
-  return flagged;
+  return { categories: flagged, hasRedFlag };
 }
 
 // Check if momentum indicates physical intent
@@ -82,10 +102,22 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
   const { consentSignal, contextFactors, momentum, additionalContext } = decisions;
   
   // Check for flag words in free text
-  const flaggedWords = detectFlagWords(additionalContext);
+  const flagResult = detectFlagWords(additionalContext);
+  const flaggedWords = flagResult.categories;
   const hasFlagWords = flaggedWords.length > 0;
+  const hasImmediateRedFlag = flagResult.hasRedFlag;
   
   const isPhysicalMomentum = hasPhysicalMomentum(momentum);
+  
+  // CRITICAL SAFETY: Immediate red flag from keyword triggers - NO AI interpretation
+  if (hasImmediateRedFlag) {
+    return {
+      level: "red",
+      stopMessage: "Stop. What you've described includes serious red flags that indicate harm.",
+      reasoning: "Your description contains language associated with non-consensual or harmful behavior.",
+      flaggedWords
+    };
+  }
   
   // RED FLAG conditions - immediate stop
   if (consentSignal === "said-no") {
