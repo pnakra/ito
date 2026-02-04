@@ -62,8 +62,8 @@ const ShredButton = ({ onShred, className = "" }: ShredButtonProps) => {
         <Trash2 className="w-4 h-4 mr-2 group-hover:animate-pulse-soft" />
         Clear this session
       </Button>
-      <p className="text-[10px] text-muted-foreground/70 text-center max-w-[200px]">
-        Clears your local view only. Does not delete device cache or any data already sent.
+      <p className="text-[10px] text-muted-foreground/70 text-center max-w-[240px]">
+        Clears this screen only. This does not hide your activity from your internet provider, browser history, or someone with access to your device.
       </p>
     </div>
   );

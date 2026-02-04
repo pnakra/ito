@@ -28,6 +28,13 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
 
   return (
     <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 border-border/50">
+      {/* Mandatory consent banner - always visible */}
+      <div className="bg-muted/50 border border-border p-3 rounded-lg">
+        <p className="text-xs text-muted-foreground text-center">
+          The absence of a red flag is not the presence of consent. Only the other person can tell you what they want.
+        </p>
+      </div>
+
       {/* Neutral header - no green, no approval */}
       <div className="flex justify-center">
         <div className="bg-muted text-muted-foreground py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">

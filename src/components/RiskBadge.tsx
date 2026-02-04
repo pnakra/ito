@@ -1,5 +1,5 @@
 import { RiskLevel } from "@/types/risk";
-import { Circle, Hand, Pause, ThumbsUp } from "lucide-react";
+import { Hand, Pause, HelpCircle } from "lucide-react";
 
 interface RiskBadgeProps {
   level: RiskLevel;
@@ -22,9 +22,9 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
     },
     green: {
       label: "No flags detected",
-      icon: ThumbsUp,
-      className: "bg-signal-clear/15 text-signal-clear border border-signal-clear/30",
-      disclaimer: "This is not permission. Consent must be given freely in the moment."
+      icon: HelpCircle,
+      className: "bg-muted text-muted-foreground border border-border/50",
+      disclaimer: "The absence of a red flag is not the presence of consent. This tool cannot see what's actually happening."
     }
   };
 
@@ -42,6 +42,11 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
       {disclaimer && size === "lg" && (
         <p className="text-xs text-muted-foreground text-center max-w-xs">
           {disclaimer}
+        </p>
+      )}
+      {size === "lg" && (
+        <p className="text-[10px] text-muted-foreground/70 text-center max-w-[280px] mt-1">
+          This is a reflection tool, not a legal or moral ruling. Only the other person can give consent.
         </p>
       )}
     </div>
