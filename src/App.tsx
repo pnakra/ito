@@ -6,7 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Before from "./pages/Before";
 import After from "./pages/After";
-import HappenedToMe from "./pages/HappenedToMe";
+// Third flow (survivor support) - commented out for prototype to focus on perpetrator interruption
+// import HappenedToMe from "./pages/HappenedToMe";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
 // PWA install page - commented out for prototype
@@ -26,7 +27,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/before" element={<Before />} />
           <Route path="/after" element={<After />} />
-          <Route path="/happened-to-me" element={<HappenedToMe />} />
+          {/* Third flow (survivor support) - commented out for prototype */}
+          {/* <Route path="/happened-to-me" element={<HappenedToMe />} /> */}
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           {/* PWA install page - commented out for prototype */}
@@ -35,7 +37,7 @@ const App = () => (
           {/* Legacy routes for backwards compatibility */}
           <Route path="/avoid-line" element={<Before />} />
           <Route path="/crossed-line" element={<After />} />
-          <Route path="/someone-crossed" element={<HappenedToMe />} />
+          {/* <Route path="/someone-crossed" element={<HappenedToMe />} /> */}
           <Route path="/chat" element={<Before />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

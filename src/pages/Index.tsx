@@ -55,8 +55,8 @@ const Index = () => {
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
             </Link>
 
-            {/* Tile 3 - Something happened to me */}
-            <Link
+            {/* Tile 3 - Something happened to me (commented out for prototype) */}
+            {/* <Link
               to="/happened-to-me"
               className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-muted-foreground/50 ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "300ms", animationFillMode: "both" }}
@@ -66,7 +66,7 @@ const Index = () => {
                 <p className="text-muted-foreground text-sm">Not sure how you <strong className="font-semibold text-muted-foreground">feel</strong> about it? Talk through it.</p>
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
-            </Link>
+            </Link> */}
           </div>
 
           {/* Collapsible What is this? */}
