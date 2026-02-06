@@ -63,9 +63,9 @@ ito is fundamentally different from a "chatbot with a nice UI":
 
 | Mindset | Route | User State |
 |---------|-------|------------|
-| Uncertain | `/before` | "I'm thinking about making a move" |
-| Reflective | `/after` | "I think I may have done something wrong" |
-| Processing | `/happened-to-me` | "Something happened to me that felt off" |
+| Uncertain | `/before` | "I might do something with someone" |
+| Reflective | `/after` | "I already did something" |
+| Processing | `/happened-to-me` | "Someone did something to me" |
 
 ---
 
@@ -158,8 +158,8 @@ ito is fundamentally different from a "chatbot with a nice UI":
 ### 3.4 Data Flow
 
 **Prevention Flow (Moves + Ladder Architecture):**
-1. **Phase 1 - Name the Move:** User selects specific action they're considering
-2. User sees visual "ladder" showing intimacy spectrum
+1. **Phase 1 - What are you thinking about doing?:** User selects specific action they're considering
+2. User sees visual "ladder" showing intimacy spectrum ("There's a whole spectrum between here and there")
 3. User selects orientation (where they are in the situation)
 4. User describes observed consent signals (what the other person is doing/saying)
 5. User selects context factors that might affect consent clarity
@@ -240,7 +240,7 @@ CREATE POLICY "Authenticated users cannot read submissions"
 
 ## 4. Flow Specifications
 
-## 4.1 Flow A: Prevention ("I'm thinking about making a move")
+## 4.1 Flow A: Prevention ("I might do something with someone")
 
 ### Route
 `/before`
@@ -250,13 +250,13 @@ Interrupt risky behavior in the moment. Help users name what they're considering
 
 ### Core Insight
 Many teens feel "I want to do something more" but lack a shared language for:
-- What "a move" actually is
+- What specific actions exist on the spectrum of physical intimacy
 - What options exist between kissing and sex
-- How to recognize when a move is mutual
+- How to recognize when something is mutual
 
 ### Interaction Model (v5.0 — Moves + Ladder Architecture)
 
-**Phase 1: Name the Move → Phase 2: Contextual Reflection → Phase 3: Grounding Output**
+**Phase 1: What are you thinking about doing? → Phase 2: Contextual Reflection → Phase 3: Grounding Output**
 
 This is NOT a chatbot. It is a consent risk assessment and behavioral interruption tool.
 
@@ -267,17 +267,18 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│                         PHASE 1: NAME THE MOVE                              │
+│                 PHASE 1: WHAT ARE YOU THINKING ABOUT DOING?                  │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  ┌─────────────────┐                                                        │
-│  │ Privacy Banner  │  "Nothing is saved. This is just for you."            │
+│  │ Privacy Banner  │  "No data is stored long-term."                       │
+│  │                 │  "Your input is processed for analysis but not        │
+│  │                 │   retained."                                          │
 │  └─────────────────┘                                                        │
 │                                                                              │
-│  "What kind of move are you thinking about?"                                │
+│  "What are you thinking about doing?"                                       │
+│  "Start with one — you can always come back for others."                   │
 │                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │  THE LADDER (Visual Spectrum)                                        │   │
-│  │  ────────────────────────────                                        │   │
 │  │  ○ Sit closer                                                        │   │
 │  │  ○ Hold hands                                                        │   │
 │  │  ● Kiss  ◄── Selected                                                │   │
@@ -416,26 +417,32 @@ Free text input (max 800 characters). Subject to dual-layer flag detection.
 ### Phase 3: Grounding Output
 
 **A) Mutuality Signals (Always Shown)**
-Move-specific indicators that a move is mutual:
+Move-specific indicators that something is mutual:
 
 | Move | Mutuality Signals |
 |------|-------------------|
-| `kiss` | Both people lean in, eye contact, relaxed body language, easy to pause |
-| `make-out` | Active participation from both, hands moving naturally, comfortable pauses |
-| `touch-over-clothes` | They guide your hand or touch back, relaxed not tense |
-| `touch-under-clothes` | Clear verbal yes, they help with clothing, ongoing enthusiasm |
-| `have-sex` | Explicit conversation, both actively participating, can stop anytime |
+| `sit-closer` | They lean in too, not away; they don't put their bag between you; they seem comfortable, not stiff |
+| `hold-hands` | They hold back, not just let it happen; their hand relaxes into yours; they don't pull away after a moment |
+| `kiss` | They lean in to meet you; they kiss back, not just receive; they don't freeze or go stiff |
+| `make-out` | Both people are actively involved; bodies are relaxed, not tense; you can pause without it being weird |
+| `touch-over` | They're touching you back; their body moves toward you, not away; they seem into it, not just tolerating it |
+| `touch-under` | They guide your hand or give clear signals; they're actively participating; checking in feels natural, not awkward |
+| `go-private` | They suggest it or enthusiastically agree; they're leading or walking with you; they're not looking for friends or exits |
+| `have-sex` | Clear verbal enthusiasm from both people; active participation, not just allowing; either person can pause or stop anytime |
 
-**B) In-Between Options (Shown for Yellow/Red or Uncertainty)**
-Low-pressure alternatives based on selected move:
+**B) Communication Options (Shown for Yellow/Red or Uncertainty)**
+These are ways to check in — NOT tactical alternatives to get what you want:
 
-| Selected Move | In-Between Options |
-|---------------|-------------------|
-| `kiss` | Longer hug, sitting closer, hand on their back |
-| `make-out` | Gentle kiss, holding hands, asking what they want |
-| `touch-over-clothes` | Making out with clothes on, holding them close |
-| `touch-under-clothes` | Touching over clothes only, asking what feels good |
-| `have-sex` | Everything else on the ladder, explicit conversation about what they want |
+| Selected Move | Check-In Options |
+|---------------|------------------|
+| `kiss` | "Can I kiss you?"; "I'd like to kiss you. How do you feel about that?"; "Is this okay?" before leaning in |
+| `make-out` | Pause and ask: "How are you feeling?"; "We can slow down anytime"; "Still good?" |
+| `touch-over` | "Is this okay?"; "Tell me if you want me to stop"; "Do you want this?" |
+| `touch-under` | "Can I touch you here?"; "I want to check in with you"; "What do you want right now?" |
+| `go-private` | "Do you want to go somewhere private?"; "We don't have to if you're not sure"; "What would you be comfortable with?" |
+| `have-sex` | Have an actual conversation about what you both want; "Are you sure you want this?"; "I need to know you want this too" |
+
+**Design Note:** The disclaimer "If asking feels awkward, that might be a sign you're not ready" appears below these options.
 
 ### Dual-Layer Flag Word Detection
 
@@ -521,20 +528,20 @@ When risk is internally classified as GREEN:
 For RED and YELLOW risk levels, a full-screen modal appears:
 
 **RED Stop Moment:**
-- Large octagon icon
+- Hand (stop) icon
 - Header: "Wait"
-- Subtext: "This is a hard stop."
+- Subtext: "Read this first."
 - Message: Specific concern based on classification
-- Button: "I understand" (required to proceed)
-- Footer: "Proceeding without clear consent can cause serious harm."
+- Button: "I understand, continue" (required to proceed)
+- Footer: "Stopping to think is always the right move."
 
 **YELLOW Pause Moment:**
-- Large triangle warning icon
-- Header: "Pause & Check"
-- Subtext: "Take a moment before continuing."
+- Pause icon
+- Header: "One second"
+- Subtext: "Take a look at this."
 - Message: Specific caution based on classification
-- Button: "I understand" (required to proceed)
-- Footer: "When things are unclear, a simple check-in helps."
+- Button: "I understand, continue" (required to proceed)
+- Footer: "Checking in is a good thing."
 
 ---
 
@@ -605,7 +612,7 @@ IMPORTANT: The risk level has ALREADY been determined by the system.
 Do NOT override or reassess it. Your job is to EXPLAIN why this risk 
 level applies, not to judge it.
 
-CONTEXT: The user is thinking about making a move: [SELECTED_MOVE]
+CONTEXT: The user is thinking about doing: [SELECTED_MOVE]
 
 TONE:
 - Direct, not preachy. Like an older brother, not a teacher.
@@ -645,7 +652,7 @@ You are "is this ok?" You help people think through situations where they're not
 IMPORTANT: The system has determined there are no immediate red flags, 
 but this is NOT approval or permission to proceed.
 
-CONTEXT: The user is thinking about making a move: [SELECTED_MOVE]
+CONTEXT: The user is thinking about doing: [SELECTED_MOVE]
 
 TONE:
 - Brief and neutral. Not celebratory.
@@ -1052,9 +1059,9 @@ ito/
 |------|------------|
 | **Consent** | Freely given, reversible, informed, enthusiastic, specific agreement |
 | **The Ladder** | Visual spectrum of physical intimacy levels, used as orientation aid |
-| **Move** | A specific physical action the user is considering |
+| **Move** | A specific physical action the user is considering (internal term; user sees "What are you thinking about doing?") |
 | **Mutuality Signals** | Observable behaviors indicating both people want the same thing |
-| **In-Between Options** | Lower-pressure alternatives to the user's selected move |
+| **In-Between Options** | Communication-focused check-in prompts shown when uncertainty is detected (e.g., "Ask: 'Can I kiss you?'") |
 | **Freeze response** | A trauma response where someone becomes unable to speak or move |
 | **Survivor-led repair** | Accountability process guided by the person who was harmed |
 | **Red flag** | Clear indicator of absent or withdrawn consent |
