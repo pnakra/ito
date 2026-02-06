@@ -19,6 +19,14 @@ const corsHeaders = {
 // 5. BANNED phrases: "Real talk," "Classic tactic," "Everyone knows"
 // 6. No judgment labels: "manipulation," "toxic," "red flag"
 // =============================================================================
+// COPY CONSTRAINTS (NON-NEGOTIABLE)
+// =============================================================================
+// 1. NO clinical/diagnostic labels: "sexual coercion," "manipulation," "toxic," "abuse"
+// 2. Describe behavior/dynamics in PLAIN LANGUAGE instead
+// 3. Describe dynamics, NOT character - focus on what is happening, not who they are
+// 4. Self-harm: acknowledge seriousness, remove responsibility from user, redirect to support
+// 5. NEVER assume intent behind threats
+// =============================================================================
 
 const SYSTEM_PROMPT = `You are "is this ok?" — a calm, supportive friend helping someone think through a situation.
 
