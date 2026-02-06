@@ -64,11 +64,11 @@ const orientationOptions: StepOption[] = [
 const getConsentSignalOptions = (move: MoveType | null): StepOption[] => {
   const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "this";
   return [
-    { id: "clear-yes", label: `They've said they want to ${moveLabel}` },
-    { id: "enthusiastic-actions", label: "They seem actually into it, not just going along" },
-    { id: "mixed-signals", label: "Hard to tell what they want" },
-    { id: "no-response", label: "They're quiet or haven't really said anything" },
-    { id: "said-no", label: "They said no or pulled away" }
+    { id: "clear-yes", label: `They've said they want to ${moveLabel}`, description: "They used words like 'yes', 'I want to', or asked you to" },
+    { id: "enthusiastic-actions", label: "They seem actually into it, not just going along", description: "Leaning in, touching you back, making eye contact, smiling" },
+    { id: "mixed-signals", label: "Hard to tell what they want", description: "Sometimes engaged, sometimes distant, or their words and body don't match" },
+    { id: "no-response", label: "They're quiet or haven't really said anything", description: "No clear reaction, looking away, or just going along without enthusiasm" },
+    { id: "said-no", label: "They said no or pulled away", description: "Verbally declined, moved away, or created physical distance" }
   ];
 };
 
@@ -77,7 +77,7 @@ const contextFactorOptions: StepOption[] = [
   { id: "alcohol", label: "Alcohol or drugs are involved" },
   { id: "experience-gap", label: "One of us has done this more than the other" },
   { id: "age-imbalance", label: "One of us is older or in charge" },
-  { id: "emotional-pressure", label: "Someone feels pressured" },
+  { id: "emotional-pressure", label: "Someone might feel like they have to" },
   { id: "none", label: "None of these" }
 ];
 
@@ -85,7 +85,7 @@ const contextFactorOptions: StepOption[] = [
 const getMomentumOptions = (move: MoveType | null): StepOption[] => {
   const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "something";
   return [
-    { id: "toward-physical", label: `Moving toward ${moveLabel}` },
+    { id: "toward-physical", label: `I want to ${moveLabel}` },
     { id: "staying-flirty", label: "Just flirting or vibing" },
     { id: "slow-down", label: "I want to slow down" },
     { id: "dont-know", label: "I'm not sure" }
@@ -93,7 +93,8 @@ const getMomentumOptions = (move: MoveType | null): StepOption[] => {
 };
 
 const Before = () => {
-  const [phase, setPhase] = useState<FlowPhase>("welcome");
+  const [phase, setPhase] = useState<FlowPhase>("move-selection");
+  const [phaseHistory, setPhaseHistory] = useState<FlowPhase[]>([]);
   const [selectedMove, setSelectedMove] = useState<MoveType | null>(null);
   const [decisions, setDecisions] = useState<DecisionState>({
     orientation: null,
@@ -127,8 +128,22 @@ const Before = () => {
   };
 
   const handleMoveContinue = () => {
+    setPhaseHistory(prev => [...prev, phase]);
     setPhase("orientation");
   };
+
+  // Navigate back to previous step (or home if at first step)
+  const handleBack = () => {
+    if (phaseHistory.length > 0) {
+      const newHistory = [...phaseHistory];
+      const previousPhase = newHistory.pop()!;
+      setPhaseHistory(newHistory);
+      setPhase(previousPhase);
+    }
+  };
+
+  // Determine if back should go to previous step or home
+  const isInQuestionFlow = ["orientation", "consent-signal", "context-factors", "momentum", "additional-context"].includes(phase);
 
   const handleOrientationSelect = (id: string) => {
     setDecisions(prev => ({ ...prev, orientation: id }));
@@ -164,6 +179,7 @@ const Before = () => {
   };
 
   const proceedToNextStep = () => {
+    setPhaseHistory(prev => [...prev, phase]);
     if (phase === "orientation" && decisions.orientation) {
       setPhase("consent-signal");
     } else if (phase === "consent-signal" && decisions.consentSignal) {
@@ -306,7 +322,8 @@ const Before = () => {
   };
 
   const resetFlow = () => {
-    setPhase("welcome");
+    setPhase("move-selection");
+    setPhaseHistory([]);
     setSelectedMove(null);
     setDecisions({ orientation: null, consentSignal: null, contextFactors: [], momentum: null, additionalContext: "" });
     setRiskResult(null);
@@ -348,28 +365,14 @@ const Before = () => {
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          <BackButton to="/" />
-          
-          {shouldShowPatternWarning && phase === "welcome" && (
-            <SessionPatternWarning />
+          {isInQuestionFlow ? (
+            <BackButton label="Back" onClick={handleBack} />
+          ) : (
+            <BackButton to="/" />
           )}
-
-          {phase === "welcome" && (
-            <Card className="p-8 text-center border-border/50 animate-fade-in">
-              <h1 className="text-2xl font-semibold mb-3">
-                Before anything happens
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Answer a few quick questions. See what comes up.
-              </p>
-              <Button 
-                size="lg" 
-                onClick={() => setPhase("move-selection")}
-                className="px-8"
-              >
-                Continue <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </Card>
+          
+          {shouldShowPatternWarning && phase === "move-selection" && (
+            <SessionPatternWarning />
           )}
 
           {/* Phase 1: Name the Move */}
@@ -411,7 +414,7 @@ const Before = () => {
 
           <DecisionStep
             stepNumber={4}
-            title="Where is this going?"
+            title="Where do you want this to go?"
             options={momentumOptions}
             selectedValues={decisions.momentum ? [decisions.momentum] : []}
             onSelect={handleMomentumSelect}

@@ -28,7 +28,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
             <X className="w-5 h-5" />
           </button>
         )}
-        <div className="flex flex-col items-center text-center space-y-6">
+        <div className="flex flex-col items-center text-center space-y-5">
           {/* Icon */}
           <div className={`p-4 rounded-xl ${
             isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"
@@ -41,16 +41,11 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           </div>
           
           {/* Header */}
-          <div>
-            <h2 className={`text-xl font-medium mb-2 ${
-              isRed ? "text-signal-stop" : "text-signal-pause"
-            }`}>
-              {isRed ? "Wait" : "One second"}
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              {isRed ? "Read this first." : "Take a look at this."}
-            </p>
-          </div>
+          <h2 className={`text-xl font-medium ${
+            isRed ? "text-signal-stop" : "text-signal-pause"
+          }`}>
+            {isRed ? "Wait" : "One second"}
+          </h2>
           
           {/* Message */}
           <p className="text-foreground/90">
@@ -62,22 +57,14 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
             onClick={onAcknowledge}
             size="lg"
             variant="outline"
-            className={`mt-4 w-full py-5 font-medium border transition-all ${
+            className={`w-full py-5 font-medium border transition-all ${
               isRed 
                 ? "border-signal-stop/30 text-signal-stop hover:bg-signal-stop/5" 
                 : "border-signal-pause/30 text-signal-pause hover:bg-signal-pause/5"
             }`}
           >
-            I understand, continue
+            See what this means for you
           </Button>
-          
-          {/* Subtext */}
-          <p className="text-sm text-muted-foreground">
-            {isRed 
-              ? "Stopping to think is always the right move."
-              : "Checking in is a good thing."
-            }
-          </p>
         </div>
       </Card>
     </div>

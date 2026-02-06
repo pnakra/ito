@@ -5,10 +5,26 @@ import { Button } from "@/components/ui/button";
 interface BackButtonProps {
   to?: string;
   label?: string;
+  onClick?: () => void;
 }
 
-const BackButton = ({ to, label = "Back" }: BackButtonProps) => {
+const BackButton = ({ to, label = "Back", onClick }: BackButtonProps) => {
   const navigate = useNavigate();
+
+  // If custom onClick is provided, use that
+  if (onClick) {
+    return (
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="gap-1.5 -ml-2 text-muted-foreground hover:text-foreground"
+        onClick={onClick}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        {label}
+      </Button>
+    );
+  }
 
   if (to) {
     return (

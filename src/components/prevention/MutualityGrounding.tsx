@@ -25,11 +25,6 @@ const MUTUALITY_SIGNALS: Partial<Record<MoveType, string[]>> = {
     "They kiss back, not just receive",
     "They don't freeze or go stiff",
   ],
-  "make-out": [
-    "Both people are actively involved",
-    "Bodies are relaxed, not tense",
-    "You can pause without it being weird",
-  ],
   "touch-over": [
     "They're touching you back",
     "Their body moves toward you, not away",
@@ -39,11 +34,6 @@ const MUTUALITY_SIGNALS: Partial<Record<MoveType, string[]>> = {
     "They guide your hand or give clear signals",
     "They're actively participating",
     "Checking in feels natural, not awkward",
-  ],
-  "go-private": [
-    "They suggest it or enthusiastically agree",
-    "They're leading or walking with you",
-    "They're not looking for friends or exits",
   ],
   "have-sex": [
     "Clear verbal enthusiasm from both people",
@@ -60,11 +50,6 @@ const IN_BETWEEN_OPTIONS: Partial<Record<MoveType, string[]>> = {
     "Say: 'I'd like to kiss you. How do you feel about that?'",
     "Check: 'Is this okay?' before leaning in",
   ],
-  "make-out": [
-    "Pause and ask: 'How are you feeling?'",
-    "Say: 'We can slow down anytime'",
-    "Check in: 'Still good?'",
-  ],
   "touch-over": [
     "Ask: 'Is this okay?'",
     "Say: 'Tell me if you want me to stop'",
@@ -74,11 +59,6 @@ const IN_BETWEEN_OPTIONS: Partial<Record<MoveType, string[]>> = {
     "Ask clearly: 'Can I touch you here?'",
     "Say: 'I want to check in with you'",
     "Ask: 'What do you want right now?'",
-  ],
-  "go-private": [
-    "Ask: 'Do you want to go somewhere private?'",
-    "Say: 'We don't have to if you're not sure'",
-    "Check: 'What would you be comfortable with?'",
   ],
   "have-sex": [
     "Have an actual conversation about what you both want",

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, X, Check, MessageCircle, ArrowRight } from "lucide-react";
+import { Loader2, Eye, ArrowRight, MessageCircle, ChevronRight } from "lucide-react";
 import RiskBadge from "@/components/RiskBadge";
 import type { RiskLevel } from "@/types/risk";
 
@@ -20,9 +20,9 @@ interface AnimatedExplanationCardProps {
   onComplete?: () => void;
 }
 
-type RevealStep = "assessment" | "whatsHappening" | "whatNotToDo" | "whatToDoInstead" | "realTalk" | "complete";
+type RevealStep = "assessment" | "whatsHappening" | "insteadOf" | "realTalk" | "complete";
 
-const ALL_STEPS: RevealStep[] = ["assessment", "whatsHappening", "whatNotToDo", "whatToDoInstead", "realTalk", "complete"];
+const ALL_STEPS: RevealStep[] = ["assessment", "whatsHappening", "insteadOf", "realTalk", "complete"];
 
 const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("assessment");
@@ -31,10 +31,27 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
   const availableSteps = useMemo(() => {
     if (!analysis) return ALL_STEPS;
     return ALL_STEPS.filter(step => {
-      if (step === "whatNotToDo") return analysis.whatNotToDo.length > 0;
-      if (step === "whatToDoInstead") return analysis.whatToDoInstead.length > 0;
+      // Skip "insteadOf" if both arrays are empty
+      if (step === "insteadOf") {
+        return analysis.whatNotToDo.length > 0 || analysis.whatToDoInstead.length > 0;
+      }
       return true;
     });
+  }, [analysis]);
+
+  // Combine "whatNotToDo" and "whatToDoInstead" into "Instead of X, try Y" format
+  const insteadOfItems = useMemo(() => {
+    if (!analysis) return [];
+    const items: { instead: string; tryThis: string }[] = [];
+    const maxLen = Math.max(analysis.whatNotToDo.length, analysis.whatToDoInstead.length);
+    
+    for (let i = 0; i < maxLen; i++) {
+      items.push({
+        instead: analysis.whatNotToDo[i] || "",
+        tryThis: analysis.whatToDoInstead[i] || ""
+      });
+    }
+    return items.filter(item => item.instead || item.tryThis);
   }, [analysis]);
 
   if (isLoading) {
@@ -42,7 +59,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       <Card className="p-8 animate-in fade-in duration-300">
         <div className="flex flex-col items-center justify-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Breaking this down for you...</p>
+          <p className="text-muted-foreground">Looking at your situation...</p>
         </div>
       </Card>
     );
@@ -52,17 +69,14 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
 
   const currentStepIndex = ALL_STEPS.indexOf(currentStep);
   const currentAvailableIndex = availableSteps.indexOf(currentStep);
-  // Don't count "complete" as a step in progress
   const totalVisibleSteps = availableSteps.length - 1;
   const completedSteps = Math.min(currentAvailableIndex, totalVisibleSteps);
   
-  // Skip empty sections
   const getNextStep = (from: RevealStep): RevealStep => {
     const fromIndex = ALL_STEPS.indexOf(from);
     for (let i = fromIndex + 1; i < ALL_STEPS.length; i++) {
       const step = ALL_STEPS[i];
-      if (step === "whatNotToDo" && analysis.whatNotToDo.length === 0) continue;
-      if (step === "whatToDoInstead" && analysis.whatToDoInstead.length === 0) continue;
+      if (step === "insteadOf" && analysis.whatNotToDo.length === 0 && analysis.whatToDoInstead.length === 0) continue;
       return step;
     }
     return "complete";
@@ -79,13 +93,11 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
   const isComplete = currentStep === "complete";
   const showNext = !isComplete;
 
-  // Get label for next button
   const getNextLabel = (): string => {
     const next = getNextStep(currentStep);
     switch (next) {
       case "whatsHappening": return "What's going on";
-      case "whatNotToDo": return "What not to do";
-      case "whatToDoInstead": return "What to try instead";
+      case "insteadOf": return "What to try";
       case "realTalk": return "The main thing";
       case "complete": return "Got it";
       default: return "Next";
@@ -94,19 +106,12 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
 
   return (
     <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Mandatory consent banner for all results */}
-      <div className="bg-muted/50 border border-border p-3 rounded-lg">
-        <p className="text-xs text-muted-foreground text-center">
-          This is a reflection tool, not a permission slip. Only the other person can give consent.
-        </p>
-      </div>
-
-      {/* Always show: Risk Badge + Assessment */}
+      {/* Risk Badge + Assessment - always visible */}
       <div className="flex justify-center">
         <RiskBadge level={analysis.riskLevel} size="lg" />
       </div>
 
-      {/* Progress indicator */}
+      {/* Progress dots */}
       {!isComplete && (
         <div className="flex justify-center gap-1.5">
           {availableSteps.slice(0, -1).map((step, i) => (
@@ -124,7 +129,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       
       <p className="text-lg font-medium text-center">{analysis.assessment}</p>
 
-      {/* What's Happening - show if step >= whatsHappening */}
+      {/* What's Happening */}
       {currentStepIndex >= ALL_STEPS.indexOf("whatsHappening") && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
@@ -142,43 +147,33 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
         </div>
       )}
 
-      {/* What NOT to Do - show if step >= whatNotToDo and has content */}
-      {currentStepIndex >= ALL_STEPS.indexOf("whatNotToDo") && analysis.whatNotToDo.length > 0 && (
+      {/* Instead of X, try Y - combined section */}
+      {currentStepIndex >= ALL_STEPS.indexOf("insteadOf") && insteadOfItems.length > 0 && (
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
-            <X className="w-5 h-5 text-destructive" />
-            <h3 className="font-bold text-lg">Don't do this</h3>
+            <ChevronRight className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-lg">What to try</h3>
           </div>
-          <div className="space-y-2 ml-7">
-            {analysis.whatNotToDo.map((point, i) => (
-              <div key={i} className="flex gap-2 items-start bg-destructive/10 p-3 rounded-lg">
-                <X className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
-                <span>{point}</span>
+          <div className="space-y-3 ml-2">
+            {insteadOfItems.map((item, i) => (
+              <div key={i} className="rounded-lg border border-border/50 overflow-hidden">
+                {item.instead && (
+                  <div className="bg-muted/30 px-4 py-2 text-sm text-muted-foreground">
+                    Instead of: {item.instead}
+                  </div>
+                )}
+                {item.tryThis && (
+                  <div className="bg-success/5 px-4 py-3 text-foreground">
+                    <span className="text-success font-medium">Try:</span> {item.tryThis}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* What to Do Instead - show if step >= whatToDoInstead and has content */}
-      {currentStepIndex >= ALL_STEPS.indexOf("whatToDoInstead") && analysis.whatToDoInstead.length > 0 && (
-        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex items-center gap-2">
-            <Check className="w-5 h-5 text-success" />
-            <h3 className="font-bold text-lg">Try this instead</h3>
-          </div>
-          <div className="space-y-2 ml-7">
-            {analysis.whatToDoInstead.map((point, i) => (
-              <div key={i} className="flex gap-2 items-start bg-success/10 p-3 rounded-lg">
-                <Check className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                <span>{point}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Real Talk - show if step >= realTalk */}
+      {/* Real Talk */}
       {currentStepIndex >= ALL_STEPS.indexOf("realTalk") && (
         <div className="bg-accent/20 border border-accent p-4 rounded-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-2">
@@ -189,13 +184,25 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
         </div>
       )}
 
-      {/* Next button */}
+      {/* Next button - more visually distinct */}
       {showNext && (
         <div className="flex justify-center pt-2">
-          <Button onClick={handleNext} className="px-6">
-            {getNextLabel()} <ArrowRight className="ml-2 w-4 h-4" />
+          <Button 
+            onClick={handleNext} 
+            className="px-6 gap-2"
+            size="lg"
+          >
+            {getNextLabel()} 
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
+      )}
+
+      {/* Subtle reminder at completion */}
+      {isComplete && (
+        <p className="text-xs text-muted-foreground text-center">
+          Only the other person can give consent.
+        </p>
       )}
     </Card>
   );
