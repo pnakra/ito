@@ -1,17 +1,14 @@
-import { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type MoveType = 
+export type MoveType =
   | "sit-closer"
   | "hold-hands" 
   | "kiss"
-  | "make-out"
   | "touch-over"
   | "touch-under"
-  | "go-private"
   | "have-sex"
   | "not-sure";
 
@@ -25,11 +22,9 @@ export const MOVE_OPTIONS: MoveOption[] = [
   { id: "sit-closer", label: "Sit closer", ladder: 1 },
   { id: "hold-hands", label: "Hold hands", ladder: 2 },
   { id: "kiss", label: "Kiss", ladder: 3 },
-  { id: "make-out", label: "Make out", ladder: 4 },
-  { id: "touch-over", label: "Touch over clothes", ladder: 5 },
-  { id: "touch-under", label: "Touch under clothes", ladder: 6 },
-  { id: "go-private", label: "Go somewhere private", ladder: 7 },
-  { id: "have-sex", label: "Have sex", ladder: 8 },
+  { id: "touch-over", label: "Touch over clothes", ladder: 4 },
+  { id: "touch-under", label: "Touch under clothes", ladder: 5 },
+  { id: "have-sex", label: "Have sex", ladder: 6 },
   { id: "not-sure", label: "Not sure yet", ladder: 0 },
 ];
 
@@ -41,22 +36,7 @@ interface MoveSelectionProps {
 }
 
 const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSelectionProps) => {
-  const spectrumRef = useRef<HTMLDivElement>(null);
-  
-  // Auto-scroll to spectrum when a move is selected
-  useEffect(() => {
-    if (selectedMove && selectedMove !== "not-sure" && spectrumRef.current) {
-      // Small delay to let the spectrum render
-      setTimeout(() => {
-        spectrumRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 100);
-    }
-  }, [selectedMove]);
-
   if (!isActive) return null;
-
-  const selectedOption = MOVE_OPTIONS.find(m => m.id === selectedMove);
-  const showLadder = selectedMove && selectedMove !== "not-sure";
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -111,40 +91,6 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
           ))}
         </div>
       </Card>
-
-      {/* Ladder visual - shows when a move is selected */}
-      {showLadder && selectedOption && (
-        <Card ref={spectrumRef} className="p-4 border-border/30 bg-muted/20 animate-fade-in">
-          <p className="text-xs text-muted-foreground text-center mb-3">
-            There's a whole spectrum between here and there
-          </p>
-          <div className="flex flex-col gap-1">
-            {MOVE_OPTIONS.filter(m => m.id !== "not-sure")
-              .sort((a, b) => b.ladder - a.ladder)
-              .map((option) => (
-                <div
-                  key={option.id}
-                  className={cn(
-                    "px-3 py-1.5 rounded text-sm transition-all",
-                    option.id === selectedMove
-                      ? "bg-primary/20 text-primary font-medium"
-                      : option.ladder < selectedOption.ladder
-                        ? "text-muted-foreground/70"
-                        : "text-muted-foreground/40"
-                  )}
-                >
-                  {option.label}
-                  {option.id === selectedMove && (
-                    <span className="ml-2 text-xs">← you're here</span>
-                  )}
-                </div>
-              ))}
-          </div>
-          <p className="text-xs text-muted-foreground text-center mt-3">
-            You don't have to jump ahead. There are options in between.
-          </p>
-        </Card>
-      )}
 
       {selectedMove && (
         <div className="flex justify-center pt-2">
