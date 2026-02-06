@@ -1,17 +1,29 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import ShredButton from "@/components/ShredButton";
+import AfterDecisionStep, { type AfterStepOption } from "@/components/after/AfterDecisionStep";
+import AfterContextInput from "@/components/after/AfterContextInput";
+import AfterExplanationCard from "@/components/after/AfterExplanationCard";
+import AfterFollowUpChat from "@/components/after/AfterFollowUpChat";
 import { supabase } from "@/integrations/supabase/client";
-import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
-import { Loader2, Send, MessageSquare } from "lucide-react";
+import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
+import { ArrowRight, RotateCcw, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-type Screen = "intro" | "input" | "results";
+type FlowPhase = 
+  | "intro"
+  | "situation"
+  | "what-happened"
+  | "their-response"
+  | "current-feelings"
+  | "additional-context"
+  | "results"
+  | "follow-up-chat"
+  | "complete";
 
 interface ReflectionResult {
   clarityCheck: string;
@@ -26,47 +38,169 @@ interface FollowUpMessage {
   content: string;
 }
 
+interface DecisionState {
+  situation: string | null;
+  whatHappened: string | null;
+  theirResponse: string | null;
+  currentFeelings: string | null;
+  additionalContext: string;
+}
+
+// Step 1: Situation options
+const situationOptions: AfterStepOption[] = [
+  { id: "hookup", label: "We hooked up or were physical" },
+  { id: "conversation", label: "Something was said" },
+  { id: "ongoing", label: "It's been happening over time" },
+  { id: "digital", label: "It happened online or over text" },
+  { id: "not-sure", label: "I'm not sure how to describe it" }
+];
+
+// Step 2: What happened options
+const whatHappenedOptions: AfterStepOption[] = [
+  { id: "went-further", label: "Things went further than they wanted", description: "Physically or emotionally" },
+  { id: "ignored-signals", label: "I didn't notice or ignored their signals", description: "They went quiet, pulled away, or seemed off" },
+  { id: "pressure", label: "I kept asking or pushing", description: "Until they went along with it" },
+  { id: "intoxicated", label: "They were drunk or high", description: "And might not have been able to fully consent" },
+  { id: "power-dynamic", label: "There was a power difference", description: "Age, position, experience, etc." },
+  { id: "other", label: "Something else", description: "I'll explain more in a moment" }
+];
+
+// Step 3: Their response options
+const theirResponseOptions: AfterStepOption[] = [
+  { id: "told-me", label: "They told me I hurt them" },
+  { id: "distant", label: "They've been distant or avoiding me" },
+  { id: "no-contact", label: "They stopped talking to me" },
+  { id: "acting-different", label: "They're acting differently around me" },
+  { id: "havent-said", label: "They haven't said anything, but I'm worried" },
+  { id: "someone-else", label: "Someone else told me there's a problem" }
+];
+
+// Step 4: Current feelings options
+const currentFeelingsOptions: AfterStepOption[] = [
+  { id: "worried", label: "I'm worried I hurt them" },
+  { id: "confused", label: "I'm confused about what happened" },
+  { id: "defensive", label: "I feel defensive but want to understand" },
+  { id: "guilty", label: "I feel guilty" },
+  { id: "want-to-fix", label: "I want to make it right" },
+  { id: "need-clarity", label: "I just need to understand what I did" }
+];
+
 const After = () => {
-  const [screen, setScreen] = useState<Screen>("intro");
-  const [userInput, setUserInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [phase, setPhase] = useState<FlowPhase>("intro");
+  const [phaseHistory, setPhaseHistory] = useState<FlowPhase[]>([]);
+  const [decisions, setDecisions] = useState<DecisionState>({
+    situation: null,
+    whatHappened: null,
+    theirResponse: null,
+    currentFeelings: null,
+    additionalContext: ""
+  });
   const [results, setResults] = useState<ReflectionResult | null>(null);
-  
-  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [explanationComplete, setExplanationComplete] = useState(false);
   const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([]);
-  const [followUpInput, setFollowUpInput] = useState("");
   const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
   
   const { toast } = useToast();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const maxLength = 2000;
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Navigate forward with history
+  const goToPhase = (nextPhase: FlowPhase) => {
+    setPhaseHistory(prev => [...prev, phase]);
+    setPhase(nextPhase);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [results, followUpMessages]);
+  // Navigate back
+  const handleBack = () => {
+    if (phaseHistory.length > 0) {
+      const newHistory = [...phaseHistory];
+      const previousPhase = newHistory.pop()!;
+      setPhaseHistory(newHistory);
+      setPhase(previousPhase);
+    }
+  };
 
-  const handleSubmit = async () => {
-    if (!userInput.trim()) return;
+  const isInQuestionFlow = ["situation", "what-happened", "their-response", "current-feelings", "additional-context"].includes(phase);
 
-    // Log the initial scenario input
-    logFreetext("after-crossed", "scenario", userInput);
+  // Selection handlers
+  const handleSituationSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, situation: id }));
+    logChoice("after-crossed", "situation", id);
+  };
+
+  const handleWhatHappenedSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, whatHappened: id }));
+    logChoice("after-crossed", "what-happened", id);
+  };
+
+  const handleTheirResponseSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, theirResponse: id }));
+    logChoice("after-crossed", "their-response", id);
+  };
+
+  const handleCurrentFeelingsSelect = (id: string) => {
+    setDecisions(prev => ({ ...prev, currentFeelings: id }));
+    logChoice("after-crossed", "current-feelings", id);
+  };
+
+  const proceedToNextStep = () => {
+    if (phase === "situation" && decisions.situation) {
+      goToPhase("what-happened");
+    } else if (phase === "what-happened" && decisions.whatHappened) {
+      goToPhase("their-response");
+    } else if (phase === "their-response" && decisions.theirResponse) {
+      goToPhase("current-feelings");
+    } else if (phase === "current-feelings" && decisions.currentFeelings) {
+      goToPhase("additional-context");
+    }
+  };
+
+  const formatSelectionsForAI = (): string => {
+    const parts: string[] = [];
+
+    // Situation
+    const situationLabel = situationOptions.find(o => o.id === decisions.situation)?.label;
+    if (situationLabel) parts.push(`Situation: ${situationLabel}`);
+
+    // What happened
+    const whatHappenedOption = whatHappenedOptions.find(o => o.id === decisions.whatHappened);
+    if (whatHappenedOption) {
+      parts.push(`What happened: ${whatHappenedOption.label}${whatHappenedOption.description ? ` (${whatHappenedOption.description})` : ''}`);
+    }
+
+    // Their response
+    const theirResponseLabel = theirResponseOptions.find(o => o.id === decisions.theirResponse)?.label;
+    if (theirResponseLabel) parts.push(`Their response: ${theirResponseLabel}`);
+
+    // Current feelings
+    const currentFeelingsLabel = currentFeelingsOptions.find(o => o.id === decisions.currentFeelings)?.label;
+    if (currentFeelingsLabel) parts.push(`How I'm feeling: ${currentFeelingsLabel}`);
+
+    // Additional context
+    if (decisions.additionalContext.trim()) {
+      parts.push(`Additional context: ${decisions.additionalContext}`);
+    }
+
+    return parts.join("\n\n");
+  };
+
+  const handleContextInputContinue = async () => {
+    if (decisions.additionalContext.trim()) {
+      logFreetext("after-crossed", "additional-context", decisions.additionalContext);
+    }
 
     setIsLoading(true);
+    goToPhase("results");
+
     try {
+      const scenario = formatSelectionsForAI();
+      
       const { data, error } = await supabase.functions.invoke("analyze-crossed-line", {
-        body: { scenario: userInput },
+        body: { scenario }
       });
 
       if (error) throw error;
 
       setResults(data as ReflectionResult);
-      setScreen("results");
-      
-      // Log AI response
       logAIResponse("after-crossed", "reflection", data.clarityCheck?.slice(0, 100) || "Reflection generated");
     } catch (error: any) {
       console.error("Error:", error);
@@ -75,27 +209,34 @@ const After = () => {
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
+      // Set fallback results
+      setResults({
+        clarityCheck: "We're having trouble processing this right now.",
+        otherPersonPerspective: "Please try again in a moment.",
+        yourPatterns: "",
+        accountabilitySteps: "If this continues, please seek support from a trusted adult.",
+        avoidingRepetition: ""
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFollowUpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!followUpInput.trim() || isFollowUpLoading) return;
+  const handleExplanationComplete = () => {
+    setExplanationComplete(true);
+  };
 
-    // Log follow-up message
-    logFreetext("after-crossed", "follow-up", followUpInput);
-
-    const userMessage: FollowUpMessage = { role: "user", content: followUpInput };
+  const handleFollowUpSubmit = async (message: string) => {
+    const userMessage: FollowUpMessage = { role: "user", content: message };
     setFollowUpMessages(prev => [...prev, userMessage]);
-    setFollowUpInput("");
     setIsFollowUpLoading(true);
+    
+    logFreetext("after-crossed", "follow-up", message);
 
     try {
       const { data, error } = await supabase.functions.invoke("crossed-line-followup", {
         body: { 
-          message: followUpInput,
+          message,
           conversationHistory: followUpMessages,
           originalReflection: results
         }
@@ -108,16 +249,9 @@ const After = () => {
         content: data.response
       };
       setFollowUpMessages(prev => [...prev, assistantMessage]);
-      
-      // Log AI follow-up response
       logAIResponse("after-crossed", "follow-up-response", data.response || "Follow-up response");
     } catch (error: any) {
       console.error("Error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
       const errorMessage: FollowUpMessage = {
         role: "assistant",
         content: "I'm having trouble right now. Please try again."
@@ -128,261 +262,217 @@ const After = () => {
     }
   };
 
-  const handleStartOver = () => {
-    setScreen("intro");
-    setUserInput("");
-    setResults(null);
-    setShowFollowUp(false);
-    setFollowUpMessages([]);
-    setFollowUpInput("");
-    resetSessionId(); // Start new session on reset
+  const handleFollowUpDone = () => {
+    goToPhase("complete");
   };
 
-  if (screen === "intro") {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-2xl">
-          <div className="space-y-6">
+  const handleStartFollowUp = () => {
+    setFollowUpMessages([]);
+    goToPhase("follow-up-chat");
+  };
+
+  const resetFlow = () => {
+    setPhase("intro");
+    setPhaseHistory([]);
+    setDecisions({
+      situation: null,
+      whatHappened: null,
+      theirResponse: null,
+      currentFeelings: null,
+      additionalContext: ""
+    });
+    setResults(null);
+    setIsLoading(false);
+    setExplanationComplete(false);
+    setFollowUpMessages([]);
+    resetSessionId();
+  };
+
+  const canProceed = useCallback(() => {
+    if (phase === "situation") return !!decisions.situation;
+    if (phase === "what-happened") return !!decisions.whatHappened;
+    if (phase === "their-response") return !!decisions.theirResponse;
+    if (phase === "current-feelings") return !!decisions.currentFeelings;
+    return false;
+  }, [phase, decisions]);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {isInQuestionFlow ? (
+            <BackButton label="Back" onClick={handleBack} />
+          ) : (
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold text-center animate-fade-in">
-              Let's think through what happened.
-            </h1>
+          )}
 
-            <p className="text-center text-muted-foreground animate-fade-in" style={{ animationDelay: '0.05s' }}>
-              Sometimes you look back and realize something felt off, or you're worried you went too far. 
-              This is a space to slow down and figure it out.
-            </p>
+          {/* Intro */}
+          {phase === "intro" && (
+            <div className="space-y-6 animate-fade-in">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-center">
+                Let's think through what happened.
+              </h1>
 
-            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              This is a guide to help you think things through.
-            </div>
-
-            <div className="flex justify-center pt-4 animate-fade-in" style={{ animationDelay: '0.15s' }}>
-              <Button 
-                onClick={() => setScreen("input")} 
-                size="lg"
-                className="px-8"
-              >
-                Continue
-              </Button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (screen === "input") {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
-          <div className="space-y-6 sm:space-y-8">
-            <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold">What happened?</h1>
-            
-            <div className="space-y-4">
-              <p className="text-muted-foreground">
-                Describe what happened in your own words. You don't have to share every detail — 
-                just the parts that matter.
+              <p className="text-center text-muted-foreground">
+                Sometimes you look back and realize something felt off, or you're worried you went too far. 
+                This is a space to slow down and figure it out.
               </p>
-              
-              <Textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value.slice(0, maxLength))}
-                placeholder="Take your time..."
-                className="min-h-[200px] sm:min-h-[250px] text-base"
-                disabled={isLoading}
-              />
-              
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">
-                  {userInput.length} / {maxLength}
-                </span>
-              </div>
 
-              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 justify-between pt-4">
+              <Card className="p-4 bg-muted/50 border-border/50">
+                <p className="text-sm text-muted-foreground text-center">
+                  This is a guide to help you think things through. We'll ask a few questions first.
+                </p>
+              </Card>
+
+              <div className="flex justify-center pt-4">
                 <Button 
-                  variant="ghost" 
-                  onClick={() => setScreen("intro")}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
-                <Button 
-                  onClick={handleSubmit} 
-                  disabled={!userInput.trim() || isLoading}
+                  onClick={() => goToPhase("situation")} 
                   size="lg"
                   className="px-8"
                 >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Taking a moment...
-                    </>
-                  ) : (
-                    "Continue"
-                  )}
+                  Continue <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+          )}
 
-  if (screen === "results" && results) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 sm:py-12 max-w-3xl">
-          <div className="space-y-6 sm:space-y-8">
-            <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-6 sm:mb-8">
-              Here's what came up
-            </h1>
+          {/* Step 1: Situation */}
+          <AfterDecisionStep
+            stepNumber={1}
+            title="What's the situation?"
+            options={situationOptions}
+            selectedValues={decisions.situation ? [decisions.situation] : []}
+            onSelect={handleSituationSelect}
+            isActive={phase === "situation"}
+          />
 
-            <Card className="p-4 sm:p-6 border-border/50">
-              <h2 className="text-lg font-medium mb-3">What might have happened</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.clarityCheck}</p>
-            </Card>
+          {/* Step 2: What happened */}
+          <AfterDecisionStep
+            stepNumber={2}
+            title="What are you worried about?"
+            options={whatHappenedOptions}
+            selectedValues={decisions.whatHappened ? [decisions.whatHappened] : []}
+            onSelect={handleWhatHappenedSelect}
+            isActive={phase === "what-happened"}
+          />
 
-            <Card className="p-4 sm:p-6 border-border/50">
-              <h2 className="text-lg font-medium mb-3">How they might have felt</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.otherPersonPerspective}</p>
-            </Card>
+          {/* Step 3: Their response */}
+          <AfterDecisionStep
+            stepNumber={3}
+            title="How are they acting now?"
+            options={theirResponseOptions}
+            selectedValues={decisions.theirResponse ? [decisions.theirResponse] : []}
+            onSelect={handleTheirResponseSelect}
+            isActive={phase === "their-response"}
+          />
 
-            <Card className="p-4 sm:p-6 border-border/50">
-              <h2 className="text-lg font-medium mb-3">Patterns to notice</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.yourPatterns}</p>
-            </Card>
+          {/* Step 4: Current feelings */}
+          <AfterDecisionStep
+            stepNumber={4}
+            title="How are you feeling about it?"
+            options={currentFeelingsOptions}
+            selectedValues={decisions.currentFeelings ? [decisions.currentFeelings] : []}
+            onSelect={handleCurrentFeelingsSelect}
+            isActive={phase === "current-feelings"}
+          />
 
-            <Card className="p-4 sm:p-6 border-border/50">
-              <h2 className="text-lg font-medium mb-3">What you can do now</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.accountabilitySteps}</p>
-            </Card>
+          {/* Step 5: Additional context */}
+          <AfterContextInput
+            value={decisions.additionalContext}
+            onChange={(value) => setDecisions(prev => ({ ...prev, additionalContext: value }))}
+            onContinue={handleContextInputContinue}
+            isActive={phase === "additional-context"}
+            isLoading={isLoading}
+          />
 
-            <Card className="p-4 sm:p-6 border-border/50">
-              <h2 className="text-lg font-medium mb-3">Going forward</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap text-sm sm:text-base">{results.avoidingRepetition}</p>
-            </Card>
+          {/* Continue button for steps 1-4 */}
+          {(phase === "situation" || phase === "what-happened" || phase === "their-response" || phase === "current-feelings") && (
+            <div className="flex justify-center pt-4">
+              <Button
+                size="lg"
+                onClick={proceedToNextStep}
+                disabled={!canProceed()}
+                className="px-8"
+              >
+                Continue <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </div>
+          )}
 
-            {!showFollowUp ? (
-              <Card className="p-4 sm:p-6 border-border/50 bg-accent/30">
-                <div className="text-center space-y-4">
-                  <MessageSquare className="w-6 h-6 mx-auto text-muted-foreground" />
-                  <h3 className="text-base font-medium">Have questions?</h3>
-                  <p className="text-muted-foreground text-sm">
-                    If you want to talk through anything else, you can keep going.
-                  </p>
-                  <Button onClick={() => setShowFollowUp(true)} variant="outline">
+          {/* Results - Step-through reveal */}
+          {phase === "results" && (
+            <AfterExplanationCard
+              results={results}
+              isLoading={isLoading}
+              onComplete={handleExplanationComplete}
+            />
+          )}
+
+          {/* Post-explanation options */}
+          {phase === "results" && !isLoading && results && explanationComplete && (
+            <Card className="p-4 sm:p-6 bg-accent/30 border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="text-center space-y-4">
+                <MessageSquare className="w-6 h-6 mx-auto text-muted-foreground" />
+                <h3 className="text-base font-medium">Have questions?</h3>
+                <p className="text-muted-foreground text-sm">
+                  If you want to talk through anything else, you can keep going.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button onClick={handleStartFollowUp} variant="default">
                     Keep talking
                   </Button>
+                  <Button onClick={() => goToPhase("complete")} variant="outline">
+                    I'm done
+                  </Button>
                 </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Follow-up chat */}
+          <AfterFollowUpChat
+            messages={followUpMessages}
+            onSendMessage={handleFollowUpSubmit}
+            onDone={handleFollowUpDone}
+            isLoading={isFollowUpLoading}
+            isActive={phase === "follow-up-chat"}
+          />
+
+          {/* Complete - resources and actions */}
+          {phase === "complete" && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <Card className="p-4 sm:p-6 bg-muted/50 border-border/50">
+                <h3 className="text-base font-medium mb-3">If someone was hurt</h3>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  If the other person was hurt or uncomfortable, they might need support too.
+                </p>
+                <ul className="space-y-2 text-muted-foreground text-sm">
+                  <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
+                  <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
+                  <li>• Love Is Respect — <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">loveisrespect.org</a></li>
+                </ul>
               </Card>
-            ) : (
-              <Card className="p-4 sm:p-6 border-border/50">
-                <h3 className="text-base font-medium mb-4 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  Keep talking
-                </h3>
-                
-                <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto">
-                  {followUpMessages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className={`max-w-[85%] p-3 rounded-lg text-sm ${
-                        message.role === "user" 
-                          ? "bg-primary text-primary-foreground" 
-                          : "bg-muted"
-                      }`}>
-                        <p className="whitespace-pre-wrap">{message.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isFollowUpLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted p-3 rounded-lg">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                <form onSubmit={handleFollowUpSubmit} className="space-y-3">
-                  <Textarea
-                    value={followUpInput}
-                    onChange={(e) => setFollowUpInput(e.target.value.slice(0, maxLength))}
-                    placeholder="Ask a question or share more..."
-                    className="min-h-[80px] resize-none text-sm"
-                    disabled={isFollowUpLoading}
-                  />
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">
-                      {followUpInput.length} / {maxLength}
-                    </span>
-                    <Button 
-                      type="submit" 
-                      disabled={!followUpInput.trim() || isFollowUpLoading}
-                      size="sm"
-                    >
-                      {isFollowUpLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Send
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Card>
-            )}
-
-            <div className="bg-muted/50 border border-border/50 rounded-lg p-4 sm:p-6">
-              <h3 className="text-base font-medium mb-3">If someone was hurt</h3>
-              <p className="text-muted-foreground mb-4 text-sm">
-                If the other person was hurt or uncomfortable, they might need support too.
-              </p>
-              <ul className="space-y-2 text-muted-foreground text-sm">
-                <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
-                <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
-                <li>• Love Is Respect — <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">loveisrespect.org</a></li>
-              </ul>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <ShredButton onShred={resetFlow} />
+                <Button variant="outline" onClick={resetFlow}>
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Start Over
+                </Button>
+                <Button asChild>
+                  <a href="/">Return Home</a>
+                </Button>
+              </div>
             </div>
+          )}
+        </div>
+      </main>
 
-            <div className="text-center py-4">
-              <p className="text-muted-foreground italic text-sm">
-                Thinking about this doesn't make you a bad person. It means you're trying to do better.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-6">
-              <ShredButton onShred={handleStartOver} />
-              <Button variant="outline" onClick={handleStartOver} className="w-full sm:w-auto">
-                Start Over
-              </Button>
-              <Button asChild className="w-full sm:w-auto">
-                <a href="/">Return Home</a>
-              </Button>
-            </div>
-          </div>
-          <div ref={messagesEndRef} />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  return null;
+      <Footer />
+    </div>
+  );
 };
 
 export default After;
