@@ -1,7 +1,7 @@
 # ito ("is this ok?") — Product Requirements Document (PRD)
 
-**Version:** 5.0  
-**Last Updated:** January 2026  
+**Version:** 5.1  
+**Last Updated:** February 2026  
 **Status:** Early Prototype / Exploratory  
 **Live URL:** https://ito.lovable.app
 
@@ -204,14 +204,36 @@ CREATE TABLE public.submissions (
   choice_value TEXT,                 -- Selected option ID
   freetext_value TEXT,               -- User's free text (if any)
   ai_response_summary TEXT,          -- Brief AI response summary
+  message_index INTEGER,             -- Position in conversation (for multi-turn)
   metadata JSONB,                    -- Additional context
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- RLS: Anonymous insert only, no read access
+-- RLS: Anonymous insert only, no client read access
 ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anonymous inserts" ON submissions FOR INSERT WITH CHECK (true);
--- SELECT restricted to service_role for admin review only
+
+-- Allow anonymous inserts (write-only for users)
+CREATE POLICY "Allow anonymous inserts" 
+  ON submissions FOR INSERT 
+  WITH CHECK (true);
+
+-- Restrict SELECT to service_role only (admin/analytics access)
+CREATE POLICY "Only service role can read submissions" 
+  ON submissions FOR SELECT 
+  TO service_role 
+  USING (true);
+
+-- Explicit DENY for anonymous users
+CREATE POLICY "Anonymous users cannot read submissions" 
+  ON submissions FOR SELECT 
+  TO anon 
+  USING (false);
+
+-- Explicit DENY for authenticated users  
+CREATE POLICY "Authenticated users cannot read submissions" 
+  ON submissions FOR SELECT 
+  TO authenticated 
+  USING (false);
 ```
 
 ---
@@ -323,9 +345,9 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 | `hold-hands` | Hold hands | 2 |
 | `kiss` | Kiss | 3 |
 | `make-out` | Make out | 4 |
-| `touch-over-clothes` | Touch over clothes | 5 |
-| `touch-under-clothes` | Touch under clothes | 6 |
-| `go-somewhere-private` | Go somewhere private | 7 |
+| `touch-over` | Touch over clothes | 5 |
+| `touch-under` | Touch under clothes | 6 |
+| `go-private` | Go somewhere private | 7 |
 | `have-sex` | Have sex | 8 (most intimate) |
 | `not-sure` | Not sure yet | N/A |
 
@@ -337,55 +359,57 @@ Primarily teenage boys (14-18) navigating dating/hookup situations for the first
 
 ### Phase 2: Contextual Reflection Steps
 
-**Step 0: Orientation**
-> "Where are you in this situation right now?"
+**Step 1: Orientation**
+> "What's the situation?"
 
 | ID | Label | Description |
 |----|-------|-------------|
 | `texting` | We're texting or messaging | Remote/async context |
 | `in-person` | We're together in person | Physical proximity |
-| `party-group` | We're at a party or group setting | Social context with others |
-| `already-happened` | Something already happened and I'm unsure | Post-event reflection |
-| `not-sure` | I'm not sure how to describe it | Unclear context |
+| `party-group` | We're at a party or with other people | Social context with others |
+| `already-happened` | Something already happened | Post-event reflection (triggers AfterHandoff) |
+| `not-sure` | I'm not sure | Unclear context |
 
-**Step 1: Observed Consent Signals**
-> "What have they been doing or saying?"
+**Step 2: Observed Consent Signals**
+> "What are they doing or saying?"
 
-Questions are dynamically contextualized with the selected move. Example:
-- Generic: "Are you confident the other person is comfortable?"
-- Contextualized: "Do they seem actually into this, or just going along with it?"
+Questions are dynamically contextualized with the selected move. Example for "kiss":
+- "They've said they want to kiss"
+- "They seem actually into it, not just going along"
 
-| ID | Label | Description |
-|----|-------|-------------|
-| `clear-yes` | Clearly saying yes or expressing interest in words | Explicit verbal consent |
-| `enthusiastic-actions` | Actively initiating or reciprocating | Non-verbal but active consent |
-| `mixed-signals` | Mixed or hard to read | Ambiguous signals |
-| `no-response` | Quiet or not responding | Absence of response |
-| `said-no` | Said no or pulled away | Clear refusal |
+| ID | Label (Contextualized) | Description |
+|----|------------------------|-------------|
+| `clear-yes` | They've said they want to [move] | Explicit verbal consent |
+| `enthusiastic-actions` | They seem actually into it, not just going along | Non-verbal but active consent |
+| `mixed-signals` | Hard to tell what they want | Ambiguous signals |
+| `no-response` | They're quiet or haven't really said anything | Absence of response |
+| `said-no` | They said no or pulled away | Clear refusal |
 
-**Step 2: Context Risk Factors**
-> "Anything here that might affect how clear consent is?" (Multi-select)
+**Step 3: Context Risk Factors**
+> "Is anything else going on?" (Multi-select, pick all that apply)
 
 | ID | Label |
 |----|-------|
-| `alcohol` | Alcohol or drugs involved |
-| `experience-gap` | One of us is much more experienced |
-| `age-imbalance` | Age or power imbalance |
-| `emotional-pressure` | Emotional pressure |
+| `alcohol` | Alcohol or drugs are involved |
+| `experience-gap` | One of us has done this more than the other |
+| `age-imbalance` | One of us is older or in charge |
+| `emotional-pressure` | Someone feels pressured |
 | `none` | None of these |
 
-**Step 3: Momentum Check**
-> "What direction does this feel like it's heading?"
+**Step 4: Momentum Check**
+> "Where is this going?"
 
-| ID | Label | Risk Mapping |
-|----|-------|--------------|
-| `toward-physical` | Toward something physical | Maps to physical intent risk weights |
-| `staying-flirty` | Staying flirty or emotional | Non-physical |
-| `slow-down` | I want to slow things down | Non-physical |
-| `dont-know` | I don't know | Non-physical |
+Options are dynamically contextualized with the selected move:
 
-**Step 4: Additional Context (Optional)**
-> "Anything else you want to add?"
+| ID | Label (Contextualized) | Risk Mapping |
+|----|------------------------|--------------|
+| `toward-physical` | Moving toward [move] | Maps to physical intent risk weights |
+| `staying-flirty` | Just flirting or vibing | Non-physical |
+| `slow-down` | I want to slow down | Non-physical |
+| `dont-know` | I'm not sure | Non-physical |
+
+**Step 5: Additional Context (Optional)**
+> "Anything else?"
 
 Free text input (max 800 characters). Subject to dual-layer flag detection.
 
@@ -977,6 +1001,14 @@ ito/
 ---
 
 ## 12. Changelog
+
+### v5.1 (February 2026)
+- **Step Copy Updates**: Simplified question labels ("What's the situation?", "What are they doing or saying?", "Is anything else going on?", "Where is this going?", "Anything else?")
+- **Contextualized Options**: Consent signals and momentum options now dynamically reference the selected move
+- **Move ID Cleanup**: Standardized move IDs (`touch-over`, `touch-under`, `go-private`)
+- **Database Security**: Enhanced RLS policies with explicit DENY rules for anon/authenticated SELECT
+- **MutualityGrounding**: Communication-focused check-in options for uncertainty (not tactical alternatives)
+- **AfterHandoff**: Triggers on "already-happened" orientation OR 2+ yellow/red outcomes in session
 
 ### v5.0 (January 2026)
 - **Moves + Ladder Architecture**: Three-phase flow replacing linear decision steps
