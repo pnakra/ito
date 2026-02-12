@@ -44,11 +44,9 @@ type FlowPhase =
 
 interface AnalysisData {
   riskLevel: RiskLevel;
-  assessment: string;
-  whatsHappening: string[];
-  whatNotToDo: string[];
-  whatToDoInstead: string[];
-  realTalk: string;
+  signalLabel: string;
+  why: string[];
+  suggestion: string;
 }
 
 // STEP 0: Orientation options
@@ -249,24 +247,20 @@ const Before = () => {
 
       setAnalysis({
         riskLevel: riskLevel,
-        assessment: data.assessment,
-        whatsHappening: data.whatsHappening,
-        whatNotToDo: data.whatNotToDo,
-        whatToDoInstead: data.whatToDoInstead,
-        realTalk: data.realTalk
+        signalLabel: data.signalLabel || "Check in with them",
+        why: data.why || [],
+        suggestion: data.suggestion || "",
       });
       
       // Log AI response summary
-      logAIResponse("before", "explanation", `Risk: ${riskLevel} - ${data.assessment?.slice(0, 100) || "Response generated"}`);
+      logAIResponse("before", "explanation", `Risk: ${riskLevel} - ${data.signalLabel || "Response generated"}`);
     } catch (error) {
       console.error("Error fetching explanation:", error);
       setAnalysis({
         riskLevel: riskLevel,
-        assessment: "We couldn't check this right now.",
-        whatsHappening: ["Something went wrong on our end"],
-        whatNotToDo: ["Don't keep going if you're not sure"],
-        whatToDoInstead: ["Ask them directly how they're feeling"],
-        realTalk: "When in doubt, slow down."
+        signalLabel: "Something went wrong",
+        why: ["We couldn't check this right now"],
+        suggestion: "When in doubt, slow down and check in verbally.",
       });
     } finally {
       setIsLoading(false);
