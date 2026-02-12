@@ -12,7 +12,7 @@ interface ContextInputProps {
 }
 
 const ContextInput = ({ value, onChange, onContinue, isActive }: ContextInputProps) => {
-  const maxLength = 800;
+  const maxLength = 2000;
 
   if (!isActive) return null;
 
