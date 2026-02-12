@@ -123,10 +123,10 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
             <Heart className="w-5 h-5 text-primary" />
             <h3 className="font-bold text-lg">What might they have experienced?</h3>
           </div>
-          <p className="text-xs text-muted-foreground/70 ml-7 -mt-1 mb-2">
-            This is based only on what you shared. Only they know how they actually feel.
-          </p>
           <p className="text-muted-foreground whitespace-pre-wrap ml-7">{results.otherPersonPerspective}</p>
+          <p className="text-[10px] text-muted-foreground/60 ml-7">
+            Based on what you shared. This is not a substitute for hearing from them directly.
+          </p>
         </div>
       )}
 
