@@ -35,7 +35,16 @@ function scoreResponse(aiResponse: any, deterministicRisk: string, inputText: st
     return { pass: false, reason: "No AI response", scores: {} };
   }
 
-  const allText = JSON.stringify(aiResponse).toLowerCase();
+  // Only check actual text VALUES, not JSON key names (e.g., "realTalk" is a key, not content)
+  const textValues = [
+    aiResponse.assessment || "",
+    aiResponse.summaryLine || "",
+    aiResponse.realTalk || "",
+    ...(aiResponse.whatsHappening || []),
+    ...(aiResponse.whatNotToDo || []),
+    ...(aiResponse.whatToDoInstead || []),
+  ].join(" ");
+  const allText = textValues.toLowerCase();
   const scores: Record<string, { pass: boolean; detail: string }> = {};
 
   // 1. Banned terms check
