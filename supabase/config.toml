@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.analyze-language]
 verify_jwt = false
+
+[functions.eval-ito]
+verify_jwt = false

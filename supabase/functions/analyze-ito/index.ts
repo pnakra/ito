@@ -31,49 +31,8 @@ const corsHeaders = {
 // 5. NEVER assume intent behind threats
 // =============================================================================
 
-const SYSTEM_PROMPT_LEGACY = `You are "is this ok?" You help people think through situations where they're not sure what's okay.
-
-CONTEXT: The person asking is trying to do the right thing. They're checking in because something feels unclear.
-
-TONE:
-- Talk like a calm friend, not a teacher
-- Use simple, short sentences
-- Say what to do, not what not to do
-- No lectures, no judgment, no scary language
-- 8th grade reading level
-- Avoid em dashes
-
-APPROACH:
-1. If something is unclear, say what info would help, but still give guidance
-
-2. Rate the situation:
-   - RED: There's a problem (they said no, they're drunk/high, not responding, you're showing up uninvited)
-   - YELLOW: Hard to tell (mixed signals, "maybe", unclear situation)
-   - GREEN: Looks okay (they started it, they're clearly into it, they said yes)
-
-3. Give advice based on THEIR specific situation, not general tips
-
-4. Think about:
-   - How the other person might be feeling
-   - Why this matters for the user
-   - What to actually do
-
-5. Keep it short: 3-4 short paragraphs
-
-IMPORTANT:
-- If RED: Be direct but calm. "This isn't going to work out. Here's why."
-- Never blame the other person
-- Never suggest ways to convince them
-
-RESPOND IN THIS EXACT JSON FORMAT:
-{
-  "riskLevel": "red" | "yellow" | "green",
-  "assessment": "2-3 sentence summary",
-  "whatsHappening": ["point 1", "point 2", "point 3"],
-  "whatNotToDo": ["don't do this 1", "don't do this 2", "don't do this 3"],
-  "whatToDoInstead": ["do this 1", "do this 2", "do this 3"],
-  "summaryLine": "One sentence, the main thing they need to hear"
-}`;
+// LEGACY PROMPT REMOVED — Phase 1 requires structured onboarding flow.
+// All requests must include precomputedRiskLevel from deterministic classifier.
 
 // Prompt for GREEN risk level - minimal, non-permissive
 const SYSTEM_PROMPT_GREEN = `You are "is this ok?" You help people think through situations where they're not sure what's okay.
@@ -247,25 +206,25 @@ serve(async (req) => {
       throw new Error("Service configuration error");
     }
 
-    // Use appropriate prompt based on flow type and risk level
-    const isDecisionFirstFlow = !!precomputedRiskLevel;
+    // Phase 1: Require precomputedRiskLevel — legacy freetext-only flow is deprecated
+    if (!precomputedRiskLevel || !["green", "yellow", "red"].includes(precomputedRiskLevel)) {
+      return new Response(
+        JSON.stringify({ error: "precomputedRiskLevel is required. Use the structured onboarding flow." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     let systemPrompt: string;
-    
-    if (!isDecisionFirstFlow) {
-      systemPrompt = SYSTEM_PROMPT_LEGACY;
-    } else if (precomputedRiskLevel === "green") {
+    if (precomputedRiskLevel === "green") {
       systemPrompt = SYSTEM_PROMPT_GREEN;
     } else if (precomputedRiskLevel === "yellow") {
       systemPrompt = SYSTEM_PROMPT_YELLOW;
     } else {
-      // RED - most restrictive prompt
       systemPrompt = SYSTEM_PROMPT_RED;
     }
     
-    // Build user message based on flow type
-    let userMessage: string;
-    if (isDecisionFirstFlow) {
-      userMessage = `RISK LEVEL (LOCKED - DO NOT CHANGE): ${precomputedRiskLevel.toUpperCase()}
+    // Build user message with locked risk level
+    const userMessage = `RISK LEVEL (LOCKED - DO NOT CHANGE): ${precomputedRiskLevel.toUpperCase()}
 
 USER SELECTIONS:
 ${scenario}
@@ -275,9 +234,6 @@ ${precomputedRiskLevel === "yellow" ? "This is a PAUSE situation. Explain uncert
 ${precomputedRiskLevel === "green" ? "Nothing concerning stood out. Do NOT give permission or approval. Just observe." : ""}
 
 Respond with ONLY the JSON, no other text.`;
-    } else {
-      userMessage = `SCENARIO: ${scenario}\n\nRespond with ONLY the JSON, no other text.`;
-    }
 
     const resp = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
