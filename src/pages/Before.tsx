@@ -62,7 +62,9 @@ const orientationOptions: StepOption[] = [
 
 // STEP 1: Consent signal options (observation-first) - contextualized with selected move
 const getConsentSignalOptions = (move: MoveType | null): StepOption[] => {
-  const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "this";
+  const moveLabel = move && move !== "not-sure"
+    ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase()
+    : "this";
   return [
     { id: "clear-yes", label: `They've said they want to ${moveLabel}`, description: "They used words like 'yes', 'I want to', or asked you to" },
     { id: "enthusiastic-actions", label: "They seem actually into it, not just going along", description: "Leaning in, touching you back, making eye contact, smiling" },
@@ -83,9 +85,11 @@ const contextFactorOptions: StepOption[] = [
 
 // STEP 3: Momentum check - contextualized
 const getMomentumOptions = (move: MoveType | null): StepOption[] => {
-  const moveLabel = move ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase() : "something";
+  const moveLabel = move && move !== "not-sure"
+    ? MOVE_OPTIONS.find(m => m.id === move)?.label.toLowerCase()
+    : null;
   return [
-    { id: "toward-physical", label: `I want to ${moveLabel}` },
+    { id: "toward-physical", label: moveLabel ? `I want to ${moveLabel}` : "I want to move forward physically" },
     { id: "staying-flirty", label: "Just flirting or vibing" },
     { id: "slow-down", label: "I want to slow down" },
     { id: "dont-know", label: "I'm not sure" }
