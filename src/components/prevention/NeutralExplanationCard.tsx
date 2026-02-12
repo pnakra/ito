@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { Loader2, Info, MessageCircle } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 
 interface NeutralAnalysisData {
-  assessment: string;
-  whatsHappening: string[];
-  realTalk: string;
+  signalLabel: string;
+  why: string[];
+  suggestion: string;
 }
 
 interface NeutralExplanationCardProps {
@@ -27,28 +27,25 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
   if (!analysis) return null;
 
   return (
-    <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300 border-border/50">
-      {/* Mandatory consent banner - always visible */}
+    <Card className="p-6 md:p-8 space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 border-border/50">
+      {/* Mandatory consent banner */}
       <div className="bg-muted/50 border border-border p-3 rounded-lg">
         <p className="text-xs text-muted-foreground text-center">
           The absence of a red flag is not the presence of consent. Only the other person can tell you what they want.
         </p>
       </div>
 
-      {/* Neutral header - no green, no approval */}
+      {/* Neutral header */}
       <div className="flex justify-center">
         <div className="bg-muted text-muted-foreground py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2">
           <Info className="w-4 h-4" />
-          No clear red flags right now
+          {analysis.signalLabel}
         </div>
       </div>
-      
-      {/* Core message - deliberately minimal */}
-      <p className="text-center text-muted-foreground">{analysis.assessment}</p>
 
-      {/* Key points - brief */}
+      {/* Why bullets */}
       <div className="space-y-2">
-        {analysis.whatsHappening.slice(0, 2).map((point, i) => (
+        {analysis.why.map((point, i) => (
           <p key={i} className="text-sm text-muted-foreground flex gap-2">
             <span>•</span>
             <span>{point}</span>
@@ -56,20 +53,16 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
         ))}
       </div>
 
-      {/* Consent reminder - always present */}
-      <div className="bg-muted/50 border border-border/50 p-4 rounded-lg">
-        <div className="flex items-center gap-2 mb-2">
-          <MessageCircle className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-muted-foreground">Keep in mind</span>
+      {/* The one suggestion */}
+      {analysis.suggestion && (
+        <div className="bg-muted/50 border border-border/50 p-4 rounded-lg">
+          <p className="text-sm text-muted-foreground">{analysis.suggestion}</p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Consent can change at any time. This isn't permission to keep going. If they hesitate, go quiet, or pull back, that's your cue to stop.
-        </p>
-      </div>
+      )}
 
-      {/* Self-interest angle - brief */}
+      {/* Consent reminder */}
       <p className="text-sm text-muted-foreground text-center italic">
-        {analysis.realTalk}
+        Consent can change at any time. If they hesitate, go quiet, or pull back, that's your cue to stop.
       </p>
     </Card>
   );
