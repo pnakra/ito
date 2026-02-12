@@ -77,7 +77,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
   const getNextLabel = (): string => {
     const next = getNextStep(currentStep);
     switch (next) {
-      case "perspective": return "How they might have felt";
+      case "perspective": return "What they might have experienced";
       case "patterns": return "Patterns to notice";
       case "accountability": return "What you can do now";
       case "forward": return "Going forward";
@@ -121,8 +121,11 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-lg">How they might have felt</h3>
+            <h3 className="font-bold text-lg">What might they have experienced?</h3>
           </div>
+          <p className="text-xs text-muted-foreground/70 ml-7 -mt-1 mb-2">
+            This is based only on what you shared. Only they know how they actually feel.
+          </p>
           <p className="text-muted-foreground whitespace-pre-wrap ml-7">{results.otherPersonPerspective}</p>
         </div>
       )}

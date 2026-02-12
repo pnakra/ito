@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import type { MoveType } from "./MoveSelection";
 
 interface MutualityGroundingProps {
@@ -8,37 +8,37 @@ interface MutualityGroundingProps {
   isActive: boolean;
 }
 
-// What mutual engagement looks like for different moves
-const MUTUALITY_SIGNALS: Partial<Record<MoveType, string[]>> = {
+// Questions to ask yourself — focused on their enthusiasm, not observable compliance
+const MUTUALITY_CHECKS: Partial<Record<MoveType, string[]>> = {
   "sit-closer": [
-    "They lean in too, not away",
-    "They don't put their bag between you",
-    "They seem comfortable, not stiff",
+    "Do they seem relaxed, or are they pulling away?",
+    "Are they choosing to stay close, or just not leaving?",
+    "Would they tell you if they were uncomfortable?",
   ],
   "hold-hands": [
-    "They hold back, not just let it happen",
-    "Their hand relaxes into yours",
-    "They don't pull away after a moment",
+    "Are they holding your hand back, or just letting it happen?",
+    "If you let go, would they reach for you again?",
+    "Have you asked if this is okay?",
   ],
   "kiss": [
-    "They lean in to meet you",
-    "They kiss back, not just receive",
-    "They don't freeze or go stiff",
+    "Are they leaning in too, or staying still?",
+    "Have you asked, or are you assuming?",
+    "Would they feel safe saying no right now?",
   ],
   "touch-over": [
-    "They're touching you back",
-    "Their body moves toward you, not away",
-    "They seem into it, not just tolerating it",
+    "Have you checked in with them verbally?",
+    "Are they actively responding, or just not stopping you?",
+    "Could they comfortably say 'stop' right now?",
   ],
   "touch-under": [
-    "They guide your hand or give clear signals",
-    "They're actively participating",
-    "Checking in feels natural, not awkward",
+    "Have you asked clearly before doing this?",
+    "Are they enthusiastic, or just going along with it?",
+    "If they went quiet, would you notice?",
   ],
   "have-sex": [
-    "Clear verbal enthusiasm from both people",
-    "Active participation, not just allowing",
-    "Either person can pause or stop anytime",
+    "Have you both talked about what you want?",
+    "Are they enthusiastic, not just willing?",
+    "Can either of you pause or stop without it being a problem?",
   ],
 };
 
@@ -70,22 +70,22 @@ const IN_BETWEEN_OPTIONS: Partial<Record<MoveType, string[]>> = {
 const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: MutualityGroundingProps) => {
   if (!isActive || !selectedMove || selectedMove === "not-sure") return null;
 
-  const mutualitySignals = MUTUALITY_SIGNALS[selectedMove];
+  const mutualityChecks = MUTUALITY_CHECKS[selectedMove];
   const inBetweenOptions = IN_BETWEEN_OPTIONS[selectedMove];
 
   return (
     <div className="space-y-4 animate-fade-in">
-      {/* Mutuality signals */}
-      {mutualitySignals && mutualitySignals.length > 0 && (
+      {/* Enthusiasm checks — interrogative, not observational */}
+      {mutualityChecks && mutualityChecks.length > 0 && (
         <Card className="p-5 border-border/30 bg-muted/10">
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            What this usually looks like when it's mutual
+            Ask yourself honestly
           </h3>
           <ul className="space-y-2">
-            {mutualitySignals.map((signal, idx) => (
+            {mutualityChecks.map((check, idx) => (
               <li key={idx} className="flex items-start gap-2 text-sm">
-                <Check className="w-4 h-4 mt-0.5 text-success shrink-0" />
-                <span>{signal}</span>
+                <HelpCircle className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
+                <span>{check}</span>
               </li>
             ))}
           </ul>

@@ -15,17 +15,16 @@ export type MoveType =
 export interface MoveOption {
   id: MoveType;
   label: string;
-  ladder: number; // Position on ladder 1-8
 }
 
 export const MOVE_OPTIONS: MoveOption[] = [
-  { id: "sit-closer", label: "Sit closer", ladder: 1 },
-  { id: "hold-hands", label: "Hold hands", ladder: 2 },
-  { id: "kiss", label: "Kiss", ladder: 3 },
-  { id: "touch-over", label: "Touch over clothes", ladder: 4 },
-  { id: "touch-under", label: "Touch under clothes", ladder: 5 },
-  { id: "have-sex", label: "Have sex", ladder: 6 },
-  { id: "not-sure", label: "Not sure yet", ladder: 0 },
+  { id: "sit-closer", label: "Sit closer" },
+  { id: "hold-hands", label: "Hold hands" },
+  { id: "kiss", label: "Kiss" },
+  { id: "touch-over", label: "Touch over clothes" },
+  { id: "touch-under", label: "Touch under clothes" },
+  { id: "have-sex", label: "Have sex" },
+  { id: "not-sure", label: "Not sure yet" },
 ];
 
 interface MoveSelectionProps {
