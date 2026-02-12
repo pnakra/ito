@@ -295,9 +295,12 @@ serve(async (req) => {
           sectionScores.hasPerspective = { pass: !!aiResponse.otherPersonPerspective?.trim(), detail: aiResponse.otherPersonPerspective ? "Present" : "MISSING" };
           sectionScores.hasAccountability = { pass: !!aiResponse.accountabilitySteps?.trim(), detail: aiResponse.accountabilitySteps ? "Present" : "MISSING" };
 
-          // No minimizing check
-          const minimizingPhrases = /\b(not\s*that\s*bad|overreact|no\s*big\s*deal|don'?t\s*worry|you'?re\s*fine|it'?s?\s*okay|wasn'?t\s*that\s*serious)\b/i;
-          sectionScores.noMinimizing = { pass: !minimizingPhrases.test(allText), detail: minimizingPhrases.test(allText) ? "MINIMIZING detected" : "Clean" };
+          // No minimizing check — "it's okay to feel..." is legitimate empathy, only flag "it's okay" when followed by behavior/action context
+          const minimizingPhrases = /\b(not\s*that\s*bad|overreact(ing)?|no\s*big\s*deal|don'?t\s*worry\s*about\s*it|you'?re\s*fine|wasn'?t\s*that\s*serious)\b/i;
+          // Match "it's okay" only when used to minimize — exclude "it's okay to feel..." (empathy) and "doesn't make it okay" / "not okay" (accountability)
+          const itsOkayMinimizing = /(?<!(doesn'?t|does not|don'?t|do not|not|isn'?t|is not|wasn'?t|was not|never)\s+(make\s+)?)(^|\s)it'?s?\s*okay(?!\s+to\s+(feel|be\s+(confused|worried|upset|scared|guilty|uncertain|unsure|anxious)))/i;
+          const hasMinimizing = minimizingPhrases.test(allText) || itsOkayMinimizing.test(allText);
+          sectionScores.noMinimizing = { pass: !hasMinimizing, detail: hasMinimizing ? "MINIMIZING detected" : "Clean" };
 
           // Merge with standard scores
           evaluation.scores = { ...evaluation.scores, ...sectionScores };
