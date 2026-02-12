@@ -8,37 +8,31 @@ interface MutualityGroundingProps {
   isActive: boolean;
 }
 
-// Questions to ask yourself — focused on their enthusiasm, not observable compliance
+// Direct checks — not hedged, not a checklist to game
 const MUTUALITY_CHECKS: Partial<Record<MoveType, string[]>> = {
   "sit-closer": [
-    "Do they seem relaxed, or are they pulling away?",
-    "Are they choosing to stay close, or just not leaving?",
-    "Would they tell you if they were uncomfortable?",
+    "Are they moving closer too, or just not leaving?",
+    "Not pulling away is not the same as wanting you there.",
   ],
   "hold-hands": [
-    "Are they holding your hand back, or just letting it happen?",
+    "Are they holding back, or just letting it happen?",
     "If you let go, would they reach for you again?",
-    "Have you asked if this is okay?",
   ],
   "kiss": [
-    "Are they leaning in too, or staying still?",
-    "Have you asked, or are you assuming?",
-    "Would they feel safe saying no right now?",
+    "Are they leaning in, or are you the only one moving?",
+    "Not stopping you is not the same as wanting it.",
   ],
   "touch-over": [
-    "Have you checked in with them verbally?",
-    "Are they actively responding, or just not stopping you?",
-    "Could they comfortably say 'stop' right now?",
+    "Are they responding, or just not stopping you?",
+    "Silence is not a yes. Have you actually asked?",
   ],
   "touch-under": [
-    "Have you asked clearly before doing this?",
-    "Are they enthusiastic, or just going along with it?",
-    "If they went quiet, would you notice?",
+    "Have you asked clearly? Not hinted. Asked.",
+    "Going along with it is not the same as wanting it.",
   ],
   "have-sex": [
-    "Have you both talked about what you want?",
-    "Are they enthusiastic, not just willing?",
-    "Can either of you pause or stop without it being a problem?",
+    "Are they enthusiastic, or just not saying no?",
+    "Can either of you stop without it being a problem?",
   ],
 };
 
@@ -79,7 +73,7 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
       {mutualityChecks && mutualityChecks.length > 0 && (
         <Card className="p-5 border-border/30 bg-muted/10">
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Ask yourself honestly
+            Be honest with yourself
           </h3>
           <ul className="space-y-2">
             {mutualityChecks.map((check, idx) => (
