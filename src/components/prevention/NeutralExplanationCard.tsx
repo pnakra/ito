@@ -10,9 +10,10 @@ interface NeutralAnalysisData {
 interface NeutralExplanationCardProps {
   analysis: NeutralAnalysisData | null;
   isLoading: boolean;
+  onComplete?: () => void;
 }
 
-const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardProps) => {
+const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExplanationCardProps) => {
   if (isLoading) {
     return (
       <Card className="p-8 animate-in fade-in duration-300 border-border/50">
@@ -25,6 +26,11 @@ const NeutralExplanationCard = ({ analysis, isLoading }: NeutralExplanationCardP
   }
 
   if (!analysis) return null;
+
+  // Auto-complete since content renders immediately
+  if (onComplete) {
+    setTimeout(onComplete, 100);
+  }
 
   return (
     <Card className="p-6 md:p-8 space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 border-border/50">

@@ -453,7 +453,7 @@ const Before = () => {
 
           {phase === "explanation" && (
             isNeutralRisk ? (
-              <NeutralExplanationCard analysis={analysis} isLoading={isLoading} />
+              <NeutralExplanationCard analysis={analysis} isLoading={isLoading} onComplete={() => setExplanationComplete(true)} />
             ) : (
               <AnimatedExplanationCard 
                 analysis={analysis} 
