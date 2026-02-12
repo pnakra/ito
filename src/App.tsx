@@ -10,8 +10,6 @@ import After from "./pages/After";
 // import HappenedToMe from "./pages/HappenedToMe";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
-// PWA install page - commented out for prototype
-// import Install from "./pages/Install";
 import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
@@ -31,8 +29,6 @@ const App = () => (
           {/* <Route path="/happened-to-me" element={<HappenedToMe />} /> */}
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
-          {/* PWA install page - commented out for prototype */}
-          {/* <Route path="/install" element={<Install />} /> */}
           <Route path="/demo" element={<Demo />} />
           {/* Legacy routes for backwards compatibility */}
           <Route path="/avoid-line" element={<Before />} />
