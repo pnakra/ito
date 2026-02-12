@@ -233,8 +233,8 @@ serve(async (req) => {
   }
 
   try {
-    const { posts, source, flowType } = await req.json();
-
+    const { posts, source, flowType, verbose } = await req.json();
+    const includeFullResponse = verbose === true;
     if (!Array.isArray(posts) || posts.length === 0) {
       return new Response(JSON.stringify({ error: "Provide array of { id, text, relevance } posts" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -313,6 +313,7 @@ serve(async (req) => {
               clarityCheck: aiResponse.clarityCheck?.slice(0, 200),
               accountabilitySteps: aiResponse.accountabilitySteps?.slice(0, 200),
             },
+            ...(includeFullResponse ? { fullResponse: aiResponse } : {}),
           });
         } catch (aiErr) {
           results.push({ id, title: title?.slice(0, 80), evaluation: { pass: false, failedChecks: ["ai_call_failed"], scores: {} }, error: aiErr.message });
@@ -360,6 +361,7 @@ serve(async (req) => {
               summaryLine: aiResponse.summaryLine?.slice(0, 150),
               actionCount: aiResponse.whatToDoInstead?.length ?? 0,
             },
+            ...(includeFullResponse ? { fullResponse: aiResponse } : {}),
           });
       } catch (aiErr) {
         results.push({
