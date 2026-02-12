@@ -1,7 +1,7 @@
 # Product Requirements Document: "Is This OK?"
 
-> **Version:** 1.0  
-> **Last Updated:** 2026-02-06  
+> **Version:** 2.0  
+> **Last Updated:** 2026-02-12  
 > **Status:** In Development  
 > **Classification:** Internal / Not for public distribution
 
@@ -100,6 +100,27 @@ To prevent shame, stigma, or clinical framing that could discourage use:
 
 ### 4.4 Risk Classification System
 
+#### Escalation Severity Model (0–3)
+
+Every scenario is classified into ONE level. Higher levels override lower levels. No blending.
+
+| Severity | UI Level | Triggers | Goal | Tone |
+|----------|----------|----------|------|------|
+| **Level 3** | RED | Ignoring "no", threats, authority exploit, age gap (minor/adult), blackmail, isolation, boundary violations | Encourage stopping, stepping away, seeking support | Direct, protective, firm |
+| **Level 2** | RED | Age imbalance among minors, repeated asking, intoxication, authority-adjacent, one person unsure, manipulation patterns | Strong slowdown, reinforce autonomy | Firm, not alarmist |
+| **Level 1** | YELLOW | Mixed signals, silence as consent, guessing interest, unclear pacing, momentum on assumption | Interrupt ambiguity before escalation | Calm, protective, neutral |
+| **Level 0** | GREEN | No pressure, no imbalance, explicit mutual communication, reciprocal consent | Encourage continued explicit communication | Calm and steady |
+
+#### Strict Interpretation Hierarchy
+
+When analyzing, evaluate in this order (higher overrides lower):
+1. Authority or adult/minor dynamics
+2. Clear boundary violations
+3. Pressure or manipulation
+4. Power imbalance
+5. Ambiguity in consent signals
+6. User uncertainty
+
 #### Dual-Layer Approach
 
 **Layer 1: Deterministic Regex (Frontend)**
@@ -118,13 +139,13 @@ const HARD_RED_PATTERNS = [
 - AI provides context and guidance within locked constraints
 - AI cannot downgrade risk level
 
-#### Risk Levels
+#### UI Risk Levels
 
 | Level | Visual | Behavior |
 |-------|--------|----------|
-| **RED** | Stop sign, urgent tone | Mandatory Stop Moment, single suggestion max |
-| **YELLOW** | Pause indicator | Dismissible Stop Moment, explain uncertainty |
-| **GREEN** | "No flags detected" + HelpCircle | Minimal response, explicit non-permission |
+| **RED** (Level 2–3) | "Hard Stop" badge, urgent tone | Mandatory Stop Moment, single suggestion max |
+| **YELLOW** (Level 1) | "Pause & Check" badge | Dismissible Stop Moment, explain uncertainty |
+| **GREEN** (Level 0) | "Check in with them" + Info icon | Minimal response, explicit non-permission |
 
 ### 4.5 Stop Moments
 
@@ -153,27 +174,40 @@ Enforced pauses that require user acknowledgment before continuing.
 
 #### Risk-Stratified System Prompts
 
-The system uses **three separate prompts** based on pre-computed risk level:
+The system uses **three separate prompts** based on pre-computed risk level. Each prompt enforces the Escalation Severity Model and a mandatory harm-minimization check.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  SYSTEM_PROMPT_GREEN                                     │
-│  - Minimal response, no permission language              │
-│  - Reminder: consent can be withdrawn anytime            │
-│  - No "sounds healthy" or "you're good"                  │
+│  SYSTEM_PROMPT_GREEN (Level 0)                           │
+│  - Compact format: signalLabel + why + suggestion        │
+│  - No permission language, no reassurance                │
+│  - Anchor to clarity and continued communication         │
+│  - Harm-minimization check before responding             │
 ├─────────────────────────────────────────────────────────┤
-│  SYSTEM_PROMPT_YELLOW                                    │
-│  - Explain uncertainty from user's inputs only           │
-│  - Do NOT add concerns they didn't mention               │
+│  SYSTEM_PROMPT_YELLOW (Level 1)                          │
+│  - Compact format: signalLabel + why + suggestion        │
+│  - Interrupt ambiguity, do NOT reassure                  │
+│  - Anti-coaching: no advice on escalating touch          │
 │  - Explicit rules for silence/intoxication/past consent  │
+│  - Harm-minimization check before responding             │
 ├─────────────────────────────────────────────────────────┤
-│  SYSTEM_PROMPT_RED                                       │
-│  - INTERRUPT, don't coach                                │
-│  - At most ONE actionable suggestion                     │
-│  - No "both sides" framing                               │
+│  SYSTEM_PROMPT_RED (Level 2–3)                           │
+│  - Compact format: signalLabel + why + suggestion        │
+│  - INTERRUPT, don't coach — at most ONE suggestion       │
+│  - No "both sides" framing, no softening                 │
 │  - Self-harm: redirect without labeling                  │
+│  - Harm-minimization check before responding             │
 └─────────────────────────────────────────────────────────┘
 ```
+
+#### Output Contract (Strict)
+
+All AI responses follow a compact format with a maximum of **120 words total**:
+- **Signal Label**: e.g., "Serious concern", "Uncertainty detected", "Check in with them"
+- **Why**: 1–2 bullets naming the key detected dynamics (explicitly naming power roles if present)
+- **Suggestion**: Exactly one behavioral suggestion (or none for RED if stopping is the only answer)
+
+Constraints: No multi-step advice. No therapy framing. No moralizing. No hedging contradictions. Tone scales with severity.
 
 #### Input-Only Focus
 
@@ -304,14 +338,16 @@ Verified that onboarding context **never causes unsafe downgrades**:
 ### 8.2 Response Schema
 
 ```typescript
-interface ITOResponse {
-  riskLevel: "red" | "yellow" | "green";
-  assessment: string;           // 2-3 sentence summary
-  whatsHappening: string[];     // Observations from input
-  whatNotToDo: string[];        // "Instead of [behavior]"
-  whatToDoInstead: string[];    // "Try [action]"
-  summaryLine: string;          // One-sentence takeaway
+// Compact output contract (Before flow)
+interface ITOCompactResponse {
+  signalLabel: string;    // e.g., "Serious concern", "Uncertainty detected", "Check in with them"
+  why: string[];           // 1–2 bullets naming detected dynamics
+  suggestion: string;      // Exactly one behavioral suggestion (max 120 words total)
 }
+
+// Risk level is pre-computed by the deterministic frontend classifier
+// and passed to the AI as a locked constraint — AI cannot change it
+type RiskLevel = "red" | "yellow" | "green";
 ```
 
 ### 8.3 Frontend Components
@@ -383,6 +419,7 @@ interface ITOResponse {
 // 7. NO judgment labels ("manipulation," "toxic," "red flag") - describe dynamics
 // 8. Self-harm threats: redirect to crisis resources, don't dismiss
 // 9. BANNED phrases: "Real talk," "Classic tactic," "Everyone knows"
+// 10. Maximum 120 words total. Exactly one behavioral suggestion. No multi-step advice.
 // =============================================================================
 ```
 
