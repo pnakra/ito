@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.eval-ito]
 verify_jwt = false
+
+[functions.eval-batch]
+verify_jwt = false
