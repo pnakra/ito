@@ -177,11 +177,16 @@ Remember: Respond with ONLY the JSON, no other text.`;
       if (resp.ok) break;
 
       // Retry on transient errors (overloaded, server errors)
-      if ([529, 500, 502, 503].includes(resp.status) && attempt < MAX_RETRIES - 1) {
-        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
-        console.warn(`Anthropic returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
-        await new Promise(r => setTimeout(r, delay));
-        continue;
+      if ([529, 500, 502, 503].includes(resp.status)) {
+        if (attempt < MAX_RETRIES - 1) {
+          const delay = Math.pow(2, attempt) * 1000;
+          console.warn(`Anthropic returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+        // Final attempt also transient — fall through to 503 below
+        console.error(`Anthropic returned ${resp.status} on final attempt`);
+        break;
       }
 
       if (resp.status === 429) {
