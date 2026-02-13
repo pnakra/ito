@@ -112,14 +112,16 @@ serve(async (req) => {
       );
     }
 
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) {
-      console.error("ANTHROPIC_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
       throw new Error("Service configuration error");
     }
 
-    // Build messages array for Claude
-    const messages: Message[] = [];
+    // Build messages array (OpenAI format — system + conversation)
+    const messages: Array<{ role: string; content: string }> = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
     
     // Add initial context as first user message if this is the first follow-up
     if (conversationHistory.length === 0 && initialContext) {
@@ -141,18 +143,16 @@ serve(async (req) => {
     // Add current message
     messages.push({ role: "user", content: message });
 
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 400, // Keep responses short
-        system: SYSTEM_PROMPT,
+        model: "google/gemini-2.5-flash",
         messages,
+        max_tokens: 400,
       }),
     });
 
@@ -163,8 +163,14 @@ serve(async (req) => {
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      if (resp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       const t = await resp.text();
-      console.error("Anthropic API error:", resp.status, t);
+      console.error("AI gateway error:", resp.status, t);
       return new Response(JSON.stringify({ error: "AI API error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -172,7 +178,7 @@ serve(async (req) => {
     }
 
     const data = await resp.json();
-    const responseText = data?.content?.[0]?.text ?? "";
+    const responseText = data?.choices?.[0]?.message?.content ?? "";
 
     return new Response(JSON.stringify({ response: responseText.trim() }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
