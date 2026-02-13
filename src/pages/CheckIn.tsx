@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
@@ -54,7 +55,10 @@ interface AfterAnalysisData {
 }
 
 const CheckIn = () => {
-  const [phase, setPhase] = useState<FlowPhase>("narrative-input");
+  const [searchParams] = useSearchParams();
+  const [phase, setPhase] = useState<FlowPhase>(
+    searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
+  );
   
   // Cumulative narrative context — NEVER reset, only append
   const [narrativeHistory, setNarrativeHistory] = useState<string[]>([]);

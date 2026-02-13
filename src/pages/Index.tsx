@@ -32,19 +32,13 @@ const Index = () => {
 
           <main className="flex-1">
             {/* Hero Section */}
-            <section className="container mx-auto px-4 py-12 sm:py-20 text-center">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold mb-3 text-foreground px-2 min-h-[1.2em]">
+            <section className="container mx-auto px-4 py-16 sm:py-24 text-center">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-10 text-foreground px-2 min-h-[1.2em]">
                 <TypewriterText text="is this ok?" delay={80} onComplete={() => setHeadlineComplete(true)} />
               </h1>
-              <p
-                className={`text-base sm:text-lg text-muted-foreground mb-8 max-w-md mx-auto px-2 transition-opacity duration-300 ${headlineComplete ? "opacity-100" : "opacity-0"}`}
-              >
-                For when you want to stop and think through confusing situations.
-              </p>
 
-              {/* Three Main Tiles */}
-              <div className="grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 mb-6">
-                {/* Primary: Unified narrative entry */}
+              <div className="max-w-xl mx-auto px-1 sm:px-0 space-y-6">
+                {/* Primary CTA */}
                 <Link
                   to="/check-in"
                   className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-primary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
@@ -54,29 +48,22 @@ const Index = () => {
                     <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
                       Something's on my mind
                     </h2>
-                    <p className="text-muted-foreground text-sm">Tell us what's going on. We'll help you think it through.</p>
+                    <p className="text-muted-foreground text-sm">Stop and think through a confusing situation.</p>
                   </div>
                   <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
                 </Link>
 
-                {/* Legacy tiles — smaller, secondary */}
-                <div className="grid grid-cols-2 gap-3">
+                {/* Guided mode nudge */}
+                <div
+                  className={`text-center ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+                  style={{ animationDelay: "150ms", animationFillMode: "both" }}
+                >
+                  <p className="text-sm text-muted-foreground mb-2">Not sure where to start?</p>
                   <Link
-                    to="/before"
-                    className={`group bg-card border border-border/50 rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-                    style={{ animationDelay: "100ms", animationFillMode: "both" }}
+                    to="/check-in?mode=guided"
+                    className="text-sm text-primary underline underline-offset-2 hover:no-underline"
                   >
-                    <h3 className="text-sm font-medium mb-0.5 text-foreground">Before</h3>
-                    <p className="text-muted-foreground text-xs">Guided questions</p>
-                  </Link>
-
-                  <Link
-                    to="/after"
-                    className={`group bg-card border border-border/50 rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-                    style={{ animationDelay: "200ms", animationFillMode: "both" }}
-                  >
-                    <h3 className="text-sm font-medium mb-0.5 text-foreground">After</h3>
-                    <p className="text-muted-foreground text-xs">Something happened</p>
+                    Answer some guided questions first
                   </Link>
                 </div>
               </div>
