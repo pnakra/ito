@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
 import GuidedMode from "@/components/narrative/GuidedMode";
+import SignalFloor from "@/components/narrative/SignalFloor";
 import AdaptiveFollowUp from "@/components/narrative/AdaptiveFollowUp";
 import StopMoment from "@/components/prevention/StopMoment";
 import AnimatedExplanationCard from "@/components/prevention/AnimatedExplanationCard";
@@ -24,10 +25,12 @@ import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
+import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
 
 type FlowPhase =
   | "narrative-input"
   | "guided-mode"
+  | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
   | "explanation"
@@ -62,6 +65,9 @@ const CheckIn = () => {
   
   // Cumulative narrative context — NEVER reset, only append
   const [narrativeHistory, setNarrativeHistory] = useState<string[]>([]);
+  
+  // Structured signals collected from signal floor or guided mode
+  const [structuredSignals, setStructuredSignals] = useState<StructuredSignals>({});
   
   // High-water-mark risk — can only stay same or increase
   const [riskHighWaterMark, setRiskHighWaterMark] = useState<RiskLevel>("green");
@@ -107,7 +113,6 @@ const CheckIn = () => {
 
   // Run safety classification on cumulative text
   const runSafetyClassification = useCallback((text: string) => {
-    // Map narrative to decision state for classifyRisk()
     const gapResult = detectGaps(text);
     const decisionState = narrativeToDecisionState(text, gapResult.detectedTiming);
     const result = classifyRisk(decisionState);
@@ -119,7 +124,57 @@ const CheckIn = () => {
     return { riskResult: result, gapResult, decisionState };
   }, [updateRiskLevel]);
 
-  // Handle initial narrative submission
+  // Resolve effective timing from structured signals + text detection
+  const resolveEffectiveTiming = useCallback((signals: StructuredSignals, textTiming: "before" | "after" | "unclear") => {
+    // Structured signal takes priority over text detection
+    if (signals.timing === "already-happened") return "after";
+    if (signals.timing === "deciding") return "before";
+    return textTiming;
+  }, []);
+
+  // Process after signal floor or guided mode signals are collected
+  const proceedWithSignals = useCallback((
+    cumulativeText: string,
+    signals: StructuredSignals,
+    riskResult: { level: RiskLevel; stopMessage: string; flaggedWords?: string[] },
+    gapResult: ReturnType<typeof detectGaps>
+  ) => {
+    const hasFlaggedWords = (riskResult.flaggedWords?.length ?? 0) > 0;
+    
+    // Check for immediate refusal
+    if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
+      recordRun(riskResult.level, hasFlaggedWords);
+      setPhase("refusal");
+      return;
+    }
+    
+    recordRun(riskResult.level, hasFlaggedWords);
+    
+    // Filter out gaps that structured signals already answered
+    const remainingGaps = gapResult.gaps.filter(gap => {
+      if (gap.id === "timing" && signals.timing) return false;
+      if (gap.id === "age" && (signals.ageUser || signals.ageOther)) return false;
+      return true;
+    });
+    
+    // If still missing critical context and safety allows, ask follow-ups
+    if (remainingGaps.length > 0 && !gapResult.hasMinimumSafetyContext && riskResult.level !== "red") {
+      setGaps(remainingGaps);
+      setPhase("follow-up-questions");
+      return;
+    }
+    
+    // Safety gate
+    if (riskResult.level === "red" || riskResult.level === "yellow") {
+      setPhase("stop-moment");
+      return;
+    }
+    
+    const effectiveTiming = resolveEffectiveTiming(signals, gapResult.detectedTiming);
+    fetchExplanation(cumulativeText, riskResult.level, effectiveTiming);
+  }, [coercivePatternCount, recordRun, resolveEffectiveTiming]);
+
+  // Handle initial narrative submission — go to signal floor
   const handleNarrativeSubmit = (text: string) => {
     logFreetext("before", "narrative-input", text);
     
@@ -127,39 +182,94 @@ const CheckIn = () => {
     setNarrativeHistory(newHistory);
     
     const cumulativeText = newHistory.join("\n\n");
-    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
+    const { riskResult: result } = runSafetyClassification(cumulativeText);
     
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     
-    // Check for immediate refusal (coercive pattern repeat)
+    // Immediate refusal for repeat coercive patterns
     if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(result.level, hasFlaggedWords);
       setPhase("refusal");
       return;
     }
     
+    // Immediate red from deterministic triggers — skip signal floor, go to stop moment
+    if (result.level === "red") {
+      recordRun(result.level, hasFlaggedWords);
+      setPhase("stop-moment");
+      return;
+    }
+    
+    // For non-red: show signal floor to collect structured context
+    setPhase("signal-floor");
+  };
+
+  // Handle signal floor submission
+  const handleSignalFloorSubmit = (signals: StructuredSignals) => {
+    setStructuredSignals(signals);
+    
+    // Serialize signals and append to narrative
+    const signalText = serializeSignals(signals);
+    const newHistory = signalText ? [...narrativeHistory, signalText] : [...narrativeHistory];
+    setNarrativeHistory(newHistory);
+    
+    logChoice("before", "signal-floor", JSON.stringify(signals));
+    
+    const cumulativeText = newHistory.join("\n\n");
+    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
+    
+    // Update timing from structured signal
+    if (signals.timing === "already-happened") setDetectedTiming("after");
+    else if (signals.timing === "deciding") setDetectedTiming("before");
+    
+    proceedWithSignals(cumulativeText, signals, result, gapResult);
+  };
+
+  // Handle signal floor skip
+  const handleSignalFloorSkip = () => {
+    const cumulativeText = getCumulativeText();
+    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
+    
+    const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     recordRun(result.level, hasFlaggedWords);
     
-    // If we have gaps and safety allows, ask follow-ups first
-    if (gapResult.gaps.length > 0 && !gapResult.hasMinimumSafetyContext && result.level !== "red") {
-      setGaps(gapResult.gaps);
+    // Confidence-aware clarification: ask the single highest-priority missing signal
+    const topMissing = getTopMissingSignal(structuredSignals);
+    if (topMissing && result.level !== "red") {
+      // Generate a single clarification gap for the most important missing signal
+      const clarificationGap: DetectedGap = getClarificationGap(topMissing);
+      setGaps([clarificationGap]);
       setPhase("follow-up-questions");
       return;
     }
     
-    // Safety gate: stop moment for red/yellow
     if (result.level === "red" || result.level === "yellow") {
       setPhase("stop-moment");
       return;
     }
     
-    // Green: go straight to explanation
-    fetchExplanation(cumulativeText, result.level, gapResult.detectedTiming);
+    fetchExplanation(cumulativeText, result.level, detectedTiming);
+  };
+
+  // Handle guided mode submission (already includes structured signals)
+  const handleGuidedSubmit = (text: string, signals: StructuredSignals) => {
+    logFreetext("before", "guided-mode", text);
+    setStructuredSignals(signals);
+    
+    const newHistory = [...narrativeHistory, text];
+    setNarrativeHistory(newHistory);
+    
+    const cumulativeText = newHistory.join("\n\n");
+    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
+    
+    if (signals.timing === "already-happened") setDetectedTiming("after");
+    else if (signals.timing === "deciding") setDetectedTiming("before");
+    
+    proceedWithSignals(cumulativeText, signals, result, gapResult);
   };
 
   // Handle follow-up question answers
   const handleFollowUpAnswers = (answers: Record<string, string>) => {
-    // Append answers to narrative history
     const answerLines = Object.entries(answers)
       .filter(([, v]) => v.trim())
       .map(([key, value]) => {
@@ -173,7 +283,6 @@ const CheckIn = () => {
       const newHistory = [...narrativeHistory, answerLines];
       setNarrativeHistory(newHistory);
       
-      // Re-run safety on cumulative context
       const cumulativeText = newHistory.join("\n\n");
       const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
       
@@ -185,9 +294,9 @@ const CheckIn = () => {
         return;
       }
       
-      fetchExplanation(cumulativeText, result.level, gapResult.detectedTiming);
+      const effectiveTiming = resolveEffectiveTiming(structuredSignals, gapResult.detectedTiming);
+      fetchExplanation(cumulativeText, result.level, effectiveTiming);
     } else {
-      // Skipped all questions — proceed with what we have
       handleFollowUpSkip();
     }
   };
@@ -201,13 +310,15 @@ const CheckIn = () => {
       return;
     }
     
-    fetchExplanation(cumulativeText, effectiveRisk, detectedTiming);
+    const effectiveTiming = resolveEffectiveTiming(structuredSignals, detectedTiming);
+    fetchExplanation(cumulativeText, effectiveRisk, effectiveTiming);
   };
 
   // Handle stop moment acknowledgment
   const handleStopMomentAcknowledge = () => {
     const cumulativeText = getCumulativeText();
-    fetchExplanation(cumulativeText, riskHighWaterMark, detectedTiming);
+    const effectiveTiming = resolveEffectiveTiming(structuredSignals, detectedTiming);
+    fetchExplanation(cumulativeText, riskHighWaterMark, effectiveTiming);
   };
 
   // Fetch AI explanation
@@ -224,6 +335,7 @@ const CheckIn = () => {
           precomputedRiskLevel: riskLevel,
           detectedTiming: timing,
           isFollowUp: narrativeHistory.length > 1,
+          structuredSignals,
         }
       });
 
@@ -272,19 +384,17 @@ const CheckIn = () => {
     setPhase("follow-up-chat");
   };
 
-  // Follow-up chat — iterative advice with cumulative context
+  // Follow-up chat
   const handleFollowUpSubmit = async (message: string) => {
     const userMessage = { role: "user" as const, content: message };
     setChatMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
-    // Append to narrative history for cumulative context
     const newHistory = [...narrativeHistory, message];
     setNarrativeHistory(newHistory);
     
-    // Re-run safety on cumulative text
     const cumulativeText = newHistory.join("\n\n");
-    const { riskResult: result } = runSafetyClassification(cumulativeText);
+    runSafetyClassification(cumulativeText);
     
     logFreetext("before", "follow-up", message);
     
@@ -294,7 +404,7 @@ const CheckIn = () => {
           message,
           conversationHistory: chatMessages,
           initialContext: cumulativeText,
-          riskLevel: riskHighWaterMark, // Always use high-water-mark
+          riskLevel: riskHighWaterMark,
         }
       });
 
@@ -325,6 +435,7 @@ const CheckIn = () => {
   const resetFlow = () => {
     setPhase("narrative-input");
     setNarrativeHistory([]);
+    setStructuredSignals({});
     setRiskHighWaterMark("green");
     setRiskResult(null);
     setDetectedTiming("unclear");
@@ -350,7 +461,8 @@ const CheckIn = () => {
         <div className="max-w-2xl mx-auto space-y-6">
           {phase !== "narrative-input" && phase !== "guided-mode" ? (
             <BackButton label="Back" onClick={() => {
-              if (phase === "follow-up-questions") setPhase("narrative-input");
+              if (phase === "signal-floor") setPhase("narrative-input");
+              else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
               else resetFlow();
             }} />
@@ -374,13 +486,23 @@ const CheckIn = () => {
           {/* Phase 1b: Guided Mode */}
           {phase === "guided-mode" && (
             <GuidedMode
-              onSubmit={handleNarrativeSubmit}
+              onSubmit={handleGuidedSubmit}
               onBack={() => setPhase("narrative-input")}
               isLoading={isLoading}
             />
           )}
 
-          {/* Phase 2: Adaptive Follow-Up Questions */}
+          {/* Phase 2: Signal Floor */}
+          {phase === "signal-floor" && (
+            <SignalFloor
+              onSubmit={handleSignalFloorSubmit}
+              onSkip={handleSignalFloorSkip}
+              isLoading={isLoading}
+              detectedTiming={detectedTiming}
+            />
+          )}
+
+          {/* Phase 3: Adaptive Follow-Up Questions */}
           {phase === "follow-up-questions" && (
             <AdaptiveFollowUp
               gaps={gaps}
@@ -477,5 +599,43 @@ const CheckIn = () => {
     </div>
   );
 };
+
+// Helper: generate a clarification gap for the highest-priority missing signal
+function getClarificationGap(missing: "timing" | "age" | "physical" | "intent"): DetectedGap {
+  switch (missing) {
+    case "timing":
+      return {
+        id: "timing-clarification",
+        category: "clarification",
+        question: "Quick question before I answer — did this already happen, or are you deciding what to do?",
+        priority: 1,
+        safetyRelevant: true,
+      };
+    case "age":
+      return {
+        id: "age-clarification",
+        category: "age",
+        question: "How old are you both, roughly? This helps me give better advice.",
+        priority: 2,
+        safetyRelevant: true,
+      };
+    case "physical":
+      return {
+        id: "physical-clarification",
+        category: "clarification",
+        question: "Has anything physical happened, or is this about something else?",
+        priority: 3,
+        safetyRelevant: true,
+      };
+    case "intent":
+      return {
+        id: "intent-clarification",
+        category: "clarification",
+        question: "What are you hoping to figure out?",
+        priority: 4,
+        safetyRelevant: false,
+      };
+  }
+}
 
 export default CheckIn;
