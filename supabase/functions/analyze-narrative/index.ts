@@ -111,9 +111,9 @@ serve(async (req) => {
       );
     }
 
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) {
-      console.error("ANTHROPIC_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
       throw new Error("Service configuration error");
     }
 
@@ -131,8 +131,10 @@ serve(async (req) => {
       : precomputedRiskLevel === "yellow" ? "Level 1 (UNCERTAINTY)" 
       : "Level 0 (NO ESCALATION)";
 
-    // Build messages
-    const messages: Array<{ role: string; content: string }> = [];
+    // Build messages (OpenAI format)
+    const messages: Array<{ role: string; content: string }> = [
+      { role: "system", content: systemPrompt },
+    ];
 
     // Add conversation history for iterative advice
     if (isFollowUp && conversationHistory?.length > 0) {
@@ -141,7 +143,7 @@ serve(async (req) => {
       }
     }
 
-    let userMessage = `SEVERITY: ${severityLabel} (LOCKED — DO NOT CHANGE)
+    const userMessage = `SEVERITY: ${severityLabel} (LOCKED — DO NOT CHANGE)
 
 USER'S NARRATIVE (in their own words):
 ${narrativeText}
@@ -159,33 +161,30 @@ Remember: Respond with ONLY the JSON, no other text.`;
     const MAX_RETRIES = 3;
     let resp: Response | null = null;
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      resp = await fetch("https://api.anthropic.com/v1/messages", {
+      resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01",
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 600,
-          system: systemPrompt,
+          model: "google/gemini-2.5-flash",
           messages,
+          max_tokens: 600,
         }),
       });
 
       if (resp.ok) break;
 
-      // Retry on transient errors (overloaded, server errors)
-      if ([529, 500, 502, 503].includes(resp.status)) {
+      // Retry on transient errors
+      if ([500, 502, 503].includes(resp.status)) {
         if (attempt < MAX_RETRIES - 1) {
           const delay = Math.pow(2, attempt) * 1000;
-          console.warn(`Anthropic returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+          console.warn(`AI gateway returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
           await new Promise(r => setTimeout(r, delay));
           continue;
         }
-        // Final attempt also transient — fall through to 503 below
-        console.error(`Anthropic returned ${resp.status} on final attempt`);
+        console.error(`AI gateway returned ${resp.status} on final attempt`);
         break;
       }
 
@@ -196,8 +195,15 @@ Remember: Respond with ONLY the JSON, no other text.`;
         );
       }
 
+      if (resp.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       const t = await resp.text();
-      console.error("Anthropic API error:", resp.status, t);
+      console.error("AI gateway error:", resp.status, t);
       return new Response(JSON.stringify({ error: "AI API error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -212,10 +218,11 @@ Remember: Respond with ONLY the JSON, no other text.`;
     }
 
     const data = await resp.json();
-    const raw = data?.content?.[0]?.text ?? "";
+    const raw = data?.choices?.[0]?.message?.content ?? "";
 
     const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
     if (!match) {
+      console.error("Failed to parse AI response:", raw);
       throw new Error("Failed to parse AI response");
     }
 
