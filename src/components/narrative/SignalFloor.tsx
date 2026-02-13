@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,29 +15,25 @@ import {
   PHYSICAL_STAGE_OPTIONS,
   AGE_BAND_OPTIONS,
   INTENT_OPTIONS,
-  RELATIONSHIP_OPTIONS,
-  serializeSignals,
 } from "@/types/signals";
 
-interface GuidedModeProps {
-  onSubmit: (text: string, signals: StructuredSignals) => void;
-  onBack: () => void;
+interface SignalFloorProps {
+  onSubmit: (signals: StructuredSignals) => void;
+  onSkip: () => void;
   isLoading: boolean;
+  /** Whether the narrative is future-oriented (detected from text) */
+  detectedTiming?: "before" | "after" | "unclear";
 }
 
-const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
-  // Structured signals
-  const [timing, setTiming] = useState("");
-  const [relationship, setRelationship] = useState("");
+const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloorProps) => {
+  const [timing, setTiming] = useState<string>(
+    detectedTiming === "after" ? "already-happened" :
+    detectedTiming === "before" ? "deciding" : ""
+  );
   const [physicalStage, setPhysicalStage] = useState<string[]>([]);
   const [ageUser, setAgeUser] = useState("");
   const [ageOther, setAgeOther] = useState("");
   const [intent, setIntent] = useState("");
-
-  // Free text
-  const [whatHappened, setWhatHappened] = useState("");
-  const [worried, setWorried] = useState("");
-  const maxLength = 2000;
 
   const togglePhysical = (value: string) => {
     setPhysicalStage(prev =>
@@ -51,49 +46,28 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
   const handleSubmit = () => {
     const signals: StructuredSignals = {};
     if (timing) signals.timing = timing as StructuredSignals["timing"];
-    if (relationship) signals.relationship = relationship;
     if (physicalStage.length > 0) signals.physicalStage = physicalStage;
     if (ageUser) signals.ageUser = ageUser;
     if (ageOther) signals.ageOther = ageOther;
     if (intent) signals.intent = intent;
-
-    // Build narrative from free text + serialized signals
-    const parts: string[] = [];
-    if (whatHappened.trim()) parts.push(whatHappened.trim());
-    if (worried.trim()) parts.push(`What I'm worried about: ${worried.trim()}`);
-
-    const signalText = serializeSignals(signals);
-    if (signalText) parts.push(signalText);
-
-    const narrative = parts.join("\n\n");
-    if (narrative.trim()) {
-      onSubmit(narrative, signals);
-    }
+    onSubmit(signals);
   };
 
-  const hasContent = whatHappened.trim() || worried.trim() || timing || physicalStage.length > 0;
   const isFutureOriented = timing === "deciding";
+  const physicalLabel = isFutureOriented
+    ? "What are you thinking about?"
+    : "Has anything physical happened?";
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to free write
-      </button>
+    <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <h2 className="text-lg sm:text-xl font-semibold text-center mb-1">
+        A couple quick things that help me be more accurate
+      </h2>
+      <p className="text-muted-foreground text-center mb-6 text-sm">
+        Skip if you want — these just make the advice better.
+      </p>
 
-      <Card className="p-6 md:p-8 space-y-6">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-center mb-2">
-            Let's walk through it
-          </h2>
-          <p className="text-muted-foreground text-center text-sm">
-            Answer what feels right. These help me give you better advice.
-          </p>
-        </div>
-
+      <div className="space-y-5">
         {/* 1. Timing */}
         <div className="space-y-2">
           <label className="text-sm font-medium">
@@ -120,40 +94,9 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 2. Relationship */}
+        {/* 2. Physical stage (multi-select) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Who's the other person?</label>
-          <Select value={relationship} onValueChange={setRelationship} disabled={isLoading}>
-            <SelectTrigger>
-              <SelectValue placeholder="This helps me understand the situation" />
-            </SelectTrigger>
-            <SelectContent>
-              {RELATIONSHIP_OPTIONS.map(opt => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* 3. What happened / situation */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">What happened or what's the situation?</label>
-          <Textarea
-            value={whatHappened}
-            onChange={(e) => setWhatHappened(e.target.value.slice(0, maxLength))}
-            placeholder="Describe what's going on..."
-            className="min-h-[100px] resize-none"
-            disabled={isLoading}
-          />
-        </div>
-
-        {/* 4. Physical stage (multi-select pills) */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            {isFutureOriented ? "What are you thinking about?" : "Has anything physical happened?"}
-          </label>
+          <label className="text-sm font-medium">{physicalLabel}</label>
           <div className="flex flex-wrap gap-2">
             {PHYSICAL_STAGE_OPTIONS.map(opt => (
               <button
@@ -175,9 +118,11 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 5. Ages */}
+        {/* 3. Ages */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Rough ages help me give better advice</label>
+          <label className="text-sm font-medium">
+            Rough ages help me give better advice
+          </label>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <span className="text-xs text-muted-foreground mb-1 block">You</span>
@@ -208,19 +153,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 6. What I'm worried about */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">What are you worried about?</label>
-          <Textarea
-            value={worried}
-            onChange={(e) => setWorried(e.target.value.slice(0, maxLength))}
-            placeholder="This helps me understand what matters to you"
-            className="min-h-[80px] resize-none"
-            disabled={isLoading}
-          />
-        </div>
-
-        {/* 7. Intent */}
+        {/* 4. Intent */}
         <div className="space-y-2">
           <label className="text-sm font-medium">What are you hoping to figure out?</label>
           <div className="flex flex-col gap-2">
@@ -243,20 +176,28 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
             ))}
           </div>
         </div>
+      </div>
 
-        <div className="flex justify-end">
-          <Button
-            onClick={handleSubmit}
-            disabled={!hasContent || isLoading}
-            size="lg"
-            className="px-8"
-          >
-            Continue <ArrowRight className="ml-2 w-4 h-4" />
-          </Button>
-        </div>
-      </Card>
-    </div>
+      <div className="flex justify-between items-center mt-6">
+        <Button
+          variant="ghost"
+          onClick={onSkip}
+          disabled={isLoading}
+          className="text-muted-foreground"
+        >
+          Skip these
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          size="lg"
+          className="px-8"
+        >
+          Continue <ArrowRight className="ml-2 w-4 h-4" />
+        </Button>
+      </div>
+    </Card>
   );
 };
 
-export default GuidedMode;
+export default SignalFloor;
