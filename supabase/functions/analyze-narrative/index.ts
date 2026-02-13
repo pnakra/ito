@@ -156,32 +156,52 @@ Remember: Respond with ONLY the JSON, no other text.`;
 
     messages.push({ role: "user", content: userMessage });
 
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 600,
-        system: systemPrompt,
-        messages,
-      }),
-    });
+    const MAX_RETRIES = 3;
+    let resp: Response | null = null;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 600,
+          system: systemPrompt,
+          messages,
+        }),
+      });
 
-    if (!resp.ok) {
+      if (resp.ok) break;
+
+      // Retry on transient errors (overloaded, server errors)
+      if ([529, 500, 502, 503].includes(resp.status) && attempt < MAX_RETRIES - 1) {
+        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
+        console.warn(`Anthropic returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await new Promise(r => setTimeout(r, delay));
+        continue;
+      }
+
       if (resp.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
       const t = await resp.text();
       console.error("Anthropic API error:", resp.status, t);
       return new Response(JSON.stringify({ error: "AI API error" }), {
         status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!resp || !resp.ok) {
+      return new Response(JSON.stringify({ error: "AI service temporarily overloaded. Please try again in a moment." }), {
+        status: 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
