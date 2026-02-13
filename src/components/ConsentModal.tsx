@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
 const CONSENT_KEY = "ito_consent_given";
+const STORAGE = sessionStorage; // Clears on browser close — no persistent trace
 
 interface ConsentModalProps {
   onConsentGiven: () => void;
@@ -23,7 +24,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
   const [loggingConsent, setLoggingConsent] = useState(false);
 
   useEffect(() => {
-    const hasConsented = localStorage.getItem(CONSENT_KEY);
+    const hasConsented = STORAGE.getItem(CONSENT_KEY);
     if (!hasConsented) {
       setOpen(true);
     } else {
@@ -32,7 +33,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
   }, [onConsentGiven]);
 
   const handleAccept = () => {
-    localStorage.setItem(CONSENT_KEY, new Date().toISOString());
+    STORAGE.setItem(CONSENT_KEY, new Date().toISOString());
     setOpen(false);
     onConsentGiven();
   };
