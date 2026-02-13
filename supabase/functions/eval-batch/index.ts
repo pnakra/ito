@@ -46,8 +46,8 @@ function scoreResponse(aiResponse: any, deterministicRisk: string, inputText: st
       aiResponse.avoidingRepetition || "",
     ].join(" ");
   } else {
-    // Before flow keys
-    textValues = [
+    // Before flow keys — support both legacy and compact format
+    const legacyText = [
       aiResponse.assessment || "",
       aiResponse.summaryLine || "",
       aiResponse.realTalk || "",
@@ -55,6 +55,12 @@ function scoreResponse(aiResponse: any, deterministicRisk: string, inputText: st
       ...(aiResponse.whatNotToDo || []),
       ...(aiResponse.whatToDoInstead || []),
     ].join(" ");
+    const compactText = [
+      aiResponse.signalLabel || "",
+      aiResponse.suggestion || "",
+      ...(aiResponse.why || []),
+    ].join(" ");
+    textValues = legacyText.trim() ? legacyText : compactText;
   }
   const allText = textValues.toLowerCase();
   const scores: Record<string, { pass: boolean; detail: string }> = {};
