@@ -44,33 +44,41 @@ const Index = () => {
 
               {/* Three Main Tiles */}
               <div className="grid grid-cols-1 gap-4 max-w-xl mx-auto px-1 sm:px-0 mb-6">
-                {/* Tile 1 - Before */}
+                {/* Primary: Unified narrative entry */}
                 <Link
-                  to="/before"
+                  to="/check-in"
                   className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-primary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
                   style={{ animationDelay: "0ms", animationFillMode: "both" }}
                 >
                   <div className="flex-1 min-w-0">
                     <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
-                      I might do something with someone
+                      Something's on my mind
                     </h2>
-                    <p className="text-muted-foreground text-sm">Not sure if <strong className="font-semibold text-muted-foreground">it's</strong> okay? Pause and check.</p>
+                    <p className="text-muted-foreground text-sm">Tell us what's going on. We'll help you think it through.</p>
                   </div>
                   <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
                 </Link>
 
-                {/* Tile 2 - After */}
-                <Link
-                  to="/after"
-                  className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-secondary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-                  style={{ animationDelay: "150ms", animationFillMode: "both" }}
-                >
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">I already did something</h2>
-                    <p className="text-muted-foreground text-sm">Not sure if it <strong className="font-semibold text-muted-foreground">was</strong> okay? Let's figure it out.</p>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
-                </Link>
+                {/* Legacy tiles — smaller, secondary */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Link
+                    to="/before"
+                    className={`group bg-card border border-border/50 rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+                    style={{ animationDelay: "100ms", animationFillMode: "both" }}
+                  >
+                    <h3 className="text-sm font-medium mb-0.5 text-foreground">Before</h3>
+                    <p className="text-muted-foreground text-xs">Guided questions</p>
+                  </Link>
+
+                  <Link
+                    to="/after"
+                    className={`group bg-card border border-border/50 rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+                    style={{ animationDelay: "200ms", animationFillMode: "both" }}
+                  >
+                    <h3 className="text-sm font-medium mb-0.5 text-foreground">After</h3>
+                    <p className="text-muted-foreground text-xs">Something happened</p>
+                  </Link>
+                </div>
               </div>
 
               {/* Collapsible What is this? */}

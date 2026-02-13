@@ -4,10 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import CheckIn from "./pages/CheckIn";
 import Before from "./pages/Before";
 import After from "./pages/After";
-// Third flow (survivor support) - commented out for prototype to focus on perpetrator interruption
-// import HappenedToMe from "./pages/HappenedToMe";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Demo from "./pages/Demo";
@@ -23,18 +22,16 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/check-in" element={<CheckIn />} />
           <Route path="/before" element={<Before />} />
           <Route path="/after" element={<After />} />
-          {/* Third flow (survivor support) - commented out for prototype */}
-          {/* <Route path="/happened-to-me" element={<HappenedToMe />} /> */}
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/demo" element={<Demo />} />
           {/* Legacy routes for backwards compatibility */}
           <Route path="/avoid-line" element={<Before />} />
           <Route path="/crossed-line" element={<After />} />
-          {/* <Route path="/someone-crossed" element={<HappenedToMe />} /> */}
-          <Route path="/chat" element={<Before />} />
+          <Route path="/chat" element={<CheckIn />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

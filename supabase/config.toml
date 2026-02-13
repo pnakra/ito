@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.eval-batch]
 verify_jwt = false
+
+[functions.analyze-narrative]
+verify_jwt = false
