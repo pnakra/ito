@@ -5,10 +5,10 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
-import ShredButton from "@/components/ShredButton";
+
 import { supabase } from "@/integrations/supabase/client";
 import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
-import { Loader2, Send, Heart, Shield, HelpCircle, ArrowRight } from "lucide-react";
+import { Loader2, Send, Heart, Shield, HelpCircle, ArrowRight, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -302,7 +302,10 @@ const HappenedToMe = () => {
                 </p>
               </Card>
               <div className="flex justify-center">
-                <ShredButton onShred={handleShred} />
+                <Button variant="ghost" onClick={handleShred} className="text-muted-foreground text-sm">
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Start over
+                </Button>
               </div>
             </div>
           )}

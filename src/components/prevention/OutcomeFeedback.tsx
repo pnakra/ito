@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
-import ShredButton from "@/components/ShredButton";
+
 
 interface OutcomeFeedbackProps {
   outcomeId: string;
@@ -23,8 +23,6 @@ const OutcomeFeedback = ({ outcomeId, onReset }: OutcomeFeedbackProps) => {
       <p className="text-muted-foreground text-lg mb-6">{feedback}</p>
       
       <div className="flex flex-col gap-3 items-center">
-        <ShredButton onShred={onReset} />
-        
         <Button
           variant="ghost"
           onClick={onReset}

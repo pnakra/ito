@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
-import ShredButton from "@/components/ShredButton";
+
 import AfterDecisionStep, { type AfterStepOption } from "@/components/after/AfterDecisionStep";
 import AfterContextInput from "@/components/after/AfterContextInput";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
@@ -456,7 +456,6 @@ const After = () => {
               </Card>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <ShredButton onShred={resetFlow} />
                 <Button variant="outline" onClick={resetFlow}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Start Over
