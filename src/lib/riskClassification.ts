@@ -26,7 +26,9 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bpassed\s*out\b/i, category: "incapacitation", severity: "red" },
   { pattern: /\basleep\b/i, category: "incapacitation", severity: "red" },
   { pattern: /\bunconscious\b/i, category: "incapacitation", severity: "red" },
+  // Tense-aware: only fire on present/future intoxication, not retrospective "we were drunk"
   { pattern: /\btoo\s*(drunk|wasted|high)\b/i, category: "incapacitation", severity: "red" },
+  // Retrospective intoxication handled separately below (not an immediate red trigger)
   { pattern: /\bforce[d]?\b/i, category: "force", severity: "red" },
   { pattern: /\bmake\s*(her|him|them)\b.*\b(do|have|give)\b/i, category: "coercion", severity: "red" },
   { pattern: /\bhold\s*(her|him|them)\s*down\b/i, category: "force", severity: "red" },
@@ -69,6 +71,14 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bjust\s*let\s*me\b/i, category: "coercion", severity: "yellow" },
   { pattern: /\bcome\s*on\b/i, category: "pressure", severity: "yellow" },
   { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure", severity: "yellow" },
+  
+  // === REPORTED PRESSURE (victim perspective — someone else doing it to them) ===
+  { pattern: /\b(he|she|they)\s*kept\s*(pushing|asking|trying|pressuring)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(he|she|they)\s*wouldn'?t\s*(stop|take\s*no|listen|back\s*off|leave\s*me\s*alone)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(pressured|guilted|coerced|guilt(ed|\s*trip))\s*me\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(made|forced|talked)\s*me\s*(into|to)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(wouldn'?t|won'?t|didn'?t)\s*(let\s*me\s*(leave|go|say\s*no|stop))\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\bi\s*(said|told)\s*(no|stop|him|her|them)\s*(but|and)\s*(he|she|they)\s*(kept|continued|didn'?t\s*(stop|listen))\b/i, category: "reported boundary violation", severity: "red" },
 ];
 
 // Detect flag words in additional context

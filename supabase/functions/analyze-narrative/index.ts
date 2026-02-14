@@ -94,7 +94,8 @@ serve(async (req) => {
       precomputedRiskLevel, 
       detectedTiming,
       conversationHistory,
-      isFollowUp 
+      isFollowUp,
+      structuredSignals 
     } = await req.json();
 
     if (!narrativeText || !narrativeText.trim()) {
@@ -131,6 +132,21 @@ serve(async (req) => {
       : precomputedRiskLevel === "yellow" ? "Level 1 (UNCERTAINTY)" 
       : "Level 0 (NO ESCALATION)";
 
+    // Build structured context block from typed signals (if provided)
+    let structuredContextBlock = "";
+    if (structuredSignals && typeof structuredSignals === "object") {
+      const parts: string[] = [];
+      if (structuredSignals.timing) parts.push(`Timing: ${structuredSignals.timing}`);
+      if (structuredSignals.relationship) parts.push(`Relationship: ${structuredSignals.relationship}`);
+      if (structuredSignals.physicalStage?.length > 0) parts.push(`Physical stage: ${structuredSignals.physicalStage.join(", ")}`);
+      if (structuredSignals.ageUser) parts.push(`User age: ${structuredSignals.ageUser}`);
+      if (structuredSignals.ageOther) parts.push(`Other person age: ${structuredSignals.ageOther}`);
+      if (structuredSignals.intent) parts.push(`User intent: ${structuredSignals.intent}`);
+      if (parts.length > 0) {
+        structuredContextBlock = `\nUSER CONTEXT (structured signals):\n${parts.join(" | ")}\n`;
+      }
+    }
+
     // Build messages (OpenAI format)
     const messages: Array<{ role: string; content: string }> = [
       { role: "system", content: systemPrompt },
@@ -144,7 +160,7 @@ serve(async (req) => {
     }
 
     const userMessage = `SEVERITY: ${severityLabel} (LOCKED — DO NOT CHANGE)
-
+${structuredContextBlock}
 USER'S NARRATIVE (in their own words):
 ${narrativeText}
 

@@ -181,6 +181,12 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow" },
   { pattern: /\bjust\s*let\s*me\b/i, category: "coercion", severity: "yellow" },
   { pattern: /\bcome\s*on\b/i, category: "pressure", severity: "yellow" },
+  // Reported pressure (victim perspective)
+  { pattern: /\b(he|she|they)\s*kept\s*(pushing|asking|trying|pressuring)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(he|she|they)\s*wouldn'?t\s*(stop|take\s*no|listen|back\s*off)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(pressured|guilted|coerced)\s*me\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\b(made|forced|talked)\s*me\s*(into|to)\b/i, category: "reported pressure", severity: "red" },
+  { pattern: /\bi\s*(said|told)\s*(no|stop|him|her|them)\s*(but|and)\s*(he|she|they)\s*(kept|continued|didn'?t\s*(stop|listen))\b/i, category: "reported boundary violation", severity: "red" },
 ];
 
 const CONTEXT_PATTERNS = {
