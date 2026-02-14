@@ -37,17 +37,16 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red" },
   { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red" },
   
-  // === YELLOW FLAG (concerning attitudes) ===
-  // Derogatory labels
-  { pattern: /\bslut\b/i, category: "derogatory label", severity: "yellow" },
-  { pattern: /\bwhore\b/i, category: "derogatory label", severity: "yellow" },
-  { pattern: /\bho\b/i, category: "derogatory label", severity: "yellow" },
-  { pattern: /\bthot\b/i, category: "derogatory label", severity: "yellow" },
-  { pattern: /\bskank\b/i, category: "derogatory label", severity: "yellow" },
+  // === RED FLAG (derogatory/objectifying language — indicates harmful framing) ===
+  { pattern: /\bslut\b/i, category: "derogatory label", severity: "red" },
+  { pattern: /\bwhore\b/i, category: "derogatory label", severity: "red" },
+  { pattern: /\bho[e]?\b/i, category: "derogatory label", severity: "red" },
+  { pattern: /\bthot\b/i, category: "derogatory label", severity: "red" },
+  { pattern: /\bskank\b/i, category: "derogatory label", severity: "red" },
+  { pattern: /\beasy\b/i, category: "objectifying assumption", severity: "red" },
+  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption", severity: "red" },
   
-  // Objectifying assumptions
-  { pattern: /\beasy\b/i, category: "objectifying assumption", severity: "yellow" },
-  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption", severity: "yellow" },
+  // === YELLOW FLAG (concerning attitudes) ===
   
   // Entitlement
   { pattern: /\bowes?\s*me\b/i, category: "entitlement", severity: "red" },
