@@ -53,19 +53,19 @@ const Index = () => {
                   <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
                 </Link>
 
-                {/* Guided mode nudge */}
-                <div
-                  className={`text-center ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+                {/* Guided mode */}
+                <Link
+                  to="/check-in?mode=guided"
+                  className={`group bg-card border border-border/50 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
                   style={{ animationDelay: "150ms", animationFillMode: "both" }}
                 >
-                  <p className="text-sm text-muted-foreground mb-2">Not sure where to start?</p>
-                  <Link
-                    to="/check-in?mode=guided"
-                    className="text-sm text-primary underline underline-offset-2 hover:no-underline"
-                  >
-                    Answer some guided questions first
-                  </Link>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      Not sure where to start? <span className="text-primary font-medium">Answer some guided questions first</span>
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
+                </Link>
               </div>
 
               {/* Collapsible What is this? */}
@@ -76,7 +76,7 @@ const Index = () => {
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="what-is-this" className="border-none">
                     <AccordionTrigger className="justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
-                      What is this?
+                      About ito
                     </AccordionTrigger>
                     <AccordionContent className="text-center pb-4">
                       <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
