@@ -227,6 +227,7 @@ const CheckIn = () => {
 
   // Handle signal floor skip
   const handleSignalFloorSkip = () => {
+    logChoice("before", "signal-floor-skip", "skipped");
     const cumulativeText = getCumulativeText();
     const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     

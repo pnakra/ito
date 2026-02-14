@@ -189,7 +189,17 @@ export function narrativeToDecisionState(
 
   // Map context factors
   const contextFactors: string[] = [];
-  if (hasMatch(text, SUBSTANCE_PATTERNS)) contextFactors.push("alcohol");
+  // Tense-aware intoxication: retrospective mentions ("we were drunk", "I had been drinking")
+  // in after-flow shouldn't auto-escalate the same way as present-tense
+  const hasSubstances = hasMatch(text, SUBSTANCE_PATTERNS);
+  const isRetrospective = detectedTiming === "after" || /\b(was|were|had been|got)\s+(drunk|wasted|high|drinking|tipsy|buzzed)\b/i.test(text);
+  if (hasSubstances && !isRetrospective) {
+    contextFactors.push("alcohol");
+  } else if (hasSubstances && isRetrospective) {
+    // Still flag as a factor but at lower weight — push "alcohol" only if combined with other red signals
+    // Don't push it so classifyRisk doesn't auto-red from alcohol+physical alone
+    contextFactors.push("emotional-pressure"); // maps to a context factor that won't auto-red with physical
+  }
   if (hasMatch(text, POWER_PATTERNS)) contextFactors.push("age-imbalance");
   if (/\b(first time|never done|experience|virgin|new to)\b/i.test(text)) contextFactors.push("experience-gap");
   if (/\b(have to|obligated|owe|guilt|pressure|expected)\b/i.test(text)) contextFactors.push("emotional-pressure");
