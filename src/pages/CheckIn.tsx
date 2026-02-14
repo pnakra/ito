@@ -353,7 +353,10 @@ const CheckIn = () => {
         });
       }
 
-      logAIResponse("before", "narrative-explanation", `Risk: ${riskLevel} - ${data.signalLabel || "Response generated"}`);
+      const fullResponse = isAfter
+        ? `Risk: ${riskLevel} | ${data.clarityCheck || ""} | ${data.accountabilitySteps || ""}`
+        : `Risk: ${riskLevel} - ${data.signalLabel || "Response generated"} | Why: ${(data.why || []).join("; ")} | Suggestion: ${data.suggestion || ""}`;
+      logAIResponse("before", "narrative-explanation", fullResponse);
     } catch (error) {
       console.error("Error fetching explanation:", error);
       if (isAfter) {
