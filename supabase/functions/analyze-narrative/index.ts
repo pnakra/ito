@@ -57,10 +57,16 @@ TONE: Calm, direct, honest. 8th grade reading level. No em dashes. Talk like a t
 
 RESPOND IN THIS EXACT JSON FORMAT (max 150 words total):
 {
-  "signalLabel": "Short label (e.g., 'Serious concern', 'Uncertainty detected', 'Check in with them')",
-  "why": ["1-3 bullets naming the key dynamics — including the user's own problematic framing if present"],
+  "signalLabel": "Short label naming the core tension (e.g., 'Their words and actions don't match', 'You're deciding for them', 'No answer yet')",
+  "why": ["1-3 bullets naming specific tension points — where intent doesn't match behavior, where assumptions replace communication, or where the user's own framing reveals a gap"],
   "suggestion": "One single behavioral suggestion"
 }
+
+CRITICAL — TENSION POINTS, NOT GRADES:
+- Do NOT frame your response as a verdict, grade, rating, or safety certificate.
+- NEVER say "nothing major," "you're fine," "seems okay," "no red flags," or any language that functions as permission.
+- Even when no escalation signals are present, ALWAYS name at least one tension point: an assumption the user is making, a question they haven't asked the other person, or a gap between what they want and what they know.
+- Your job is to surface what the user isn't seeing, not to reassure them.
 
 Constraints: max 150 words total. Exactly one suggestion. No multi-step advice. No therapy framing. No moralizing.`;
 
@@ -178,7 +184,7 @@ ${narrativeText}
 
 ${precomputedRiskLevel === "red" ? "This is a STOP situation. Interrupt momentum. Do not coach or suggest alternatives to proceeding." : ""}
 ${precomputedRiskLevel === "yellow" ? "This is an UNCERTAINTY situation. Interrupt ambiguity. Do not imply it's okay to proceed. Do not reassure." : ""}
-${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT give permission or approval. Anchor to clarity and continued communication." : ""}
+${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT give permission, approval, or reassurance. Do NOT say 'nothing major' or 'seems fine.' Name at least one tension point: an assumption the user is making, a question they haven't asked, or a gap between what they want and what they know. Anchor to clarity and continued communication." : ""}
 
 ${isFollowUp ? "IMPORTANT: This is additional context from the user. Update your understanding but do NOT lower the risk level. Acknowledge what they shared before and how this changes or doesn't change the picture." : ""}
 
