@@ -9,19 +9,19 @@ interface RiskBadgeProps {
 const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
   const config = {
     red: {
-      label: "Hard Stop",
+      label: "Stop and think",
       icon: Hand,
       className: "bg-signal-stop/15 text-signal-stop border border-signal-stop/30",
       disclaimer: null
     },
     yellow: {
-      label: "Pause & Check",
+      label: "Something's off",
       icon: Pause,
       className: "bg-signal-pause/15 text-signal-pause border border-signal-pause/30",
       disclaimer: null
     },
     green: {
-      label: "Check in with them",
+      label: "You're making assumptions",
       icon: HelpCircle,
       className: "bg-muted text-muted-foreground border border-border/50",
       disclaimer: "This tool only sees what you typed. It cannot tell you whether something is okay. Only the other person can do that."
