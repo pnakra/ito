@@ -44,7 +44,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           <h2 className={`text-xl font-medium ${
             isRed ? "text-signal-stop" : "text-signal-pause"
           }`}>
-            {isRed ? "Wait" : "One second"}
+            {isRed ? "Stop and think" : "Something's off"}
           </h2>
           
           {/* Message */}
