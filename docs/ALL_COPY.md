@@ -445,65 +445,7 @@
 
 ---
 
-## 22. HAPPENED TO ME PAGE (HappenedToMe.tsx)
-
-### Intro Screen
-**Heading:** "Something happened. Let's talk through it."
-
-**Privacy banner:** "This is a private, anonymous space. Nothing you share is saved. This isn't therapy or legal advice. It's here to help you think and feel things through."
-
-**Body:** "Sometimes things happen that leave you confused or unsure how to feel. You might not know what to call it. That's okay. This is a space to figure it out at your own pace."
-
-**Cards:**
-1. "Your feelings make sense" — "Being confused, upset, or not sure what to feel is totally normal."
-2. "No pressure, no labels" — "You get to decide what to call it. We're not going to tell you."
-3. "You're in control" — "Share as much or as little as you want. You can ask questions anytime."
-
-**Button:** "Continue"
-
-### Chat Screen
-**Empty state heading:** "Share what happened"
-**Empty state body:** "Describe what happened in your own words. You don't have to share every detail — just the parts that feel important."
-**Empty state footer:** "Take your time."
-
-**Placeholders:**
-- First message: "Share what happened..."
-- Follow-up: "Ask a question or share more..."
-
-**Loading:** "Taking a moment..."
-
-**Structured response section headers:**
-- "What happened"
-- "Your feelings make sense"
-- "About consent"
-- "What you can do"
-
-**Resources footer:** "Need support? RAINN · Crisis Text Line · Love Is Respect"
-
-**Button:** "Start over"
-
----
-
-## 23. CHAT PAGE (Chat.tsx)
-
-**Heading:** "Chat with ito"
-**Body:** "Describe your situation and I'll give you honest feedback. You can ask follow-up questions and we'll have a real conversation about it."
-**Privacy:** "100% anonymous. No data stored."
-
-**Placeholder:** "Describe your situation or ask a follow-up question..."
-**Loading:** "Analyzing..."
-
-**Response section headers:**
-- "What's Actually Happening"
-- "What NOT to Do"
-- "What to Do Instead"
-- "Real Talk"
-
-**Button:** "Send"
-
----
-
-## 24. RESOURCES PAGE (Resources.tsx)
+## 22. RESOURCES PAGE (Resources.tsx)
 
 **Heading:** "Get Help"
 **Subheading:** "Sometimes you need to talk to a real person. These are here for you."
@@ -522,7 +464,7 @@
 
 ---
 
-## 25. ABOUT PAGE (About.tsx)
+## 23. ABOUT PAGE (About.tsx)
 
 **Heading:** "About"
 
@@ -544,7 +486,7 @@
 
 ---
 
-## 26. ERROR / FALLBACK COPY
+## 24. ERROR / FALLBACK COPY
 
 ### Analysis failure (CheckIn.tsx)
 - **Before flow:** signalLabel: "Something went wrong" / why: "We couldn't check this right now" / suggestion: "When in doubt, slow down and check in verbally."
@@ -557,9 +499,3 @@
 - clarityCheck: "We're having trouble processing this right now."
 - otherPersonPerspective: "Please try again in a moment."
 - accountabilitySteps: "If this continues, please seek support from a trusted adult."
-
-### HappenedToMe error
-- "I'm having trouble right now. Please try again, or reach out to someone you trust."
-
-### Chat page error
-- "Sorry, I'm having trouble analyzing that right now. Can you try rephrasing or asking something else?"
