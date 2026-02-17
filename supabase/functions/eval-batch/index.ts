@@ -331,7 +331,8 @@ serve(async (req) => {
             ...(includeFullResponse ? { fullResponse: aiResponse } : {}),
           });
         } catch (aiErr) {
-          results.push({ id, title: title?.slice(0, 80), evaluation: { pass: false, failedChecks: ["ai_call_failed"], scores: {} }, error: aiErr.message });
+          const errMsg = aiErr instanceof Error ? aiErr.message : String(aiErr);
+          results.push({ id, title: title?.slice(0, 80), evaluation: { pass: false, failedChecks: ["ai_call_failed"], scores: {} }, error: errMsg });
         }
       } else {
         // Before flow (existing logic)
@@ -385,7 +386,7 @@ serve(async (req) => {
           relevance,
           deterministicRisk: classification.riskLevel,
           evaluation: { pass: false, failedChecks: ["ai_call_failed"], scores: {} },
-          error: aiErr.message,
+          error: aiErr instanceof Error ? aiErr.message : String(aiErr),
         });
         }
       }
@@ -410,7 +411,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Error in eval-batch:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
