@@ -1,3 +1,4 @@
+import SupabaseTest from '../SupabaseTest'
 import { Card } from "@/components/ui/card";
 import ScenarioSection from "@/components/demo/ScenarioSection";
 
@@ -72,6 +73,8 @@ const Demo = () => {
           </p>
         </div>
       </header>
+      <SupabaseTest />
+
 
       {/* Scenario 1: Green Signal */}
       <ScenarioSection number={1} title="Green Signal (No Red Flags)" signalColor="green">
