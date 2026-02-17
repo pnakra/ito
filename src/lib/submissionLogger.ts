@@ -1,5 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+import { supabase } from "./supabase";
 
 type FlowType = "before" | "after-crossed" | "after-someone-crossed";
 type StepType = "choice" | "freetext" | "ai_response";
@@ -11,7 +10,7 @@ let currentMessageIndex = 0;
 function getSessionId(): string {
   if (!currentSessionId) {
     currentSessionId = crypto.randomUUID();
-    currentMessageIndex = 0; // Reset index for new session
+    currentMessageIndex = 0;
   }
   return currentSessionId;
 }
@@ -32,7 +31,7 @@ interface LogSubmissionParams {
   choiceValue?: string | string[];
   freetextValue?: string;
   aiResponseSummary?: string;
-  metadata?: Json;
+  metadata?: any;
 }
 
 export async function logSubmission({
@@ -45,32 +44,36 @@ export async function logSubmission({
   metadata
 }: LogSubmissionParams): Promise<void> {
   try {
-    const choiceString = Array.isArray(choiceValue) 
-      ? choiceValue.join(", ") 
+    const choiceString = Array.isArray(choiceValue)
+      ? choiceValue.join(", ")
       : choiceValue;
 
-    const { error } = await supabase.from("submissions").insert([{
-      session_id: getSessionId(),
-      flow_type: flowType,
-      step_name: stepName,
-      step_type: stepType,
-      choice_value: choiceString || null,
-      freetext_value: freetextValue || null,
-      ai_response_summary: aiResponseSummary || null,
-      metadata: metadata ?? {},
-      message_index: getNextMessageIndex()
-    }]);
+    const { error } = await supabase.from("submissions").insert([
+      {
+        id: crypto.randomUUID(), // REQUIRED for your schema
+        created_at: new Date().toISOString(), // ensure timestamp
+
+        session_id: getSessionId(),
+        flow_type: flowType,
+        step_name: stepName,
+        step_type: stepType,
+        choice_value: choiceString || null,
+        freetext_value: freetextValue || null,
+        ai_response_summary: aiResponseSummary || null,
+        metadata: metadata ?? {},
+        message_index: getNextMessageIndex().toString()
+      }
+    ]);
 
     if (error) {
       console.error("Failed to log submission:", error);
     }
   } catch (err) {
-    // Fail silently - logging should never break the user experience
     console.error("Submission logging error:", err);
   }
 }
 
-// Convenience functions for common logging patterns
+// Convenience helpers
 export function logChoice(
   flowType: FlowType,
   stepName: string,
