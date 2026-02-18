@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +8,29 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
+
+  // ✅ Supabase visit logger
+  useEffect(() => {
+    const logVisit = async () => {
+      try {
+        await fetch("https://xzwtpgujdajinvcbfprd.supabase.co/rest/v1/visits", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": "sb_publishable_paD7DqfoF5qmg1P6xLWcVg_JYpr8AWC",
+            "Authorization": "Bearer sb_publishable_paD7DqfoF5qmg1P6xLWcVg_JYpr8AWC",
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify({})
+        });
+        console.log("visit logged");
+      } catch (e) {
+        console.log("visit log failed", e);
+      }
+    };
+
+    logVisit();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
