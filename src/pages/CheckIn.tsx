@@ -425,20 +425,32 @@ const CheckIn = () => {
     logFreetext("before", "follow-up", message);
     
     try {
-      const { data, error } = await supabase.functions.invoke("ito-followup", {
-        body: {
-          message,
-          conversationHistory: chatMessages,
-          initialContext: cumulativeText,
-          riskLevel: riskHighWaterMark,
+      const followUpResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            message,
+            conversationHistory: chatMessages,
+            initialContext: cumulativeText,
+            riskLevel: riskHighWaterMark,
+          }),
         }
-      });
+      );
 
-      if (error) throw error;
+      if (!followUpResponse.ok) {
+        throw new Error(`HTTP ${followUpResponse.status}`);
+      }
 
-      const assistantMessage = { role: "assistant" as const, content: data.response };
+      const followUpData = await followUpResponse.json();
+      const assistantMessage = { role: "assistant" as const, content: followUpData.response };
       setChatMessages(prev => [...prev, assistantMessage]);
-      logAIResponse("before", "follow-up-response", data.response || "Follow-up response");
+      logAIResponse("before", "follow-up-response", followUpData.response || "Follow-up response");
     } catch (error) {
       console.error("Error in follow-up:", error);
       setChatMessages(prev => [...prev, {
