@@ -4,13 +4,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
 import HomepageDemo from "@/components/HomepageDemo";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
+  const [cardsVisible, setCardsVisible] = useState(false);
 
-  // ✅ Supabase visit logger
   useEffect(() => {
     const logVisit = async () => {
       try {
@@ -24,12 +24,10 @@ const Index = () => {
           },
           body: JSON.stringify({})
         });
-        console.log("visit logged");
       } catch (e) {
-        console.log("visit log failed", e);
+        // silent
       }
     };
-
     logVisit();
   }, []);
 
@@ -38,16 +36,47 @@ const Index = () => {
       <Header />
 
       <main className="flex-1">
-        <section className="container mx-auto px-4 py-16 sm:py-24 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-10 text-foreground px-2 min-h-[1.2em]">
+        <section className="container mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
+
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-8 text-foreground text-center min-h-[1.2em]">
             <TypewriterText text="is this ok?" delay={80} onComplete={() => setHeadlineComplete(true)} />
           </h1>
 
-          <div className="max-w-xl mx-auto px-1 sm:px-0 space-y-6">
+          {/* Demo — hero */}
+          <div
+            className={`w-full max-w-sm mx-auto transition-all duration-500 ${headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+          >
+            <HomepageDemo />
+          </div>
+
+          {/* CTA */}
+          <div
+            className={`mt-10 flex flex-col items-center gap-2 transition-all duration-500 ${headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+            style={{ transitionDelay: "200ms" }}
+          >
+            {!cardsVisible ? (
+              <button
+                onClick={() => setCardsVisible(true)}
+                className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Ready to try it out?
+                <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+              </button>
+            ) : (
+              <p className="text-sm text-muted-foreground">Where would you like to start?</p>
+            )}
+          </div>
+
+          {/* Action cards — revealed on CTA click */}
+          <div
+            className={`w-full max-w-xl mx-auto px-1 sm:px-0 mt-4 space-y-4 overflow-hidden transition-all duration-500 ${
+              cardsVisible ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+            }`}
+          >
             <Link
               to="/check-in"
-              className={`group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-primary ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-              style={{ animationDelay: "0ms", animationFillMode: "both" }}
+              className="group bg-card border border-border/50 rounded-xl p-5 sm:p-6 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left border-l-4 border-l-primary"
             >
               <div className="flex-1 min-w-0">
                 <h2 className="text-base sm:text-lg font-medium mb-1 text-foreground">
@@ -60,8 +89,7 @@ const Index = () => {
 
             <Link
               to="/check-in?mode=guided"
-              className={`group bg-card border border-border/50 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-              style={{ animationDelay: "150ms", animationFillMode: "both" }}
+              className="group bg-card border border-border/50 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-md transition-all flex items-center text-left"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm sm:text-base text-muted-foreground">
@@ -72,18 +100,10 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Animated demo */}
+          {/* About accordion */}
           <div
-            className={`max-w-sm mx-auto px-1 sm:px-0 pt-2 ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-            style={{ animationDelay: "300ms", animationFillMode: "both" }}
-          >
-            <p className="text-center text-xs text-muted-foreground mb-4 uppercase tracking-wider font-medium">See how it works</p>
-            <HomepageDemo />
-          </div>
-
-          <div
-            className={`max-w-xl mx-auto px-1 sm:px-0 ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
-            style={{ animationDelay: "450ms", animationFillMode: "both" }}
+            className={`w-full max-w-xl mx-auto px-1 sm:px-0 mt-8 transition-all duration-500 ${headlineComplete ? "opacity-100" : "opacity-0"}`}
+            style={{ transitionDelay: "400ms" }}
           >
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="what-is-this" className="border-none">
@@ -110,6 +130,7 @@ const Index = () => {
               </AccordionItem>
             </Accordion>
           </div>
+
         </section>
       </main>
 
