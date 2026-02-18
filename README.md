@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+# ito
 
-## Project info
+**ito** is a real-time consent and accountability tool. It helps people slow down and think clearly about physical and emotional dynamics — before something happens, or after.
 
-**URL**: https://lovable.dev/projects/5f6d2f63-8818-48f9-8d02-018cd17da4b8
+It is not a safety certificate. It does not give green lights, approve situations, or tell users whether an action is permitted. It surfaces tension, names risk, and prompts reflection.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## What it does
 
-**Use Lovable**
+ito has two paths, reached through a shared intake screen:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5f6d2f63-8818-48f9-8d02-018cd17da4b8) and start prompting.
+### Before — "Something's on my mind"
+For users uncertain about a situation they're approaching. The flow asks about what they're planning, what the other person is signalling, and what contextual factors are present (substances, power gaps, age gaps, emotional pressure). It returns a tiered assessment — not a verdict — describing the tension in the situation and offering one grounding suggestion.
 
-Changes made via Lovable will be committed automatically to this repo.
+**There is no green light.** Even low-risk assessments remind users that silence is not consent and that conditions can change.
 
-**Use your preferred IDE**
+### After — "Something happened to me"
+For users processing something that already occurred. The flow collects a narrative description and returns an accountability framing — naming dynamics without diagnosing or labelling the other party. It is designed to hold space without assigning legal categories.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Safety architecture
 
-Follow these steps:
+### Risk tiers (Before flow)
+| Tier | Meaning |
+|------|---------|
+| Green | Minimal flagged signals — still prompts grounding, no permission granted |
+| Yellow | Mixed or ambiguous signals — anti-coaching constraint applied, no escalation advice |
+| Red | Clear concern signals — stop moment before AI response, refusal after repeated patterns |
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Non-negotiable invariants
+- **Silence ≠ consent** — stated in all yellow/red responses
+- **Intoxication/sleep invalidates consent** — stated when alcohol or sleep context is present
+- **Past consent ≠ present consent** — stated when relationship history is a factor
+- **No step-by-step coaching** — yellow and red responses do not give specific physical advice
+- **No clinical labels** — the system describes situational dynamics, not psychological categories (no "manipulation", "abuse", "gaslighting", "coercion", "toxic")
+- **Self-harm threats** — redirected to crisis resources without assigning blame to the user
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Session pattern detection
+If a user runs multiple high-risk scenarios in the same session, the system surfaces a pattern warning and eventually returns a refusal card rather than continuing to engage.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Architecture
 
-**Edit a file directly in GitHub**
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS
+- **Backend**: Lovable Cloud (Supabase) — edge functions, database logging
+- **AI**: Anthropic Claude (via edge functions) for response generation
+- **Routing**: React Router — `/before`, `/after`, `/check-in`, `/about`, `/resources`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Edge functions
+| Function | Purpose |
+|----------|---------|
+| `analyze-ito` | Before flow AI response generation |
+| `ito-followup` | Conversational follow-up in Before flow |
+| `analyze-crossed-line` | After flow initial analysis |
+| `crossed-line-followup` | Conversational follow-up in After flow |
+| `analyze-language` | Supplementary language signal detection |
+| `analyze-narrative` | Narrative gap detection for After flow |
+| `analyze-someone-crossed` | Third-party accountability framing |
 
-**Use GitHub Codespaces**
+### Risk classification
+Risk is pre-computed deterministically in `src/lib/riskClassification.ts` before any AI call. The AI receives the pre-computed risk level and cannot override it. This ensures consistent safety outcomes regardless of AI response variation.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## What this is not
 
-This project is built with:
+- Not a legal tool
+- Not a therapist or counsellor
+- Not a permission system
+- Not a "consent checker" that approves actions
+- Not a substitute for direct communication between people
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## Docs
 
-Simply open [Lovable](https://lovable.dev/projects/5f6d2f63-8818-48f9-8d02-018cd17da4b8) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+| File | Purpose |
+|------|---------|
+| `docs/PRD.md` | Full product requirements and intervention logic (excluded from version control) |
+| `docs/AFTER_FLOW.md` | After flow design decisions and copy rationale |
+| `docs/ALL_COPY.md` | Full UI copy reference |

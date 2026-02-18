@@ -1,4 +1,3 @@
-import SupabaseTest from '../SupabaseTest'
 import { Card } from "@/components/ui/card";
 import ScenarioSection from "@/components/demo/ScenarioSection";
 
@@ -73,7 +72,7 @@ const Demo = () => {
           </p>
         </div>
       </header>
-      <SupabaseTest />
+
 
 
       {/* Scenario 1: Green Signal */}
