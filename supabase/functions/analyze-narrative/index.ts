@@ -7,22 +7,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// =============================================================================
-// NARRATIVE ANALYSIS — Safety-gated advice from freetext narrative
-// =============================================================================
-// This function receives:
-// - narrativeText: cumulative user narrative (all inputs concatenated)
-// - precomputedRiskLevel: deterministic risk from classifyRisk() on the client
-// - detectedTiming: "before" | "after" | "unclear"
-// - conversationHistory: prior messages for iterative advice
-// - isFollowUp: whether this is additional context after initial advice
-//
-// Safety invariants are identical to analyze-ito:
-// - Risk level is LOCKED by client-side classifyRisk()
-// - AI cannot lower the risk level
-// - All safety invariants from analyze-ito apply
-// =============================================================================
-
 const SYSTEM_PROMPT_BEFORE = `You are "is this ok?" — a teen consent clarity and harm-prevention tool. Not a therapist, coach, or moral authority.
 
 Your job: Analyze a situation described in the user's own words. The user is often the person who may cause harm — not just someone it's happening to. Your primary purpose is to interrupt harmful momentum before it becomes action.
@@ -30,70 +14,38 @@ Your job: Analyze a situation described in the user's own words. The user is oft
 CORE PRINCIPLE: This tool exists primarily to prevent people from causing harm. Many users will not realize their framing, language, or expectations are problematic. Your job is to name what you see plainly.
 
 WHEN THE USER'S OWN FRAMING IS CONCERNING:
-- If the user uses derogatory language about another person (e.g., calling them a slut, hoe, thot, easy), name it directly: "Calling someone [word] reduces them to a label. That label says nothing about what they want with you."
-- If the user expects or feels entitled to sex, name it: "No one owes you sex, regardless of their reputation, past behavior, or what other people say about them."
-- If the user is treating another person as a means to an end, name it: "Right now you're focused on what you want to get. That's not how consent works."
-- Do NOT soften or hedge when the user is displaying objectification or entitlement. Be direct.
+- If the user uses derogatory language about another person, name it directly
+- If the user expects or feels entitled to sex, name it clearly
+- If the user is treating another person as a means to an end, name it directly
 
-AGE-AWARE RESPONSES:
-- If both people are under 16: explicitly state their ages matter and that the law and their readiness both apply here
-- If there is an age gap with a minor: name the power imbalance plainly
+SAFETY INVARIANTS:
+- NEVER imply permission to proceed
+- Silence is not consent
+- Intoxicated people cannot consent
+- Past consent is not current consent
+- No clinical labels
 
-SAFETY INVARIANTS (NON-NEGOTIABLE):
-- NEVER imply permission or encouragement to proceed
-- If silence or no response: explicitly state "No response is not a yes"
-- If intoxication: "Someone who is drunk or high cannot consent"
-- If past consent referenced: "What happened before doesn't give permission for now"
-- NO clinical labels: "sexual coercion," "manipulation," "toxic," "abuse," "gaslighting," "controlling"
-- Describe behavior in PLAIN LANGUAGE
-- BANNED: "Real talk," "Classic tactic," "Everyone knows," "That's manipulation," "red flag," "toxic"
-- Do NOT assume or assign intent to the other person
+TONE: Calm, direct, honest. 8th grade reading level.
 
-ANTI-COACHING: Do NOT provide specific advice on how to progress or escalate physical touch. Do NOT help the user "get" sex or physical contact.
-
-HARM-MINIMIZATION: Before responding, verify: no phrasing encourages escalation, no tactical language provided, no reassurance that reduces caution, no power imbalance downplayed, exactly one behavioral directive.
-
-TONE: Calm, direct, honest. 8th grade reading level. No em dashes. Talk like a thoughtful friend who isn't afraid to tell you when you're wrong.
-
-RESPOND IN THIS EXACT JSON FORMAT (max 150 words total):
+RESPOND IN JSON:
 {
-  "signalLabel": "Short label naming the core tension (e.g., 'Their words and actions don't match', 'You're deciding for them', 'No answer yet')",
-  "why": ["1-3 bullets naming specific tension points — where intent doesn't match behavior, where assumptions replace communication, or where the user's own framing reveals a gap"],
-  "suggestion": "One single behavioral suggestion"
-}
+  "signalLabel": "Short label",
+  "why": ["1-3 bullets"],
+  "suggestion": "One behavioral suggestion"
+}`;
 
-CRITICAL — TENSION POINTS, NOT GRADES:
-- Do NOT frame your response as a verdict, grade, rating, or safety certificate.
-- NEVER say "nothing major," "you're fine," "seems okay," "no red flags," or any language that functions as permission.
-- Even when no escalation signals are present, ALWAYS name at least one tension point: an assumption the user is making, a question they haven't asked the other person, or a gap between what they want and what they know.
-- Your job is to surface what the user isn't seeing, not to reassure them.
+const SYSTEM_PROMPT_AFTER = `You are "is this ok?" — a calm reflection tool.
 
-Constraints: max 150 words total. Exactly one suggestion. No multi-step advice. No therapy framing. No moralizing.`;
+Help the user think through what happened honestly without judgment.
 
-const SYSTEM_PROMPT_AFTER = `You are "is this ok?" — a calm, supportive reflection tool for someone looking back at something that happened.
-
-Your job: Help someone think through what happened honestly, without judgment but without softening.
-
-SAFETY INVARIANTS (NON-NEGOTIABLE):
-- NEVER minimize what happened
-- NEVER blame the other person
-- Do NOT use clinical labels: "abuse," "manipulation," "toxic," "gaslighting"
-- Describe what happened in plain language
-- If self-harm is mentioned: redirect to crisis resources
-- BANNED: "Real talk," "Classic tactic," "Everyone knows"
-
-TONE: Calm, direct, honest. 8th grade reading level. No em dashes.
-
-RESPOND IN THIS EXACT JSON FORMAT:
+RESPOND IN JSON:
 {
-  "clarityCheck": "1-2 sentences naming what happened plainly",
-  "otherPersonPerspective": "One way they might have experienced this (2-3 sentences)",
-  "perspectiveDisclaimer": "This is based only on what you shared. Only they know how they actually feel. This is not their voice — it's a prompt to consider their perspective.",
-  "accountabilitySteps": "One concrete thing they can do now",
-  "avoidingRepetition": "One thing to do differently next time"
-}
-
-Constraints: max 200 words total. Plain language. No moralizing.`;
+  "clarityCheck": "What happened plainly",
+  "otherPersonPerspective": "Possible perspective",
+  "perspectiveDisclaimer": "Only they know how they feel",
+  "accountabilitySteps": "One thing to do now",
+  "avoidingRepetition": "One future change"
+}`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -123,142 +75,55 @@ serve(async (req) => {
       });
     }
 
-    if (narrativeText.length > 10000) {
-      return new Response(
-        JSON.stringify({ error: "Input is too long. Please keep it under 10000 characters." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
-      throw new Error("Service configuration error");
-    }
-
-    if (!precomputedRiskLevel || !["green", "yellow", "red"].includes(precomputedRiskLevel)) {
-      return new Response(
-        JSON.stringify({ error: "precomputedRiskLevel is required." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY missing");
     }
 
     const isAfterFlow = detectedTiming === "after";
     const systemPrompt = isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE;
 
-    const severityLabel = precomputedRiskLevel === "red" ? "Level 2–3 (STOP)" 
-      : precomputedRiskLevel === "yellow" ? "Level 1 (UNCERTAINTY)" 
-      : "Level 0 (NO ESCALATION)";
-
-    // Build structured context block from typed signals (if provided)
-    let structuredContextBlock = "";
-    if (structuredSignals && typeof structuredSignals === "object") {
-      const parts: string[] = [];
-      if (structuredSignals.timing) parts.push(`Timing: ${structuredSignals.timing}`);
-      if (structuredSignals.relationship) parts.push(`Relationship: ${structuredSignals.relationship}`);
-      if (structuredSignals.physicalStage?.length > 0) parts.push(`Physical stage: ${structuredSignals.physicalStage.join(", ")}`);
-      if (structuredSignals.ageUser) parts.push(`User age: ${structuredSignals.ageUser}`);
-      if (structuredSignals.ageOther) parts.push(`Other person age: ${structuredSignals.ageOther}`);
-      if (structuredSignals.intent) parts.push(`User intent: ${structuredSignals.intent}`);
-      if (parts.length > 0) {
-        structuredContextBlock = `\nUSER CONTEXT (structured signals):\n${parts.join(" | ")}\n`;
-      }
-    }
-
-    // Build messages (OpenAI format)
     const messages: Array<{ role: string; content: string }> = [
       { role: "system", content: systemPrompt },
     ];
 
-    // Add conversation history for iterative advice
     if (isFollowUp && conversationHistory?.length > 0) {
       for (const msg of conversationHistory) {
         messages.push(msg);
       }
     }
 
-    const userMessage = `SEVERITY: ${severityLabel} (LOCKED — DO NOT CHANGE)
-${structuredContextBlock}
-USER'S NARRATIVE (in their own words):
-${narrativeText}
-
-${precomputedRiskLevel === "red" ? "This is a STOP situation. Interrupt momentum. Do not coach or suggest alternatives to proceeding." : ""}
-${precomputedRiskLevel === "yellow" ? "This is an UNCERTAINTY situation. Interrupt ambiguity. Do not imply it's okay to proceed. Do not reassure." : ""}
-${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT give permission, approval, or reassurance. Do NOT say 'nothing major' or 'seems fine.' Name at least one tension point: an assumption the user is making, a question they haven't asked, or a gap between what they want and what they know. Anchor to clarity and continued communication." : ""}
-
-${isFollowUp ? "IMPORTANT: This is additional context from the user. Update your understanding but do NOT lower the risk level. Acknowledge what they shared before and how this changes or doesn't change the picture." : ""}
-
-Remember: Respond with ONLY the JSON, no other text.`;
-
+    const userMessage = `Narrative:\n${narrativeText}`;
     messages.push({ role: "user", content: userMessage });
 
-    const MAX_RETRIES = 3;
-    let resp: Response | null = null;
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages,
-          max_tokens: 600,
-        }),
-      });
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 600,
+        messages: messages.map(m => ({
+          role: m.role === "system" ? "user" : m.role,
+          content: m.content
+        }))
+      }),
+    });
 
-      if (resp.ok) break;
-
-      // Retry on transient errors
-      if ([500, 502, 503].includes(resp.status)) {
-        if (attempt < MAX_RETRIES - 1) {
-          const delay = Math.pow(2, attempt) * 1000;
-          console.warn(`AI gateway returned ${resp.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
-          await new Promise(r => setTimeout(r, delay));
-          continue;
-        }
-        console.error(`AI gateway returned ${resp.status} on final attempt`);
-        break;
-      }
-
-      if (resp.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      if (resp.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const t = await resp.text();
-      console.error("AI gateway error:", resp.status, t);
-      return new Response(JSON.stringify({ error: "AI API error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!resp || !resp.ok) {
-      return new Response(JSON.stringify({ error: "AI service temporarily overloaded. Please try again in a moment." }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!resp.ok) {
+      const text = await resp.text();
+      console.error("Claude error:", text);
+      throw new Error("Claude request failed");
     }
 
     const data = await resp.json();
-    const raw = data?.choices?.[0]?.message?.content ?? "";
+    const raw = data?.content?.[0]?.text ?? "";
 
-    const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
-    if (!match) {
-      console.error("Failed to parse AI response:", raw);
-      throw new Error("Failed to parse AI response");
-    }
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("Failed to parse AI response");
 
     const parsed = JSON.parse(match[0]);
 
@@ -266,13 +131,12 @@ Remember: Respond with ONLY the JSON, no other text.`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error in analyze-narrative function:", error);
+    console.error("Error:", error);
     return new Response(
       JSON.stringify({
-        error: "Service temporarily unavailable",
         signalLabel: "Something went wrong",
         why: ["The system is temporarily unavailable"],
-        suggestion: "When in doubt, slow down and check in verbally.",
+        suggestion: "Slow down and check in verbally.",
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
