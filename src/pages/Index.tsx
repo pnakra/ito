@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
 import HomepageDemo from "@/components/HomepageDemo";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const Index = () => {
@@ -55,13 +55,12 @@ const Index = () => {
             className={`mt-10 flex flex-col items-center gap-2 transition-all duration-500 ${headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
             style={{ transitionDelay: "200ms" }}
           >
-            {!cardsVisible ? (
+          {!cardsVisible ? (
               <button
                 onClick={() => setCardsVisible(true)}
-                className="group flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="bg-primary text-primary-foreground px-7 py-3 rounded-full text-base font-semibold hover:bg-primary/90 active:scale-95 transition-all shadow-sm"
               >
                 Ready to try it out?
-                <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
               </button>
             ) : (
               <p className="text-sm text-muted-foreground">Where would you like to start?</p>
