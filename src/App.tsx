@@ -23,14 +23,15 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/check-in" element={<CheckIn />} />
-          <Route path="/before" element={<Before />} />
-          <Route path="/after" element={<After />} />
+          {/* Orphaned flows — commented out for ethical scanner review */}
+          {/* <Route path="/before" element={<Before />} /> */}
+          {/* <Route path="/after" element={<After />} /> */}
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/demo" element={<Demo />} />
-          {/* Legacy routes for backwards compatibility */}
-          <Route path="/avoid-line" element={<Before />} />
-          <Route path="/crossed-line" element={<After />} />
+          {/* Legacy routes — commented out, no longer surfaced in UI */}
+          {/* <Route path="/avoid-line" element={<Before />} /> */}
+          {/* <Route path="/crossed-line" element={<After />} /> */}
           <Route path="/chat" element={<CheckIn />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
