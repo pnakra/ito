@@ -6,6 +6,7 @@ export default function SupabaseTest() {
       {
         id: crypto.randomUUID(),
         session_id: 'manual-test',
+        flow_type: 'debug',
         step_name: 'smoke_test',
         step_type: 'debug',
         freetext_value: 'MANUAL INSERT TEST',

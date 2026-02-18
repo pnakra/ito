@@ -61,7 +61,7 @@ export async function logSubmission({
         freetext_value: freetextValue || null,
         ai_response_summary: aiResponseSummary || null,
         metadata: metadata ?? {},
-        message_index: getNextMessageIndex().toString()
+        message_index: getNextMessageIndex()
       }
     ]);
 
