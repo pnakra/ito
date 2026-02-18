@@ -330,30 +330,31 @@ const CheckIn = () => {
     setExplanationComplete(false);
 
     try {
-      console.log("[CheckIn] invoking analyze-narrative", { riskLevel, timing, textLen: text?.length, structuredSignals });
-      const { data, error } = await supabase.functions.invoke("analyze-narrative", {
-        body: {
-          narrativeText: text,
-          precomputedRiskLevel: riskLevel,
-          detectedTiming: timing,
-          isFollowUp: narrativeHistory.length > 1,
-          structuredSignals,
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-narrative`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            narrativeText: text,
+            precomputedRiskLevel: riskLevel,
+            detectedTiming: timing,
+            isFollowUp: narrativeHistory.length > 1,
+            structuredSignals,
+          }),
         }
-      });
-      console.log("[CheckIn] analyze-narrative response", { data, error });
+      );
 
-      if (error) {
-        // FunctionsHttpError has context with the real body
-        let errBody: Record<string, unknown> | null = null;
-        try {
-          errBody = await (error as { context?: { json?: () => Promise<Record<string, unknown>> } })?.context?.json?.();
-        } catch {
-          // ignore parse failures
-        }
-        const serverMsg = (errBody as { error?: string } | null)?.error;
-        console.error("Edge function error:", error.message, errBody);
-        throw new Error(serverMsg || error.message);
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody?.error || `HTTP ${response.status}`);
       }
+
+      const data = await response.json();
       if (data?.error) throw new Error(data.error);
 
       if (isAfter) {
@@ -373,14 +374,11 @@ const CheckIn = () => {
       logAIResponse("before", "narrative-explanation", fullResponse);
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
-      console.error("[CheckIn] fetchExplanation failed. timing:", timing, "riskLevel:", riskLevel, "error:", errMsg, error);
+      console.error("fetchExplanation error:", errMsg);
 
-      const isRateLimit = errMsg?.toLowerCase().includes("too many") || errMsg?.toLowerCase().includes("rate limit") || errMsg?.toLowerCase().includes("429");
-      const isCredits = errMsg?.toLowerCase().includes("credit") || errMsg?.toLowerCase().includes("402");
+      const isRateLimit = errMsg?.includes("429") || errMsg?.toLowerCase().includes("rate limit") || errMsg?.toLowerCase().includes("too many");
       const userFacingMsg = isRateLimit
         ? "You've sent a few requests in a row — give it a minute and try again."
-        : isCredits
-        ? "Service temporarily unavailable. Please try again later."
         : "We couldn't check this right now. Try again in a moment.";
 
       if (isAfter) {
