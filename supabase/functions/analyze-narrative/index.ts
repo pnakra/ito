@@ -101,7 +101,7 @@ serve(async (req) => {
   }
 
   const clientIP = getClientIP(req);
-  const rateLimit = checkRateLimit(clientIP, { maxRequests: 5, windowMs: 60000 });
+  const rateLimit = checkRateLimit(clientIP, { maxRequests: 20, windowMs: 60000 });
   if (!rateLimit.allowed) {
     return createRateLimitResponse(rateLimit.resetIn);
   }
