@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TypewriterText from "@/components/TypewriterText";
+import HomepageDemo from "@/components/HomepageDemo";
 import { ArrowRight } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -69,6 +70,15 @@ const Index = () => {
               </div>
               <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
             </Link>
+          </div>
+
+          {/* Animated demo */}
+          <div
+            className={`max-w-sm mx-auto px-1 sm:px-0 pt-2 ${headlineComplete ? "animate-fade-in" : "opacity-0"}`}
+            style={{ animationDelay: "300ms", animationFillMode: "both" }}
+          >
+            <p className="text-center text-xs text-muted-foreground mb-4 uppercase tracking-wider font-medium">See how it works</p>
+            <HomepageDemo />
           </div>
 
           <div
