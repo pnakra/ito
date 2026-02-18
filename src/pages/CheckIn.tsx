@@ -341,6 +341,7 @@ const CheckIn = () => {
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       if (isAfter) {
         setAfterAnalysis(data as AfterAnalysisData);
