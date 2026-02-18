@@ -126,7 +126,7 @@ const HomepageDemo = () => {
   const sig = signalConfig[scenario.signal];
 
   return (
-    <div ref={containerRef} className="w-full max-w-sm mx-auto">
+    <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
       {/* Phone frame */}
       <div className="relative rounded-[2rem] border-2 border-border bg-card shadow-xl overflow-hidden">
         {/* Status bar */}
