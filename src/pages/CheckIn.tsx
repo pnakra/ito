@@ -359,20 +359,27 @@ const CheckIn = () => {
         : `Risk: ${riskLevel} - ${data.signalLabel || "Response generated"} | Why: ${(data.why || []).join("; ")} | Suggestion: ${data.suggestion || ""}`;
       logAIResponse("before", "narrative-explanation", fullResponse);
     } catch (error) {
-      console.error("Error fetching explanation:", error);
+      const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
+      console.error("Error fetching explanation:", errMsg, error);
+
+      const isRateLimit = errMsg?.toLowerCase().includes("too many") || errMsg?.toLowerCase().includes("rate limit");
+      const userFacingMsg = isRateLimit
+        ? "You've sent a few requests in a row — give it a minute and try again."
+        : "We couldn't check this right now. Try again in a moment.";
+
       if (isAfter) {
         setAfterAnalysis({
-          clarityCheck: "We couldn't check this right now.",
+          clarityCheck: userFacingMsg,
           otherPersonPerspective: "",
           yourPatterns: "",
-          accountabilitySteps: "When in doubt, slow down and check in.",
+          accountabilitySteps: "When in doubt, slow down and check in with them directly.",
           avoidingRepetition: "",
         });
       } else {
         setAnalysis({
           riskLevel,
-          signalLabel: "Something went wrong",
-          why: ["We couldn't check this right now"],
+          signalLabel: isRateLimit ? "Slow down for a moment" : "Something went wrong",
+          why: [userFacingMsg],
           suggestion: "When in doubt, slow down and check in verbally.",
         });
       }
