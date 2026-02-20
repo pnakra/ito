@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { logVisit } from "@/lib/logVisit";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -12,6 +13,10 @@ const Index = () => {
   const [cardsVisible, setCardsVisible] = useState(false);
   const [demoExiting, setDemoExiting] = useState(false);
 
+  // ✅ VISIT LOGGER (runs once per page load)
+  useEffect(() => {
+    logVisit();
+  }, []);
 
   const handleReady = () => {
     setDemoExiting(true);
@@ -25,12 +30,10 @@ const Index = () => {
       <main className="flex-1">
         <section className="container mx-auto px-4 py-12 sm:py-20 flex flex-col items-center">
 
-          {/* Headline */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-8 text-foreground text-center min-h-[1.2em]">
             <TypewriterText text="is this ok?" delay={80} onComplete={() => setHeadlineComplete(true)} />
           </h1>
 
-          {/* Demo hero — exits when user clicks CTA */}
           {!cardsVisible && (
             <div
               className={`w-full max-w-sm mx-auto transition-all duration-350 ${
@@ -41,7 +44,6 @@ const Index = () => {
             </div>
           )}
 
-          {/* CTA button — shown while demo is visible */}
           {!cardsVisible && (
             <div
               className={`mt-10 flex flex-col items-center gap-2 transition-all duration-500 ${
@@ -58,7 +60,6 @@ const Index = () => {
             </div>
           )}
 
-          {/* Choice screen — fades in after demo exits */}
           {cardsVisible && (
             <div className="w-full max-w-xl mx-auto px-1 sm:px-0 animate-fade-in">
               <p className="text-center text-sm text-muted-foreground mb-6">Where would you like to start?</p>
@@ -89,69 +90,6 @@ const Index = () => {
                   <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-4 transition-colors" />
                 </Link>
               </div>
-
-              {/* About accordion */}
-              <div className="mt-8">
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="what-is-this" className="border-none">
-                    <AccordionTrigger className="justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
-                      About ito
-                    </AccordionTrigger>
-                    <AccordionContent className="text-center pb-4">
-                      <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
-                        <p>
-                          <strong className="text-foreground">ito</strong> is an AI-powered tool that helps you understand if things are consensual, even if things are confusing.
-                        </p>
-                        <p>
-                          <strong className="text-foreground">Totally private. No need to create an account.</strong> Everything gets deleted when you close the tab.
-                        </p>
-                        <p>
-                          Not a replacement for real support. If you need to talk to someone, check the{" "}
-                          <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">
-                            resources
-                          </Link>
-                          .
-                        </p>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            </div>
-          )}
-
-          {/* About accordion on hero screen */}
-          {!cardsVisible && (
-            <div
-              className={`w-full max-w-xl mx-auto px-1 sm:px-0 mt-8 transition-all duration-500 ${
-                headlineComplete ? "opacity-100" : "opacity-0"
-              } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
-              style={{ transitionDelay: "400ms" }}
-            >
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="what-is-this" className="border-none">
-                  <AccordionTrigger className="justify-center gap-2 py-3 text-sm text-muted-foreground hover:text-foreground hover:no-underline [&[data-state=open]]:text-foreground">
-                    About ito
-                  </AccordionTrigger>
-                  <AccordionContent className="text-center pb-4">
-                    <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
-                      <p>
-                        <strong className="text-foreground">ito</strong> is an AI-powered tool that helps you understand if things are consensual, even if things are confusing.
-                      </p>
-                      <p>
-                        <strong className="text-foreground">Totally private. No need to create an account.</strong> Everything gets deleted when you close the tab.
-                      </p>
-                      <p>
-                        Not a replacement for real support. If you need to talk to someone, check the{" "}
-                        <Link to="/resources" className="text-primary underline underline-offset-2 hover:no-underline">
-                          resources
-                        </Link>
-                        .
-                      </p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
             </div>
           )}
 
