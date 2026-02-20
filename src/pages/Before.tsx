@@ -287,22 +287,33 @@ const Before = () => {
     
     try {
       // Use the new conversational follow-up function
-      const { data, error } = await supabase.functions.invoke("ito-followup", {
-        body: { 
-          message,
-          conversationHistory: chatMessages,
-          initialContext,
-          riskLevel: riskResult?.level || "yellow"
+      const followUpResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            message,
+            conversationHistory: chatMessages,
+            initialContext,
+            riskLevel: riskResult?.level || "yellow",
+          }),
         }
-      });
+      );
 
-      if (error) throw error;
+      if (!followUpResponse.ok) {
+        throw new Error(`HTTP ${followUpResponse.status}`);
+      }
 
-      // Add assistant response to chat
-      const assistantMessage = { role: "assistant" as const, content: data.response };
+      const followUpData = await followUpResponse.json();
+      const assistantMessage = { role: "assistant" as const, content: followUpData.response };
       setChatMessages(prev => [...prev, assistantMessage]);
       
-      logAIResponse("before", "follow-up-response", data.response || "Follow-up response");
+      logAIResponse("before", "follow-up-response", followUpData.response || "Follow-up response");
     } catch (error) {
       console.error("Error in follow-up:", error);
       // Add error message to chat

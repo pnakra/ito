@@ -234,22 +234,34 @@ const After = () => {
     logFreetext("after-crossed", "follow-up", message);
 
     try {
-      const { data, error } = await supabase.functions.invoke("crossed-line-followup", {
-        body: { 
-          message,
-          conversationHistory: followUpMessages,
-          originalReflection: results
+      const followUpResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/crossed-line-followup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            message,
+            conversationHistory: followUpMessages,
+            originalReflection: results,
+          }),
         }
-      });
+      );
 
-      if (error) throw error;
+      if (!followUpResponse.ok) {
+        throw new Error(`HTTP ${followUpResponse.status}`);
+      }
 
+      const followUpData = await followUpResponse.json();
       const assistantMessage: FollowUpMessage = {
         role: "assistant",
-        content: data.response
+        content: followUpData.response,
       };
       setFollowUpMessages(prev => [...prev, assistantMessage]);
-      logAIResponse("after-crossed", "follow-up-response", data.response || "Follow-up response");
+      logAIResponse("after-crossed", "follow-up-response", followUpData.response || "Follow-up response");
     } catch (error: any) {
       console.error("Error:", error);
       const errorMessage: FollowUpMessage = {
