@@ -2,102 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
-/* is this ok? design system
-   Quiet, calm, minimal - feels like a pause
-   Muted palette, soft transitions, lots of whitespace
-   All colors MUST be HSL
-*/
+/* ito design system — dark-first, teen-native, private tool aesthetic
+   Deep neutrals, muted indigo accent, flat UI, snappy motion
+   All colors HSL */
 
 @layer base {
   :root {
-    /* Soft, quiet base - very light warm gray */
-    --background: 40 20% 98%;
-    --foreground: 220 15% 20%;
+    /* Light mode — rarely used, kept for compatibility */
+    --background: 240 6% 95%;
+    --foreground: 240 8% 15%;
 
-    /* Clean white cards with subtle warmth */
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 20%;
+    --card: 240 5% 92%;
+    --card-foreground: 240 8% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 20%;
+    --popover: 240 5% 92%;
+    --popover-foreground: 240 8% 15%;
 
-    /* Primary: Soft teal - calm, inviting */
-    --primary: 180 35% 42%;
+    /* Primary: Muted indigo */
+    --primary: 245 30% 58%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Warm coral */
-    --secondary: 12 50% 60%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary: Warm neutral */
+    --secondary: 240 5% 82%;
+    --secondary-foreground: 240 8% 20%;
 
-    /* Accent: Soft lavender-gray */
-    --accent: 240 15% 94%;
-    --accent-foreground: 220 25% 35%;
+    /* Accent: Subtle warm gray */
+    --accent: 240 5% 88%;
+    --accent-foreground: 240 8% 25%;
 
-    /* Muted: Warm gray */
-    --muted: 40 10% 94%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 240 5% 88%;
+    --muted-foreground: 240 5% 45%;
 
-    /* Status colors - very muted, non-alarming */
-    --destructive: 0 45% 55%;
+    --destructive: 0 50% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 30% 45%;
+    --success: 145 30% 42%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 35 50% 50%;
-    --warning-foreground: 220 15% 20%;
+    --warning: 35 55% 50%;
+    --warning-foreground: 240 8% 15%;
 
-    /* Signal colors - visible but not alarming */
-    --signal-stop: 0 55% 55%;
+    /* Signal colors */
+    --signal-stop: 0 55% 50%;
     --signal-stop-foreground: 0 0% 100%;
-    --signal-pause: 40 70% 50%;
-    --signal-pause-foreground: 220 15% 15%;
-    --signal-clear: 160 40% 45%;
+    --signal-pause: 40 65% 50%;
+    --signal-pause-foreground: 240 8% 12%;
+    --signal-clear: 145 35% 42%;
     --signal-clear-foreground: 0 0% 100%;
 
-    /* Borders and inputs - very subtle */
-    --border: 40 15% 90%;
-    --input: 40 15% 90%;
-    --ring: 220 25% 45%;
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 245 30% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Sidebar (keeping for shadcn compatibility) */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 15% 30%;
-    --sidebar-primary: 220 25% 45%;
+    --sidebar-background: 240 5% 93%;
+    --sidebar-foreground: 240 8% 25%;
+    --sidebar-primary: 245 30% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 95%;
-    --sidebar-accent-foreground: 220 25% 40%;
-    --sidebar-border: 40 15% 90%;
-    --sidebar-ring: 220 25% 45%;
+    --sidebar-accent: 240 5% 88%;
+    --sidebar-accent-foreground: 240 8% 30%;
+    --sidebar-border: 240 5% 85%;
+    --sidebar-ring: 245 30% 50%;
   }
 
-  /* Dark mode - keeping it very subtle */
+  /* Dark mode — DEFAULT experience */
   .dark {
-    --background: 220 15% 10%;
-    --foreground: 220 10% 90%;
-    
-    --card: 220 15% 13%;
-    --card-foreground: 220 10% 90%;
-    
-    --popover: 220 15% 13%;
-    --popover-foreground: 220 10% 90%;
-    
-    --muted: 220 10% 18%;
-    --muted-foreground: 220 10% 60%;
-    
-    --accent: 220 15% 18%;
-    --accent-foreground: 220 15% 75%;
-    
-    --border: 220 10% 20%;
-    --input: 220 10% 20%;
+    --background: 240 8% 8%;
+    --foreground: 240 5% 85%;
+
+    --card: 240 7% 11%;
+    --card-foreground: 240 5% 85%;
+
+    --popover: 240 7% 11%;
+    --popover-foreground: 240 5% 85%;
+
+    --primary: 245 25% 62%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 18%;
+    --secondary-foreground: 240 5% 75%;
+
+    --accent: 240 6% 15%;
+    --accent-foreground: 240 5% 70%;
+
+    --muted: 240 6% 14%;
+    --muted-foreground: 240 5% 50%;
+
+    --destructive: 0 50% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 5% 16%;
+    --input: 240 5% 16%;
+    --ring: 245 25% 55%;
+
+    --sidebar-background: 240 7% 10%;
+    --sidebar-foreground: 240 5% 70%;
+    --sidebar-primary: 245 25% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 6% 14%;
+    --sidebar-accent-foreground: 240 5% 65%;
+    --sidebar-border: 240 5% 16%;
+    --sidebar-ring: 245 25% 55%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html {
+    @apply dark;
   }
 
   html, body {
@@ -108,13 +124,12 @@
     @apply bg-background text-foreground font-sans antialiased;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold;
   }
 }
 
-/* Custom utility classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;

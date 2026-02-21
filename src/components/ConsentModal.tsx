@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
 const CONSENT_KEY = "ito_consent_given";
-const STORAGE = sessionStorage; // Clears on browser close — no persistent trace
+const STORAGE = sessionStorage;
 
 interface ConsentModalProps {
   onConsentGiven: () => void;
@@ -48,28 +48,24 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="text-lg">Before you begin</DialogTitle>
-          <DialogDescription className="text-left space-y-3 pt-2">
+          <DialogTitle className="text-base">heads up</DialogTitle>
+          <DialogDescription className="text-left space-y-2.5 pt-2 text-sm">
             <p>
-              <strong className="text-foreground">This is a research prototype</strong>, not a production product. 
-              It's being tested to understand how AI can help people think through difficult situations.
+              this is a <strong className="text-foreground">research prototype</strong> — not a finished product. we're testing how tools like this can help people think through confusing situations.
             </p>
             <p>
-              <strong className="text-foreground">Your responses are logged anonymously</strong> to help us 
-              evaluate and improve the tool. No personally identifiable information (name, email, IP address) 
-              is collected or stored.
+              your responses are <strong className="text-foreground">logged anonymously</strong> to improve the tool. no names, emails, or IP addresses.
             </p>
             <p>
-              <strong className="text-foreground">This is not a crisis service.</strong> If you need immediate 
-              support, please contact a{" "}
+              this isn't a crisis service. if you need help now, hit{" "}
               <a href="/resources" className="text-primary underline underline-offset-2 hover:no-underline">
-                crisis resource
+                resources
               </a>.
             </p>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-3 py-3">
           <div className="flex items-start space-x-3">
             <Checkbox
               id="understood"
@@ -78,7 +74,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
               className="mt-0.5"
             />
             <Label htmlFor="understood" className="text-sm font-normal leading-relaxed cursor-pointer">
-              I understand this is a <strong>research prototype</strong> and not a substitute for professional support
+              I get that this is a prototype, not professional support
             </Label>
           </div>
 
@@ -90,7 +86,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
               className="mt-0.5"
             />
             <Label htmlFor="logging" className="text-sm font-normal leading-relaxed cursor-pointer">
-              I consent to my <strong>anonymous responses</strong> being logged for research purposes
+              ok with anonymous logging for research
             </Label>
           </div>
         </div>
@@ -101,7 +97,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
             disabled={!canProceed}
             className="w-full"
           >
-            Continue
+            got it
           </Button>
         </DialogFooter>
       </DialogContent>
