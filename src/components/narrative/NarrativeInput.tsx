@@ -4,10 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, Lock, ChevronDown } from "lucide-react";
 
 const PLACEHOLDER_ROTATIONS = [
-  "what's going on?",
-  "write it like a text to a friend.",
-  "something happened or might happen?",
-  "what feels off?",
+  "What's going on?",
+  "Write it like a text to a friend.",
+  "Something happened or might happen?",
+  "What feels off?",
 ];
 
 interface NarrativeInputProps {
@@ -54,16 +54,16 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
       {/* Privacy note — minimal */}
       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/60 py-1">
         <Lock className="w-3 h-3" />
-        <span>nothing saved. closes when you leave.</span>
+        <span>Nothing saved. Closes when you leave.</span>
       </div>
 
       <div className="space-y-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold mb-1">
-            what's going on?
+            What's going on?
           </h1>
           <p className="text-muted-foreground text-sm">
-            describe the situation. as much or as little as you want.
+            Describe the situation. As much or as little as you want.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
             disabled={!text.trim() || isLoading}
             className="px-6"
           >
-            continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+            Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>
       </div>
@@ -96,7 +96,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
         className="w-full flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-1.5"
       >
         <ChevronDown className="w-3.5 h-3.5" />
-        not sure where to start? try guided mode
+        Not sure where to start? Try guided mode
       </button>
     </div>
   );
