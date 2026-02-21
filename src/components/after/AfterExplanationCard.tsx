@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, ArrowRight, MessageCircle, ChevronRight, Heart, Repeat } from "lucide-react";
+import { Loader2, Eye, ArrowRight, ChevronRight, Heart, Repeat } from "lucide-react";
 
 interface ReflectionResult {
   clarityCheck: string;
@@ -24,7 +23,6 @@ const ALL_STEPS: RevealStep[] = ["clarityCheck", "perspective", "patterns", "acc
 const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("clarityCheck");
 
-  // Calculate which steps are available (skip empty sections)
   const availableSteps = useMemo(() => {
     if (!results) return ALL_STEPS;
     return ALL_STEPS.filter(step => {
@@ -36,12 +34,10 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
 
   if (isLoading) {
     return (
-      <Card className="p-8 animate-in fade-in duration-300">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Taking a moment to think through this...</p>
-        </div>
-      </Card>
+      <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <p className="text-muted-foreground text-sm">Taking a moment to think through this...</p>
+      </div>
     );
   }
 
@@ -87,17 +83,15 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
   };
 
   return (
-    <Card className="p-6 md:p-8 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Header */}
-      <h2 className="text-xl font-semibold text-center">Here's what came up</h2>
+    <div className="space-y-6 animate-fade-in">
+      <h2 className="text-lg font-semibold text-center">Here's what came up</h2>
 
-      {/* Progress dots */}
       {!isComplete && (
         <div className="flex justify-center gap-1.5">
           {availableSteps.slice(0, -1).map((step, i) => (
             <div
               key={step}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1 rounded-full transition-all duration-300 ${
                 i <= completedSteps 
                   ? "w-6 bg-primary" 
                   : "w-1.5 bg-muted-foreground/30"
@@ -107,85 +101,74 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
         </div>
       )}
 
-      {/* Clarity Check - always visible */}
-      <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="space-y-3 animate-fade-in">
         <div className="flex items-center gap-2">
-          <Eye className="w-5 h-5 text-primary" />
-          <h3 className="font-bold text-lg">What might have happened</h3>
+          <Eye className="w-4 h-4 text-primary" />
+          <h3 className="font-semibold">What might have happened</h3>
         </div>
-        <p className="text-muted-foreground whitespace-pre-wrap ml-7">{results.clarityCheck}</p>
+        <p className="text-muted-foreground text-sm whitespace-pre-wrap ml-6">{results.clarityCheck}</p>
       </div>
 
-      {/* Other Person's Perspective */}
       {currentStepIndex >= ALL_STEPS.indexOf("perspective") && (
-        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="space-y-3 animate-fade-in">
           <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-lg">One way they might have experienced this</h3>
+            <Heart className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold">One way they might have experienced this</h3>
           </div>
-          <p className="text-muted-foreground whitespace-pre-wrap ml-7">{results.otherPersonPerspective}</p>
-          <p className="text-xs text-muted-foreground/80 ml-7 border-l-2 border-muted pl-3 mt-2">
-            This is based only on what you shared. Only they know how they actually feel. This is not their voice — it's a prompt to consider their perspective.
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap ml-6">{results.otherPersonPerspective}</p>
+          <p className="text-xs text-muted-foreground/80 ml-6 border-l-2 border-muted pl-3 mt-2">
+            This is based only on what you shared. Only they know how they actually feel.
           </p>
         </div>
       )}
 
-      {/* Your Patterns */}
       {currentStepIndex >= ALL_STEPS.indexOf("patterns") && results.yourPatterns?.trim() && (
-        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="space-y-3 animate-fade-in">
           <div className="flex items-center gap-2">
-            <Repeat className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-lg">Patterns to notice</h3>
+            <Repeat className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold">Patterns to notice</h3>
           </div>
-          <p className="text-muted-foreground whitespace-pre-wrap ml-7">{results.yourPatterns}</p>
+          <p className="text-muted-foreground text-sm whitespace-pre-wrap ml-6">{results.yourPatterns}</p>
         </div>
       )}
 
-      {/* Accountability Steps */}
       {currentStepIndex >= ALL_STEPS.indexOf("accountability") && (
-        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div className="space-y-3 animate-fade-in">
           <div className="flex items-center gap-2">
-            <ChevronRight className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-lg">What you can do now</h3>
+            <ChevronRight className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold">What you can do now</h3>
           </div>
-          <div className="bg-muted/30 border border-border/50 rounded-lg p-4 ml-7">
-            <p className="whitespace-pre-wrap">{results.accountabilitySteps}</p>
+          <div className="bg-muted/20 border border-border/50 rounded-md p-4 ml-6">
+            <p className="text-sm whitespace-pre-wrap">{results.accountabilitySteps}</p>
           </div>
         </div>
       )}
 
-      {/* Going Forward */}
       {currentStepIndex >= ALL_STEPS.indexOf("forward") && results.avoidingRepetition?.trim() && (
-        <div className="bg-accent/20 border border-accent p-4 rounded-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex items-center gap-2 mb-2">
-            <MessageCircle className="w-5 h-5" />
-            <h3 className="font-bold">Going forward</h3>
-          </div>
-          <p className="whitespace-pre-wrap">{results.avoidingRepetition}</p>
+        <div className="bg-accent/10 border border-accent/20 p-4 rounded-md animate-fade-in">
+          <h3 className="font-semibold mb-2 text-sm">Going forward</h3>
+          <p className="text-sm whitespace-pre-wrap">{results.avoidingRepetition}</p>
         </div>
       )}
 
-      {/* Next button */}
       {showNext && (
         <div className="flex justify-center pt-2">
           <Button 
             onClick={handleNext} 
-            className="px-6 gap-2"
-            size="lg"
+            className="px-6 active:scale-[0.97]"
           >
             {getNextLabel()} 
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>
       )}
 
-      {/* Subtle reminder at completion */}
       {isComplete && (
         <p className="text-sm text-muted-foreground text-center italic">
           Thinking about this doesn't make you a bad person. It means you're trying to do better.
         </p>
       )}
-    </Card>
+    </div>
   );
 };
 

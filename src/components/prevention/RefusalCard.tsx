@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { XOctagon, RotateCcw } from "lucide-react";
 
@@ -8,7 +7,7 @@ interface RefusalCardProps {
 
 const RefusalCard = ({ onReset }: RefusalCardProps) => {
   return (
-    <Card className="p-8 border-signal-stop/30 bg-signal-stop/5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="py-8 animate-fade-in">
       <div className="flex justify-center mb-6">
         <div className="p-4 rounded-full bg-signal-stop/10">
           <XOctagon className="w-8 h-8 text-signal-stop" />
@@ -33,7 +32,7 @@ const RefusalCard = ({ onReset }: RefusalCardProps) => {
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

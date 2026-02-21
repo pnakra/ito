@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { MessageSquare, CheckCircle } from "lucide-react";
 
 interface PostExplanationChoiceProps {
@@ -12,48 +11,46 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
   if (!isActive) return null;
 
   return (
-    <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h2 className="text-xl md:text-2xl font-bold text-center mb-2">
-        Did we get it right?
+    <div className="animate-fade-in space-y-4 pt-2">
+      <h2 className="text-base font-semibold">
+        Did that track?
       </h2>
-      <p className="text-muted-foreground text-center mb-6">
-        If something's off or there's more to the story, you can tell us.
+      <p className="text-muted-foreground text-sm">
+        If something's off or there's more to the story, you can tell me.
       </p>
       
-      <div className="grid gap-4">
-        <Button
-          variant="outline"
-          className="h-auto py-5 px-6 justify-start text-left border-2 hover:border-primary/50 hover:bg-muted"
+      <div className="flex flex-col gap-2">
+        <button
           onClick={onContinue}
+          className="text-left px-4 py-3.5 rounded-md border border-border hover:border-primary/30 transition-all duration-150 active:scale-[0.98]"
         >
-          <div className="flex items-center gap-4">
-            <MessageSquare className="w-6 h-6 text-primary flex-shrink-0" />
+          <div className="flex items-center gap-3">
+            <MessageSquare className="w-4 h-4 text-primary flex-shrink-0" />
             <div>
-              <span className="font-medium block">I want to share more</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm font-medium block">I want to share more</span>
+              <span className="text-xs text-muted-foreground">
                 Clarify something or add details
               </span>
             </div>
           </div>
-        </Button>
+        </button>
         
-        <Button
-          variant="outline"
-          className="h-auto py-5 px-6 justify-start text-left border-2 hover:border-primary/50 hover:bg-muted"
+        <button
           onClick={onDone}
+          className="text-left px-4 py-3.5 rounded-md border border-border hover:border-primary/30 transition-all duration-150 active:scale-[0.98]"
         >
-          <div className="flex items-center gap-4">
-            <CheckCircle className="w-6 h-6 text-muted-foreground flex-shrink-0" />
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <div>
-              <span className="font-medium block">That makes sense</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm font-medium block">That makes sense</span>
+              <span className="text-xs text-muted-foreground">
                 I'm good for now
               </span>
             </div>
           </div>
-        </Button>
+        </button>
       </div>
-    </Card>
+    </div>
   );
 };
 

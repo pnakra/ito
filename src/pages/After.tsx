@@ -322,29 +322,26 @@ const After = () => {
 
           {/* Intro */}
           {phase === "intro" && (
-            <div className="space-y-6 animate-fade-in">
-              <h1 className="text-2xl sm:text-3xl font-semibold text-center">
+            <div className="space-y-5 animate-fade-in">
+              <h1 className="text-xl sm:text-2xl font-semibold">
                 Let's think through what happened.
               </h1>
 
-              <p className="text-center text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Sometimes you look back and realize something felt off, or you're worried you went too far. 
                 This is a space to slow down and figure it out.
               </p>
 
-              <Card className="p-4 bg-muted/50 border-border/50">
-                <p className="text-sm text-muted-foreground text-center">
-                  This is a guide to help you think things through. We'll ask a few questions first.
-                </p>
-              </Card>
+              <p className="text-xs text-muted-foreground border border-border/50 rounded-md p-3">
+                We'll ask a few questions first, then help you think it through.
+              </p>
 
-              <div className="flex justify-center pt-4">
+              <div className="pt-2">
                 <Button 
                   onClick={() => goToPhase("situation")} 
-                  size="lg"
-                  className="px-8"
+                  className="px-6 active:scale-[0.97]"
                 >
-                  Continue <ArrowRight className="ml-2 w-4 h-4" />
+                  Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
@@ -401,14 +398,13 @@ const After = () => {
 
           {/* Continue button for steps 1-4 */}
           {(phase === "situation" || phase === "what-happened" || phase === "their-response" || phase === "current-feelings") && (
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-end pt-2">
               <Button
-                size="lg"
                 onClick={proceedToNextStep}
                 disabled={!canProceed()}
-                className="px-8"
+                className="px-6 active:scale-[0.97]"
               >
-                Continue <ArrowRight className="ml-2 w-4 h-4" />
+                Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
               </Button>
             </div>
           )}
@@ -424,23 +420,19 @@ const After = () => {
 
           {/* Post-explanation options */}
           {phase === "results" && !isLoading && results && explanationComplete && (
-            <Card className="p-4 sm:p-6 bg-accent/30 border-border/50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="text-center space-y-4">
-                <MessageSquare className="w-6 h-6 mx-auto text-muted-foreground" />
-                <h3 className="text-base font-medium">Have questions?</h3>
-                <p className="text-muted-foreground text-sm">
-                  If you want to talk through anything else, you can keep going.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button onClick={handleStartFollowUp} variant="default">
-                    Keep talking
-                  </Button>
-                  <Button onClick={() => goToPhase("complete")} variant="outline">
-                    I'm done
-                  </Button>
-                </div>
+            <div className="animate-fade-in space-y-3 pt-2">
+              <p className="text-sm text-muted-foreground">
+                Want to talk through anything else?
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={handleStartFollowUp} className="active:scale-[0.97]">
+                  Keep talking
+                </Button>
+                <Button onClick={() => goToPhase("complete")} variant="outline" className="active:scale-[0.97]">
+                  I'm done
+                </Button>
               </div>
-            </Card>
+            </div>
           )}
 
           {/* Follow-up chat */}
@@ -454,26 +446,26 @@ const After = () => {
 
           {/* Complete - resources and actions */}
           {phase === "complete" && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <Card className="p-4 sm:p-6 bg-muted/50 border-border/50">
-                <h3 className="text-base font-medium mb-3">If someone was hurt</h3>
-                <p className="text-muted-foreground mb-4 text-sm">
+            <div className="space-y-5 animate-fade-in">
+              <div className="border border-border/50 rounded-md p-4">
+                <h3 className="text-sm font-medium mb-2">If someone was hurt</h3>
+                <p className="text-muted-foreground text-sm mb-3">
                   If the other person was hurt or uncomfortable, they might need support too.
                 </p>
-                <ul className="space-y-2 text-muted-foreground text-sm">
+                <ul className="space-y-1.5 text-muted-foreground text-sm">
                   <li>• RAINN — <a href="https://rainn.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">rainn.org</a></li>
                   <li>• Crisis Text Line — <a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">crisistextline.org</a></li>
                   <li>• Love Is Respect — <a href="https://loveisrespect.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">loveisrespect.org</a></li>
                 </ul>
-              </Card>
+              </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <Button variant="outline" onClick={resetFlow}>
+              <div className="flex gap-3 items-center">
+                <Button variant="ghost" onClick={resetFlow} className="text-muted-foreground text-sm">
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  Start Over
+                  Start over
                 </Button>
-                <Button asChild>
-                  <a href="/">Return Home</a>
+                <Button asChild variant="outline" size="sm" className="active:scale-[0.97]">
+                  <a href="/">Home</a>
                 </Button>
               </div>
             </div>

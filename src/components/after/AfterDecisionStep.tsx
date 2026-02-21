@@ -1,5 +1,5 @@
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 export interface AfterStepOption {
   id: string;
@@ -31,52 +31,39 @@ const AfterDecisionStep = ({
   if (!isActive) return null;
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
-          {stepNumber}
+    <div className="animate-fade-in space-y-4">
+      <div>
+        <div className="flex items-center gap-2.5 mb-1">
+          <span className="text-xs text-muted-foreground font-medium tabular-nums">{stepNumber}</span>
+          <h2 className="text-lg font-semibold">{title}</h2>
         </div>
-        <div>
-          <h2 className="text-xl font-semibold">{title}</h2>
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
-        </div>
+        {subtitle && <p className="text-sm text-muted-foreground ml-5">{subtitle}</p>}
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-1.5">
         {options.map((option) => {
           const isSelected = selectedValues.includes(option.id);
           return (
-            <Card
+            <button
               key={option.id}
               onClick={() => onSelect(option.id)}
               className={cn(
-                "p-4 cursor-pointer transition-all duration-200 hover:border-primary/50",
+                "text-left px-3.5 py-2.5 rounded-md border text-sm transition-all duration-150 active:scale-[0.98]",
                 isSelected 
-                  ? "border-primary bg-primary/5 ring-1 ring-primary" 
-                  : "border-border/50"
+                  ? "border-primary/50 bg-primary/10 text-foreground" 
+                  : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                  isSelected 
-                    ? "border-primary bg-primary" 
-                    : "border-muted-foreground/40"
-                )}>
-                  {isSelected && (
-                    <div className="w-2 h-2 rounded-full bg-primary-foreground" />
-                  )}
-                </div>
-                <div>
-                  <p className={cn("font-medium", isSelected && "text-primary")}>
-                    {option.label}
-                  </p>
+              <span className="flex items-start gap-2">
+                {isSelected && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />}
+                <span>
+                  <span className={cn("block", isSelected && "font-medium")}>{option.label}</span>
                   {option.description && (
-                    <p className="text-sm text-muted-foreground mt-1">{option.description}</p>
+                    <span className="block text-xs text-muted-foreground mt-0.5">{option.description}</span>
                   )}
-                </div>
-              </div>
-            </Card>
+                </span>
+              </span>
+            </button>
           );
         })}
       </div>

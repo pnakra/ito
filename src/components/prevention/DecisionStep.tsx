@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 export interface StepOption {
   id: string;
@@ -32,67 +31,52 @@ const DecisionStep = ({
   if (!isActive) return null;
 
   return (
-    <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold">
-            {stepNumber}
-          </span>
-          <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
+    <div className="animate-fade-in space-y-4">
+      <div>
+        <div className="flex items-center gap-2.5 mb-1">
+          <span className="text-xs text-muted-foreground font-medium tabular-nums">{stepNumber}</span>
+          <h2 className="text-lg font-semibold">{title}</h2>
         </div>
         {subtitle && (
-          <p className="text-muted-foreground ml-11">{subtitle}</p>
+          <p className="text-muted-foreground text-sm ml-5">{subtitle}</p>
         )}
       </div>
       
-      <div className="grid gap-3">
+      <div className="flex flex-col gap-1.5">
         {options.map((option) => {
           const isSelected = selectedValues.includes(option.id);
           
           return (
-            <Button
+            <button
               key={option.id}
-              variant="outline"
-              className={cn(
-                "h-auto py-4 px-5 justify-start text-left whitespace-normal",
-                "border-2 transition-all duration-200",
-                isSelected 
-                  ? "border-primary bg-primary/10 text-foreground" 
-                  : "border-border hover:border-primary/50 hover:bg-muted"
-              )}
               onClick={() => onSelect(option.id)}
+              className={cn(
+                "text-left px-3.5 py-2.5 rounded-md border text-sm transition-all duration-150 active:scale-[0.98]",
+                isSelected 
+                  ? "border-primary/50 bg-primary/10 text-foreground" 
+                  : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+              )}
             >
-              <div className="flex items-start gap-3 w-full">
-                <div className={cn(
-                  "w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors",
-                  isSelected 
-                    ? "border-primary bg-primary" 
-                    : "border-muted-foreground"
-                )}>
-                  {isSelected && (
-                    <svg className="w-3 h-3 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </div>
-                <div>
-                  <span className="font-medium">{option.label}</span>
+              <span className="flex items-start gap-2">
+                {isSelected && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />}
+                <span>
+                  <span className={cn("block", isSelected && "font-medium")}>{option.label}</span>
                   {option.description && (
-                    <p className="text-sm text-muted-foreground mt-1">{option.description}</p>
+                    <span className="block text-xs text-muted-foreground mt-0.5">{option.description}</span>
                   )}
-                </div>
-              </div>
-            </Button>
+                </span>
+              </span>
+            </button>
           );
         })}
       </div>
       
       {multiSelect && selectedValues.length > 0 && (
-        <p className="text-sm text-muted-foreground mt-4 text-center">
+        <p className="text-xs text-muted-foreground">
           Tap to add or remove
         </p>
       )}
-    </Card>
+    </div>
   );
 };
 

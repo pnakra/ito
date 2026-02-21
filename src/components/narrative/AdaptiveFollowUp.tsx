@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, Loader2 } from "lucide-react";
 import type { DetectedGap } from "@/lib/narrativeGapDetection";
@@ -28,27 +27,27 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
 
   if (isLoading) {
     return (
-      <Card className="p-8 animate-in fade-in duration-300">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Looking at your situation...</p>
-        </div>
-      </Card>
+      <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <p className="text-muted-foreground text-sm">Looking at your situation...</p>
+      </div>
     );
   }
 
   return (
-    <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h2 className="text-xl font-semibold text-center mb-2">
-        A couple quick questions
-      </h2>
-      <p className="text-muted-foreground text-center mb-6 text-sm">
-        These help me understand better. Skip any you don't want to answer.
-      </p>
+    <div className="animate-fade-in space-y-5">
+      <div>
+        <h2 className="text-lg font-semibold mb-0.5">
+          A couple quick questions
+        </h2>
+        <p className="text-muted-foreground text-sm">
+          These help me understand better. Skip any you don't want to answer.
+        </p>
+      </div>
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         {gaps.map((gap) => (
-          <div key={gap.id} className="space-y-2">
+          <div key={gap.id} className="space-y-1.5">
             <label className="text-sm font-medium">{gap.question}</label>
             <Textarea
               value={answers[gap.id] || ""}
@@ -60,23 +59,22 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
         ))}
       </div>
 
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between items-center pt-1">
         <Button
           variant="ghost"
           onClick={onSkip}
-          className="text-muted-foreground"
+          className="text-muted-foreground text-sm"
         >
-          Skip these
+          Skip
         </Button>
         <Button
           onClick={handleSubmit}
-          size="lg"
-          className="px-8"
+          className="px-6 active:scale-[0.97]"
         >
-          {hasAnyAnswer ? "Continue" : "Skip"} <ArrowRight className="ml-2 w-4 h-4" />
+          {hasAnyAnswer ? "Continue" : "Skip"} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
 

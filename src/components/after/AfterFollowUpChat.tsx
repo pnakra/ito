@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Send, MessageSquare } from "lucide-react";
@@ -44,19 +43,19 @@ const AfterFollowUpChat = ({
   };
 
   return (
-    <Card className="p-4 sm:p-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="w-5 h-5 text-primary" />
+    <div className="animate-fade-in space-y-4">
+      <div className="flex items-center gap-2">
+        <MessageSquare className="w-4 h-4 text-primary" />
         <h3 className="font-semibold">Keep talking</h3>
       </div>
 
       {messages.length === 0 && (
-        <p className="text-muted-foreground text-sm mb-4">
+        <p className="text-muted-foreground text-sm">
           Ask questions or share more about what happened.
         </p>
       )}
 
-      <div className="space-y-4 mb-4 max-h-[400px] overflow-y-auto">
+      <div className="space-y-3 max-h-[400px] overflow-y-auto">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -97,9 +96,10 @@ const AfterFollowUpChat = ({
           <div className="flex gap-2">
             <Button 
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={onDone}
               disabled={isLoading}
+              className="text-muted-foreground text-sm"
             >
               Done
             </Button>
@@ -107,12 +107,13 @@ const AfterFollowUpChat = ({
               type="submit" 
               disabled={!input.trim() || isLoading}
               size="sm"
+              className="active:scale-[0.97]"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  <Send className="w-4 h-4 mr-2" />
+                  <Send className="w-4 h-4 mr-1.5" />
                   Send
                 </>
               )}
@@ -120,7 +121,7 @@ const AfterFollowUpChat = ({
           </div>
         </div>
       </form>
-    </Card>
+    </div>
   );
 };
 

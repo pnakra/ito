@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { HelpCircle } from "lucide-react";
 import type { MoveType } from "./MoveSelection";
 
@@ -8,7 +7,6 @@ interface MutualityGroundingProps {
   isActive: boolean;
 }
 
-// Direct checks — not hedged, not a checklist to game
 const MUTUALITY_CHECKS: Partial<Record<MoveType, string[]>> = {
   "sit-closer": [
     "Are they moving closer too, or just not leaving?",
@@ -36,8 +34,6 @@ const MUTUALITY_CHECKS: Partial<Record<MoveType, string[]>> = {
   ],
 };
 
-// Communication-focused options when uncertainty is detected
-// These are about checking in, NOT tactical alternatives to pressure someone
 const IN_BETWEEN_OPTIONS: Partial<Record<MoveType, string[]>> = {
   "kiss": [
     "Ask: 'Can I kiss you?'",
@@ -69,9 +65,8 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
 
   return (
     <div className="space-y-4 animate-fade-in">
-      {/* Enthusiasm checks — interrogative, not observational */}
       {mutualityChecks && mutualityChecks.length > 0 && (
-        <Card className="p-5 border-border/30 bg-muted/10">
+        <div className="border border-border/50 rounded-md p-4">
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
             Be honest with yourself
           </h3>
@@ -83,13 +78,12 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
               </li>
             ))}
           </ul>
-        </Card>
+        </div>
       )}
 
-      {/* Communication options (only if uncertainty detected) */}
       {showUncertaintyOptions && inBetweenOptions && inBetweenOptions.length > 0 && (
-        <Card className="p-5 border-border/30 bg-warning/5">
-          <h3 className="text-sm font-medium text-warning mb-3">
+        <div className="border border-warning/20 rounded-md p-4 bg-warning/5">
+          <h3 className="text-sm font-medium text-warning mb-2">
             If you're unsure, ask them
           </h3>
           <p className="text-xs text-muted-foreground mb-3">
@@ -105,7 +99,7 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
           <p className="text-[10px] text-muted-foreground/70 mt-3 italic">
             If asking feels awkward, that might be a sign you're not ready.
           </p>
-        </Card>
+        </div>
       )}
     </div>
   );

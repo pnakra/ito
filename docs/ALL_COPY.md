@@ -7,24 +7,24 @@
 
 ## 1. CONSENT MODAL (ConsentModal.tsx)
 
-**Title:** "Before you begin"
+**Title:** "Heads up"
 
 **Body:**
-- "This is a research prototype, not a production product. It's being tested to understand how AI can help people think through difficult situations."
-- "Your responses are logged anonymously to help us evaluate and improve the tool. No personally identifiable information (name, email, IP address) is collected or stored."
-- "This is not a crisis service. If you need immediate support, please contact a crisis resource."
+- "This is a research prototype. It's being tested to see how AI can help people think through difficult situations."
+- "Your responses are logged anonymously to improve the tool. No personal info is collected."
+- "This is not a crisis service. If you need help now, check the resources page."
 
 **Checkboxes:**
-- "I understand this is a research prototype and not a substitute for professional support"
-- "I consent to my anonymous responses being logged for research purposes"
+- "I understand this is a research prototype, not a substitute for real support"
+- "I'm okay with my anonymous responses being logged for research"
 
-**Button:** "Continue"
+**Button:** "Got it"
 
 ---
 
 ## 2. HEADER (Header.tsx)
 
-**Logo:** "ito" / "is this ok?"
+**Logo:** "ito"
 
 **Nav links:** "About", "Resources"
 
@@ -32,7 +32,7 @@
 
 ## 3. FOOTER (Footer.tsx)
 
-"© {year} is this ok?"
+"© {year} Is This OK?"
 
 ---
 
@@ -42,37 +42,33 @@
 
 **Primary CTA:**
 - Title: "Something's on my mind"
-- Subtitle: "Stop and think through a confusing situation."
+- Subtitle: "Talk through a situation that feels off"
 
 **Guided mode CTA:**
-- "Not sure where to start? Answer some guided questions first"
+- "Not sure where to start? Answer a few questions first"
 
-**About accordion trigger:** "About ito"
+**Button:** "Try it out"
 
-**About accordion content:**
-- "ito is an AI-powered tool that helps you understand if things are consensual, even if things are confusing."
-- "Totally private. No need to create an account. Everything gets deleted when you close the tab."
-- "Not a replacement for real support. If you need to talk to someone, check the resources."
+**Post-demo prompt:** "Where do you want to start?"
 
 ---
 
 ## 5. CHECK-IN PAGE — Narrative Input (CheckIn.tsx + NarrativeInput.tsx)
 
-### Privacy Banner
-- "No data is stored long-term."
-- "Your input is processed for analysis but not retained."
+### Privacy note
+- (Inline, subtle) "Nothing is saved. Close the tab and it's gone."
 
 ### Narrative Input
 **Heading:** "What's going on?"
-**Subheading:** "Describe what happened or what you're thinking about. Write as much or as little as you want."
+**Subheading:** "Describe what happened or what you're thinking about."
 
 **Rotating placeholders:**
 1. "Tell me what's going on."
-2. "You can write this like a Reddit post or text to a friend."
+2. "You can write this like a text to a friend."
 3. "Something happen or something might happen?"
 4. "What are you unsure about?"
 
-**Guided mode toggle:** "Not sure how to start? Use guided mode."
+**Guided mode link:** "Not sure how to start? Try guided mode"
 
 **Button:** "Continue"
 
@@ -81,24 +77,23 @@
 ## 6. GUIDED MODE (GuidedMode.tsx)
 
 **Heading:** "Let's walk through it"
-**Subheading:** "Answer what feels right. These help me give you better advice."
+**Subheading:** "Answer what feels right. Skip anything you want."
 
 **Back link:** "Back to free write"
 
 ### Questions:
 
-1. **Timing:** "Is this something that already happened, or something you're thinking about?"
+1. **Timing:** "Has this already happened, or are you deciding what to do?"
 2. **Relationship:** "Who's the other person?"
    - Placeholder: "This helps me understand the situation"
 3. **What happened:** "What happened or what's the situation?"
    - Placeholder: "Describe what's going on..."
 4. **Physical stage:** "What are you thinking about?" (future) / "Has anything physical happened?" (past)
-5. **Ages:** "Rough ages help me give better advice"
+5. **Ages:** "Rough ages"
    - Labels: "You" / "Them"
-   - Placeholders: "Your age" / "Their age"
 6. **Worried about:** "What are you worried about?"
    - Placeholder: "This helps me understand what matters to you"
-7. **Intent:** "What are you hoping to figure out?"
+7. **Intent:** "What are you trying to figure out?"
 
 **Button:** "Continue"
 
@@ -106,16 +101,16 @@
 
 ## 7. SIGNAL FLOOR (SignalFloor.tsx)
 
-**Heading:** "A couple quick things that help me be more accurate"
-**Subheading:** "Skip if you want — these just make the advice better."
+**Heading:** "Quick context so I don't give bad advice"
+**Subheading:** "Skip whatever you want."
 
-### Questions (same options as Guided Mode):
-1. **Timing:** "Is this something that already happened, or something you're thinking about?"
-2. **Physical stage:** "What are you thinking about?" (future) / "Has anything physical happened?" (past)
-3. **Ages:** "Rough ages help me give better advice"
-4. **Intent:** "What are you hoping to figure out?"
+### Questions:
+1. **Timing:** "Already happened or still deciding?"
+2. **Physical stage:** "What are you thinking about doing?" (future) / "Has anything physical happened?" (past)
+3. **Ages:** "Rough ages" — Labels: "You" / "Them"
+4. **Intent:** "What are you trying to figure out?"
 
-**Buttons:** "Skip these" / "Continue"
+**Buttons:** "Skip" / "Continue"
 
 ---
 
@@ -166,14 +161,14 @@
 
 **Placeholder:** "Optional"
 **Loading text:** "Looking at your situation..."
-**Buttons:** "Skip these" / "Continue" or "Skip"
+**Buttons:** "Skip" / "Continue" or "Skip"
 
 ---
 
 ## 10. STOP MOMENT (StopMoment.tsx)
 
-**Red header:** "Wait"
-**Yellow header:** "One second"
+**Red header:** "Stop and think"
+**Yellow header:** "Something's off"
 
 **Message:** (dynamic from riskClassification — `stopMessage`)
 
@@ -209,8 +204,8 @@
 
 ## 14. POST-EXPLANATION CHOICE (PostExplanationChoice.tsx)
 
-**Heading:** "Did we get it right?"
-**Subheading:** "If something's off or there's more to the story, you can tell us."
+**Heading:** "Did that track?"
+**Subheading:** "If something's off or there's more to the story, you can tell me."
 
 **Options:**
 - "I want to share more" — "Clarify something or add details"
@@ -224,7 +219,7 @@
 **Subheading:** "Share more, ask questions, or clarify anything."
 
 **Placeholder:** "Type here..."
-**Buttons:** "I'm done" / "Send"
+**Buttons:** "Done" / "Send"
 
 ---
 
@@ -318,10 +313,10 @@
 ## 20. BEFORE PAGE — Structured Flow (Before.tsx)
 
 ### Move Selection (MoveSelection.tsx)
-**Privacy banner:** "No data is stored long-term." / "Your input is processed for analysis but not retained."
+**Privacy note:** "Nothing is saved. Close the tab and it's gone."
 
 **Heading:** "What are you thinking about doing?"
-**Subheading:** "Start with one — you can always come back for others."
+**Subheading:** "Pick one — you can always come back for others."
 
 **Options:**
 - "Sit closer"
@@ -344,7 +339,7 @@
 
 ### Step 2: Consent Signal (contextualized with selected move)
 **Title:** "What are they doing or saying?"
-- "They've said they want to {move}"  — "They used words like 'yes', 'I want to', or asked you to"
+- "They've said they want to {move}" — "They used words like 'yes', 'I want to', or asked you to"
 - "They seem actually into it, not just going along" — "Leaning in, touching you back, making eye contact, smiling"
 - "Hard to tell what they want" — "Sometimes engaged, sometimes distant, or their words and body don't match"
 - "They're quiet or haven't really said anything" — "No clear reaction, looking away, or just going along without enthusiasm"
@@ -379,7 +374,7 @@
 ### Intro
 **Heading:** "Let's think through what happened."
 **Body:** "Sometimes you look back and realize something felt off, or you're worried you went too far. This is a space to slow down and figure it out."
-**Card:** "This is a guide to help you think things through. We'll ask a few questions first."
+**Note:** "We'll ask a few questions first, then help you think it through."
 **Button:** "Continue"
 
 ### Step 1: Situation
@@ -424,8 +419,7 @@
 **Button:** "Continue" / "Processing..."
 
 ### Post-Results
-**Heading:** "Have questions?"
-**Body:** "If you want to talk through anything else, you can keep going."
+**Body:** "Want to talk through anything else?"
 **Buttons:** "Keep talking" / "I'm done"
 
 ### After Follow-Up Chat (AfterFollowUpChat.tsx)
@@ -441,7 +435,7 @@
 - "RAINN — rainn.org"
 - "Crisis Text Line — crisistextline.org"
 - "Love Is Respect — loveisrespect.org"
-**Button:** "Start Over"
+**Buttons:** "Start over" / "Home"
 
 ---
 
@@ -450,17 +444,17 @@
 **Heading:** "Get Help"
 **Subheading:** "Sometimes you need to talk to a real person. These are here for you."
 
-### Talk to Someone Now
+### Talk to someone now
 - **Crisis Text Line:** "Text HOME to 741741" — "Free, 24/7. Text with someone who's trained to help."
 - **RAINN:** "1-800-656-HOPE (4673)" — "Free, private, 24/7 support line."
 - **Teen Line:** "Text TEEN to 839863" — "Talk to another teen. 6-9 PM Pacific time."
 - **Love Is Respect:** "Text LOVEIS to 22522" — "Help with relationships and what's healthy."
 
-### Learn More
+### Learn more
 - **Scarleteen:** "Honest info about relationships, consent, and sex."
 - **Planned Parenthood for Teens:** "Straight answers about your body and relationships."
 
-**Footer card:** "Asking for help is smart. All of these are private."
+**Footer:** "Asking for help is smart. All of these are private."
 
 ---
 
@@ -469,10 +463,10 @@
 **Heading:** "About"
 
 **Body:**
-- "is this ok? is a tool to help you pause and think through what's happening. It's not legal advice, therapy, or a substitute for talking to someone you trust."
+- "Is This OK? is a tool to help you pause and think through what's happening. It's not legal advice, therapy, or a substitute for talking to someone you trust."
 - "Sometimes it's hard to tell what's okay in the moment. This is a space to slow down and figure it out."
 
-### Privacy Card
+### Privacy
 - "No login required. No account, no personal info needed."
 - "No tracking. We don't know who you are, where you're from, or anything about you."
 - "Completely anonymous. Close the tab and it's gone."
@@ -492,6 +486,9 @@
 - **Before flow:** signalLabel: "Something went wrong" / why: "We couldn't check this right now" / suggestion: "When in doubt, slow down and check in verbally."
 - **After flow:** clarityCheck: "We couldn't check this right now." / accountabilitySteps: "When in doubt, slow down and check in."
 
+### Rate limit
+- signalLabel: "Slow down for a moment" / why: "You've sent a few requests in a row — give it a minute and try again."
+
 ### Follow-up chat error
 - "I'm having trouble right now. Can you try again?"
 
@@ -499,3 +496,22 @@
 - clarityCheck: "We're having trouble processing this right now."
 - otherPersonPerspective: "Please try again in a moment."
 - accountabilitySteps: "If this continues, please seek support from a trusted adult."
+
+---
+
+## 25. HOMEPAGE DEMO (HomepageDemo.tsx)
+
+**Prompt:** "We were at a party and I think things went too far"
+
+**Response title:** "Pause and check"
+**Response body:** "What you described sounds like it might not have been fully okay."
+**Suggestion:** "The best move right now: check in with them directly and honestly."
+
+---
+
+## 26. CLARIFICATION GAPS (CheckIn.tsx)
+
+- **Timing:** "Quick question before I answer — did this already happen, or are you deciding what to do?"
+- **Age:** "How old are you both, roughly? This helps me give better advice."
+- **Physical:** "Has anything physical happened, or is this about something else?"
+- **Intent:** "What are you hoping to figure out?"
