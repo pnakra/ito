@@ -8,38 +8,31 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/about", label: "About" },
-    { to: "/resources", label: "Resources" },
+    { to: "/about", label: "about" },
+    { to: "/resources", label: "resources" },
   ];
-
-  // PWA install link - commented out for prototype
-  // const mobileOnlyLinks = [
-  //   { to: "/install", label: "Add to Home Screen", icon: Smartphone },
-  // ];
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="border-b border-border/30 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border/40 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link 
           to="/" 
-          className="flex flex-col hover:opacity-80 transition-opacity"
+          className="hover:opacity-80 transition-opacity"
         >
-          <span className="text-lg font-semibold text-primary tracking-tight leading-none">ito</span>
-          <span className="text-[10px] text-muted-foreground leading-tight">is this ok?</span>
+          <span className="text-base font-semibold text-foreground tracking-tight">ito</span>
         </Link>
         
-        {/* Desktop Navigation */}
         <div className="hidden md:flex gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
                 isActive(link.to)
-                  ? "bg-accent text-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {link.label}
@@ -47,59 +40,34 @@ const Header = () => {
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden h-8 w-8"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="Toggle menu"
         >
-          {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </Button>
       </nav>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-border/30 bg-background">
-          <div className="container mx-auto px-4 py-2 flex flex-col">
-            {/* Primary nav links */}
+        <div className="md:hidden border-t border-border/40 bg-background">
+          <div className="container mx-auto px-4 py-1.5 flex flex-col">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`py-3 px-4 rounded-lg transition-colors ${
+                className={`py-2.5 px-3 rounded-md text-sm transition-colors ${
                   isActive(link.to)
-                    ? "bg-accent text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            
-            {/* PWA install links - commented out for prototype */}
-            {/* <div className="border-t border-border/30 my-2" />
-            
-            {mobileOnlyLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`py-3 px-4 rounded-lg transition-colors flex items-center gap-2 ${
-                    isActive(link.to)
-                      ? "bg-accent text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {Icon && <Icon className="w-4 h-4" />}
-                  {link.label}
-                </Link>
-              );
-            })} */}
           </div>
         </div>
       )}

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 import {
@@ -27,15 +26,12 @@ interface GuidedModeProps {
 }
 
 const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
-  // Structured signals
   const [timing, setTiming] = useState("");
   const [relationship, setRelationship] = useState("");
   const [physicalStage, setPhysicalStage] = useState<string[]>([]);
   const [ageUser, setAgeUser] = useState("");
   const [ageOther, setAgeOther] = useState("");
   const [intent, setIntent] = useState("");
-
-  // Free text
   const [whatHappened, setWhatHappened] = useState("");
   const [worried, setWorried] = useState("");
   const maxLength = 2000;
@@ -57,7 +53,6 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
     if (ageOther) signals.ageOther = ageOther;
     if (intent) signals.intent = intent;
 
-    // Build narrative from free text + serialized signals
     const parts: string[] = [];
     if (whatHappened.trim()) parts.push(whatHappened.trim());
     if (worried.trim()) parts.push(`What I'm worried about: ${worried.trim()}`);
@@ -78,41 +73,39 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
     <div className="space-y-4 animate-fade-in">
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back to free write
+        <ArrowLeft className="w-3.5 h-3.5" />
+        back to free write
       </button>
 
-      <Card className="p-6 md:p-8 space-y-6">
+      <div className="space-y-5">
         <div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-center mb-2">
-            Let's walk through it
+          <h2 className="text-lg sm:text-xl font-semibold mb-0.5">
+            let's walk through it
           </h2>
-          <p className="text-muted-foreground text-center text-sm">
-            Answer what feels right. These help me give you better advice.
+          <p className="text-muted-foreground text-sm">
+            answer what feels right. skip the rest.
           </p>
         </div>
 
-        {/* 1. Timing */}
+        {/* Timing */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">
-            Is this something that already happened, or something you're thinking about?
-          </label>
-          <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">already happened or still thinking about it?</label>
+          <div className="flex flex-col gap-1.5">
             {TIMING_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setTiming(opt.value)}
                 disabled={isLoading}
-                className={`text-left px-4 py-2.5 rounded-lg border text-sm transition-colors ${
+                className={`text-left px-3.5 py-2 rounded-md border text-sm transition-all duration-150 active:scale-[0.98] ${
                   timing === opt.value
-                    ? "border-primary bg-primary/10 text-foreground"
+                    ? "border-primary/50 bg-primary/10 text-foreground"
                     : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  {timing === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                  {timing === opt.value && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
               </button>
@@ -120,12 +113,12 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 2. Relationship */}
+        {/* Relationship */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Who's the other person?</label>
+          <label className="text-sm font-medium">who's the other person?</label>
           <Select value={relationship} onValueChange={setRelationship} disabled={isLoading}>
-            <SelectTrigger>
-              <SelectValue placeholder="This helps me understand the situation" />
+            <SelectTrigger className="bg-card">
+              <SelectValue placeholder="helps me understand the situation" />
             </SelectTrigger>
             <SelectContent>
               {RELATIONSHIP_OPTIONS.map(opt => (
@@ -137,32 +130,32 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </Select>
         </div>
 
-        {/* 3. What happened / situation */}
+        {/* What happened */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">What happened or what's the situation?</label>
+          <label className="text-sm font-medium">what happened?</label>
           <Textarea
             value={whatHappened}
             onChange={(e) => setWhatHappened(e.target.value.slice(0, maxLength))}
-            placeholder="Describe what's going on..."
-            className="min-h-[100px] resize-none"
+            placeholder="describe what's going on..."
+            className="min-h-[100px] resize-none bg-card border-border"
             disabled={isLoading}
           />
         </div>
 
-        {/* 4. Physical stage (multi-select pills) */}
+        {/* Physical stage */}
         <div className="space-y-2">
           <label className="text-sm font-medium">
-            {isFutureOriented ? "What are you thinking about?" : "Has anything physical happened?"}
+            {isFutureOriented ? "what are you thinking about doing?" : "has anything physical happened?"}
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {PHYSICAL_STAGE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => togglePhysical(opt.value)}
                 disabled={isLoading}
-                className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
+                className={`px-3 py-1.5 rounded-md border text-sm transition-all duration-150 active:scale-[0.97] ${
                   physicalStage.includes(opt.value)
-                    ? "border-primary bg-primary/10 text-foreground"
+                    ? "border-primary/50 bg-primary/10 text-foreground"
                     : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -175,15 +168,15 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 5. Ages */}
+        {/* Ages */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Rough ages help me give better advice</label>
-          <div className="grid grid-cols-2 gap-3">
+          <label className="text-sm font-medium">rough ages</label>
+          <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <span className="text-xs text-muted-foreground mb-1 block">You</span>
+              <span className="text-xs text-muted-foreground mb-1 block">you</span>
               <Select value={ageUser} onValueChange={setAgeUser} disabled={isLoading}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Your age" />
+                <SelectTrigger className="bg-card">
+                  <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
                   {AGE_BAND_OPTIONS.map(opt => (
@@ -193,10 +186,10 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
               </Select>
             </div>
             <div>
-              <span className="text-xs text-muted-foreground mb-1 block">Them</span>
+              <span className="text-xs text-muted-foreground mb-1 block">them</span>
               <Select value={ageOther} onValueChange={setAgeOther} disabled={isLoading}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Their age" />
+                <SelectTrigger className="bg-card">
+                  <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
                   {AGE_BAND_OPTIONS.map(opt => (
@@ -208,35 +201,35 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        {/* 6. What I'm worried about */}
+        {/* Worried */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">What are you worried about?</label>
+          <label className="text-sm font-medium">what are you worried about?</label>
           <Textarea
             value={worried}
             onChange={(e) => setWorried(e.target.value.slice(0, maxLength))}
-            placeholder="This helps me understand what matters to you"
-            className="min-h-[80px] resize-none"
+            placeholder="what matters to you here"
+            className="min-h-[80px] resize-none bg-card border-border"
             disabled={isLoading}
           />
         </div>
 
-        {/* 7. Intent */}
+        {/* Intent */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">What are you hoping to figure out?</label>
-          <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">what are you trying to figure out?</label>
+          <div className="flex flex-col gap-1.5">
             {INTENT_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setIntent(prev => prev === opt.value ? "" : opt.value)}
                 disabled={isLoading}
-                className={`text-left px-4 py-2.5 rounded-lg border text-sm transition-colors ${
+                className={`text-left px-3.5 py-2 rounded-md border text-sm transition-all duration-150 active:scale-[0.98] ${
                   intent === opt.value
-                    ? "border-primary bg-primary/10 text-foreground"
+                    ? "border-primary/50 bg-primary/10 text-foreground"
                     : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  {intent === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                  {intent === opt.value && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
               </button>
@@ -244,17 +237,16 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-1">
           <Button
             onClick={handleSubmit}
             disabled={!hasContent || isLoading}
-            size="lg"
-            className="px-8"
+            className="px-6"
           >
-            Continue <ArrowRight className="ml-2 w-4 h-4" />
+            continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
