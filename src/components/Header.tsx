@@ -8,8 +8,8 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/about", label: "about" },
-    { to: "/resources", label: "resources" },
+    { to: "/about", label: "About" },
+    { to: "/resources", label: "Resources" },
   ];
 
   const isActive = (path: string) => location.pathname === path;

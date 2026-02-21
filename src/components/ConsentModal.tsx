@@ -48,16 +48,16 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle className="text-base">heads up</DialogTitle>
+          <DialogTitle className="text-base">Heads up</DialogTitle>
           <DialogDescription className="text-left space-y-2.5 pt-2 text-sm">
             <p>
-              this is a <strong className="text-foreground">research prototype</strong> — not a finished product. we're testing how tools like this can help people think through confusing situations.
+              This is a <strong className="text-foreground">research prototype</strong> — not a finished product. We're testing how tools like this can help people think through confusing situations.
             </p>
             <p>
-              your responses are <strong className="text-foreground">logged anonymously</strong> to improve the tool. no names, emails, or IP addresses.
+              Your responses are <strong className="text-foreground">logged anonymously</strong> to improve the tool. No names, emails, or IP addresses.
             </p>
             <p>
-              this isn't a crisis service. if you need help now, hit{" "}
+              This isn't a crisis service. If you need help now, hit{" "}
               <a href="/resources" className="text-primary underline underline-offset-2 hover:no-underline">
                 resources
               </a>.
@@ -74,7 +74,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
               className="mt-0.5"
             />
             <Label htmlFor="understood" className="text-sm font-normal leading-relaxed cursor-pointer">
-              I get that this is a prototype, not professional support
+              I understand this is a prototype, not professional support
             </Label>
           </div>
 
@@ -86,7 +86,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
               className="mt-0.5"
             />
             <Label htmlFor="logging" className="text-sm font-normal leading-relaxed cursor-pointer">
-              ok with anonymous logging for research
+              OK with anonymous logging for research
             </Label>
           </div>
         </div>
@@ -97,7 +97,7 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
             disabled={!canProceed}
             className="w-full"
           >
-            got it
+            Got it
           </Button>
         </DialogFooter>
       </DialogContent>

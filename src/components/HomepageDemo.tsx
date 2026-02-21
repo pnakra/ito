@@ -109,7 +109,7 @@ const HomepageDemo = () => {
       {/* Minimal frame — no phone chrome */}
       <div className="relative rounded-lg border border-border bg-card overflow-hidden">
         <div className="px-4 pt-3 pb-1">
-          <span className="text-xs text-muted-foreground">what's going on?</span>
+          <span className="text-xs text-muted-foreground">What's going on?</span>
         </div>
 
         <div className="px-4 pb-4 space-y-3 min-h-[280px]">
@@ -121,7 +121,7 @@ const HomepageDemo = () => {
             )}
             {!displayedText && phase === "typing" && (
               <span className="text-muted-foreground/50 text-sm">
-                tell me what's going on.
+                Tell me what's going on...
               </span>
             )}
           </div>
@@ -135,7 +135,7 @@ const HomepageDemo = () => {
                   : "bg-muted text-muted-foreground opacity-40"
               }`}
             >
-              continue →
+              Continue →
             </div>
           </div>
 
@@ -143,7 +143,7 @@ const HomepageDemo = () => {
           {phase === "submitting" && (
             <div className="flex items-center gap-2 py-3 animate-fade-in">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">thinking…</p>
+              <p className="text-xs text-muted-foreground">Thinking…</p>
             </div>
           )}
 

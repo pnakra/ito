@@ -53,14 +53,14 @@ const Index = () => {
                 onClick={handleReady}
                 className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/85 active:scale-[0.97] transition-all"
               >
-                ok let's try it
+                Try it out
               </button>
             </div>
           )}
 
           {cardsVisible && (
             <div className="w-full max-w-lg mx-auto px-1 sm:px-0 animate-fade-in">
-              <p className="text-center text-sm text-muted-foreground mb-5">where do you want to start?</p>
+              <p className="text-center text-sm text-muted-foreground mb-5">Where do you want to start?</p>
 
               <div className="space-y-3">
                 <Link
@@ -69,9 +69,9 @@ const Index = () => {
                 >
                   <div className="flex-1 min-w-0">
                     <h2 className="text-base font-medium mb-0.5 text-foreground">
-                      something's on my mind
+                      Something's on my mind
                     </h2>
-                    <p className="text-muted-foreground text-sm">talk through a situation that feels off</p>
+                    <p className="text-muted-foreground text-sm">Talk through a situation that feels off</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
@@ -82,7 +82,7 @@ const Index = () => {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-muted-foreground">
-                      not sure where to start? <span className="text-primary font-medium">answer a few questions first</span>
+                      Not sure where to start? <span className="text-primary font-medium">Answer a few questions first</span>
                     </p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
