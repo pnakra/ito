@@ -438,14 +438,13 @@ const Before = () => {
           />
 
           {(phase === "orientation" || phase === "consent-signal" || phase === "context-factors" || phase === "momentum") && (
-            <div className="flex justify-center pt-4">
+            <div className="flex justify-end pt-2">
               <Button
-                size="lg"
                 onClick={proceedToNextStep}
                 disabled={!canProceed()}
-                className="px-8"
+                className="px-6 active:scale-[0.97]"
               >
-                Continue <ArrowRight className="ml-2 w-4 h-4" />
+                Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
               </Button>
             </div>
           )}

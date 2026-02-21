@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
-import { Card } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -18,10 +17,10 @@ const About = () => {
         <div className="max-w-2xl mx-auto space-y-8">
           <div>
             <BackButton to="/" />
-            <h1 className="text-2xl sm:text-3xl font-semibold mb-4">About</h1>
-            <div className="space-y-4 text-muted-foreground text-sm">
+            <h1 className="text-xl sm:text-2xl font-semibold mb-4">About</h1>
+            <div className="space-y-3 text-muted-foreground text-sm">
               <p>
-                <strong className="text-foreground">is this ok?</strong> is a tool to help you pause and think through what's happening. It's not legal advice, therapy, or a substitute for talking to someone you trust.
+                <strong className="text-foreground">Is This OK?</strong> is a tool to help you pause and think through what's happening. It's not legal advice, therapy, or a substitute for talking to someone you trust.
               </p>
               <p>
                 Sometimes it's hard to tell what's okay in the moment. This is a space to slow down and figure it out.
@@ -29,9 +28,9 @@ const About = () => {
             </div>
           </div>
 
-          <Card className="p-5 sm:p-6 border-border/50">
-            <h2 className="text-lg font-medium mb-4">Privacy</h2>
-            <div className="space-y-3 text-muted-foreground text-sm">
+          <div className="border border-border/50 rounded-md p-4 sm:p-5">
+            <h2 className="text-base font-medium mb-3">Privacy</h2>
+            <div className="space-y-2.5 text-muted-foreground text-sm">
               <p>
                 <strong className="text-foreground">No login required.</strong> No account, no personal info needed.
               </p>
@@ -42,10 +41,10 @@ const About = () => {
                 <strong className="text-foreground">Completely anonymous.</strong> Close the tab and it's gone.
               </p>
             </div>
-          </Card>
+          </div>
 
           <div>
-            <h2 className="text-xl font-medium mb-4">FAQs</h2>
+            <h2 className="text-base font-medium mb-3">FAQs</h2>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="border-border/50">
                 <AccordionTrigger className="text-left text-sm hover:no-underline">

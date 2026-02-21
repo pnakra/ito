@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 
 interface FollowUpChatProps {
   onSubmit: (message: string) => void;
@@ -25,48 +24,53 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
   };
 
   return (
-    <Card className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <h2 className="text-xl md:text-2xl font-bold mb-2">What else is on your mind?</h2>
-      <p className="text-muted-foreground mb-6">
-        You can share more or ask questions.
-      </p>
+    <div className="animate-fade-in space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold mb-0.5">What else is on your mind?</h2>
+        <p className="text-muted-foreground text-sm">
+          Share more or ask questions.
+        </p>
+      </div>
 
       <Textarea
         value={message}
         onChange={(e) => setMessage(e.target.value.slice(0, maxLength))}
         placeholder="Type here..."
-        className="min-h-[100px] resize-none mb-4"
+        className="min-h-[100px] resize-none text-sm"
         disabled={isLoading}
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           {message.length} / {maxLength}
         </span>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Button 
             variant="ghost" 
             onClick={onDone}
             disabled={isLoading}
+            className="text-muted-foreground text-sm"
           >
-            I'm done
+            Done
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!message.trim() || isLoading}
-            className="px-6"
+            size="sm"
+            className="active:scale-[0.97]"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>
-                Send <ArrowRight className="ml-2 w-4 h-4" />
+                <Send className="w-4 h-4 mr-1.5" />
+                Send
               </>
             )}
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import RiskBadge from "@/components/RiskBadge";
 import type { RiskLevel } from "@/types/risk";
@@ -19,33 +18,27 @@ interface AnimatedExplanationCardProps {
 const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedExplanationCardProps) => {
   if (isLoading) {
     return (
-      <Card className="p-8 animate-in fade-in duration-300">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Looking at your situation...</p>
-        </div>
-      </Card>
+      <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        <p className="text-muted-foreground text-sm">Looking at your situation...</p>
+      </div>
     );
   }
 
   if (!analysis) return null;
 
-  // Auto-complete since there's no multi-step reveal anymore
   if (onComplete) {
     setTimeout(onComplete, 100);
   }
 
   return (
-    <Card className="p-6 md:p-8 space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Risk Badge */}
+    <div className="space-y-5 animate-fade-in">
       <div className="flex justify-center">
         <RiskBadge level={analysis.riskLevel} size="lg" />
       </div>
 
-      {/* Signal Label */}
-      <p className="text-lg font-bold text-center">{analysis.signalLabel}</p>
+      <p className="text-base font-semibold text-center">{analysis.signalLabel}</p>
 
-      {/* Why bullets */}
       <div className="space-y-2">
         {analysis.why.map((point, i) => (
           <p key={i} className="text-sm flex gap-2">
@@ -55,18 +48,16 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
         ))}
       </div>
 
-      {/* The one suggestion */}
       {analysis.suggestion && (
-        <div className="bg-accent/20 border border-accent p-4 rounded-lg">
-          <p className="text-sm font-medium">{analysis.suggestion}</p>
+        <div className="bg-accent/20 border border-accent/30 p-4 rounded-md">
+          <p className="text-sm">{analysis.suggestion}</p>
         </div>
       )}
 
-      {/* Consent reminder */}
       <p className="text-xs text-muted-foreground text-center">
         Only the other person can give consent.
       </p>
-    </Card>
+    </div>
   );
 };
 

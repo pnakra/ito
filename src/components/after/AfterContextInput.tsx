@@ -22,37 +22,34 @@ const AfterContextInput = ({
   if (!isActive) return null;
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
-          5
+    <div className="animate-fade-in space-y-4">
+      <div>
+        <div className="flex items-center gap-2.5 mb-1">
+          <span className="text-xs text-muted-foreground font-medium tabular-nums">5</span>
+          <h2 className="text-lg font-semibold">Anything else?</h2>
         </div>
-        <div>
-          <h2 className="text-xl font-semibold">Anything else?</h2>
-          <p className="text-sm text-muted-foreground">Add any other details that might help (optional)</p>
-        </div>
+        <p className="text-sm text-muted-foreground ml-5">Add any other details that might help (optional)</p>
       </div>
 
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
         placeholder="Share any other context that feels relevant..."
-        className="min-h-[120px] resize-none"
+        className="min-h-[120px] resize-none text-sm"
         disabled={isLoading}
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-sm text-muted-foreground">
+        <span className="text-xs text-muted-foreground">
           {value.length} / {maxLength}
         </span>
         <Button
           onClick={onContinue}
-          size="lg"
-          className="px-6"
+          className="px-6 active:scale-[0.97]"
           disabled={isLoading}
         >
           {isLoading ? "Processing..." : "Continue"} 
-          <ArrowRight className="ml-2 w-4 h-4" />
+          <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
       </div>
     </div>
