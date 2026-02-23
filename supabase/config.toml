@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.analyze-narrative]
 verify_jwt = false
+
+[functions.log-visit]
+verify_jwt = false
