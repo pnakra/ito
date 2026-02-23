@@ -106,21 +106,21 @@ const HomepageDemo = () => {
 
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      {/* Minimal frame — no phone chrome */}
-      <div className="relative rounded-lg border border-border bg-card overflow-hidden">
-        <div className="px-4 pt-3 pb-1">
-          <span className="text-xs text-muted-foreground">What's going on?</span>
+      {/* Card frame */}
+      <div className="relative rounded-lg bg-card shadow-card overflow-hidden">
+        <div className="px-5 pt-4 pb-1">
+          <span className="text-caption text-muted-foreground">What's going on?</span>
         </div>
 
-        <div className="px-4 pb-4 space-y-3 min-h-[280px]">
+        <div className="px-5 pb-5 space-y-3 min-h-[280px]">
           {/* Text area mock */}
-          <div className="rounded-md border border-border bg-background p-3 min-h-[100px] text-sm text-foreground leading-relaxed">
+          <div className="rounded-lg border border-input bg-background p-4 min-h-[100px] text-body text-foreground leading-relaxed">
             {displayedText}
             {phase === "typing" && (
-              <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse align-middle" />
+              <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
             )}
             {!displayedText && phase === "typing" && (
-              <span className="text-muted-foreground/50 text-sm">
+              <span className="text-muted-foreground/50 text-body">
                 Tell me what's going on...
               </span>
             )}
@@ -129,7 +129,7 @@ const HomepageDemo = () => {
           {/* Submit */}
           <div className="flex justify-end">
             <div
-              className={`text-xs px-3.5 py-1.5 rounded-md font-medium transition-all duration-200 ${
+              className={`text-caption px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 phase === "submitting" || phase === "result" || (phase === "typing" && charIndex === scenario.text.length)
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground opacity-40"
@@ -143,34 +143,33 @@ const HomepageDemo = () => {
           {phase === "submitting" && (
             <div className="flex items-center gap-2 py-3 animate-fade-in">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">Thinking…</p>
+              <p className="text-caption text-muted-foreground">Thinking…</p>
             </div>
           )}
 
           {/* Result */}
           {phase === "result" && (
-            <div className="space-y-2.5 animate-fade-in">
+            <div className="space-y-3 animate-fade-in">
               <div className="inline-flex">
-                <span className={`text-xs py-1 px-2.5 rounded-md font-medium ${
+                <span className={`text-caption py-1.5 px-3 rounded-lg font-medium shadow-badge ${
                   scenario.signal === "yellow"
-                    ? "bg-[hsl(var(--signal-pause)/0.15)] text-[hsl(var(--signal-pause))]"
+                    ? "bg-signal-pause/10 text-signal-pause"
                     : "bg-muted text-muted-foreground"
                 }`}>
                   {scenario.label}
                 </span>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {scenario.points.map((p, i) => (
-                  <p key={i} className="text-xs text-foreground/75 flex gap-2">
-                    <span className="text-muted-foreground/50 flex-shrink-0">·</span>
-                    <span>{p}</span>
+                  <p key={i} className="text-caption text-foreground/75">
+                    {p}
                   </p>
                 ))}
               </div>
 
-              <div className="border-l-2 border-primary/30 pl-3 py-1">
-                <p className="text-xs font-medium text-foreground/80">{scenario.tension}</p>
+              <div className="bg-callout rounded-lg p-3">
+                <p className="text-caption font-medium text-callout-foreground">{scenario.tension}</p>
               </div>
             </div>
           )}
@@ -178,12 +177,12 @@ const HomepageDemo = () => {
       </div>
 
       {/* Dots */}
-      <div className="flex justify-center gap-1.5 mt-2.5">
+      <div className="flex justify-center gap-1.5 mt-3">
         {SCENARIOS.map((_, i) => (
           <div
             key={i}
-            className={`h-1 rounded-full transition-all duration-200 ${
-              i === scenarioIndex ? "bg-primary w-4" : "bg-border w-1"
+            className={`h-1.5 rounded-full transition-all duration-200 ${
+              i === scenarioIndex ? "bg-primary w-4" : "bg-border w-1.5"
             }`}
           />
         ))}

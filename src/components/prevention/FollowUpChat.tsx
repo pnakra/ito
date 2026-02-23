@@ -24,10 +24,10 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
   };
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-0.5">What else is on your mind?</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="text-h2 mb-1">What else is on your mind?</h2>
+        <p className="text-muted-foreground text-body">
           Share more or ask questions.
         </p>
       </div>
@@ -36,12 +36,12 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
         value={message}
         onChange={(e) => setMessage(e.target.value.slice(0, maxLength))}
         placeholder="Type here..."
-        className="min-h-[100px] resize-none text-sm"
+        className="min-h-[100px] resize-none text-body"
         disabled={isLoading}
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-caption text-muted-foreground">
           {message.length} / {maxLength}
         </span>
         <div className="flex gap-2">
@@ -49,7 +49,7 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
             variant="ghost" 
             onClick={onDone}
             disabled={isLoading}
-            className="text-muted-foreground text-sm"
+            className="text-muted-foreground text-caption"
           >
             Done
           </Button>
@@ -57,7 +57,6 @@ const FollowUpChat = ({ onSubmit, onDone, isLoading, isActive }: FollowUpChatPro
             onClick={handleSubmit} 
             disabled={!message.trim() || isLoading}
             size="sm"
-            className="active:scale-[0.97]"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

@@ -19,7 +19,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-sm">Breaking this down for you...</p>
+        <p className="text-muted-foreground text-body">Breaking this down for you...</p>
       </div>
     );
   }
@@ -27,9 +27,9 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
   if (!analysis) return null;
 
   return (
-    <div className="space-y-5 animate-fade-in">
-      <div className="bg-muted/30 border border-border/50 p-3 rounded-md">
-        <p className="text-xs text-muted-foreground text-center">
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-card shadow-card p-5 rounded-lg">
+        <p className="text-caption text-muted-foreground text-center">
           This is a reflection tool, not a permission slip. Only the other person can give consent.
         </p>
       </div>
@@ -38,22 +38,21 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
         <RiskBadge level={analysis.riskLevel} size="lg" />
       </div>
       
-      <p className="text-base font-semibold text-center">{analysis.signalLabel}</p>
+      <p className="text-h2 text-center">{analysis.signalLabel}</p>
 
-      <div className="space-y-2">
+      {analysis.suggestion && (
+        <div className="bg-callout rounded-lg p-5 text-center">
+          <p className="text-[17px] font-semibold text-callout-foreground leading-relaxed">{analysis.suggestion}</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
         {analysis.why.map((point, i) => (
-          <p key={i} className="text-sm flex gap-2">
-            <span className="text-muted-foreground">•</span>
-            <span>{point}</span>
+          <p key={i} className="text-body">
+            {point}
           </p>
         ))}
       </div>
-
-      {analysis.suggestion && (
-        <div className="bg-accent/20 border border-accent/30 p-4 rounded-md">
-          <p className="text-sm">{analysis.suggestion}</p>
-        </div>
-      )}
     </div>
   );
 };

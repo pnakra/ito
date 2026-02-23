@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
 import GuidedMode from "@/components/narrative/GuidedMode";
@@ -495,7 +494,7 @@ const CheckIn = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
           {phase !== "narrative-input" && phase !== "guided-mode" ? (
             <BackButton label="Back" onClick={() => {
@@ -632,8 +631,6 @@ const CheckIn = () => {
           )}
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 };

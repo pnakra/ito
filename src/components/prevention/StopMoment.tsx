@@ -13,10 +13,8 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
   const isRed = riskLevel === "red";
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/95 backdrop-blur-sm animate-fade-in">
-      <div className={`max-w-lg w-full p-8 border rounded-lg relative ${
-        isRed ? "border-signal-stop/30 bg-card" : "border-signal-pause/30 bg-card"
-      } animate-scale-in`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-background/95 backdrop-blur-sm animate-fade-in">
+      <div className={`max-w-lg w-full p-8 rounded-lg relative bg-card shadow-card animate-scale-in`}>
         {!isRed && onDismiss && (
           <button
             onClick={onDismiss}
@@ -26,7 +24,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
             <X className="w-5 h-5" />
           </button>
         )}
-        <div className="flex flex-col items-center text-center space-y-5">
+        <div className="flex flex-col items-center text-center space-y-6">
           <div className={`p-4 rounded-xl ${
             isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"
           }`}>
@@ -37,13 +35,13 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
             )}
           </div>
           
-          <h2 className={`text-xl font-medium ${
+          <h2 className={`text-h2 ${
             isRed ? "text-signal-stop" : "text-signal-pause"
           }`}>
             {isRed ? "Stop and think" : "Something's off"}
           </h2>
           
-          <p className="text-foreground/90">
+          <p className="text-body text-foreground/90">
             {stopMessage}
           </p>
           
@@ -51,7 +49,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
             onClick={onAcknowledge}
             size="lg"
             variant="outline"
-            className={`w-full py-5 font-medium border transition-all active:scale-[0.98] ${
+            className={`w-full py-5 font-medium transition-all ${
               isRed 
                 ? "border-signal-stop/30 text-signal-stop hover:bg-signal-stop/5" 
                 : "border-signal-pause/30 text-signal-pause hover:bg-signal-pause/5"

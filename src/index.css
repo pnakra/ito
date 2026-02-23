@@ -2,36 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ito design system — dark-first, teen-native, private tool aesthetic
-   Deep neutrals, muted indigo accent, flat UI, snappy motion
+/* ito design system — warm, intentional, light-first
+   Instrument Serif headings, DM Sans body, warm off-white bg
    All colors HSL */
 
 @layer base {
   :root {
-    /* Light mode — rarely used, kept for compatibility */
-    --background: 240 6% 95%;
-    --foreground: 240 8% 15%;
+    /* Warm off-white background */
+    --background: 40 33% 97%;
+    --foreground: 0 0% 10%;
 
-    --card: 240 5% 92%;
-    --card-foreground: 240 8% 15%;
+    /* Cards: pure white with shadow, no border */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 240 5% 92%;
-    --popover-foreground: 240 8% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    /* Primary: Muted indigo */
-    --primary: 245 30% 58%;
+    /* Primary: Intentional teal #4a8c7f */
+    --primary: 167 30% 42%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: Warm neutral */
-    --secondary: 240 5% 82%;
-    --secondary-foreground: 240 8% 20%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 42%;
 
-    /* Accent: Subtle warm gray */
-    --accent: 240 5% 88%;
-    --accent-foreground: 240 8% 25%;
+    /* Accent: Warm cream for callouts */
+    --accent: 38 60% 96%;
+    --accent-foreground: 0 0% 10%;
 
-    --muted: 240 5% 88%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 42%;
 
     --destructive: 0 50% 50%;
     --destructive-foreground: 0 0% 100%;
@@ -40,70 +41,34 @@
     --success-foreground: 0 0% 100%;
 
     --warning: 35 55% 50%;
-    --warning-foreground: 240 8% 15%;
+    --warning-foreground: 0 0% 10%;
 
     /* Signal colors */
     --signal-stop: 0 55% 50%;
     --signal-stop-foreground: 0 0% 100%;
     --signal-pause: 40 65% 50%;
-    --signal-pause-foreground: 240 8% 12%;
+    --signal-pause-foreground: 0 0% 10%;
     --signal-clear: 145 35% 42%;
     --signal-clear-foreground: 0 0% 100%;
 
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 245 30% 50%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 167 30% 42%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 240 5% 93%;
-    --sidebar-foreground: 240 8% 25%;
-    --sidebar-primary: 245 30% 50%;
+    /* Callout warm block */
+    --callout: 38 60% 96%;
+    --callout-foreground: 0 0% 10%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 25%;
+    --sidebar-primary: 167 30% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 88%;
-    --sidebar-accent-foreground: 240 8% 30%;
-    --sidebar-border: 240 5% 85%;
-    --sidebar-ring: 245 30% 50%;
-  }
-
-  /* Dark mode — DEFAULT experience */
-  .dark {
-    --background: 240 8% 8%;
-    --foreground: 240 5% 85%;
-
-    --card: 240 7% 11%;
-    --card-foreground: 240 5% 85%;
-
-    --popover: 240 7% 11%;
-    --popover-foreground: 240 5% 85%;
-
-    --primary: 245 25% 62%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 5% 18%;
-    --secondary-foreground: 240 5% 75%;
-
-    --accent: 240 6% 15%;
-    --accent-foreground: 240 5% 70%;
-
-    --muted: 240 6% 14%;
-    --muted-foreground: 240 5% 50%;
-
-    --destructive: 0 50% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 5% 16%;
-    --input: 240 5% 16%;
-    --ring: 245 25% 55%;
-
-    --sidebar-background: 240 7% 10%;
-    --sidebar-foreground: 240 5% 70%;
-    --sidebar-primary: 245 25% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 14%;
-    --sidebar-accent-foreground: 240 5% 65%;
-    --sidebar-border: 240 5% 16%;
-    --sidebar-ring: 245 25% 55%;
+    --sidebar-accent: 0 0% 95%;
+    --sidebar-accent-foreground: 0 0% 30%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 167 30% 42%;
   }
 }
 
@@ -112,21 +77,38 @@
     @apply border-border;
   }
 
-  html {
-    @apply dark;
-  }
-
   html, body {
     @apply overflow-x-hidden;
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: "DM Sans", system-ui, sans-serif;
     -webkit-overflow-scrolling: touch;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold;
+  h1 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-weight: 600;
+  }
+
+  p, span, div, button, input, textarea, select, label, a {
+    font-size: 16px;
+    line-height: 1.6;
   }
 }
 
@@ -134,23 +116,39 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Type scale utilities */
+  .text-h1 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .text-h2 {
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .text-body {
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .text-caption {
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
 }
 
-/* Subtle noise texture on background */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* Textarea focus states — visible ring, no default outline */
+/* Textarea & input focus states */
 textarea:focus,
 input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.4);
-  border-color: hsl(var(--ring) / 0.6);
+  box-shadow: 0 0 0 3px hsla(167, 30%, 42%, 0.15);
+  border-color: hsl(167, 30%, 42%);
 }

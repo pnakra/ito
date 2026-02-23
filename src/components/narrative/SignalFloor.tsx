@@ -54,36 +54,36 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
   const isFutureOriented = timing === "deciding";
 
   return (
-    <div className="animate-fade-in space-y-5">
+    <div className="animate-fade-in space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-0.5">
+        <h2 className="text-h2 mb-1">
           Quick context so I don't give bad advice
         </h2>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-body">
           Skip whatever you want.
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {/* Timing */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
+        <div className="space-y-3">
+          <label className="text-body font-medium">
             Already happened or still deciding?
           </label>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {TIMING_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setTiming(opt.value)}
                 disabled={isLoading}
-                className={`text-left px-3.5 py-2 rounded-md border text-sm transition-all duration-150 active:scale-[0.98] ${
+                className={`text-left px-4 py-3 rounded-lg text-body transition-all duration-150 active:scale-[0.98] ${
                   timing === opt.value
-                    ? "border-primary/50 bg-primary/10 text-foreground"
-                    : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/8 border-2 border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80"
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  {timing === opt.value && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
+                  {timing === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
               </button>
@@ -91,23 +91,23 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
           </div>
         </div>
 
-        {/* Physical stage */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{isFutureOriented ? "What are you thinking about doing?" : "Has anything physical happened?"}</label>
-          <div className="flex flex-wrap gap-1.5">
+        {/* Physical stage — 2-column grid */}
+        <div className="space-y-3">
+          <label className="text-body font-medium">{isFutureOriented ? "What are you thinking about doing?" : "Has anything physical happened?"}</label>
+          <div className="grid grid-cols-2 gap-2">
             {PHYSICAL_STAGE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => togglePhysical(opt.value)}
                 disabled={isLoading}
-                className={`px-3 py-1.5 rounded-md border text-sm transition-all duration-150 active:scale-[0.97] ${
+                className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-[14px] transition-all duration-150 active:scale-[0.97] text-left ${
                   physicalStage.includes(opt.value)
-                    ? "border-primary/50 bg-primary/10 text-foreground"
-                    : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/8 border-2 border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80"
                 }`}
               >
-                <span className="flex items-center gap-1.5">
-                  {physicalStage.includes(opt.value) && <Check className="w-3 h-3 text-primary" />}
+                <span className="flex items-center gap-2">
+                  {physicalStage.includes(opt.value) && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
               </button>
@@ -116,13 +116,13 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
 
         {/* Ages */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Rough ages</label>
-          <div className="grid grid-cols-2 gap-2.5">
+        <div className="space-y-3">
+          <label className="text-body font-medium">Rough ages</label>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <span className="text-xs text-muted-foreground mb-1 block">You</span>
+              <span className="text-caption text-muted-foreground mb-1.5 block">You</span>
               <Select value={ageUser} onValueChange={setAgeUser} disabled={isLoading}>
-                <SelectTrigger className="bg-card">
+                <SelectTrigger className="bg-card shadow-card border-0">
                   <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
@@ -133,9 +133,9 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
               </Select>
             </div>
             <div>
-              <span className="text-xs text-muted-foreground mb-1 block">Them</span>
+              <span className="text-caption text-muted-foreground mb-1.5 block">Them</span>
               <Select value={ageOther} onValueChange={setAgeOther} disabled={isLoading}>
-                <SelectTrigger className="bg-card">
+                <SelectTrigger className="bg-card shadow-card border-0">
                   <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,22 +149,22 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
 
         {/* Intent */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">What are you trying to figure out?</label>
-          <div className="flex flex-col gap-1.5">
+        <div className="space-y-3">
+          <label className="text-body font-medium">What are you trying to figure out?</label>
+          <div className="flex flex-col gap-2">
             {INTENT_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setIntent(prev => prev === opt.value ? "" : opt.value)}
                 disabled={isLoading}
-                className={`text-left px-3.5 py-2 rounded-md border text-sm transition-all duration-150 active:scale-[0.98] ${
+                className={`text-left px-4 py-3 rounded-lg text-body transition-all duration-150 active:scale-[0.98] ${
                   intent === opt.value
-                    ? "border-primary/50 bg-primary/10 text-foreground"
-                    : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                    ? "bg-primary/8 border-2 border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80"
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  {intent === opt.value && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
+                  {intent === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
               </button>
@@ -173,15 +173,14 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
       </div>
 
-      <div className="flex justify-between items-center pt-1">
-        <Button
-          variant="ghost"
+      <div className="flex justify-between items-center pt-2">
+        <button
           onClick={onSkip}
           disabled={isLoading}
-          className="text-muted-foreground text-sm"
+          className="text-caption text-muted-foreground hover:text-foreground transition-colors"
         >
           Skip
-        </Button>
+        </button>
         <Button
           onClick={handleSubmit}
           disabled={isLoading}

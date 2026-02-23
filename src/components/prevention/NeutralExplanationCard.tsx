@@ -17,7 +17,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-sm">Taking a moment...</p>
+        <p className="text-muted-foreground text-body">Taking a moment...</p>
       </div>
     );
   }
@@ -29,36 +29,36 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
   }
 
   return (
-    <div className="space-y-5 animate-fade-in">
-      <div className="bg-muted/30 border border-border/50 p-3 rounded-md">
-        <p className="text-xs text-muted-foreground text-center">
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-card shadow-card rounded-lg p-5">
+        <p className="text-caption text-muted-foreground text-center">
           The absence of a red flag is not the presence of consent. Only the other person can tell you what they want.
         </p>
       </div>
 
       <div className="flex justify-center">
-        <div className="bg-muted text-muted-foreground py-2 px-3.5 rounded-md text-sm font-medium flex items-center gap-2">
+        <div className="bg-muted text-muted-foreground py-2.5 px-4 rounded-lg text-body font-medium flex items-center gap-2 shadow-badge">
           <Info className="w-4 h-4" />
           {analysis.signalLabel}
         </div>
       </div>
 
-      <div className="space-y-2">
+      {/* Key advice callout */}
+      {analysis.suggestion && (
+        <div className="bg-callout rounded-lg p-5 text-center">
+          <p className="text-[17px] font-semibold text-callout-foreground leading-relaxed">{analysis.suggestion}</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
         {analysis.why.map((point, i) => (
-          <p key={i} className="text-sm text-muted-foreground flex gap-2">
-            <span>•</span>
-            <span>{point}</span>
+          <p key={i} className="text-body text-muted-foreground">
+            {point}
           </p>
         ))}
       </div>
 
-      {analysis.suggestion && (
-        <div className="bg-muted/30 border border-border/50 p-4 rounded-md">
-          <p className="text-sm text-muted-foreground">{analysis.suggestion}</p>
-        </div>
-      )}
-
-      <p className="text-sm text-muted-foreground text-center italic">
+      <p className="text-body text-muted-foreground text-center italic">
         Consent can change at any time. If they hesitate, go quiet, or pull back, that's your cue to stop.
       </p>
     </div>

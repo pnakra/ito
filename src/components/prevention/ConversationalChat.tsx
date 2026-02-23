@@ -48,10 +48,10 @@ const ConversationalChat = ({
   };
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in space-y-6">
       <div>
-        <h2 className="text-lg font-semibold mb-0.5">Let's talk through it</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="text-h2 mb-1">Let's talk through it</h2>
+        <p className="text-muted-foreground text-body">
           Share more, ask questions, or clarify anything.
         </p>
       </div>
@@ -64,10 +64,10 @@ const ConversationalChat = ({
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div 
-                className={`max-w-[85%] p-3 rounded-lg text-sm ${
+                className={`max-w-[85%] p-4 rounded-lg text-body ${
                   msg.role === "user" 
                     ? "bg-primary text-primary-foreground" 
-                    : "bg-muted"
+                    : "bg-card shadow-card"
                 }`}
               >
                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -77,7 +77,7 @@ const ConversationalChat = ({
           
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-muted p-3 rounded-lg">
+              <div className="bg-card shadow-card p-4 rounded-lg">
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               </div>
             </div>
@@ -92,12 +92,12 @@ const ConversationalChat = ({
         onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
         onKeyDown={handleKeyDown}
         placeholder="Type here..."
-        className="min-h-[80px] resize-none text-sm"
+        className="min-h-[80px] resize-none text-body"
         disabled={isLoading}
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-caption text-muted-foreground">
           {input.length} / {maxLength}
         </span>
         <div className="flex gap-2">
@@ -105,7 +105,7 @@ const ConversationalChat = ({
             variant="ghost" 
             onClick={onDone}
             disabled={isLoading}
-            className="text-muted-foreground text-sm"
+            className="text-muted-foreground text-caption"
           >
             Done
           </Button>
@@ -113,7 +113,6 @@ const ConversationalChat = ({
             onClick={handleSubmit} 
             disabled={!input.trim() || isLoading}
             size="sm"
-            className="active:scale-[0.97]"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
