@@ -9,7 +9,6 @@ import AfterDecisionStep, { type AfterStepOption } from "@/components/after/Afte
 import AfterContextInput from "@/components/after/AfterContextInput";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import AfterFollowUpChat from "@/components/after/AfterFollowUpChat";
-import { supabase } from "@/integrations/supabase/client";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { ArrowRight, RotateCcw, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -194,11 +193,30 @@ const After = () => {
     try {
       const scenario = formatSelectionsForAI();
       
-      const { data, error } = await supabase.functions.invoke("analyze-crossed-line", {
-        body: { scenario }
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-crossed-line`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ scenario }),
+        }
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data || !data.clarityCheck) {
+        console.error("Invalid response structure:", data);
+        throw new Error("Received an empty response");
+      }
 
       setResults(data as ReflectionResult);
       logAIResponse("after-crossed", "reflection", data.clarityCheck?.slice(0, 100) || "Reflection generated");
@@ -246,7 +264,13 @@ const After = () => {
           body: JSON.stringify({
             message,
             conversationHistory: followUpMessages,
-            originalReflection: results,
+            originalReflection: results ? {
+              clarityCheck: results.clarityCheck || "",
+              otherPersonPerspective: results.otherPersonPerspective || "",
+              yourPatterns: results.yourPatterns || "",
+              accountabilitySteps: results.accountabilitySteps || "",
+              avoidingRepetition: results.avoidingRepetition || "",
+            } : null,
           }),
         }
       );
@@ -256,6 +280,11 @@ const After = () => {
       }
 
       const followUpData = await followUpResponse.json();
+      
+      if (!followUpData?.response) {
+        throw new Error("Empty response from server");
+      }
+      
       const assistantMessage: FollowUpMessage = {
         role: "assistant",
         content: followUpData.response,
