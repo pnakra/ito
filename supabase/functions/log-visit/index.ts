@@ -20,10 +20,11 @@ Deno.serve(async (req) => {
     );
 
     const { error } = await supabase.from("visits").insert({
-      path: path || "/",
-      referrer: referrer || null,
-      user_agent: user_agent || null,
-      session_id: session_id || null,
+      metadata: {
+        path: path || "/",
+        referrer: referrer || "",
+        userAgent: user_agent || "",
+      },
     });
 
     if (error) {
