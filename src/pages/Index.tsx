@@ -24,8 +24,8 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 flex flex-col justify-center">
-        <section className="container mx-auto px-5 py-10 sm:py-16 flex flex-col items-center">
+      <main className="flex-1 flex flex-col justify-start pt-[18vh]">
+        <section className="container mx-auto px-5 flex flex-col items-center">
 
           <h1 className="text-h1 mb-8 text-foreground text-center min-h-[1.2em]">
             <TypewriterText text="is this ok?" delay={70} onComplete={() => setHeadlineComplete(true)} />
