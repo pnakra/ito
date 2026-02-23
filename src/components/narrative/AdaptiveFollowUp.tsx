@@ -12,6 +12,7 @@ interface AdaptiveFollowUpProps {
 }
 
 const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowUpProps) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const maxLength = 500;
 
@@ -19,59 +20,64 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
     setAnswers(prev => ({ ...prev, [gapId]: value.slice(0, maxLength) }));
   };
 
-  const handleSubmit = () => {
-    onSubmit(answers);
+  const handleNext = () => {
+    if (currentIndex < gaps.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      onSubmit(answers);
+    }
   };
 
-  const hasAnyAnswer = Object.values(answers).some(v => v.trim());
+  const hasCurrentAnswer = (answers[gaps[currentIndex]?.id] || "").trim();
 
   if (isLoading) {
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-sm">Looking at your situation...</p>
+        <p className="text-muted-foreground text-body">Looking at your situation...</p>
       </div>
     );
   }
 
-  return (
-    <div className="animate-fade-in space-y-5">
-      <div>
-        <h2 className="text-lg font-semibold mb-0.5">
-          A couple quick questions
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          These help me understand better. Skip any you don't want to answer.
-        </p>
-      </div>
+  const currentGap = gaps[currentIndex];
+  if (!currentGap) return null;
 
-      <div className="space-y-4">
-        {gaps.map((gap) => (
-          <div key={gap.id} className="space-y-1.5">
-            <label className="text-sm font-medium">{gap.question}</label>
-            <Textarea
-              value={answers[gap.id] || ""}
-              onChange={(e) => handleChange(gap.id, e.target.value)}
-              placeholder="Optional"
-              className="min-h-[60px] resize-none text-sm"
-            />
-          </div>
+  return (
+    <div className="animate-fade-in space-y-6">
+      {/* Progress dots */}
+      <div className="flex justify-center gap-2">
+        {gaps.map((_, i) => (
+          <div
+            key={i}
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === currentIndex ? "bg-primary" : i < currentIndex ? "bg-primary/40" : "bg-border"
+            }`}
+          />
         ))}
       </div>
 
-      <div className="flex justify-between items-center pt-1">
-        <Button
-          variant="ghost"
+      <div className="space-y-8">
+        <label className="text-h2 block">{currentGap.question}</label>
+        <Textarea
+          value={answers[currentGap.id] || ""}
+          onChange={(e) => handleChange(currentGap.id, e.target.value)}
+          placeholder="Optional"
+          className="min-h-[80px] resize-none text-body"
+        />
+      </div>
+
+      <div className="flex justify-between items-center pt-2">
+        <button
           onClick={onSkip}
-          className="text-muted-foreground text-sm"
+          className="text-caption text-muted-foreground hover:text-foreground transition-colors"
         >
           Skip
-        </Button>
+        </button>
         <Button
-          onClick={handleSubmit}
-          className="px-6 active:scale-[0.97]"
+          onClick={handleNext}
+          className="px-6"
         >
-          {hasAnyAnswer ? "Continue" : "Skip"} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+          {currentIndex < gaps.length - 1 ? "Next" : (hasCurrentAnswer ? "Continue" : "Skip")} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
       </div>
     </div>

@@ -37,31 +37,31 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
   if (!isActive) return null;
 
   return (
-    <div className="space-y-5 animate-fade-in">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-2 text-caption text-muted-foreground">
         <Lock className="w-3 h-3" />
         <span>Nothing is saved. Close the tab and it's gone.</span>
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold mb-1">
+        <h2 className="text-h2 mb-1">
           What are you thinking about doing?
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-body text-muted-foreground">
           Pick one — you can always come back for others.
         </p>
       </div>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="grid grid-cols-2 gap-2">
         {MOVE_OPTIONS.map((option) => (
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
             className={cn(
-              "text-left px-3.5 py-2.5 rounded-md border text-sm transition-all duration-150 active:scale-[0.98]",
+              "text-left px-3.5 py-3 rounded-lg min-h-[44px] text-[14px] transition-all duration-150 active:scale-[0.98]",
               selectedMove === option.id
-                ? "border-primary/50 bg-primary/10 text-foreground"
-                : "border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                ? "bg-primary/8 border-2 border-primary text-foreground"
+                : "bg-muted text-foreground hover:bg-muted/80"
             )}
           >
             <span className="flex items-center gap-2">
@@ -74,7 +74,7 @@ const MoveSelection = ({ selectedMove, onSelect, onContinue, isActive }: MoveSel
 
       {selectedMove && (
         <div className="flex justify-end pt-1">
-          <Button onClick={onContinue} className="px-6 active:scale-[0.97]">
+          <Button onClick={onContinue} className="px-6">
             Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>

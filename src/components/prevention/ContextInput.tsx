@@ -15,13 +15,13 @@ const ContextInput = ({ value, onChange, onContinue, isActive }: ContextInputPro
   if (!isActive) return null;
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in space-y-6">
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="text-xs text-muted-foreground font-medium tabular-nums">5</span>
-          <h2 className="text-lg font-semibold">Anything else?</h2>
+          <span className="text-caption text-muted-foreground font-medium tabular-nums">5</span>
+          <h2 className="text-h2">Anything else?</h2>
         </div>
-        <p className="text-muted-foreground text-sm ml-5">
+        <p className="text-muted-foreground text-body ml-5">
           Optional — but more details can help.
         </p>
       </div>
@@ -30,14 +30,14 @@ const ContextInput = ({ value, onChange, onContinue, isActive }: ContextInputPro
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
         placeholder="What else is going on? How are you feeling?"
-        className="min-h-[120px] resize-none text-sm"
+        className="min-h-[120px] resize-none text-body"
       />
 
       <div className="flex justify-between items-center">
-        <span className="text-xs text-muted-foreground">
+        <span className="text-caption text-muted-foreground">
           {value.length} / {maxLength}
         </span>
-        <Button onClick={onContinue} className="px-6 active:scale-[0.97]">
+        <Button onClick={onContinue} className="px-6">
           {value.trim() ? "Continue" : "Skip"} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
       </div>

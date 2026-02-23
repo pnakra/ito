@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Lock, ChevronDown } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
@@ -50,35 +50,37 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
   };
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Privacy note — minimal */}
-      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/60 py-1">
+    <div className="space-y-6 animate-fade-in">
+      {/* Privacy note */}
+      <div className="flex items-center justify-center gap-2 text-caption text-muted-foreground py-1">
         <Lock className="w-3 h-3" />
         <span>Nothing saved. Closes when you leave.</span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold mb-1">
+          <h1 className="text-h1 mb-2">
             What's going on?
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-body">
             Describe the situation. As much or as little as you want.
           </p>
         </div>
 
-        <Textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.target.value.slice(0, maxLength))}
-          onKeyDown={handleKeyDown}
-          placeholder={PLACEHOLDER_ROTATIONS[placeholderIndex]}
-          className="min-h-[140px] resize-none text-base bg-card border-border"
-          disabled={isLoading}
-        />
+        <div className="bg-card shadow-card rounded-lg p-6">
+          <Textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, maxLength))}
+            onKeyDown={handleKeyDown}
+            placeholder={PLACEHOLDER_ROTATIONS[placeholderIndex]}
+            className="min-h-[140px] resize-none text-body border-input"
+            disabled={isLoading}
+          />
+        </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-xs text-muted-foreground/50">
+          <span className="text-caption text-muted-foreground">
             {text.length > 0 && `${text.length} / ${maxLength}`}
           </span>
           <Button
@@ -93,10 +95,9 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
 
       <button
         onClick={onGuidedMode}
-        className="w-full flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors py-1.5"
+        className="w-full flex items-center justify-center gap-1.5 text-caption text-muted-foreground hover:text-foreground transition-colors py-2"
       >
-        <ChevronDown className="w-3.5 h-3.5" />
-        Not sure where to start? Try guided mode
+        Not sure where to start? <span className="text-primary font-medium">Try guided mode</span>
       </button>
     </div>
   );

@@ -17,13 +17,15 @@ const OutcomeFeedback = ({ outcomeId, onReset }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[outcomeId] || feedbackMap["not-sure"];
 
   return (
-    <div className="text-center space-y-6 py-4 animate-fade-in">
-      <p className="text-muted-foreground">{feedback}</p>
+    <div className="text-center space-y-6 py-6 animate-fade-in">
+      <div className="bg-callout rounded-lg p-5">
+        <p className="text-[17px] font-semibold text-callout-foreground">{feedback}</p>
+      </div>
       
       <Button
         variant="ghost"
         onClick={onReset}
-        className="text-muted-foreground text-sm"
+        className="text-muted-foreground text-caption"
       >
         <RotateCcw className="w-4 h-4 mr-2" />
         Start over

@@ -16,12 +16,12 @@ const Header = () => {
 
   return (
     <header className="border-b border-border/40 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
-      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <nav className="container mx-auto px-5 py-3 flex items-center justify-between">
         <Link 
           to="/" 
           className="hover:opacity-80 transition-opacity"
         >
-          <span className="text-base font-semibold text-foreground tracking-tight">ito</span>
+          <span className="font-serif text-xl text-foreground">ito</span>
         </Link>
         
         <div className="hidden md:flex gap-1">
@@ -29,7 +29,7 @@ const Header = () => {
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-caption transition-colors ${
                 isActive(link.to)
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -53,12 +53,12 @@ const Header = () => {
 
       {isMenuOpen && (
         <div className="md:hidden border-t border-border/40 bg-background">
-          <div className="container mx-auto px-4 py-1.5 flex flex-col">
+          <div className="container mx-auto px-5 py-1.5 flex flex-col">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`py-2.5 px-3 rounded-md text-sm transition-colors ${
+                className={`py-2.5 px-3 rounded-lg text-caption transition-colors ${
                   isActive(link.to)
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
