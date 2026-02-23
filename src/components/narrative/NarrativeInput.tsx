@@ -21,6 +21,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const maxLength = 3000;
+  const minChars = 10;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,56 +50,63 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
     }
   };
 
+  const showButton = text.trim().length >= minChars;
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Privacy note */}
-      <div className="flex items-center justify-center gap-2 text-caption text-muted-foreground py-1">
-        <Lock className="w-3 h-3" />
-        <span>Nothing saved. Closes when you leave.</span>
+    <div className="min-h-[calc(100vh-60px)] flex flex-col justify-start pt-[15vh] animate-fade-in">
+      <h1 className="text-h1 mb-6 text-foreground text-center">is this ok?</h1>
+
+      <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
+        <span className="text-[13px] text-muted-foreground font-normal">What's going on?</span>
+
+        <Textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value.slice(0, maxLength))}
+          onKeyDown={handleKeyDown}
+          placeholder={PLACEHOLDER_ROTATIONS[placeholderIndex]}
+          className="min-h-[140px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
+          style={{ boxShadow: "none" }}
+          disabled={isLoading}
+        />
+
+        {showButton && (
+          <div className="flex justify-end animate-fade-in">
+            <Button
+              onClick={handleSubmit}
+              disabled={!text.trim() || isLoading}
+              size="sm"
+              className="w-auto px-5 h-10"
+            >
+              Continue <ArrowRight className="ml-1 w-3.5 h-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-h1 mb-2">
-            What's going on?
-          </h1>
-          <p className="text-muted-foreground text-body">
-            Describe the situation. As much or as little as you want.
-          </p>
+      {/* Loading dots */}
+      {isLoading && (
+        <div className="flex justify-center gap-1.5 mt-6">
+          <span className="typing-dot" />
+          <span className="typing-dot" />
+          <span className="typing-dot" />
+        </div>
+      )}
+
+      {/* Privacy + guided mode */}
+      <div className="mt-6 flex flex-col items-center gap-3">
+        <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+          <Lock className="w-3 h-3" />
+          <span>Nothing saved. Closes when you leave.</span>
         </div>
 
-        <div className="bg-card shadow-card rounded-lg p-6">
-          <Textarea
-            ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value.slice(0, maxLength))}
-            onKeyDown={handleKeyDown}
-            placeholder={PLACEHOLDER_ROTATIONS[placeholderIndex]}
-            className="min-h-[140px] resize-none text-body border-input"
-            disabled={isLoading}
-          />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <span className="text-caption text-muted-foreground">
-            {text.length > 0 && `${text.length} / ${maxLength}`}
-          </span>
-          <Button
-            onClick={handleSubmit}
-            disabled={!text.trim() || isLoading}
-            className="px-6"
-          >
-            Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
-          </Button>
-        </div>
+        <button
+          onClick={onGuidedMode}
+          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Not sure where to start? <span className="text-primary font-medium">Answer a few questions</span>
+        </button>
       </div>
-
-      <button
-        onClick={onGuidedMode}
-        className="w-full flex items-center justify-center gap-1.5 text-caption text-muted-foreground hover:text-foreground transition-colors py-2"
-      >
-        Not sure where to start? <span className="text-primary font-medium">Try guided mode</span>
-      </button>
     </div>
   );
 };

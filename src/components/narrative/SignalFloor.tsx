@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -35,9 +35,7 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
 
   const togglePhysical = (value: string) => {
     setPhysicalStage(prev =>
-      prev.includes(value)
-        ? prev.filter(v => v !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
     );
   };
 
@@ -54,35 +52,33 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
   const isFutureOriented = timing === "deciding";
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in space-y-8">
       <div>
-        <h2 className="text-h2 mb-1">
+        <h2 className="text-question mb-1">
           Quick context so I don't give bad advice
         </h2>
-        <p className="text-muted-foreground text-body">
+        <p className="text-muted-foreground text-[15px]">
           Skip whatever you want.
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Timing */}
-        <div className="space-y-3">
-          <label className="text-body font-medium">
-            Already happened or still deciding?
-          </label>
-          <div className="flex flex-col gap-2">
+        <div className="space-y-4">
+          <label className="text-[15px] font-medium">Already happened or still deciding?</label>
+          <div className="flex flex-col gap-2.5">
             {TIMING_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setTiming(opt.value)}
                 disabled={isLoading}
-                className={`text-left px-4 py-3 rounded-lg text-body transition-all duration-150 active:scale-[0.98] ${
+                className={`text-left px-4 h-[56px] rounded-[12px] text-[14px] transition-all duration-150 active:scale-[0.98] ${
                   timing === opt.value
-                    ? "bg-primary/8 border-2 border-primary text-foreground"
-                    : "bg-muted text-foreground hover:bg-muted/80"
+                    ? "bg-accent border-[1.5px] border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80 border-[1.5px] border-transparent"
                 }`}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2.5">
                   {timing === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
@@ -91,19 +87,19 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
           </div>
         </div>
 
-        {/* Physical stage — 2-column grid */}
-        <div className="space-y-3">
-          <label className="text-body font-medium">{isFutureOriented ? "What are you thinking about doing?" : "Has anything physical happened?"}</label>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Physical stage */}
+        <div className="space-y-4">
+          <label className="text-[15px] font-medium">{isFutureOriented ? "What are you thinking about doing?" : "Has anything physical happened?"}</label>
+          <div className="grid grid-cols-2 gap-2.5">
             {PHYSICAL_STAGE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => togglePhysical(opt.value)}
                 disabled={isLoading}
-                className={`min-h-[44px] px-3.5 py-2.5 rounded-lg text-[14px] transition-all duration-150 active:scale-[0.97] text-left ${
+                className={`min-h-[48px] px-3.5 py-2.5 rounded-[10px] text-[14px] transition-all duration-150 active:scale-[0.97] text-left ${
                   physicalStage.includes(opt.value)
-                    ? "bg-primary/8 border-2 border-primary text-foreground"
-                    : "bg-muted text-foreground hover:bg-muted/80"
+                    ? "bg-accent border-[1.5px] border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80 border-[1.5px] border-transparent"
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -116,13 +112,13 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
 
         {/* Ages */}
-        <div className="space-y-3">
-          <label className="text-body font-medium">Rough ages</label>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-4">
+          <label className="text-[15px] font-medium">Rough ages</label>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="text-caption text-muted-foreground mb-1.5 block">You</span>
+              <span className="text-[13px] text-muted-foreground mb-2 block">You</span>
               <Select value={ageUser} onValueChange={setAgeUser} disabled={isLoading}>
-                <SelectTrigger className="bg-card shadow-card border-0">
+                <SelectTrigger className="h-[56px] bg-card shadow-card border-0 rounded-[12px]">
                   <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
@@ -133,9 +129,9 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
               </Select>
             </div>
             <div>
-              <span className="text-caption text-muted-foreground mb-1.5 block">Them</span>
+              <span className="text-[13px] text-muted-foreground mb-2 block">Them</span>
               <Select value={ageOther} onValueChange={setAgeOther} disabled={isLoading}>
-                <SelectTrigger className="bg-card shadow-card border-0">
+                <SelectTrigger className="h-[56px] bg-card shadow-card border-0 rounded-[12px]">
                   <SelectValue placeholder="age" />
                 </SelectTrigger>
                 <SelectContent>
@@ -149,21 +145,21 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
 
         {/* Intent */}
-        <div className="space-y-3">
-          <label className="text-body font-medium">What are you trying to figure out?</label>
-          <div className="flex flex-col gap-2">
+        <div className="space-y-4">
+          <label className="text-[15px] font-medium">What are you trying to figure out?</label>
+          <div className="flex flex-col gap-2.5">
             {INTENT_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => setIntent(prev => prev === opt.value ? "" : opt.value)}
                 disabled={isLoading}
-                className={`text-left px-4 py-3 rounded-lg text-body transition-all duration-150 active:scale-[0.98] ${
+                className={`text-left px-4 h-[56px] rounded-[12px] text-[14px] transition-all duration-150 active:scale-[0.98] ${
                   intent === opt.value
-                    ? "bg-primary/8 border-2 border-primary text-foreground"
-                    : "bg-muted text-foreground hover:bg-muted/80"
+                    ? "bg-accent border-[1.5px] border-primary text-foreground"
+                    : "bg-muted text-foreground hover:bg-muted/80 border-[1.5px] border-transparent"
                 }`}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2.5">
                   {intent === opt.value && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
                   {opt.label}
                 </span>
@@ -173,18 +169,19 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
         </div>
       </div>
 
-      <div className="flex justify-between items-center pt-2">
+      <div className="flex justify-between items-center pt-4">
         <button
           onClick={onSkip}
           disabled={isLoading}
-          className="text-caption text-muted-foreground hover:text-foreground transition-colors"
+          className="text-[14px] text-muted-foreground hover:text-foreground transition-colors"
         >
           Skip
         </button>
         <Button
           onClick={handleSubmit}
           disabled={isLoading}
-          className="px-6"
+          size="sm"
+          className="w-auto px-6 h-11"
         >
           Continue <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
