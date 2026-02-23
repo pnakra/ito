@@ -173,19 +173,32 @@ export function narrativeToDecisionState(
 ) {
   const text = cumulativeText.toLowerCase();
 
-  // Map consent signals
+  // Map consent signals — IMPORTANT: distinguish user's own boundaries from other person's signals
+  // "I don't want X" = user setting their OWN boundary (healthy, not "said-no")
+  // "They said no" / "They pulled away" = OTHER person refusing (said-no)
   let consentSignal: string | null = null;
-  if (/\b(said no|said stop|pulled away|refused|don't want)\b/i.test(text)) {
+  
+  // Other person explicitly refused or withdrew
+  if (/\b(they|he|she)\s+(said\s+no|said\s+stop|pulled\s+away|refused|pushed\s+me\s+away)\b/i.test(text)) {
     consentSignal = "said-no";
-  } else if (/\b(didn't say anything|silent|quiet|didn't respond|froze|frozen)\b/i.test(text)) {
+  } else if (/\bsaid\s+(no|stop)\s+to\s+(me|him|her|them)\b/i.test(text)) {
+    consentSignal = "said-no";
+  // Other person went silent/non-responsive
+  } else if (/\b(they|he|she)\s+(didn't say anything|went\s+quiet|froze|didn't respond|was\s+silent|stopped\s+responding)\b/i.test(text)) {
     consentSignal = "no-response";
-  } else if (/\b(mixed|hard to tell|sometimes|not sure|confused)\b/i.test(text)) {
+  } else if (/\b(didn't say anything|silent|quiet|didn't respond|froze|frozen)\b/i.test(text) && !/\bi\s+(was|went|am|feel|felt)\s+(quiet|silent|frozen|froze)\b/i.test(text)) {
+    consentSignal = "no-response";
+  // Mixed signals from other person
+  } else if (/\b(mixed|hard to tell|sometimes|not sure how they feel|confused about (their|his|her))\b/i.test(text)) {
     consentSignal = "mixed-signals";
-  } else if (/\b(enthusiastic|into it|wanted|said yes|agreed|nodded|excited)\b/i.test(text)) {
+  // Other person showing enthusiasm
+  } else if (/\b(they|he|she)\s+(is|was|seems?|seemed)\s+(enthusiastic|into it|excited)\b/i.test(text) || /\b(said yes|agreed|nodded|asked me to)\b/i.test(text)) {
     consentSignal = "enthusiastic-actions";
-  } else if (/\b(clear yes|explicitly|verbally agreed|told me to|asked me to)\b/i.test(text)) {
+  } else if (/\b(clear yes|explicitly|verbally agreed|told me to)\b/i.test(text)) {
     consentSignal = "clear-yes";
   }
+  // NOTE: "I don't want X" / "I wasn't into it" = user's own feelings, NOT other person's consent signal
+  // These are left as consentSignal = null, which defaults to yellow/uncertainty
 
   // Map context factors
   const contextFactors: string[] = [];
