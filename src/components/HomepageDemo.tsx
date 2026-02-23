@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
 
 interface DemoScenario {
   text: string;
@@ -106,30 +105,27 @@ const HomepageDemo = () => {
 
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      {/* Card frame */}
-      <div className="relative rounded-lg bg-card shadow-card overflow-hidden">
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden">
         <div className="px-5 pt-4 pb-1">
-          <span className="text-caption text-muted-foreground">What's going on?</span>
+          <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
 
         <div className="px-5 pb-5 space-y-3 min-h-[280px]">
-          {/* Text area mock */}
-          <div className="rounded-lg border border-input bg-background p-4 min-h-[100px] text-body text-foreground leading-relaxed">
+          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-relaxed">
             {displayedText}
             {phase === "typing" && (
               <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
             )}
             {!displayedText && phase === "typing" && (
-              <span className="text-muted-foreground/50 text-body">
+              <span className="text-muted-foreground/50 text-[15px]">
                 Tell me what's going on...
               </span>
             )}
           </div>
 
-          {/* Submit */}
           <div className="flex justify-end">
             <div
-              className={`text-caption px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`text-[13px] px-4 py-2 rounded-[14px] font-semibold transition-all duration-200 ${
                 phase === "submitting" || phase === "result" || (phase === "typing" && charIndex === scenario.text.length)
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground opacity-40"
@@ -139,11 +135,14 @@ const HomepageDemo = () => {
             </div>
           </div>
 
-          {/* Loading */}
+          {/* Loading: typing dots */}
           {phase === "submitting" && (
-            <div className="flex items-center gap-2 py-3 animate-fade-in">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-              <p className="text-caption text-muted-foreground">Thinking…</p>
+            <div className="flex justify-center py-3 animate-fade-in">
+              <div className="flex gap-1.5">
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+                <span className="typing-dot" />
+              </div>
             </div>
           )}
 
@@ -151,32 +150,27 @@ const HomepageDemo = () => {
           {phase === "result" && (
             <div className="space-y-3 animate-fade-in">
               <div className="inline-flex">
-                <span className={`text-caption py-1.5 px-3 rounded-lg font-medium shadow-badge ${
-                  scenario.signal === "yellow"
-                    ? "bg-signal-pause/10 text-signal-pause"
-                    : "bg-muted text-muted-foreground"
-                }`}>
+                <span className="bg-accent text-primary border-[1.5px] border-primary text-[13px] py-1.5 px-3 rounded-full font-semibold">
                   {scenario.label}
                 </span>
               </div>
 
               <div className="space-y-2">
                 {scenario.points.map((p, i) => (
-                  <p key={i} className="text-caption text-foreground/75">
+                  <p key={i} className="text-[13px] text-foreground/75">
                     {p}
                   </p>
                 ))}
               </div>
 
-              <div className="bg-callout rounded-lg p-3">
-                <p className="text-caption font-medium text-callout-foreground">{scenario.tension}</p>
+              <div className="bg-callout rounded-[12px] p-3">
+                <p className="text-[13px] font-medium italic text-foreground">{scenario.tension}</p>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Dots */}
       <div className="flex justify-center gap-1.5 mt-3">
         {SCENARIOS.map((_, i) => (
           <div

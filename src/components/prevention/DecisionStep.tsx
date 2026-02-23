@@ -34,15 +34,15 @@ const DecisionStep = ({
     <div className="animate-fade-in space-y-6">
       <div>
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="text-caption text-muted-foreground font-medium tabular-nums">{stepNumber}</span>
-          <h2 className="text-h2">{title}</h2>
+          <span className="text-[13px] text-muted-foreground font-medium tabular-nums">{stepNumber}</span>
+          <h2 className="text-question">{title}</h2>
         </div>
         {subtitle && (
-          <p className="text-muted-foreground text-body ml-5">{subtitle}</p>
+          <p className="text-muted-foreground text-[15px] ml-5">{subtitle}</p>
         )}
       </div>
       
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         {options.map((option) => {
           const isSelected = selectedValues.includes(option.id);
           
@@ -51,10 +51,10 @@ const DecisionStep = ({
               key={option.id}
               onClick={() => onSelect(option.id)}
               className={cn(
-                "text-left px-3.5 py-3 rounded-lg min-h-[44px] text-[14px] transition-all duration-150 active:scale-[0.98]",
+                "text-left px-3.5 py-3 rounded-[10px] min-h-[48px] text-[14px] transition-all duration-150 active:scale-[0.98]",
                 isSelected 
-                  ? "bg-primary/8 border-2 border-primary text-foreground" 
-                  : "bg-muted text-foreground hover:bg-muted/80"
+                  ? "bg-accent border-[1.5px] border-primary text-foreground" 
+                  : "bg-muted text-foreground hover:bg-muted/80 border-[1.5px] border-transparent"
               )}
             >
               <span className="flex items-start gap-2">
@@ -62,7 +62,7 @@ const DecisionStep = ({
                 <span>
                   <span className={cn("block", isSelected && "font-medium")}>{option.label}</span>
                   {option.description && (
-                    <span className="block text-caption text-muted-foreground mt-0.5">{option.description}</span>
+                    <span className="block text-[13px] text-muted-foreground mt-0.5">{option.description}</span>
                   )}
                 </span>
               </span>
@@ -72,7 +72,7 @@ const DecisionStep = ({
       </div>
       
       {multiSelect && selectedValues.length > 0 && (
-        <p className="text-caption text-muted-foreground">
+        <p className="text-[13px] text-muted-foreground">
           Tap to add or remove
         </p>
       )}

@@ -1,76 +1,23 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-
-  const navLinks = [
-    { to: "/about", label: "About" },
-    { to: "/resources", label: "Resources" },
-  ];
-
-  const isActive = (path: string) => location.pathname === path;
-
   return (
-    <header className="border-b border-border/40 bg-background/90 backdrop-blur-sm sticky top-0 z-50">
+    <header className="bg-background sticky top-0 z-50">
       <nav className="container mx-auto px-5 py-3 flex items-center justify-between">
         <Link 
           to="/" 
           className="hover:opacity-80 transition-opacity"
         >
-          <span className="font-serif text-xl text-foreground">ito</span>
+          <span className="font-serif text-[20px] font-semibold tracking-[-0.5px] text-foreground">ito</span>
         </Link>
         
-        <div className="hidden md:flex gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`px-3 py-1.5 rounded-lg text-caption transition-colors ${
-                isActive(link.to)
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden h-8 w-8"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
+        <Link
+          to="/about"
+          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          {isMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-        </Button>
+          about
+        </Link>
       </nav>
-
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-border/40 bg-background">
-          <div className="container mx-auto px-5 py-1.5 flex flex-col">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`py-2.5 px-3 rounded-lg text-caption transition-colors ${
-                  isActive(link.to)
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   );
 };

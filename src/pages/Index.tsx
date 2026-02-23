@@ -50,7 +50,7 @@ const Index = () => {
             >
               <button
                 onClick={handleReady}
-                className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg text-body font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+                className="bg-primary text-primary-foreground px-6 py-3 rounded-[14px] text-[15px] font-semibold hover:bg-primary/90 active:scale-[0.97] transition-all"
               >
                 Try it out
               </button>
@@ -59,28 +59,28 @@ const Index = () => {
 
           {cardsVisible && (
             <div className="w-full max-w-lg mx-auto animate-fade-in">
-              <p className="text-center text-caption text-muted-foreground mb-5">Where do you want to start?</p>
+              <p className="text-center text-[13px] text-muted-foreground mb-5">Where do you want to start?</p>
 
               <div className="space-y-3">
                 <Link
                   to="/check-in"
-                  className="group bg-card shadow-card rounded-lg p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
+                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
                 >
                   <div className="flex-1 min-w-0">
                     <h2 className="text-h2 mb-1 text-foreground">
                       Something's on my mind
                     </h2>
-                    <p className="text-muted-foreground text-body">Talk through a situation that feels off</p>
+                    <p className="text-muted-foreground text-[15px]">Talk through a situation that feels off</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
 
                 <Link
                   to="/check-in?mode=guided"
-                  className="group bg-card shadow-card rounded-lg p-4 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
+                  className="group bg-card shadow-card rounded-[16px] p-4 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-body text-muted-foreground">
+                    <p className="text-[15px] text-muted-foreground">
                       Not sure where to start? <span className="text-primary font-medium">Answer a few questions first</span>
                     </p>
                   </div>
