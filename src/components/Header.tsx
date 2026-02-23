@@ -8,7 +8,7 @@ const Header = () => {
           to="/" 
           className="hover:opacity-80 transition-opacity"
         >
-          <span className="font-serif text-[20px] font-semibold tracking-[-0.5px] text-foreground">ito</span>
+          <span className="font-serif text-[22px] font-bold tracking-[-0.5px] text-foreground">ito</span>
         </Link>
         
         <Link
