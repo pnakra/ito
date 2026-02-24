@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import RiskBadge from "@/components/RiskBadge";
+import { AlertTriangle, MessageCircle, ArrowRight as ArrowRightIcon } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
 interface AnalysisData {
@@ -66,28 +67,32 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* Why lines — staggered fade */}
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {analysis.why.map((point, i) => (
-          <p
+          <div
             key={i}
-            className={`text-[15px] text-[#3a3a3a] leading-[1.7] transition-opacity duration-200 ${
+            className={`flex items-start gap-3 transition-opacity duration-200 ${
               i < visibleLines ? "opacity-100 animate-fade-in" : "opacity-0"
             }`}
           >
-            {point}
-          </p>
+            <AlertTriangle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <p className="text-[15px] text-foreground leading-[1.65]">
+              {point}
+            </p>
+          </div>
         ))}
       </div>
 
       {/* Callout — appears last */}
       {showCallout && analysis.suggestion && (
-        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in">
+        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in flex items-start gap-3">
+          <MessageCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
           <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
         </div>
       )}
 
       <p className="text-[13px] text-muted-foreground text-center">
-        Only the other person can give consent.
+        Reflection tool, not a ruling.
       </p>
     </div>
   );
