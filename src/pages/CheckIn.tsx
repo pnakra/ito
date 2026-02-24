@@ -522,6 +522,7 @@ const CheckIn = () => {
               onSubmit={handleNarrativeSubmit}
               onGuidedMode={() => setPhase("guided-mode")}
               isLoading={isLoading}
+              compact={shouldShowPatternWarning}
             />
           )}
 

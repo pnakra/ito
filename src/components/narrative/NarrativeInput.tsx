@@ -14,9 +14,10 @@ interface NarrativeInputProps {
   onSubmit: (text: string) => void;
   onGuidedMode: () => void;
   isLoading: boolean;
+  compact?: boolean;
 }
 
-const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputProps) => {
+const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: NarrativeInputProps) => {
   const [text, setText] = useState("");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -53,7 +54,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
   const showButton = text.trim().length >= minChars;
 
   return (
-    <div className="min-h-[calc(100vh-60px)] flex flex-col justify-start pt-[15vh] animate-fade-in">
+    <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
       <h1 className="text-h1 mb-6 text-foreground text-center">is this ok?</h1>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
