@@ -84,6 +84,25 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
         )}
       </div>
 
+      {/* Scenario prompts */}
+      {!text && !isLoading && (
+        <div className="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
+          {[
+            "We've been drinking and she's gone quiet but hasn't left",
+            "He keeps asking after I said not yet",
+            "We hooked up before but tonight feels different",
+          ].map((prompt) => (
+            <button
+              key={prompt}
+              onClick={() => setText(prompt)}
+              className="text-[13px] text-muted-foreground bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] hover:text-foreground px-3.5 py-2 rounded-[10px] transition-colors text-left leading-snug"
+            >
+              "{prompt}"
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Loading dots */}
       {isLoading && (
         <div className="flex justify-center gap-1.5 mt-6">
