@@ -67,7 +67,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* Why lines — staggered fade */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {analysis.why.map((point, i) => (
           <div
             key={i}
@@ -75,7 +75,9 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
               i < visibleLines ? "opacity-100 animate-fade-in" : "opacity-0"
             }`}
           >
-            <AlertTriangle className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-[11px] font-medium text-muted-foreground">{i + 1}</span>
+            </span>
             <p className="text-[15px] text-foreground leading-[1.65]">
               {point}
             </p>
@@ -86,8 +88,8 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       {/* Callout — appears last */}
       {showCallout && analysis.suggestion && (
         <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in flex items-start gap-3">
-          <MessageCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
+          <ArrowRightIcon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+          <p className="text-[15px] font-medium text-foreground leading-relaxed">{analysis.suggestion}</p>
         </div>
       )}
 

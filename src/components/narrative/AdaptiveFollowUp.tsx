@@ -66,19 +66,21 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
         />
       </div>
 
-      <div className="flex justify-between items-center pt-2">
-        <button
-          onClick={onSkip}
-          className="text-caption text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Skip
-        </button>
+      <div className="space-y-3 pt-2">
         <Button
           onClick={handleNext}
-          className="px-6"
+          className="w-full"
         >
-          {currentIndex < gaps.length - 1 ? "Next" : (hasCurrentAnswer ? "Continue" : "Skip")} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
+          {hasCurrentAnswer ? "Next" : "Skip"} <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
+        {hasCurrentAnswer && (
+          <button
+            onClick={onSkip}
+            className="block mx-auto text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip all
+          </button>
+        )}
       </div>
     </div>
   );
