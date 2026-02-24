@@ -11,39 +11,28 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
   if (!isActive) return null;
 
   return (
-    <div className="animate-fade-in space-y-4 pt-4">
-      <div className="bg-card shadow-card rounded-[16px] p-5">
-        <h2 className="text-h2 mb-2">Did that track?</h2>
-        <p className="text-muted-foreground text-[15px]">
-          If something's off or there's more to the story, you can tell me.
-        </p>
+    <div className="animate-fade-in space-y-3 pt-6">
+      <p className="text-[15px] text-muted-foreground text-center mb-4">
+        Did that track?
+      </p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={onContinue}
+          className="flex-1 text-center border-[1.5px] border-border rounded-[12px] px-4 py-3 transition-all duration-150 active:scale-[0.98] hover:border-primary/40"
+        >
+          <MessageSquare className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
+          <span className="text-[14px] font-medium block text-foreground">Share more</span>
+        </button>
+
+        <button
+          onClick={onDone}
+          className="flex-1 text-center border-[1.5px] border-border rounded-[12px] px-4 py-3 transition-all duration-150 active:scale-[0.98] hover:border-primary/40"
+        >
+          <CheckCircle className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
+          <span className="text-[14px] font-medium block text-foreground">Makes sense</span>
+        </button>
       </div>
-
-      <button
-        onClick={onContinue}
-        className="w-full text-left border-[1.5px] border-primary text-primary rounded-[12px] px-5 py-3.5 transition-all duration-150 active:scale-[0.98] hover:bg-primary/5"
-      >
-        <div className="flex items-center gap-3">
-          <MessageSquare className="w-4 h-4 flex-shrink-0" />
-          <div>
-            <span className="text-[15px] font-medium block">I want to share more</span>
-            <span className="text-[13px] text-muted-foreground">Clarify something or add details</span>
-          </div>
-        </div>
-      </button>
-
-      <button
-        onClick={onDone}
-        className="w-full text-left border-[1.5px] border-primary text-primary rounded-[12px] px-5 py-3.5 transition-all duration-150 active:scale-[0.98] hover:bg-primary/5"
-      >
-        <div className="flex items-center gap-3">
-          <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          <div>
-            <span className="text-[15px] font-medium block">That makes sense</span>
-            <span className="text-[13px] text-muted-foreground">I'm good for now</span>
-          </div>
-        </div>
-      </button>
     </div>
   );
 };
