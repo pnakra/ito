@@ -12,24 +12,24 @@ const SCENARIOS: DemoScenario[] = [
   {
     text: "we've been together 2 years and things have been good but last night felt off — they said yes but seemed distant the whole time and i don't know if i should have stopped",
     signal: "yellow",
-    label: "something's off",
+    label: "Something's off",
     points: [
-      "you noticed hesitation but continued anyway.",
-      "a 'yes' said while seeming distant isn't the same as enthusiasm.",
-      "the fact that you're asking matters.",
+      "You noticed hesitation but continued anyway.",
+      "A 'yes' said while seeming distant isn't the same as enthusiasm.",
+      "The fact that you're asking matters.",
     ],
-    tension: "you're deciding what their behaviour meant, instead of asking them.",
+    tension: "You're deciding what their behavior meant, instead of asking them.",
   },
   {
     text: "i want to send them a message asking if they want to hook up but we haven't really talked in a while and i'm not sure if they'd be into it",
     signal: "green",
-    label: "you're guessing",
+    label: "You're guessing",
     points: [
-      "you're reading silence as ambiguity, not as a no.",
-      "there's a gap between what you want and what you know they want.",
-      "asking directly removes the guesswork — and the risk.",
+      "You're reading silence as ambiguity, not as a no.",
+      "There's a gap between what you want and what you know they want.",
+      "Asking directly removes the guesswork — and the risk.",
     ],
-    tension: "you're about to act on a hope, not a signal.",
+    tension: "You're about to act on a hope, not a signal.",
   },
 ];
 

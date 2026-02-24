@@ -57,14 +57,12 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
       <h1 className="text-h1 mb-6 text-foreground text-center">is this ok?</h1>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
-        <span className="text-[13px] text-muted-foreground font-normal">What's going on?</span>
-
         <Textarea
           ref={textareaRef}
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, maxLength))}
           onKeyDown={handleKeyDown}
-          placeholder={PLACEHOLDER_ROTATIONS[placeholderIndex]}
+          placeholder="What's on your mind?"
           className="min-h-[140px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
           style={{ boxShadow: "none" }}
           disabled={isLoading}
@@ -88,9 +86,9 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading }: NarrativeInputPro
       {!text && !isLoading && (
         <div className="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
-            "We've been drinking and she's gone quiet but hasn't left",
-            "He keeps asking after I said not yet",
-            "We hooked up before but tonight feels different",
+            "She said yes earlier but now she seems off",
+            "I keep thinking about whether I pushed too hard",
+            "We've hooked up before but this time felt different",
           ].map((prompt) => (
             <button
               key={prompt}

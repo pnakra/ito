@@ -501,6 +501,11 @@ const CheckIn = () => {
               if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
+              else if (phase === "explanation" || phase === "after-explanation") setPhase("signal-floor");
+              else if (phase === "post-explanation-choice") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
+              else if (phase === "follow-up-chat") setPhase("post-explanation-choice");
+              else if (phase === "outcome") setPhase("post-explanation-choice");
+              else if (phase === "outcome-feedback") setPhase("outcome");
               else resetFlow();
             }} />
           ) : phase === "guided-mode" ? null : (

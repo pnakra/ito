@@ -254,25 +254,8 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
         </div>
       </div>
 
-      {/* Bottom: skip + dots + continue */}
+      {/* Bottom: dots + continue + skip */}
       <div className="pb-8 pt-4 space-y-4">
-        {isOptional && (
-          <button
-            onClick={next}
-            className="block mx-auto text-[14px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Skip for now
-          </button>
-        )}
-
-        <Button
-          onClick={next}
-          disabled={!canContinue() && !isOptional}
-          className={`transition-opacity ${(!canContinue() && !isOptional) ? "opacity-40" : "opacity-100"}`}
-        >
-          {step === TOTAL_STEPS ? "Continue" : "Continue"}
-        </Button>
-
         {/* Dot progress */}
         <div className="flex justify-center gap-2">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (
@@ -284,6 +267,23 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
             />
           ))}
         </div>
+
+        <Button
+          onClick={next}
+          disabled={!canContinue() && !isOptional}
+          className={`transition-opacity ${(!canContinue() && !isOptional) ? "opacity-40" : "opacity-100"}`}
+        >
+          {isOptional && !canContinue() ? "Skip" : "Continue"}
+        </Button>
+
+        {isOptional && canContinue() && (
+          <button
+            onClick={next}
+            className="block mx-auto text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Skip for now
+          </button>
+        )}
       </div>
     </div>
   );
