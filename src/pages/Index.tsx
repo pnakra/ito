@@ -43,7 +43,7 @@ const Index = () => {
 
           {!cardsVisible && (
             <div
-              className={`mt-4 flex flex-col items-center gap-2 transition-all duration-300 ${
+              className={`mt-6 flex flex-col items-center gap-2 transition-all duration-300 ${
                 headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
               } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
               style={{ transitionDelay: headlineComplete ? "150ms" : "0ms" }}
