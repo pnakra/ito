@@ -10,18 +10,18 @@ interface DemoScenario {
 
 const SCENARIOS: DemoScenario[] = [
   {
-    text: "we've been together 2 years and things have been good but last night felt off — they said yes but seemed distant the whole time and i don't know if i should have stopped",
+    text: "she said yes earlier but seemed distant the whole time and i don't know if i should have stopped",
     signal: "yellow",
     label: "Something's off",
     points: [
       "You noticed hesitation but continued anyway.",
-      "A 'yes' said while seeming distant isn't the same as enthusiasm.",
+      "A 'yes' said while seeming distant isn't enthusiasm.",
       "The fact that you're asking matters.",
     ],
     tension: "You're deciding what their behavior meant, instead of asking them.",
   },
   {
-    text: "i want to send them a message asking if they want to hook up but we haven't really talked in a while and i'm not sure if they'd be into it",
+    text: "i want to message them asking to hook up but we haven't talked in a while and i'm not sure they'd be into it",
     signal: "green",
     label: "You're guessing",
     points: [
@@ -143,7 +143,7 @@ const HomepageDemo = () => {
 
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '470px' }}>
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '440px' }}>
         <div className="px-5 pt-4 pb-1">
           <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
