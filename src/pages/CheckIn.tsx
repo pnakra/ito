@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
@@ -109,6 +109,52 @@ const CheckIn = () => {
   const getCumulativeText = useCallback(() => {
     return narrativeHistory.join("\n\n");
   }, [narrativeHistory]);
+
+  // Demo mode: auto-submit pre-filled scenario
+  useEffect(() => {
+    if (searchParams.get("demo") !== "true") return;
+    const raw = sessionStorage.getItem("ito-demo-scenario");
+    if (!raw) return;
+    sessionStorage.removeItem("ito-demo-scenario");
+
+    try {
+      const { signals, narrative, worried } = JSON.parse(raw);
+      const parts: string[] = [];
+      if (narrative) parts.push(narrative);
+      if (worried) parts.push(`What I'm worried about: ${worried}`);
+
+      const signalText = serializeSignals(signals);
+      if (signalText) parts.push(signalText);
+
+      const text = parts.join("\n\n");
+      if (text.trim()) {
+        // Skip straight to analysis with pre-filled data
+        setNarrativeHistory([text]);
+        setStructuredSignals(signals);
+        if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
+        else if (signals.timing === "deciding") setDetectedTiming("before");
+
+        const gapResult = detectGaps(text);
+        const decisionState = narrativeToDecisionState(text, gapResult.detectedTiming);
+        const result = classifyRisk(decisionState);
+        updateRiskLevel(result.level);
+        setRiskResult(result);
+
+        const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
+        recordRun(result.level, hasFlaggedWords);
+
+        if (result.level === "red" || result.level === "yellow") {
+          setPhase("stop-moment");
+        } else {
+          const effectiveTiming = signals.timing === "already-happened" ? "after" : signals.timing === "deciding" ? "before" : gapResult.detectedTiming;
+          fetchExplanation(text, result.level, effectiveTiming);
+        }
+      }
+    } catch (e) {
+      console.error("[ITO] Demo scenario parse error:", e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update risk high-water-mark — can only go up
   const updateRiskLevel = useCallback((newLevel: RiskLevel) => {
