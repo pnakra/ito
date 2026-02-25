@@ -110,7 +110,7 @@ const HomepageDemo = () => {
           <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
 
-        <div className="px-5 pb-5 space-y-3 min-h-[280px]">
+        <div className="px-5 pb-5 space-y-3 min-h-[220px]">
           <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-relaxed">
             {displayedText}
             {phase === "typing" && (

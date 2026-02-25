@@ -171,7 +171,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     if (isPhysicalMomentum) {
       return {
         level: "red",
-        stopMessage: "Do not escalate physically with mixed signals. Check in verbally first.",
+        stopMessage: "Do not escalate physically when signals are unclear. Check in verbally first.",
         reasoning: "Mixed signals require verbal clarification before any physical escalation.",
         flaggedWords
       };
@@ -187,7 +187,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     }
     return {
       level: "yellow",
-      stopMessage: "Mixed signals mean you need to check in before going further.",
+      stopMessage: "Mixed signals mean you should check in before going further.",
       reasoning: "Unclear signals require direct communication, not assumption.",
       flaggedWords
     };

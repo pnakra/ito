@@ -24,7 +24,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 flex flex-col justify-start pt-[18vh]">
+      <main className="flex-1 flex flex-col justify-start pt-[10vh]">
         <section className="container mx-auto px-5 flex flex-col items-center">
 
           <h1 className="text-h1 mb-8 text-foreground text-center min-h-[1.2em]">
@@ -59,30 +59,29 @@ const Index = () => {
 
           {cardsVisible && (
             <div className="w-full max-w-lg mx-auto animate-fade-in">
-              <p className="text-center text-[13px] text-muted-foreground mb-5">Where do you want to start?</p>
-
               <div className="space-y-3">
                 <Link
                   to="/check-in"
                   className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
                 >
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-h2 mb-1 text-foreground">
-                      Something's on my mind
+                    <h2 className="text-[16px] font-medium mb-1 text-foreground">
+                      Write it out
                     </h2>
-                    <p className="text-muted-foreground text-[15px]">Talk through a situation that feels off</p>
+                    <p className="text-muted-foreground text-[14px]">Describe what happened or what you're thinking about</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
 
                 <Link
                   to="/check-in?mode=guided"
-                  className="group bg-card shadow-card rounded-[16px] p-4 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
+                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] text-muted-foreground">
-                      Not sure where to start? <span className="text-primary font-medium">Answer a few questions first</span>
-                    </p>
+                    <h2 className="text-[16px] font-medium mb-1 text-foreground">
+                      Answer a few questions
+                    </h2>
+                    <p className="text-muted-foreground text-[14px]">Not sure where to start? We'll walk you through it</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
