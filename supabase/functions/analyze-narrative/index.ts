@@ -120,40 +120,81 @@ serve(async (req) => {
     const userMessage = `Narrative:\n${narrativeText}`;
     messages.push({ role: "user", content: userMessage });
 
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-3-haiku-20240307",
-        max_tokens: 600,
-        messages: messages.map(m => ({
-          role: m.role === "system" ? "user" : m.role,
-          content: m.content
-        }))
-      }),
-    });
+    const MAX_RETRIES = 2;
+    let lastError: Error | null = null;
 
-    if (!resp.ok) {
-      const text = await resp.text();
-      console.error("Claude error:", text);
-      throw new Error("Claude request failed");
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-3-haiku-20240307",
+            max_tokens: 600,
+            messages: messages.map(m => ({
+              role: m.role === "system" ? "user" : m.role,
+              content: m.content
+            }))
+          }),
+        });
+
+        if (!resp.ok) {
+          const text = await resp.text();
+          console.error(`Claude error (attempt ${attempt + 1}):`, text);
+          lastError = new Error("Claude request failed");
+          continue;
+        }
+
+        const data = await resp.json();
+        const raw = data?.content?.[0]?.text ?? "";
+        console.log("Response length:", raw.length, "finish_reason:", data?.stop_reason);
+
+        if (!raw.trim()) {
+          console.error(`Empty response (attempt ${attempt + 1})`);
+          lastError = new Error("Empty response");
+          continue;
+        }
+
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (!match) {
+          console.error(`Failed to parse (attempt ${attempt + 1}):`, raw.slice(0, 200));
+          lastError = new Error("Failed to parse AI response");
+          continue;
+        }
+
+        const parsed = JSON.parse(match[0]);
+
+        // Validate required fields based on flow
+        const requiredFields = isAfterFlow
+          ? ["clarityCheck", "otherPersonPerspective", "accountabilitySteps"]
+          : ["signalLabel", "why", "suggestion"];
+        const emptyFields = requiredFields.filter(f => {
+          const val = parsed[f];
+          if (Array.isArray(val)) return val.length === 0;
+          return !val?.toString().trim();
+        });
+
+        if (emptyFields.length > 0) {
+          console.error(`Empty fields (attempt ${attempt + 1}):`, emptyFields.join(", "));
+          lastError = new Error(`Empty fields: ${emptyFields.join(", ")}`);
+          continue;
+        }
+
+        return new Response(JSON.stringify({ ...parsed, detectedTiming: isAfterFlow ? "after" : "before" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (parseErr) {
+        console.error(`Error (attempt ${attempt + 1}):`, parseErr);
+        lastError = parseErr as Error;
+        continue;
+      }
     }
 
-    const data = await resp.json();
-    const raw = data?.content?.[0]?.text ?? "";
-
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error("Failed to parse AI response");
-
-    const parsed = JSON.parse(match[0]);
-
-    return new Response(JSON.stringify({ ...parsed, detectedTiming: isAfterFlow ? "after" : "before" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    throw lastError || new Error("All retry attempts failed");
   } catch (error) {
     console.error("Error:", error);
     return new Response(
