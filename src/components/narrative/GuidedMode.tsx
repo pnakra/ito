@@ -126,7 +126,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
         <div className="pt-6 pb-4">
           {/* Step content */}
           {step === 1 && (
-            <StepLayout question="Already happened, or still thinking about what to do?">
+            <StepLayout question="Did this already happen, or is it still being figured out?">
               <div className="flex flex-col gap-2.5">
                 {TIMING_OPTIONS.map(opt => (
                   <OptionButton
