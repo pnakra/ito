@@ -143,12 +143,12 @@ const HomepageDemo = () => {
 
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden">
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '420px' }}>
         <div className="px-5 pt-4 pb-1">
           <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
 
-        <div className="px-5 pb-5 space-y-3 min-h-[380px]">
+        <div className="px-5 pb-5 space-y-3 overflow-hidden">
           <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
