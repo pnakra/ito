@@ -56,6 +56,15 @@ interface AfterAnalysisData {
   yourPatterns: string;
 }
 
+const cleanText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
+
+const cleanList = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => (typeof item === "string" ? item.trim() : ""))
+    .filter((item) => item.length > 0);
+};
+
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
   const [phase, setPhase] = useState<FlowPhase>(
@@ -356,20 +365,36 @@ const CheckIn = () => {
       const data = await response.json();
       if (data?.error) throw new Error(data.error);
 
+      const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
+      const why = cleanList(data?.why);
+      const suggestion = cleanText(data?.suggestion);
+
+      const clarityCheck = cleanText(data?.clarityCheck);
+      const otherPersonPerspective = cleanText(data?.otherPersonPerspective);
+      const yourPatterns = cleanText(data?.yourPatterns);
+      const accountabilitySteps = cleanText(data?.accountabilitySteps);
+      const avoidingRepetition = cleanText(data?.avoidingRepetition);
+
       if (isAfter) {
-        setAfterAnalysis(data as AfterAnalysisData);
+        setAfterAnalysis({
+          clarityCheck: clarityCheck || "We can’t fully read this response right now, but it sounds like something important happened.",
+          otherPersonPerspective: otherPersonPerspective || "The other person may have experienced this differently than you expected.",
+          yourPatterns,
+          accountabilitySteps: accountabilitySteps || "For now, pause and give them space while you reflect.",
+          avoidingRepetition,
+        });
       } else {
         setAnalysis({
           riskLevel,
-          signalLabel: data.signalLabel || "Check in with them",
-          why: data.why || [],
-          suggestion: data.suggestion || "",
+          signalLabel,
+          why: why.length > 0 ? why : ["Something feels unclear here, so it’s best to pause and check in directly."],
+          suggestion: suggestion || "Pause and ask them directly what they want right now.",
         });
       }
 
       const fullResponse = isAfter
-        ? `Risk: ${riskLevel} | ${data.clarityCheck || ""} | ${data.accountabilitySteps || ""}`
-        : `Risk: ${riskLevel} - ${data.signalLabel || "Response generated"} | Why: ${(data.why || []).join("; ")} | Suggestion: ${data.suggestion || ""}`;
+        ? `Risk: ${riskLevel} | ${clarityCheck || "fallback"} | ${accountabilitySteps || "fallback"}`
+        : `Risk: ${riskLevel} - ${signalLabel} | Why: ${(why.length > 0 ? why : ["fallback"]).join("; ")} | Suggestion: ${suggestion || "fallback"}`;
       logAIResponse("before", "narrative-explanation", fullResponse);
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
