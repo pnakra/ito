@@ -114,7 +114,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       {/* Privacy + guided mode */}
       <div className="mt-6 flex flex-col items-center gap-3">
         <p className="text-[13px] text-muted-foreground">
-          Private and anonymous — nothing is saved.
+          Anonymous. No data is stored long-term.
         </p>
 
         <button
