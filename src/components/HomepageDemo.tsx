@@ -39,7 +39,7 @@ const TYPING_SPEED = 20;
 const SUBMIT_DELAY = 400;
 const LOADING_DURATION = 1200;
 const BADGE_HOLD = 500;
-const POINT_STAGGER = 450;
+const POINT_STAGGER = 650;
 const TENSION_DELAY = 600;
 const READING_HOLD = 6000;
 const RESET_PAUSE = 800;
@@ -148,8 +148,8 @@ const HomepageDemo = () => {
           <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
 
-        <div className="px-5 pb-5 space-y-3 min-h-[220px]">
-          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-relaxed">
+        <div className="px-5 pb-5 space-y-3 min-h-[380px]">
+          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
               <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
@@ -218,7 +218,7 @@ const HomepageDemo = () => {
         </div>
       </div>
 
-      <div className="flex justify-center gap-1.5 mt-3">
+      <div className="flex justify-center gap-1.5 mt-4">
         {SCENARIOS.map((_, i) => (
           <div
             key={i}
