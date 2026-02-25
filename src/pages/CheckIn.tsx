@@ -136,7 +136,7 @@ const CheckIn = () => {
   const resolveEffectiveTiming = useCallback((signals: StructuredSignals, textTiming: "before" | "after" | "unclear") => {
     if (signals.timing === "already-happened") return "after";
     if (signals.timing === "deciding") return "before";
-    if (signals.timing === "both") return "after"; // treat "both" as after-leaning for safety
+    if (signals.timing === "both") return "after";
     return textTiming;
   }, []);
 
@@ -149,7 +149,6 @@ const CheckIn = () => {
   ) => {
     const hasFlaggedWords = (riskResult.flaggedWords?.length ?? 0) > 0;
     
-    // Check for immediate refusal
     if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(riskResult.level, hasFlaggedWords);
       setPhase("refusal");
@@ -158,21 +157,18 @@ const CheckIn = () => {
     
     recordRun(riskResult.level, hasFlaggedWords);
     
-    // Filter out gaps that structured signals already answered
     const remainingGaps = gapResult.gaps.filter(gap => {
       if (gap.id === "timing" && signals.timing) return false;
       if (gap.id === "age" && (signals.ageUser || signals.ageOther)) return false;
       return true;
     });
     
-    // If still missing critical context and safety allows, ask follow-ups
     if (remainingGaps.length > 0 && !gapResult.hasMinimumSafetyContext && riskResult.level !== "red") {
       setGaps(remainingGaps);
       setPhase("follow-up-questions");
       return;
     }
     
-    // Safety gate
     if (riskResult.level === "red" || riskResult.level === "yellow") {
       setPhase("stop-moment");
       return;
@@ -194,21 +190,18 @@ const CheckIn = () => {
     
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     
-    // Immediate refusal for repeat coercive patterns
     if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(result.level, hasFlaggedWords);
       setPhase("refusal");
       return;
     }
     
-    // Immediate red from deterministic triggers — skip signal floor, go to stop moment
     if (result.level === "red") {
       recordRun(result.level, hasFlaggedWords);
       setPhase("stop-moment");
       return;
     }
     
-    // For non-red: show signal floor to collect structured context
     setPhase("signal-floor");
   };
 
@@ -216,7 +209,6 @@ const CheckIn = () => {
   const handleSignalFloorSubmit = (signals: StructuredSignals) => {
     setStructuredSignals(signals);
     
-    // Serialize signals and append to narrative
     const signalText = serializeSignals(signals);
     const newHistory = signalText ? [...narrativeHistory, signalText] : [...narrativeHistory];
     setNarrativeHistory(newHistory);
@@ -226,7 +218,6 @@ const CheckIn = () => {
     const cumulativeText = newHistory.join("\n\n");
     const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     
-    // Update timing from structured signal
     if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
     else if (signals.timing === "deciding") setDetectedTiming("before");
     
@@ -242,10 +233,8 @@ const CheckIn = () => {
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     recordRun(result.level, hasFlaggedWords);
     
-    // Confidence-aware clarification: ask the single highest-priority missing signal
     const topMissing = getTopMissingSignal(structuredSignals);
     if (topMissing && result.level !== "red") {
-      // Generate a single clarification gap for the most important missing signal
       const clarificationGap: DetectedGap = getClarificationGap(topMissing);
       setGaps([clarificationGap]);
       setPhase("follow-up-questions");
@@ -260,7 +249,7 @@ const CheckIn = () => {
     fetchExplanation(cumulativeText, result.level, detectedTiming);
   };
 
-  // Handle guided mode submission (already includes structured signals)
+  // Handle guided mode submission
   const handleGuidedSubmit = (text: string, signals: StructuredSignals) => {
     logFreetext("before", "guided-mode", text);
     setStructuredSignals(signals);
@@ -363,6 +352,14 @@ const CheckIn = () => {
       }
 
       const data = await response.json();
+      
+      // === TEMPORARY DIAGNOSTICS ===
+      console.log("[ITO-DIAG] Raw API response:", JSON.stringify(data));
+      console.log("[ITO-DIAG] isAfter:", isAfter, "timing:", timing, "riskLevel:", riskLevel);
+      console.log("[ITO-DIAG] data keys:", data ? Object.keys(data) : "null");
+      console.log("[ITO-DIAG] signalLabel:", JSON.stringify(data?.signalLabel), "why:", JSON.stringify(data?.why), "suggestion:", JSON.stringify(data?.suggestion));
+      // === END DIAGNOSTICS ===
+      
       if (data?.error) throw new Error(data.error);
 
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
@@ -375,21 +372,28 @@ const CheckIn = () => {
       const accountabilitySteps = cleanText(data?.accountabilitySteps);
       const avoidingRepetition = cleanText(data?.avoidingRepetition);
 
+      console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck);
+      console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
+
       if (isAfter) {
-        setAfterAnalysis({
+        const afterObj = {
           clarityCheck: clarityCheck || "We can’t fully read this response right now, but it sounds like something important happened.",
           otherPersonPerspective: otherPersonPerspective || "The other person may have experienced this differently than you expected.",
           yourPatterns,
           accountabilitySteps: accountabilitySteps || "For now, pause and give them space while you reflect.",
           avoidingRepetition,
-        });
+        };
+        console.log("[ITO-DIAG] Setting afterAnalysis:", JSON.stringify(afterObj));
+        setAfterAnalysis(afterObj);
       } else {
-        setAnalysis({
+        const beforeObj = {
           riskLevel,
           signalLabel,
           why: why.length > 0 ? why : ["Something feels unclear here, so it’s best to pause and check in directly."],
           suggestion: suggestion || "Pause and ask them directly what they want right now.",
-        });
+        };
+        console.log("[ITO-DIAG] Setting analysis:", JSON.stringify(beforeObj));
+        setAnalysis(beforeObj);
       }
 
       const fullResponse = isAfter
@@ -398,12 +402,12 @@ const CheckIn = () => {
       logAIResponse("before", "narrative-explanation", fullResponse);
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
-      console.error("fetchExplanation error:", errMsg);
+      console.error("[ITO-DIAG] fetchExplanation error:", errMsg);
 
       const isRateLimit = errMsg?.includes("429") || errMsg?.toLowerCase().includes("rate limit") || errMsg?.toLowerCase().includes("too many");
       const userFacingMsg = isRateLimit
-        ? "You've sent a few requests in a row — give it a minute and try again."
-        : "We couldn't check this right now. Try again in a moment.";
+        ? "You’ve sent a few requests in a row — give it a minute and try again."
+        : "We couldn’t check this right now. Try again in a moment.";
 
       if (isAfter) {
         setAfterAnalysis({
@@ -472,14 +476,14 @@ const CheckIn = () => {
         const backendError = typeof errorData?.error === "string" ? errorData.error : "";
 
         if (followUpResponse.status === 429) {
-          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+          throw new Error("You’re sending messages quickly. Please wait a few seconds and try again.");
         }
 
         if (followUpResponse.status === 402) {
           throw new Error("AI credits are temporarily exhausted. Please try again later.");
         }
 
-        throw new Error(backendError || "The assistant couldn't respond right now. Please try again.");
+        throw new Error(backendError || "The assistant couldn’t respond right now. Please try again.");
       }
 
       const followUpData = await followUpResponse.json();
@@ -496,7 +500,7 @@ const CheckIn = () => {
       console.error("Error in follow-up:", error);
       const userFacingError = error instanceof Error && error.message
         ? error.message
-        : "I'm having trouble right now. Can you try again?";
+        : "I’m having trouble right now. Can you try again?";
 
       setChatMessages(prev => [...prev, {
         role: "assistant" as const,
