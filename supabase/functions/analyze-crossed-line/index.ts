@@ -125,53 +125,86 @@ serve(async (req) => {
 
     console.log("Calling Anthropic API...");
     
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
-        system: SYSTEM_PROMPT,
-        messages: [
-          { role: "user", content: scenario }
-        ],
-      }),
-    });
+    const MAX_RETRIES = 2;
+    let lastError: Error | null = null;
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 2048,
+            system: SYSTEM_PROMPT,
+            messages: [
+              { role: "user", content: scenario }
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          
+          const errorText = await response.text();
+          console.error(`Anthropic API error (attempt ${attempt + 1}):`, response.status, errorText);
+          lastError = new Error(`Anthropic API error: ${response.status}`);
+          continue;
+        }
+
+        const data = await response.json();
+        console.log("Anthropic response received, finish_reason:", data?.stop_reason);
+
+        const content = data?.content?.[0]?.text ?? "";
+        console.log("Response content length:", content.length);
+
+        if (!content.trim()) {
+          console.error(`Empty response from Anthropic (attempt ${attempt + 1})`);
+          lastError = new Error("Empty response from Anthropic");
+          continue;
+        }
+        
+        const match = content.match(/\{[\s\S]*\}/);
+        if (!match) {
+          console.error(`Failed to parse JSON (attempt ${attempt + 1}):`, content.slice(0, 200));
+          lastError = new Error("Failed to parse AI response");
+          continue;
+        }
+        
+        const parsedContent = JSON.parse(match[0]);
+
+        // Validate critical fields are non-empty
+        const requiredFields = ["clarityCheck", "otherPersonPerspective", "accountabilitySteps"];
+        const emptyFields = requiredFields.filter(f => !parsedContent[f]?.trim());
+        
+        if (emptyFields.length > 0) {
+          console.error(`Empty required fields (attempt ${attempt + 1}):`, emptyFields.join(", "));
+          lastError = new Error(`Empty fields: ${emptyFields.join(", ")}`);
+          continue;
+        }
+
+        console.log("Valid response, returning to client");
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify(parsedContent),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
+      } catch (parseErr) {
+        console.error(`Parse/fetch error (attempt ${attempt + 1}):`, parseErr);
+        lastError = parseErr as Error;
+        continue;
       }
-      
-      const errorText = await response.text();
-      console.error("Anthropic API error:", response.status, errorText);
-      throw new Error(`Anthropic API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log("Received response from Anthropic API");
-
-    const content = data.content[0].text;
-    
-    // Extract JSON from response
-    const match = content.match(/\{[\s\S]*\}/);
-    if (!match) {
-      throw new Error("Failed to parse AI response");
-    }
-    
-    const parsedContent = JSON.parse(match[0]);
-
-    return new Response(
-      JSON.stringify(parsedContent),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    throw lastError || new Error("All retry attempts failed");
 
   } catch (error) {
     console.error("Error in analyze-crossed-line:", error);
