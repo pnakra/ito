@@ -83,6 +83,62 @@ interface Message {
   content: string;
 }
 
+const MAX_HISTORY_MESSAGES = 12;
+const MAX_INITIAL_CONTEXT_CHARS = 4000;
+const MAX_GATEWAY_RETRIES = 2;
+const RETRYABLE_GATEWAY_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function callLovableAIGateway(
+  messages: Array<{ role: string; content: string }>,
+  apiKey: string,
+): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= MAX_GATEWAY_RETRIES; attempt++) {
+    try {
+      const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages,
+          max_tokens: 400,
+        }),
+      });
+
+      if (
+        resp.ok ||
+        resp.status === 402 ||
+        !RETRYABLE_GATEWAY_STATUSES.has(resp.status) ||
+        attempt === MAX_GATEWAY_RETRIES
+      ) {
+        return resp;
+      }
+
+      const retryDelay = 350 * (attempt + 1);
+      console.warn(`AI gateway returned ${resp.status}. Retrying in ${retryDelay}ms.`);
+      await sleep(retryDelay);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (attempt === MAX_GATEWAY_RETRIES) {
+        throw lastError;
+      }
+
+      const retryDelay = 350 * (attempt + 1);
+      console.warn(`AI gateway request failed. Retrying in ${retryDelay}ms.`, lastError.message);
+      await sleep(retryDelay);
+    }
+  }
+
+  throw lastError ?? new Error("AI gateway unavailable");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -97,7 +153,22 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory, initialContext, riskLevel } = await req.json();
+    const payload = await req.json().catch(() => null);
+    const message = typeof payload?.message === "string" ? payload.message : "";
+    const initialContext = typeof payload?.initialContext === "string"
+      ? payload.initialContext.slice(0, MAX_INITIAL_CONTEXT_CHARS)
+      : "";
+    const riskLevel = typeof payload?.riskLevel === "string" ? payload.riskLevel : "unknown";
+
+    const conversationHistory: Message[] = Array.isArray(payload?.conversationHistory)
+      ? payload.conversationHistory
+          .filter((msg: any) =>
+            msg &&
+            (msg.role === "user" || msg.role === "assistant") &&
+            typeof msg.content === "string"
+          )
+          .slice(-MAX_HISTORY_MESSAGES)
+      : [];
 
     if (!message || !message.trim()) {
       return new Response(JSON.stringify({ error: "Message is required" }), {
@@ -124,44 +195,33 @@ serve(async (req) => {
     const messages: Array<{ role: string; content: string }> = [
       { role: "system", content: SYSTEM_PROMPT },
     ];
-    
+
     // Add initial context as first user message if this is the first follow-up
     if (conversationHistory.length === 0 && initialContext) {
       messages.push({
         role: "user",
-        content: `[Initial situation shared by user]\n${initialContext}\n\n[Risk level assigned: ${riskLevel || "unknown"}]\n\nREMINDER: Do not lower the risk level. Do not give permission to proceed.`
+        content: `[Initial situation shared by user]\n${initialContext}\n\n[Risk level assigned: ${riskLevel}]\n\nREMINDER: Do not lower the risk level. Do not give permission to proceed.`
       });
       messages.push({
-        role: "assistant", 
+        role: "assistant",
         content: "I hear you. What else is on your mind about this?"
       });
     }
-    
+
     // Add conversation history
     for (const msg of conversationHistory) {
       messages.push(msg);
     }
-    
+
     // Add current message
     messages.push({ role: "user", content: message });
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
-        max_tokens: 400,
-      }),
-    });
+    const resp = await callLovableAIGateway(messages, LOVABLE_API_KEY);
 
     if (!resp.ok) {
       if (resp.status === 429) {
         return new Response(
-          JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
+          JSON.stringify({ error: "Rate limits exceeded, please try again in a few seconds." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -172,17 +232,27 @@ serve(async (req) => {
         );
       }
       const t = await resp.text();
-      console.error("AI gateway error:", resp.status, t);
-      return new Response(JSON.stringify({ error: "AI API error" }), {
-        status: 500,
+      console.error("AI gateway error:", resp.status, t.slice(0, 800));
+      return new Response(JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }), {
+        status: 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const data = await resp.json();
-    const responseText = data?.choices?.[0]?.message?.content ?? "";
+    const responseText = typeof data?.choices?.[0]?.message?.content === "string"
+      ? data.choices[0].message.content.trim()
+      : "";
 
-    return new Response(JSON.stringify({ response: responseText.trim() }), {
+    if (!responseText) {
+      console.error("AI gateway returned empty content:", JSON.stringify(data).slice(0, 800));
+      return new Response(JSON.stringify({ error: "AI returned an empty response" }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ response: responseText }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

@@ -443,18 +443,39 @@ const CheckIn = () => {
       );
 
       if (!followUpResponse.ok) {
-        throw new Error(`HTTP ${followUpResponse.status}`);
+        const errorData = await followUpResponse.json().catch(() => ({}));
+        const backendError = typeof errorData?.error === "string" ? errorData.error : "";
+
+        if (followUpResponse.status === 429) {
+          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+        }
+
+        if (followUpResponse.status === 402) {
+          throw new Error("AI credits are temporarily exhausted. Please try again later.");
+        }
+
+        throw new Error(backendError || "The assistant couldn't respond right now. Please try again.");
       }
 
       const followUpData = await followUpResponse.json();
-      const assistantMessage = { role: "assistant" as const, content: followUpData.response };
+      const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
+
+      if (!responseText) {
+        throw new Error("The assistant returned an empty response. Please try again.");
+      }
+
+      const assistantMessage = { role: "assistant" as const, content: responseText };
       setChatMessages(prev => [...prev, assistantMessage]);
-      logAIResponse("before", "follow-up-response", followUpData.response || "Follow-up response");
+      logAIResponse("before", "follow-up-response", responseText);
     } catch (error) {
       console.error("Error in follow-up:", error);
+      const userFacingError = error instanceof Error && error.message
+        ? error.message
+        : "I'm having trouble right now. Can you try again?";
+
       setChatMessages(prev => [...prev, {
         role: "assistant" as const,
-        content: "I'm having trouble right now. Can you try again?"
+        content: userFacingError
       }]);
     } finally {
       setIsLoading(false);
