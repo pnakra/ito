@@ -33,19 +33,23 @@ const SCENARIOS: DemoScenario[] = [
   },
 ];
 
-type Phase = "typing" | "submitting" | "result" | "pause";
+type Phase = "typing" | "submitting" | "result-badge" | "result-points" | "result-tension" | "reading" | "pause";
 
-const TYPING_SPEED = 24;
-const SUBMIT_DELAY = 500;
-const LOADING_DURATION = 1400;
-const RESULT_DISPLAY = 4000;
-const RESET_PAUSE = 900;
+const TYPING_SPEED = 20;
+const SUBMIT_DELAY = 400;
+const LOADING_DURATION = 1200;
+const BADGE_HOLD = 500;
+const POINT_STAGGER = 450;
+const TENSION_DELAY = 600;
+const READING_HOLD = 6000;
+const RESET_PAUSE = 800;
 
 const HomepageDemo = () => {
   const [scenarioIndex, setScenarioIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("typing");
   const [displayedText, setDisplayedText] = useState("");
   const [charIndex, setCharIndex] = useState(0);
+  const [visiblePoints, setVisiblePoints] = useState(0);
   const [visible, setVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const hasStartedRef = useRef(false);
@@ -66,6 +70,7 @@ const HomepageDemo = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Typing phase
   useEffect(() => {
     if (!visible || phase !== "typing") return;
     if (charIndex < scenario.text.length) {
@@ -80,24 +85,57 @@ const HomepageDemo = () => {
     }
   }, [visible, phase, charIndex, scenario.text]);
 
+  // Submitting → badge
   useEffect(() => {
     if (phase !== "submitting") return;
-    const t = setTimeout(() => setPhase("result"), LOADING_DURATION);
+    const t = setTimeout(() => setPhase("result-badge"), LOADING_DURATION);
     return () => clearTimeout(t);
   }, [phase]);
 
+  // Badge → stagger points
   useEffect(() => {
-    if (phase !== "result") return;
-    const t = setTimeout(() => setPhase("pause"), RESULT_DISPLAY);
+    if (phase !== "result-badge") return;
+    const t = setTimeout(() => {
+      setVisiblePoints(0);
+      setPhase("result-points");
+    }, BADGE_HOLD);
     return () => clearTimeout(t);
   }, [phase]);
 
+  // Stagger each point
+  useEffect(() => {
+    if (phase !== "result-points") return;
+    if (visiblePoints < scenario.points.length) {
+      const t = setTimeout(() => setVisiblePoints(v => v + 1), POINT_STAGGER);
+      return () => clearTimeout(t);
+    } else {
+      const t = setTimeout(() => setPhase("result-tension"), TENSION_DELAY);
+      return () => clearTimeout(t);
+    }
+  }, [phase, visiblePoints, scenario.points.length]);
+
+  // Tension → reading hold
+  useEffect(() => {
+    if (phase !== "result-tension") return;
+    const t = setTimeout(() => setPhase("reading"), 100);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // Reading hold → pause
+  useEffect(() => {
+    if (phase !== "reading") return;
+    const t = setTimeout(() => setPhase("pause"), READING_HOLD);
+    return () => clearTimeout(t);
+  }, [phase]);
+
+  // Reset
   useEffect(() => {
     if (phase !== "pause") return;
     const t = setTimeout(() => {
       setScenarioIndex((i) => (i + 1) % SCENARIOS.length);
       setDisplayedText("");
       setCharIndex(0);
+      setVisiblePoints(0);
       setPhase("typing");
     }, RESET_PAUSE);
     return () => clearTimeout(t);
@@ -126,7 +164,7 @@ const HomepageDemo = () => {
           <div className="flex justify-end">
             <div
               className={`text-[13px] px-4 py-2 rounded-[14px] font-semibold transition-all duration-200 ${
-                phase === "submitting" || phase === "result" || (phase === "typing" && charIndex === scenario.text.length)
+                phase === "submitting" || phase.startsWith("result") || phase === "reading" || (phase === "typing" && charIndex === scenario.text.length)
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground opacity-40"
               }`}
@@ -146,26 +184,35 @@ const HomepageDemo = () => {
             </div>
           )}
 
-          {/* Result */}
-          {phase === "result" && (
-            <div className="space-y-3 animate-fade-in">
-              <div className="inline-flex">
+          {/* Staggered result */}
+          {(phase === "result-badge" || phase === "result-points" || phase === "result-tension" || phase === "reading") && (
+            <div className="space-y-3">
+              {/* Badge */}
+              <div className="inline-flex animate-fade-in">
                 <span className="bg-accent text-primary border-[1.5px] border-primary text-[13px] py-1.5 px-3 rounded-full font-semibold">
                   {scenario.label}
                 </span>
               </div>
 
-              <div className="space-y-2">
-                {scenario.points.map((p, i) => (
-                  <p key={i} className="text-[13px] text-foreground/75">
-                    {p}
-                  </p>
-                ))}
-              </div>
+              {/* Points — staggered */}
+              {(phase === "result-points" || phase === "result-tension" || phase === "reading") && (
+                <div className="space-y-2">
+                  {scenario.points.map((p, i) => (
+                    i < visiblePoints && (
+                      <p key={i} className="text-[13px] text-foreground/75 animate-fade-in">
+                        {p}
+                      </p>
+                    )
+                  ))}
+                </div>
+              )}
 
-              <div className="bg-callout rounded-[12px] p-3">
-                <p className="text-[13px] font-medium italic text-foreground">{scenario.tension}</p>
-              </div>
+              {/* Tension callout */}
+              {(phase === "result-tension" || phase === "reading") && (
+                <div className="bg-callout rounded-[12px] p-3 animate-fade-in">
+                  <p className="text-[13px] font-medium italic text-foreground">{scenario.tension}</p>
+                </div>
+              )}
             </div>
           )}
         </div>
