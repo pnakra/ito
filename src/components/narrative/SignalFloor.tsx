@@ -55,7 +55,7 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
     <div className="animate-fade-in space-y-8">
       <div>
         <h2 className="text-question mb-1">
-          Quick context so I don't give bad advice
+          A few quick questions for better advice
         </h2>
         <p className="text-muted-foreground text-[15px]">
           Skip whatever you want.
@@ -65,7 +65,7 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
       <div className="space-y-8">
         {/* Timing */}
         <div className="space-y-4">
-          <label className="text-[15px] font-medium">Already happened or still deciding?</label>
+          <label className="text-[15px] font-medium">Did this already happen, or is it still being figured out?</label>
           <div className="flex flex-col gap-2.5">
             {TIMING_OPTIONS.map(opt => (
               <button

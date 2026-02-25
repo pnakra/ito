@@ -4,7 +4,7 @@
  */
 
 export interface StructuredSignals {
-  timing?: "already-happened" | "deciding" | "not-sure";
+  timing?: "already-happened" | "deciding" | "both" | "not-sure";
   physicalStage?: string[];
   ageUser?: string;
   ageOther?: string;
@@ -13,8 +13,9 @@ export interface StructuredSignals {
 }
 
 export const TIMING_OPTIONS = [
-  { value: "already-happened", label: "This already happened" },
-  { value: "deciding", label: "I'm trying to decide what to do next" },
+  { value: "already-happened", label: "It already happened" },
+  { value: "deciding", label: "Still deciding what to do" },
+  { value: "both", label: "Something happened and something else might" },
   { value: "not-sure", label: "Not sure" },
 ] as const;
 

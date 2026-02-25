@@ -125,9 +125,9 @@ const CheckIn = () => {
 
   // Resolve effective timing from structured signals + text detection
   const resolveEffectiveTiming = useCallback((signals: StructuredSignals, textTiming: "before" | "after" | "unclear") => {
-    // Structured signal takes priority over text detection
     if (signals.timing === "already-happened") return "after";
     if (signals.timing === "deciding") return "before";
+    if (signals.timing === "both") return "after"; // treat "both" as after-leaning for safety
     return textTiming;
   }, []);
 
@@ -218,7 +218,7 @@ const CheckIn = () => {
     const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     
     // Update timing from structured signal
-    if (signals.timing === "already-happened") setDetectedTiming("after");
+    if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
     else if (signals.timing === "deciding") setDetectedTiming("before");
     
     proceedWithSignals(cumulativeText, signals, result, gapResult);
@@ -262,7 +262,7 @@ const CheckIn = () => {
     const cumulativeText = newHistory.join("\n\n");
     const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     
-    if (signals.timing === "already-happened") setDetectedTiming("after");
+    if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
     else if (signals.timing === "deciding") setDetectedTiming("before");
     
     proceedWithSignals(cumulativeText, signals, result, gapResult);
