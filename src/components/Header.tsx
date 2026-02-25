@@ -15,7 +15,7 @@ const Header = () => {
           to="/about"
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          about
+          About
         </Link>
       </nav>
     </header>

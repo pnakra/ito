@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, Lock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
@@ -113,10 +113,9 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
       {/* Privacy + guided mode */}
       <div className="mt-6 flex flex-col items-center gap-3">
-        <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-          <Lock className="w-3 h-3" />
-          <span>Nothing saved. Closes when you leave.</span>
-        </div>
+        <p className="text-[13px] text-muted-foreground">
+          Private and anonymous — nothing is saved.
+        </p>
 
         <button
           onClick={onGuidedMode}

@@ -96,15 +96,16 @@ const ConversationalChat = ({
         disabled={isLoading}
       />
 
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <span className="text-caption text-muted-foreground">
           {input.length} / {maxLength}
         </span>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
             onClick={onDone}
             disabled={isLoading}
+            size="sm"
             className="text-muted-foreground text-caption"
           >
             Done

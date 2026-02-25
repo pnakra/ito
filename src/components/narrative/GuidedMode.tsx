@@ -164,7 +164,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
                 <Textarea
                   value={whatHappened}
                   onChange={(e) => setWhatHappened(e.target.value.slice(0, maxLength))}
-                  placeholder="just describe it in your own words"
+                  placeholder="Just describe it in your own words"
                   className="min-h-[140px] resize-none"
                   disabled={isLoading}
                 />
@@ -229,7 +229,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
               <Textarea
                 value={worried}
                 onChange={(e) => setWorried(e.target.value.slice(0, maxLength))}
-                placeholder="anything on your mind about this"
+                placeholder="Anything on your mind about this?"
                 className="min-h-[120px] resize-none"
                 disabled={isLoading}
               />
@@ -255,7 +255,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
       </div>
 
       {/* Bottom: dots + continue + skip */}
-      <div className="pb-8 pt-4 space-y-4">
+      <div className="mt-auto pb-8 pt-6 space-y-4">
         {/* Dot progress */}
         <div className="flex justify-center gap-2">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (
