@@ -143,7 +143,7 @@ const HomepageDemo = () => {
 
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '420px' }}>
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '470px' }}>
         <div className="px-5 pt-4 pb-1">
           <span className="text-[13px] text-muted-foreground">What's going on?</span>
         </div>
