@@ -11,12 +11,20 @@ const Header = () => {
           <span className="font-serif text-[22px] font-bold tracking-[-0.5px] text-foreground">ito</span>
         </Link>
         
-        <Link
-          to="/about"
-          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          About
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/demo"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Demo
+          </Link>
+          <Link
+            to="/about"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            About
+          </Link>
+        </div>
       </nav>
     </header>
   );
