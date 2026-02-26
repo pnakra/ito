@@ -94,7 +94,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
             <button
               key={prompt}
               onClick={() => setText(prompt)}
-              className="text-[13px] text-muted-foreground bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] hover:text-foreground px-3.5 py-2 rounded-[10px] transition-colors text-left leading-snug"
+              className="text-[13px] text-muted-foreground bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] hover:text-foreground px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug"
             >
               "{prompt}"
             </button>
