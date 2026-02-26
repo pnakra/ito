@@ -17,23 +17,23 @@ interface DemoScenario {
 
 const SCENARIOS: DemoScenario[] = [
   {
-    id: "neutral",
-    label: "No flag",
-    color: "neutral",
-    tagline: "Mutual, clear, and comfortable",
+    id: "red",
+    label: "Red — Stop",
+    color: "red",
+    tagline: "Pressure, silence, and power imbalance",
     description:
-      "Two 18-year-olds who've been dating for a few months. They've talked about what they want, both seem enthusiastic, and nothing feels off.",
+      "Someone is quiet and not responding, there's a significant age gap, and the user is trying to convince them.",
     signals: {
       timing: "deciding",
-      relationship: "partner",
-      physicalStage: ["kissed", "touching-over-clothes"],
-      ageUser: "18-24",
-      ageOther: "18-24",
-      intent: "was-it-okay",
+      relationship: "stranger",
+      physicalStage: ["touching-over-clothes"],
+      ageUser: "25-plus",
+      ageOther: "16-17",
+      intent: "what-to-do",
     },
     narrative:
-      "We've been together for a few months. Last night we were hanging out and things started getting more physical. They kept checking in and asking if I was good with it. I said yes and I meant it. We talked about boundaries before and we're on the same page.",
-    worried: "I just want to make sure I'm reading things right.",
+      "I met them through a friend. They seem into me but they're pretty quiet whenever things get more physical. I've been trying to get them to relax and go with it. They haven't said no but they're not really saying anything.",
+    worried: "They're younger than me and I keep having to push things forward. But they haven't told me to stop.",
   },
   {
     id: "yellow",
@@ -56,23 +56,23 @@ const SCENARIOS: DemoScenario[] = [
       "I can't tell if they actually want this or if it's just the alcohol. I don't want to take advantage of them but I also don't want to overthink it.",
   },
   {
-    id: "red",
-    label: "Red — Stop",
-    color: "red",
-    tagline: "Pressure, silence, and power imbalance",
+    id: "neutral",
+    label: "No flag",
+    color: "neutral",
+    tagline: "Mutual, clear, and comfortable",
     description:
-      "Someone is quiet and not responding, there's a significant age gap, and the user is trying to convince them.",
+      "Two 18-year-olds who've been dating for a few months. They've talked about what they want, both seem enthusiastic, and nothing feels off.",
     signals: {
       timing: "deciding",
-      relationship: "stranger",
-      physicalStage: ["touching-over-clothes"],
-      ageUser: "25-plus",
-      ageOther: "16-17",
-      intent: "what-to-do",
+      relationship: "partner",
+      physicalStage: ["kissed", "touching-over-clothes"],
+      ageUser: "18-24",
+      ageOther: "18-24",
+      intent: "was-it-okay",
     },
     narrative:
-      "I met them through a friend. They seem into me but they're pretty quiet whenever things get more physical. I've been trying to get them to relax and go with it. They haven't said no but they're not really saying anything.",
-    worried: "They're younger than me and I keep having to push things forward. But they haven't told me to stop.",
+      "We've been together for a few months. Last night we were hanging out and things started getting more physical. They kept checking in and asking if I was good with it. I said yes and I meant it. We talked about boundaries before and we're on the same page.",
+    worried: "I just want to make sure I'm reading things right.",
   },
 ];
 
