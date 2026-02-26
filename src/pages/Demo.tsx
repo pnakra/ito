@@ -120,10 +120,13 @@ const Demo = () => {
       <main className="flex-1 flex flex-col justify-start pt-[8vh]">
         <section className="container mx-auto px-5 max-w-lg">
           <h1 className="text-[22px] font-semibold text-foreground text-center mb-2">
-            See how it works
+            See how ito works
           </h1>
-          <p className="text-[14px] text-muted-foreground text-center mb-8 max-w-sm mx-auto">
-            Pick a scenario to walk through the tool step by step. Each one shows how ito responds to different situations.
+          <p className="text-[14px] text-muted-foreground text-center mb-6 max-w-sm mx-auto">
+            ito is a real-time reflection tool for young people navigating sexual consent. It helps someone pause in a moment of confusion and think clearly about what's happening.
+          </p>
+          <p className="text-[13px] text-muted-foreground text-center mb-8 max-w-sm mx-auto">
+            Pick a scenario below to walk through the tool step by step. Each one shows how ito responds to a different level of risk.
           </p>
 
           <div className="space-y-3">
