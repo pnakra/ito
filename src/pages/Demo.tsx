@@ -250,7 +250,7 @@ const DemoWalkthrough = ({ scenario, onBack, onTryYourOwn }: DemoWalkthroughProp
                 <h3 className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   What they wrote
                 </h3>
-                <p className="text-[13px] text-foreground/70 italic leading-relaxed bg-background/50 rounded-lg p-3">
+                <p className="text-[13px] text-foreground/70 italic leading-relaxed bg-warm/60 rounded-lg p-3">
                   "{scenario.narrative}"
                 </p>
               </div>
@@ -259,7 +259,7 @@ const DemoWalkthrough = ({ scenario, onBack, onTryYourOwn }: DemoWalkthroughProp
                   <h3 className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider mb-1">
                     What they're worried about
                   </h3>
-                  <p className="text-[13px] text-foreground/70 italic bg-background/50 rounded-lg p-3">
+                  <p className="text-[13px] text-foreground/70 italic bg-warm/60 rounded-lg p-3">
                     "{scenario.worried}"
                   </p>
                 </div>
