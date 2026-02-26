@@ -21,7 +21,6 @@ import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, type DetectedGap } from "@/lib/narrativeGapDetection";
 import { classifyRisk, detectFlagWords, formatSelectionsForAI } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
-import { supabase } from "@/integrations/supabase/client";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
@@ -63,6 +62,17 @@ const cleanList = (value: unknown): string[] => {
   return value
     .map((item) => (typeof item === "string" ? item.trim() : ""))
     .filter((item) => item.length > 0);
+};
+
+const MAX_FOLLOWUP_FETCH_RETRIES = 2;
+const FOLLOWUP_RETRY_BASE_DELAY_MS = 350;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isLikelyNetworkFetchError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) return false;
+  const normalized = error.message.toLowerCase();
+  return normalized.includes("failed to fetch") || normalized.includes("load failed") || normalized.includes("networkerror");
 };
 
 const CheckIn = () => {
@@ -501,47 +511,72 @@ const CheckIn = () => {
     try {
       const followUpBody = {
         message,
-        conversationHistory: chatMessages,
+        conversationHistory: chatMessages.slice(-12),
         initialContext: cumulativeText,
         riskLevel: riskHighWaterMark,
       };
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify(followUpBody),
-        }
-      );
+      let followUpData: { response?: unknown } | null = null;
+      let lastAttemptError: unknown = null;
 
-      console.log("[ITO-DIAG] followup response status:", response.status);
+      for (let attempt = 0; attempt <= MAX_FOLLOWUP_FETCH_RETRIES; attempt++) {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+                "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              },
+              body: JSON.stringify(followUpBody),
+            }
+          );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error("[ITO-DIAG] followup error body:", errorData);
+          console.log("[ITO-DIAG] followup response status:", response.status, "attempt:", attempt + 1);
 
-        if (response.status === 429) {
-          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error("[ITO-DIAG] followup error body:", errorData);
+
+            if (response.status === 429) {
+              throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+            }
+            if (response.status === 402) {
+              throw new Error("AI credits are temporarily exhausted. Please try again later.");
+            }
+            throw new Error(
+              typeof errorData?.error === "string"
+                ? errorData.error
+                : "The assistant couldn't respond right now. Please try again."
+            );
+          }
+
+          followUpData = await response.json();
+          console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
+          break;
+        } catch (attemptError) {
+          lastAttemptError = attemptError;
+
+          const shouldRetry = isLikelyNetworkFetchError(attemptError) && attempt < MAX_FOLLOWUP_FETCH_RETRIES;
+          if (!shouldRetry) {
+            throw attemptError;
+          }
+
+          const retryDelay = FOLLOWUP_RETRY_BASE_DELAY_MS * (attempt + 1);
+          console.warn(`[ITO-DIAG] followup network issue on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
+          await sleep(retryDelay);
         }
-        if (response.status === 402) {
-          throw new Error("AI credits are temporarily exhausted. Please try again later.");
-        }
-        throw new Error(
-          typeof errorData?.error === "string"
-            ? errorData.error
-            : "The assistant couldn't respond right now. Please try again."
-        );
       }
 
-      const followUpData = await response.json();
-      console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
+      if (!followUpData) {
+        throw lastAttemptError instanceof Error
+          ? lastAttemptError
+          : new Error("The assistant couldn't respond right now. Please try again.");
+      }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
@@ -554,9 +589,11 @@ const CheckIn = () => {
       logAIResponse("before", "follow-up-response", responseText);
     } catch (error) {
       console.error("Error in follow-up:", error);
-      const userFacingError = error instanceof Error && error.message
-        ? error.message
-        : "I’m having trouble right now. Can you try again?";
+      const userFacingError = isLikelyNetworkFetchError(error)
+        ? "We hit a temporary connection issue. Please tap Send again in a few seconds."
+        : error instanceof Error && error.message
+          ? error.message
+          : "I’m having trouble right now. Can you try again?";
 
       setChatMessages(prev => [...prev, {
         role: "assistant" as const,
