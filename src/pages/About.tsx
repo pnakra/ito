@@ -16,13 +16,25 @@ const About = () => {
         <div className="max-w-2xl mx-auto space-y-8">
           <div>
             <BackButton to="/" />
-            <h1 className="text-h1 mb-4">About ito</h1>
+            <h1 className="text-h1 mb-4">What is ito?</h1>
             <div className="space-y-4 text-muted-foreground text-body">
               <p>
-                <strong className="text-foreground">ito</strong> is a real-time reflection tool for young people navigating sexual consent. It helps someone pause in a moment of confusion — before, during, or after — and think clearly about what's happening.
+                <strong className="text-foreground">ito</strong> helps you figure out if something is okay before you do it — or make sense of something that already happened.
               </p>
               <p>
-                It's not therapy, legal advice, or a substitute for talking to someone you trust. It's a calibrated nudge designed to reduce the chance that confusion turns into harm.
+                You describe the situation, and ito gives you honest feedback. Not a lecture. Not a guilt trip. Just a straight answer about what's actually going on.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-card shadow-card rounded-lg p-5">
+            <h2 className="text-h2 mb-3">Why does this exist?</h2>
+            <div className="space-y-3 text-muted-foreground text-body">
+              <p>
+                Most people don't set out to hurt someone. But in the moment, it's easy to miss things — especially when you're caught up, or when alcohol is involved, or when you're not sure what the other person actually wants.
+              </p>
+              <p>
+                ito is a way to pause and think clearly before something goes wrong.
               </p>
             </div>
           </div>
@@ -31,98 +43,71 @@ const About = () => {
             <h2 className="text-h2 mb-3">How it works</h2>
             <div className="space-y-3 text-muted-foreground text-body">
               <p>
-                Users describe a situation in their own words or answer guided questions. The system classifies risk using deterministic safety rules — not AI opinion — and surfaces honest, specific feedback.
+                You answer a few questions or write out what's happening in your own words. ito looks at the situation and tells you what it sees — things you might be missing, things that could be off, or things to think about.
               </p>
               <p>
-                AI generates the explanation, but the safety classification is hard-coded. The tool cannot give permission, validate escalation, or act as approval.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-card shadow-card rounded-lg p-5">
-            <h2 className="text-h2 mb-3">Who it's for</h2>
-            <div className="space-y-3 text-muted-foreground text-body">
-              <p>
-                Primarily designed for potential perpetrators — people who might cause harm without realizing it. It interrupts entitled thinking, challenges objectifying framing, and slows momentum before it becomes coercion.
-              </p>
-              <p>
-                It also supports people who've experienced something and need help processing what happened, without judgment or clinical labels.
+                It won't tell you what to do. It won't give you permission. It just helps you see the situation more clearly.
               </p>
             </div>
           </div>
 
           <div className="bg-card shadow-card rounded-lg p-5">
-            <h2 className="text-h2 mb-3">Privacy</h2>
+            <h2 className="text-h2 mb-3">Nobody will know you used this</h2>
             <div className="space-y-3 text-muted-foreground text-body">
               <p>
-                <strong className="text-foreground">No login required.</strong> No account, no personal information collected.
+                No login. No account. No name, no email, nothing.
               </p>
               <p>
-                <strong className="text-foreground">No data is stored long-term.</strong> Text is processed in transit for AI analysis but is not retained. Session data is cleared when the tab is closed.
-              </p>
-              <p>
-                <strong className="text-foreground">Anonymous by design.</strong> There is no way to connect usage back to a specific person.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-card shadow-card rounded-lg p-5">
-            <h2 className="text-h2 mb-3">Safety approach</h2>
-            <div className="space-y-3 text-muted-foreground text-body">
-              <p>
-                Risk classification uses a deterministic rules engine, not AI interpretation. High-risk language triggers immediate flags regardless of context. The system identifies tension points — intent-behavior mismatches — rather than providing binary safety grades.
-              </p>
-              <p>
-                The tool biases toward slowing down rather than accelerating intimacy, especially in ambiguous cases. It will never imply permission or coach escalation.
+                What you type is used to give you a response and then it's gone. There's no way for anyone to trace it back to you.
               </p>
             </div>
           </div>
 
           <div>
-            <h2 className="text-h2 mb-3">FAQs</h2>
+            <h2 className="text-h2 mb-3">Questions</h2>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  Is this really anonymous?
+                  Is this actually anonymous?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  Yes. No personal information is collected, no IP tracking, no login. There is no way to connect anything back to you.
+                  Yes. No personal info is collected. No IP tracking, no login, no cookies following you around. There is no way to connect anything back to you.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  Does AI determine if something is safe?
+                  Is this going to lecture me?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. Safety classification is handled by deterministic rules, not AI. AI generates explanations and follow-up conversation, but the risk level is set by hard-coded logic that cannot be overridden.
+                  No. It talks to you like a friend who's being real with you — not a teacher, not a counselor, not someone trying to make you feel bad.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  Can this be used to get permission?
+                  Can I use this to check if something is okay to do?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. The system is explicitly designed to never grant permission or validate escalation. Even low-risk outcomes include the message: "The absence of a red flag is not the presence of consent."
+                  You can use it to think through a situation, but it will never tell you "go ahead." Only the other person can tell you what they want. ito helps you figure out if you're actually paying attention to that.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  What if someone describes being harmed?
+                  What if something already happened to me?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  The system detects when someone is describing harm done to them and responds supportively, without blame. It does not diagnose or use clinical labels — it describes what happened in plain language.
+                  ito can help you think through that too. It won't blame you or tell you what you should have done. It just helps you understand what happened.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-5" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  Is this going to lecture me?
+                  Who made this?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. It gives direct, honest feedback without moralizing. The tone is that of a calm, thoughtful peer — not a counselor or authority figure.
+                  ito was built by people who work in sexual violence prevention. It's designed to actually help — not to collect data, sell anything, or report anyone.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
