@@ -286,41 +286,19 @@ const Before = () => {
     logFreetext("before", "follow-up", message);
     
     try {
-      // Use the new conversational follow-up function
-      const followUpResponse = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify({
-            message,
-            conversationHistory: chatMessages,
-            initialContext,
-            riskLevel: riskResult?.level || "yellow",
-          }),
-        }
-      );
+      const { data: followUpData, error: invokeError } = await supabase.functions.invoke("ito-followup", {
+        body: {
+          message,
+          conversationHistory: chatMessages,
+          initialContext,
+          riskLevel: riskResult?.level || "yellow",
+        },
+      });
 
-      if (!followUpResponse.ok) {
-        const errorData = await followUpResponse.json().catch(() => ({}));
-        const backendError = typeof errorData?.error === "string" ? errorData.error : "";
-
-        if (followUpResponse.status === 429) {
-          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
-        }
-
-        if (followUpResponse.status === 402) {
-          throw new Error("AI credits are temporarily exhausted. Please try again later.");
-        }
-
-        throw new Error(backendError || "The assistant couldn't respond right now. Please try again.");
+      if (invokeError) {
+        throw new Error(invokeError.message || "The assistant couldn't respond right now. Please try again.");
       }
 
-      const followUpData = await followUpResponse.json();
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
       if (!responseText) {
