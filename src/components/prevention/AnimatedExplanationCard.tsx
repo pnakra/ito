@@ -93,9 +93,6 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
         </div>
       )}
 
-      <p className="text-[13px] text-muted-foreground text-center">
-        Reflection tool, not a ruling.
-      </p>
     </div>
   );
 };
