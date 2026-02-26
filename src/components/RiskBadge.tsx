@@ -53,7 +53,7 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
         </p>
       )}
       <p className="text-[13px] text-muted-foreground/70 text-center max-w-[260px]">
-        Reflection tool, not a ruling. Only the other person can give consent.
+        This is a reflection tool, not a ruling. Only the other person can give consent.
       </p>
     </div>
   );
