@@ -13,7 +13,7 @@ const corsHeaders = {
 // Level 3 (RED)  — Serious Concern: ignoring no, threats, authority exploit, age gap, blackmail, isolation, boundary violations
 // Level 2 (RED)  — Clear Imbalance: age imbalance among minors, repeated asking, intoxication, authority-adjacent, manipulation
 // Level 1 (YELLOW) — Some Uncertainty: mixed signals, silence as consent, guessing, unclear pacing, momentum on assumption
-// Level 0 (GREEN) — No Escalation: no pressure, no imbalance, explicit mutual communication, reciprocal consent
+// Level 0 (NO FLAG) — No Escalation: no pressure, no imbalance, explicit mutual communication, reciprocal consent
 // =============================================================================
 // SAFETY INVARIANTS (NON-NEGOTIABLE)
 // =============================================================================
@@ -39,7 +39,7 @@ const corsHeaders = {
 // If YES to any: regenerate with stronger clarity and stricter constraints.
 // =============================================================================
 
-const SYSTEM_PROMPT_GREEN = `You are "is this ok?" — a teen consent clarity tool. Not a therapist, coach, or moral authority.
+const SYSTEM_PROMPT_GREEN = `You are "is this ok?" — a teen consent clarity tool. Not a therapist, coach, or moral authority. NEVER use the phrase "green flag" or "green light" or imply any positive signal color.
 
 SEVERITY: Level 0 — No Escalation Signals
 No pressure, no imbalance detected. Explicit mutual communication indicated.
@@ -205,7 +205,7 @@ ${scenario}
 
 ${precomputedRiskLevel === "red" ? "This is a STOP situation. Interrupt momentum. Do not coach or suggest alternatives to proceeding." : ""}
 ${precomputedRiskLevel === "yellow" ? "This is an UNCERTAINTY situation. Interrupt ambiguity. Do not imply it's okay to proceed. Do not reassure." : ""}
-${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT give permission or approval. Anchor to clarity and continued communication." : ""}
+${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT give permission, approval, or use the phrase 'green flag' or 'green light.' Anchor to clarity and continued communication." : ""}
 
 Remember: max 120 words total. Exactly one behavioral suggestion (or none for red). No multi-step advice.
 Respond with ONLY the JSON, no other text.`;

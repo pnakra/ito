@@ -7,7 +7,7 @@ import type { StructuredSignals } from "@/types/signals";
 interface DemoScenario {
   id: string;
   label: string;
-  color: "green" | "yellow" | "red";
+  color: "neutral" | "yellow" | "red";
   tagline: string;
   description: string;
   signals: StructuredSignals;
@@ -17,9 +17,9 @@ interface DemoScenario {
 
 const SCENARIOS: DemoScenario[] = [
   {
-    id: "green",
-    label: "Green — No red flags",
-    color: "green",
+    id: "neutral",
+    label: "No flag",
+    color: "neutral",
     tagline: "Mutual, clear, and comfortable",
     description:
       "Two 18-year-olds who've been dating for a few months. They've talked about what they want, both seem enthusiastic, and nothing feels off.",
@@ -77,12 +77,12 @@ const SCENARIOS: DemoScenario[] = [
 ];
 
 const colorMap = {
-  green: {
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    dot: "bg-emerald-500",
-    text: "text-emerald-700",
-    hover: "hover:border-emerald-400",
+  neutral: {
+    bg: "bg-muted",
+    border: "border-border",
+    dot: "bg-muted-foreground",
+    text: "text-foreground",
+    hover: "hover:border-muted-foreground",
   },
   yellow: {
     bg: "bg-amber-50",

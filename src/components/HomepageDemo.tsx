@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 interface DemoScenario {
   text: string;
-  signal: "yellow" | "green";
+  signal: "yellow" | "neutral";
   label: string;
   points: string[];
   tension: string;
@@ -22,7 +22,7 @@ const SCENARIOS: DemoScenario[] = [
   },
   {
     text: "i want to message them asking to hook up but we haven't talked in a while and i'm not sure they'd be into it",
-    signal: "green",
+    signal: "neutral",
     label: "You're guessing",
     points: [
       "You're reading silence as ambiguity, not as a no.",
