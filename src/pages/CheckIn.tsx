@@ -508,8 +508,21 @@ const CheckIn = () => {
         },
       });
 
+      console.log("[ITO-DIAG] followup invoke result:", { followUpData, invokeError });
+
       if (invokeError) {
-        throw new Error("The assistant couldn't respond right now. Please try again.");
+        // supabase.functions.invoke wraps non-2xx as FunctionsHttpError
+        // Try to extract the message from the error context
+        const errorContext = (invokeError as any)?.context;
+        let errorMsg = "The assistant couldn't respond right now. Please try again.";
+        if (errorContext) {
+          try {
+            const errJson = await errorContext.json();
+            console.error("[ITO-DIAG] followup error context:", errJson);
+            if (errJson?.error) errorMsg = errJson.error;
+          } catch { /* ignore parse failure */ }
+        }
+        throw new Error(errorMsg);
       }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
