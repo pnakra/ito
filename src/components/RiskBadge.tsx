@@ -9,22 +9,22 @@ interface RiskBadgeProps {
 const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
   const config = {
     red: {
-      label: "stop and think",
+      label: "Stop and think",
       icon: Hand,
       className: "bg-accent text-primary border-[1.5px] border-primary",
       disclaimer: null
     },
     yellow: {
-      label: "something's off",
+      label: "Something's off",
       icon: Pause,
       className: "bg-accent text-primary border-[1.5px] border-primary",
       disclaimer: null
     },
     green: {
-      label: "you're guessing",
+      label: "You're guessing",
       icon: HelpCircle,
       className: "bg-accent text-primary border-[1.5px] border-primary",
-      disclaimer: "this only sees what you typed. only the other person can tell you if something's ok."
+      disclaimer: "This only sees what you typed. Only the other person can tell you if something's ok."
     }
   };
 
@@ -53,7 +53,7 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
         </p>
       )}
       <p className="text-[13px] text-muted-foreground/70 text-center max-w-[260px]">
-        reflection tool, not a ruling. only the other person can give consent.
+        Reflection tool, not a ruling. Only the other person can give consent.
       </p>
     </div>
   );

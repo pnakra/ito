@@ -123,7 +123,7 @@ const Demo = () => {
             See how it works
           </h1>
           <p className="text-[14px] text-muted-foreground text-center mb-8 max-w-sm mx-auto">
-            Pick a scenario to walk through the tool step by step. Each one shows how ITO responds to different situations.
+            Pick a scenario to walk through the tool step by step. Each one shows how ito responds to different situations.
           </p>
 
           <div className="space-y-3">
@@ -245,7 +245,7 @@ const DemoWalkthrough = ({ scenario, onBack, onTryYourOwn }: DemoWalkthroughProp
             className="w-full bg-primary text-primary-foreground px-6 py-3.5 rounded-[14px] text-[15px] font-semibold hover:bg-primary/90 active:scale-[0.97] transition-all flex items-center justify-center gap-2"
           >
             <Play className="w-4 h-4" />
-            See how ITO responds
+            See how ito responds
           </button>
 
           <p className="text-[12px] text-muted-foreground text-center mt-3">
