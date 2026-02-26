@@ -499,31 +499,49 @@ const CheckIn = () => {
     logFreetext("before", "follow-up", message);
     
     try {
-      const { data: followUpData, error: invokeError } = await supabase.functions.invoke("ito-followup", {
-        body: {
-          message,
-          conversationHistory: chatMessages,
-          initialContext: cumulativeText,
-          riskLevel: riskHighWaterMark,
-        },
-      });
+      const followUpBody = {
+        message,
+        conversationHistory: chatMessages,
+        initialContext: cumulativeText,
+        riskLevel: riskHighWaterMark,
+      };
 
-      console.log("[ITO-DIAG] followup invoke result:", { followUpData, invokeError });
+      console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      if (invokeError) {
-        // supabase.functions.invoke wraps non-2xx as FunctionsHttpError
-        // Try to extract the message from the error context
-        const errorContext = (invokeError as any)?.context;
-        let errorMsg = "The assistant couldn't respond right now. Please try again.";
-        if (errorContext) {
-          try {
-            const errJson = await errorContext.json();
-            console.error("[ITO-DIAG] followup error context:", errJson);
-            if (errJson?.error) errorMsg = errJson.error;
-          } catch { /* ignore parse failure */ }
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify(followUpBody),
         }
-        throw new Error(errorMsg);
+      );
+
+      console.log("[ITO-DIAG] followup response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("[ITO-DIAG] followup error body:", errorData);
+
+        if (response.status === 429) {
+          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+        }
+        if (response.status === 402) {
+          throw new Error("AI credits are temporarily exhausted. Please try again later.");
+        }
+        throw new Error(
+          typeof errorData?.error === "string"
+            ? errorData.error
+            : "The assistant couldn't respond right now. Please try again."
+        );
       }
+
+      const followUpData = await response.json();
+      console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
