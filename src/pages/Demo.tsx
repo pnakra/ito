@@ -155,7 +155,7 @@ const Demo = () => {
             })}
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 pb-12 text-center">
             <button
               onClick={() => navigate("/check-in")}
               className="text-[13px] text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
