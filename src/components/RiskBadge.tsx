@@ -21,10 +21,10 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
       disclaimer: null
     },
     green: {
-      label: "You're guessing",
+      label: "No flag",
       icon: HelpCircle,
-      className: "bg-accent text-primary border-[1.5px] border-primary",
-      disclaimer: "This only sees what you typed. Only the other person can tell you if something's ok."
+      className: "bg-muted text-muted-foreground border-[1.5px] border-border",
+      disclaimer: "The absence of a red flag is not the presence of consent. Only the other person can tell you what they want."
     }
   };
 

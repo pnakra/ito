@@ -1,12 +1,12 @@
 interface ScenarioSectionProps {
   number: number;
   title: string;
-  signalColor: "green" | "yellow" | "red";
+  signalColor: "neutral" | "yellow" | "red";
   children: React.ReactNode;
 }
 
 const colorMap = {
-  green: "border-green-500",
+  neutral: "border-border",
   yellow: "border-yellow-500",
   red: "border-red-500",
 };

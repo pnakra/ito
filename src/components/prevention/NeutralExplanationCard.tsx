@@ -61,7 +61,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
 
       {showBadge && (
         <div className="flex justify-center animate-scale-in" style={{ animationDuration: "350ms" }}>
-          <div className="bg-accent text-primary border-[1.5px] border-primary rounded-full py-2 px-5 font-semibold text-[16px] tracking-[-0.2px] flex items-center gap-2 shadow-badge">
+          <div className="bg-muted text-muted-foreground border-[1.5px] border-border rounded-full py-2 px-5 font-semibold text-[16px] tracking-[-0.2px] flex items-center gap-2 shadow-badge">
             <Info className="w-4 h-4" />
             {analysis.signalLabel}
           </div>

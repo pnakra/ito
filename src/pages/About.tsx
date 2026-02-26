@@ -34,7 +34,7 @@ const About = () => {
                 Users describe a situation in their own words or answer guided questions. The system classifies risk using deterministic safety rules — not AI opinion — and surfaces honest, specific feedback.
               </p>
               <p>
-                AI generates the explanation, but the safety classification is hard-coded. The tool cannot give permission, validate escalation, or act as a green light.
+                AI generates the explanation, but the safety classification is hard-coded. The tool cannot give permission, validate escalation, or act as approval.
               </p>
             </div>
           </div>
