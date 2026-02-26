@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { ArrowRight, Play, RotateCcw } from "lucide-react";
 import type { StructuredSignals } from "@/types/signals";
+import { logVisit } from "@/lib/logVisit";
+import { logSubmission } from "@/lib/submissionLogger";
 
 interface DemoScenario {
   id: string;
@@ -104,6 +106,19 @@ const Demo = () => {
   const [selectedScenario, setSelectedScenario] = useState<DemoScenario | null>(null);
   const navigate = useNavigate();
 
+  const handleSelectScenario = (scenario: DemoScenario) => {
+    setSelectedScenario(scenario);
+    // Track scenario selection in both systems
+    logVisit();  // logs current path /demo
+    logSubmission({
+      flowType: "before",
+      stepName: "demo-scenario-selected",
+      stepType: "choice",
+      choiceValue: scenario.id,
+      metadata: { scenario_label: scenario.label, scenario_color: scenario.color },
+    });
+  };
+
   if (selectedScenario) {
     return (
       <DemoWalkthrough
@@ -135,7 +150,7 @@ const Demo = () => {
               return (
                 <button
                   key={scenario.id}
-                  onClick={() => setSelectedScenario(scenario)}
+                  onClick={() => handleSelectScenario(scenario)}
                   className={`w-full text-left ${c.bg} border ${c.border} ${c.hover} rounded-[14px] p-5 transition-all duration-150 active:scale-[0.99] group`}
                 >
                   <div className="flex items-start gap-3">
@@ -195,6 +210,15 @@ const DemoWalkthrough = ({ scenario, onBack, onTryYourOwn }: DemoWalkthroughProp
         worried: scenario.worried,
       })
     );
+    // Track demo start in both systems
+    logVisit();
+    logSubmission({
+      flowType: "before",
+      stepName: "demo-scenario-started",
+      stepType: "choice",
+      choiceValue: scenario.id,
+      metadata: { scenario_label: scenario.label, scenario_color: scenario.color },
+    });
     navigate("/check-in?mode=guided&demo=true");
   };
 
