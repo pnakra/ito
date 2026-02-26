@@ -9,8 +9,6 @@ const corsHeaders = {
 
 // =============================================================================
 // SAFETY INVARIANTS (NON-NEGOTIABLE)
-// These rules override all tone optimization or conversational flow.
-// Violating any rule is considered a system failure.
 // =============================================================================
 // 1. NEVER imply permission or encouragement to proceed
 // 2. NEVER normalize pressure, repeated asking, silence, or intoxication
@@ -18,14 +16,6 @@ const corsHeaders = {
 // 4. Self-harm threats: redirect to crisis resources immediately
 // 5. BANNED phrases: "Real talk," "Classic tactic," "Everyone knows"
 // 6. No judgment labels: "manipulation," "toxic," "red flag"
-// =============================================================================
-// COPY CONSTRAINTS (NON-NEGOTIABLE)
-// =============================================================================
-// 1. NO clinical/diagnostic labels: "sexual coercion," "manipulation," "toxic," "abuse"
-// 2. Describe behavior/dynamics in PLAIN LANGUAGE instead
-// 3. Describe dynamics, NOT character - focus on what is happening, not who they are
-// 4. Self-harm: acknowledge seriousness, remove responsibility from user, redirect to support
-// 5. NEVER assume intent behind threats
 // =============================================================================
 
 const SYSTEM_PROMPT = `You are "is this ok?" — a calm, supportive friend helping someone think through a situation.
@@ -85,59 +75,7 @@ interface Message {
 
 const MAX_HISTORY_MESSAGES = 12;
 const MAX_INITIAL_CONTEXT_CHARS = 4000;
-const MAX_GATEWAY_RETRIES = 2;
-const RETRYABLE_GATEWAY_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function callLovableAIGateway(
-  messages: Array<{ role: string; content: string }>,
-  apiKey: string,
-): Promise<Response> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt <= MAX_GATEWAY_RETRIES; attempt++) {
-    try {
-      const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages,
-          max_tokens: 400,
-        }),
-      });
-
-      if (
-        resp.ok ||
-        resp.status === 402 ||
-        !RETRYABLE_GATEWAY_STATUSES.has(resp.status) ||
-        attempt === MAX_GATEWAY_RETRIES
-      ) {
-        return resp;
-      }
-
-      const retryDelay = 350 * (attempt + 1);
-      console.warn(`AI gateway returned ${resp.status}. Retrying in ${retryDelay}ms.`);
-      await sleep(retryDelay);
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-
-      if (attempt === MAX_GATEWAY_RETRIES) {
-        throw lastError;
-      }
-
-      const retryDelay = 350 * (attempt + 1);
-      console.warn(`AI gateway request failed. Retrying in ${retryDelay}ms.`, lastError.message);
-      await sleep(retryDelay);
-    }
-  }
-
-  throw lastError ?? new Error("AI gateway unavailable");
-}
+const MAX_RETRIES = 2;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -177,7 +115,6 @@ serve(async (req) => {
       });
     }
 
-    // Server-side input validation
     if (message.length > 5000) {
       return new Response(
         JSON.stringify({ error: "Message is too long. Please keep it under 5000 characters." }),
@@ -185,16 +122,14 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not configured");
       throw new Error("Service configuration error");
     }
 
-    // Build messages array (OpenAI format — system + conversation)
-    const messages: Array<{ role: string; content: string }> = [
-      { role: "system", content: SYSTEM_PROMPT },
-    ];
+    // Build Anthropic messages array (user/assistant only)
+    const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
     // Add initial context as first user message if this is the first follow-up
     if (conversationHistory.length === 0 && initialContext) {
@@ -216,47 +151,72 @@ serve(async (req) => {
     // Add current message
     messages.push({ role: "user", content: message });
 
-    const resp = await callLovableAIGateway(messages, LOVABLE_API_KEY);
+    console.log("[ito-followup] Calling Claude, messages:", messages.length);
 
-    if (!resp.ok) {
-      if (resp.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limits exceeded, please try again in a few seconds." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 400,
+            system: SYSTEM_PROMPT,
+            messages,
+          }),
+        });
+
+        if (!resp.ok) {
+          if (resp.status === 429) {
+            return new Response(
+              JSON.stringify({ error: "Rate limits exceeded, please try again in a few seconds." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          if (resp.status === 402) {
+            return new Response(
+              JSON.stringify({ error: "AI credits exhausted. Please try again later." }),
+              { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const t = await resp.text();
+          console.error(`[ito-followup] Claude error (attempt ${attempt + 1}):`, resp.status, t.slice(0, 500));
+          lastError = new Error(`Claude API error: ${resp.status}`);
+          continue;
+        }
+
+        const data = await resp.json();
+        const responseText = typeof data?.content?.[0]?.text === "string"
+          ? data.content[0].text.trim()
+          : "";
+
+        if (!responseText) {
+          console.error(`[ito-followup] Empty response (attempt ${attempt + 1})`);
+          lastError = new Error("Empty AI response");
+          continue;
+        }
+
+        console.log("[ito-followup] Success, length:", responseText.length);
+
+        return new Response(JSON.stringify({ response: responseText }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (attemptErr) {
+        console.error(`[ito-followup] Error (attempt ${attempt + 1}):`, attemptErr);
+        lastError = attemptErr as Error;
+        continue;
       }
-      if (resp.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const t = await resp.text();
-      console.error("AI gateway error:", resp.status, t.slice(0, 800));
-      return new Response(JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
-    const data = await resp.json();
-    const responseText = typeof data?.choices?.[0]?.message?.content === "string"
-      ? data.choices[0].message.content.trim()
-      : "";
-
-    if (!responseText) {
-      console.error("AI gateway returned empty content:", JSON.stringify(data).slice(0, 800));
-      return new Response(JSON.stringify({ error: "AI returned an empty response" }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    return new Response(JSON.stringify({ response: responseText }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    throw lastError ?? new Error("All retry attempts failed");
   } catch (error) {
-    console.error("Error in ito-followup function:", error);
+    console.error("[ito-followup] Error:", error);
     return new Response(
       JSON.stringify({
         error: "Service temporarily unavailable",

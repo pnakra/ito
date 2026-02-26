@@ -172,9 +172,9 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not configured");
       throw new Error("Service configuration error");
     }
 
@@ -210,58 +210,69 @@ ${precomputedRiskLevel === "green" ? "No escalation signals detected. Do NOT giv
 Remember: max 120 words total. Exactly one behavioral suggestion (or none for red). No multi-step advice.
 Respond with ONLY the JSON, no other text.`;
 
-    const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        max_tokens: 512,
-      }),
-    });
+    console.log("[analyze-ito] Calling Claude, risk:", precomputedRiskLevel);
 
-    if (!resp.ok) {
-      if (resp.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    const MAX_RETRIES = 2;
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 512,
+            system: systemPrompt,
+            messages: [
+              { role: "user", content: userMessage },
+            ],
+          }),
+        });
+
+        if (!resp.ok) {
+          if (resp.status === 429) {
+            return new Response(
+              JSON.stringify({ error: "Rate limits exceeded, please try again later." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const t = await resp.text();
+          console.error(`[analyze-ito] Claude error (attempt ${attempt + 1}):`, resp.status, t.slice(0, 500));
+          lastError = new Error(`Claude API error: ${resp.status}`);
+          continue;
+        }
+
+        const data = await resp.json();
+        const raw = data?.content?.[0]?.text ?? "";
+
+        const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
+        if (!match) {
+          console.error(`[analyze-ito] No JSON (attempt ${attempt + 1}):`, raw.slice(0, 200));
+          lastError = new Error("Failed to parse AI response");
+          continue;
+        }
+
+        const parsed = JSON.parse(match[0]);
+        console.log("[analyze-ito] Success");
+
+        return new Response(JSON.stringify(parsed), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (parseErr) {
+        console.error(`[analyze-ito] Error (attempt ${attempt + 1}):`, parseErr);
+        lastError = parseErr as Error;
+        continue;
       }
-      if (resp.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add funds." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const t = await resp.text();
-      console.error("AI gateway error:", resp.status, t);
-      return new Response(JSON.stringify({ error: "AI API error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
-    const data = await resp.json();
-    const raw = data?.choices?.[0]?.message?.content ?? "";
-
-    const match = typeof raw === "string" ? raw.match(/\{[\s\S]*\}/) : null;
-    if (!match) {
-      throw new Error("Failed to parse AI response");
-    }
-
-    const parsed = JSON.parse(match[0]);
-
-    return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    throw lastError || new Error("All retry attempts failed");
   } catch (error) {
-    console.error("Error in analyze-ito function:", error);
+    console.error("[analyze-ito] Error:", error);
     return new Response(
       JSON.stringify({
         error: "Service temporarily unavailable",
