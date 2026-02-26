@@ -77,6 +77,10 @@
     @apply border-border;
   }
 
+  main {
+    padding-bottom: 3rem;
+  }
+
   html, body {
     @apply overflow-x-hidden;
   }
