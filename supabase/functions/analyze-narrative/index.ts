@@ -71,47 +71,7 @@ RESPOND IN JSON:
   "avoidingRepetition": "One future change"
 }`;
 
-const MAX_GATEWAY_RETRIES = 2;
-const RETRYABLE_STATUSES = new Set([408, 429, 500, 502, 503, 504]);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-async function callAIGateway(
-  messages: Array<{ role: string; content: string }>,
-  apiKey: string,
-): Promise<Response> {
-  let lastError: Error | null = null;
-
-  for (let attempt = 0; attempt <= MAX_GATEWAY_RETRIES; attempt++) {
-    try {
-      const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages,
-          max_tokens: 600,
-        }),
-      });
-
-      if (resp.ok || !RETRYABLE_STATUSES.has(resp.status) || attempt === MAX_GATEWAY_RETRIES) {
-        return resp;
-      }
-
-      console.warn(`AI gateway ${resp.status}, retry ${attempt + 1}`);
-      await sleep(350 * (attempt + 1));
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      if (attempt === MAX_GATEWAY_RETRIES) throw lastError;
-      console.warn(`AI gateway error, retry ${attempt + 1}:`, lastError.message);
-      await sleep(350 * (attempt + 1));
-    }
-  }
-
-  throw lastError ?? new Error("AI gateway unavailable");
-}
+const MAX_RETRIES = 2;
 
 /** Coerce value to trimmed string */
 function clean(v: unknown): string {
@@ -152,81 +112,116 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not configured");
       throw new Error("Service configuration error");
     }
 
     const isAfterFlow = detectedTiming === "after";
     const systemPrompt = isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE;
 
-    const messages: Array<{ role: string; content: string }> = [
-      { role: "system", content: systemPrompt },
-    ];
+    // Build Anthropic messages array (user/assistant only, system goes in separate param)
+    const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
     if (isFollowUp && conversationHistory?.length > 0) {
       for (const msg of conversationHistory) {
-        messages.push(msg);
+        if (msg.role === "user" || msg.role === "assistant") {
+          messages.push({ role: msg.role, content: msg.content });
+        }
       }
     }
 
     messages.push({ role: "user", content: `Narrative:\n${narrativeText}` });
 
-    console.log("[analyze-narrative] Calling AI gateway, isAfter:", isAfterFlow, "messages:", messages.length);
+    console.log("[analyze-narrative] Calling Claude, isAfter:", isAfterFlow, "messages:", messages.length);
 
-    const resp = await callAIGateway(messages, LOVABLE_API_KEY);
+    let lastError: Error | null = null;
 
-    if (!resp.ok) {
-      const t = await resp.text();
-      console.error("[analyze-narrative] Gateway error:", resp.status, t.slice(0, 500));
-      throw new Error(`Gateway error ${resp.status}`);
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 600,
+            system: systemPrompt,
+            messages,
+          }),
+        });
+
+        if (!resp.ok) {
+          if (resp.status === 429) {
+            return new Response(
+              JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+              { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
+          const text = await resp.text();
+          console.error(`[analyze-narrative] Claude error (attempt ${attempt + 1}):`, resp.status, text.slice(0, 500));
+          lastError = new Error(`Claude API error: ${resp.status}`);
+          continue;
+        }
+
+        const data = await resp.json();
+        const raw = data?.content?.[0]?.text ?? "";
+        console.log("[analyze-narrative] Response length:", raw.length, "stop_reason:", data?.stop_reason);
+
+        if (!raw.trim()) {
+          console.error(`[analyze-narrative] Empty response (attempt ${attempt + 1})`);
+          lastError = new Error("Empty AI response");
+          continue;
+        }
+
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (!match) {
+          console.error(`[analyze-narrative] No JSON found (attempt ${attempt + 1}):`, raw.slice(0, 300));
+          lastError = new Error("Failed to parse AI response");
+          continue;
+        }
+
+        const parsed = JSON.parse(match[0]);
+
+        // Normalize all fields to ensure clean output
+        let result: Record<string, unknown>;
+
+        if (isAfterFlow) {
+          result = {
+            clarityCheck: clean(parsed.clarityCheck) || "Something important happened here.",
+            otherPersonPerspective: clean(parsed.otherPersonPerspective) || "They may see this differently.",
+            perspectiveDisclaimer: clean(parsed.perspectiveDisclaimer) || "Only they know how they feel.",
+            accountabilitySteps: clean(parsed.accountabilitySteps) || "Pause and reflect before acting.",
+            avoidingRepetition: clean(parsed.avoidingRepetition) || "Notice the pattern and name it.",
+            detectedTiming: "after",
+          };
+        } else {
+          const why = cleanArr(parsed.why);
+          result = {
+            signalLabel: clean(parsed.signalLabel) || "Check in with them",
+            why: why.length > 0 ? why : ["Something feels unclear here."],
+            suggestion: clean(parsed.suggestion) || "Pause and ask them directly.",
+            detectedTiming: "before",
+          };
+        }
+
+        console.log("[analyze-narrative] Success, keys:", Object.keys(result));
+
+        return new Response(JSON.stringify(result), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (parseErr) {
+        console.error(`[analyze-narrative] Error (attempt ${attempt + 1}):`, parseErr);
+        lastError = parseErr as Error;
+        continue;
+      }
     }
 
-    const data = await resp.json();
-    const raw = data?.choices?.[0]?.message?.content ?? "";
-    console.log("[analyze-narrative] Response length:", raw.length);
-
-    if (!raw.trim()) {
-      console.error("[analyze-narrative] Empty response");
-      throw new Error("Empty AI response");
-    }
-
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) {
-      console.error("[analyze-narrative] No JSON found in:", raw.slice(0, 300));
-      throw new Error("Failed to parse AI response");
-    }
-
-    const parsed = JSON.parse(match[0]);
-
-    // Normalize all fields to ensure clean output
-    let result: Record<string, unknown>;
-
-    if (isAfterFlow) {
-      result = {
-        clarityCheck: clean(parsed.clarityCheck) || "Something important happened here.",
-        otherPersonPerspective: clean(parsed.otherPersonPerspective) || "They may see this differently.",
-        perspectiveDisclaimer: clean(parsed.perspectiveDisclaimer) || "Only they know how they feel.",
-        accountabilitySteps: clean(parsed.accountabilitySteps) || "Pause and reflect before acting.",
-        avoidingRepetition: clean(parsed.avoidingRepetition) || "Notice the pattern and name it.",
-        detectedTiming: "after",
-      };
-    } else {
-      const why = cleanArr(parsed.why);
-      result = {
-        signalLabel: clean(parsed.signalLabel) || "Check in with them",
-        why: why.length > 0 ? why : ["Something feels unclear here."],
-        suggestion: clean(parsed.suggestion) || "Pause and ask them directly.",
-        detectedTiming: "before",
-      };
-    }
-
-    console.log("[analyze-narrative] Success, keys:", Object.keys(result));
-
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    throw lastError || new Error("All retry attempts failed");
   } catch (error) {
     console.error("[analyze-narrative] Error:", error);
     return new Response(
