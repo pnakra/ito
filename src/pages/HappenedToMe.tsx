@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackButton from "@/components/BackButton";
 
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { Loader2, Send, Heart, Shield, HelpCircle, ArrowRight, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -69,14 +69,23 @@ const HappenedToMe = () => {
         content: msg.content
       }));
 
-      const { data, error } = await supabase.functions.invoke("analyze-someone-crossed", {
-        body: { 
+      const data = await invokeEdgeFunctionWithRetry<{
+        response?: string;
+        isFirstMessage?: boolean;
+        acknowledgment?: string;
+        whatYouExperienced?: string;
+        yourFeelingsAreValid?: string;
+        understandingConsent?: string;
+        whatYouCanDo?: string;
+        followUpPrompt?: string;
+      }>(
+        "analyze-someone-crossed",
+        {
           message: input,
-          conversationHistory
-        }
-      });
-
-      if (error) throw error;
+          conversationHistory,
+        },
+        { maxRetries: 3, baseDelayMs: 600, label: "analyze-someone-crossed" },
+      );
 
       const assistantMessage: Message = {
         role: "assistant",

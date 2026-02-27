@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 
 export interface AILanguageAnalysis {
   hasConcerningLanguage: boolean;
@@ -21,14 +21,11 @@ export async function analyzeLanguageWithAI(text: string): Promise<AILanguageAna
   }
 
   try {
-    const { data, error } = await supabase.functions.invoke('analyze-language', {
-      body: { text }
-    });
-
-    if (error) {
-      console.warn('AI language analysis failed, using static detection only:', error);
-      return { hasConcerningLanguage: false, categories: [], explanation: null, fallback: true };
-    }
+    const data = await invokeEdgeFunctionWithRetry<AILanguageAnalysis>(
+      "analyze-language",
+      { text },
+      { maxRetries: 2, baseDelayMs: 500, label: "analyze-language" },
+    );
 
     return data as AILanguageAnalysis;
   } catch (err) {

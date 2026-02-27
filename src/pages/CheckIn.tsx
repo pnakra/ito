@@ -24,7 +24,7 @@ import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/invokeEdgeFunctionWithRetry";
 
 type FlowPhase =
   | "narrative-input"
@@ -65,16 +65,7 @@ const cleanList = (value: unknown): string[] => {
     .filter((item) => item.length > 0);
 };
 
-const MAX_FOLLOWUP_FETCH_RETRIES = 3;
-const FOLLOWUP_RETRY_BASE_DELAY_MS = 600;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const isLikelyNetworkFetchError = (error: unknown): boolean => {
-  if (!(error instanceof Error)) return false;
-  const normalized = error.message.toLowerCase();
-  return normalized.includes("failed to fetch") || normalized.includes("load failed") || normalized.includes("networkerror");
-};
+const MAX_FOLLOWUP_RETRIES = 3;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
@@ -384,31 +375,21 @@ const CheckIn = () => {
     setExplanationComplete(false);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-narrative`,
+      const data = await invokeEdgeFunctionWithRetry<Record<string, unknown>>(
+        "analyze-narrative",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify({
-            narrativeText: text,
-            precomputedRiskLevel: riskLevel,
-            detectedTiming: timing,
-            isFollowUp: narrativeHistory.length > 1,
-            structuredSignals,
-          }),
-        }
+          narrativeText: text,
+          precomputedRiskLevel: riskLevel,
+          detectedTiming: timing,
+          isFollowUp: narrativeHistory.length > 1,
+          structuredSignals,
+        },
+        {
+          maxRetries: 3,
+          baseDelayMs: 600,
+          label: "analyze-narrative",
+        },
       );
-
-      if (!response.ok) {
-        const errBody = await response.json().catch(() => ({}));
-        throw new Error(errBody?.error || `HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
       
       // === TEMPORARY DIAGNOSTICS ===
       console.log("[ITO-DIAG] Raw API response:", JSON.stringify(data));
@@ -417,7 +398,7 @@ const CheckIn = () => {
       console.log("[ITO-DIAG] signalLabel:", JSON.stringify(data?.signalLabel), "why:", JSON.stringify(data?.why), "suggestion:", JSON.stringify(data?.suggestion));
       // === END DIAGNOSTICS ===
       
-      if (data?.error) throw new Error(data.error);
+      if (typeof data?.error === "string") throw new Error(data.error);
 
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
@@ -519,82 +500,17 @@ const CheckIn = () => {
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      let followUpData: { response?: unknown } | null = null;
-      let lastAttemptError: unknown = null;
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+        "ito-followup",
+        followUpBody,
+        {
+          maxRetries: MAX_FOLLOWUP_RETRIES,
+          baseDelayMs: 600,
+          label: "ito-followup",
+        },
+      );
 
-      for (let attempt = 0; attempt <= MAX_FOLLOWUP_FETCH_RETRIES; attempt++) {
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ito-followup`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-                "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              },
-              body: JSON.stringify(followUpBody),
-            }
-          );
-
-          console.log("[ITO-DIAG] followup response status:", response.status, "attempt:", attempt + 1);
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error("[ITO-DIAG] followup error body:", errorData);
-
-            if (response.status === 429) {
-              throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
-            }
-            if (response.status === 402) {
-              throw new Error("AI credits are temporarily exhausted. Please try again later.");
-            }
-            throw new Error(
-              typeof errorData?.error === "string"
-                ? errorData.error
-                : "The assistant couldn't respond right now. Please try again."
-            );
-          }
-
-          followUpData = await response.json();
-          console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
-          break;
-        } catch (attemptError) {
-          lastAttemptError = attemptError;
-
-          const shouldRetry = isLikelyNetworkFetchError(attemptError) && attempt < MAX_FOLLOWUP_FETCH_RETRIES;
-          if (!shouldRetry) {
-            throw attemptError;
-          }
-
-          const retryDelay = FOLLOWUP_RETRY_BASE_DELAY_MS * (attempt + 1);
-          console.warn(`[ITO-DIAG] followup network issue on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
-          await sleep(retryDelay);
-        }
-      }
-
-      if (!followUpData && isLikelyNetworkFetchError(lastAttemptError)) {
-        console.warn("[ITO-DIAG] followup fetch transport failed after retries. Falling back to invoke().");
-        const { data: invokeData, error: invokeError } = await supabase.functions.invoke("ito-followup", {
-          body: followUpBody,
-        });
-
-        if (invokeError) {
-          throw new Error(invokeError.message || "The assistant couldn't respond right now. Please try again.");
-        }
-
-        if (invokeData && typeof (invokeData as { error?: unknown }).error === "string") {
-          throw new Error((invokeData as { error: string }).error);
-        }
-
-        followUpData = (invokeData as { response?: unknown } | null) ?? null;
-      }
-
-      if (!followUpData) {
-        throw lastAttemptError instanceof Error
-          ? lastAttemptError
-          : new Error("The assistant couldn't respond right now. Please try again.");
-      }
+      console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
@@ -607,7 +523,7 @@ const CheckIn = () => {
       logAIResponse("before", "follow-up-response", responseText);
     } catch (error) {
       console.error("Error in follow-up:", error);
-      const userFacingError = isLikelyNetworkFetchError(error)
+      const userFacingError = isLikelyTransientEdgeError(error)
         ? "We hit a temporary connection issue. Please tap Send again in a few seconds."
         : error instanceof Error && error.message
           ? error.message
