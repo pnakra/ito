@@ -65,7 +65,7 @@ const cleanList = (value: unknown): string[] => {
     .filter((item) => item.length > 0);
 };
 
-const MAX_FOLLOWUP_RETRIES = 3;
+const MAX_FOLLOWUP_RETRIES = 5;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
@@ -505,7 +505,7 @@ const CheckIn = () => {
         followUpBody,
         {
           maxRetries: MAX_FOLLOWUP_RETRIES,
-          baseDelayMs: 600,
+          baseDelayMs: 900,
           label: "ito-followup",
         },
       );

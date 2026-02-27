@@ -25,19 +25,76 @@ const isRetriableStatus = (status?: number): boolean => {
   return status === 408 || status === 425 || status === 500 || status === 502 || status === 503 || status === 504;
 };
 
+const isTransportFailureMessage = (message: string): boolean => {
+  return (
+    message.includes("failed to send") ||
+    message.includes("failed to fetch") ||
+    message.includes("networkerror") ||
+    message.includes("load failed") ||
+    message.includes("request to the edge function")
+  );
+};
+
 export const isLikelyTransientEdgeError = (error: unknown): boolean => {
   const message = getErrorMessage(error).toLowerCase();
   return (
-    message.includes("failed to fetch") ||
-    message.includes("failed to send") ||
-    message.includes("networkerror") ||
-    message.includes("load failed") ||
+    isTransportFailureMessage(message) ||
     message.includes("timeout") ||
     message.includes("gateway") ||
     message.includes("temporarily unavailable") ||
     message.includes("http 5") ||
     message.includes("edge function")
   );
+};
+
+const createErrorWithStatus = (message: string, status?: number): Error => {
+  const err = new Error(message) as Error & { status?: number };
+  if (typeof status === "number") err.status = status;
+  return err;
+};
+
+const invokeEdgeFunctionDirect = async <T>(functionName: string, body: unknown): Promise<T> => {
+  const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!baseUrl || !publishableKey) {
+    throw new Error("Missing backend configuration for direct fallback call.");
+  }
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData.session?.access_token;
+
+  const response = await fetch(`${baseUrl}/functions/v1/${functionName}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: publishableKey,
+      Authorization: `Bearer ${accessToken ?? publishableKey}`,
+    },
+    body: JSON.stringify(body ?? {}),
+  });
+
+  const responseText = await response.text();
+  let parsed: unknown = {};
+
+  if (responseText) {
+    try {
+      parsed = JSON.parse(responseText);
+    } catch {
+      parsed = { error: responseText };
+    }
+  }
+
+  if (!response.ok) {
+    const payloadError =
+      parsed && typeof (parsed as { error?: unknown }).error === "string"
+        ? (parsed as { error: string }).error
+        : "";
+
+    throw createErrorWithStatus(payloadError || `HTTP ${response.status}`, response.status);
+  }
+
+  return (parsed as T) ?? ({} as T);
 };
 
 export async function invokeEdgeFunctionWithRetry<T>(
@@ -53,57 +110,55 @@ export async function invokeEdgeFunctionWithRetry<T>(
       const { data, error } = await supabase.functions.invoke(functionName, { body });
 
       if (error) {
-        const status = getErrorStatus(error);
-        const message = getErrorMessage(error);
-
-        if (status === 429) {
-          throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
-        }
-
-        if (status === 402) {
-          throw new Error("AI credits are temporarily exhausted. Please try again later.");
-        }
-
-        const shouldRetry = attempt < maxRetries && (isRetriableStatus(status) || isLikelyTransientEdgeError(message));
-        if (!shouldRetry) {
-          throw new Error(message || "The assistant couldn't respond right now. Please try again.");
-        }
-
-        lastError = new Error(message);
-        const retryDelay = baseDelayMs * (attempt + 1);
-        console.warn(`[ITO-DIAG] ${label} transient error on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
-        await sleep(retryDelay);
-        continue;
+        throw error;
       }
 
       if (data && typeof (data as { error?: unknown }).error === "string") {
-        const message = (data as { error: string }).error;
-        const shouldRetry = attempt < maxRetries && isLikelyTransientEdgeError(message);
-        if (!shouldRetry) {
-          throw new Error(message);
-        }
-
-        lastError = new Error(message);
-        const retryDelay = baseDelayMs * (attempt + 1);
-        console.warn(`[ITO-DIAG] ${label} payload error on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
-        await sleep(retryDelay);
-        continue;
+        throw new Error((data as { error: string }).error);
       }
 
       return (data as T) ?? ({} as T);
-    } catch (error) {
-      lastError = error;
+    } catch (rawError) {
+      let error = rawError;
+      const message = getErrorMessage(error);
       const status = getErrorStatus(error);
-      const shouldRetry =
-        attempt < maxRetries &&
-        (isRetriableStatus(status) || isLikelyTransientEdgeError(error));
 
-      if (!shouldRetry) {
-        throw error instanceof Error ? error : new Error(getErrorMessage(error));
+      const shouldTryDirectFallback = isTransportFailureMessage(message.toLowerCase()) || (!status && isLikelyTransientEdgeError(error));
+
+      if (shouldTryDirectFallback) {
+        try {
+          console.warn(`[ITO-DIAG] ${label} transport issue on attempt ${attempt + 1}. Trying direct fallback call.`);
+          const fallbackData = await invokeEdgeFunctionDirect<T>(functionName, body);
+          return fallbackData;
+        } catch (fallbackError) {
+          error = fallbackError;
+        }
       }
 
-      const retryDelay = baseDelayMs * (attempt + 1);
-      console.warn(`[ITO-DIAG] ${label} exception on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
+      const effectiveStatus = getErrorStatus(error);
+      const effectiveMessage = getErrorMessage(error);
+
+      if (effectiveStatus === 429) {
+        throw new Error("You're sending messages quickly. Please wait a few seconds and try again.");
+      }
+
+      if (effectiveStatus === 402) {
+        throw new Error("AI credits are temporarily exhausted. Please try again later.");
+      }
+
+      const shouldRetry =
+        attempt < maxRetries &&
+        (isRetriableStatus(effectiveStatus) || isLikelyTransientEdgeError(error));
+
+      if (!shouldRetry) {
+        throw error instanceof Error
+          ? error
+          : new Error(effectiveMessage || "The assistant couldn't respond right now. Please try again.");
+      }
+
+      lastError = error;
+      const retryDelay = baseDelayMs * Math.pow(2, attempt) + Math.floor(Math.random() * 250);
+      console.warn(`[ITO-DIAG] ${label} retrying after attempt ${attempt + 1}. Waiting ${retryDelay}ms.`);
       await sleep(retryDelay);
     }
   }
@@ -112,3 +167,4 @@ export async function invokeEdgeFunctionWithRetry<T>(
     ? lastError
     : new Error("The assistant couldn't respond right now. Please try again.");
 }
+
