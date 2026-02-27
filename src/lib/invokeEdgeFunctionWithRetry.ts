@@ -29,12 +29,14 @@ export const isLikelyTransientEdgeError = (error: unknown): boolean => {
   const message = getErrorMessage(error).toLowerCase();
   return (
     message.includes("failed to fetch") ||
+    message.includes("failed to send") ||
     message.includes("networkerror") ||
     message.includes("load failed") ||
     message.includes("timeout") ||
     message.includes("gateway") ||
     message.includes("temporarily unavailable") ||
-    message.includes("http 5")
+    message.includes("http 5") ||
+    message.includes("edge function")
   );
 };
 
