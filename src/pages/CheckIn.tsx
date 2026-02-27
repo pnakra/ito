@@ -24,6 +24,7 @@ import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
+import { supabase } from "@/integrations/supabase/client";
 
 type FlowPhase =
   | "narrative-input"
@@ -64,8 +65,8 @@ const cleanList = (value: unknown): string[] => {
     .filter((item) => item.length > 0);
 };
 
-const MAX_FOLLOWUP_FETCH_RETRIES = 2;
-const FOLLOWUP_RETRY_BASE_DELAY_MS = 350;
+const MAX_FOLLOWUP_FETCH_RETRIES = 3;
+const FOLLOWUP_RETRY_BASE_DELAY_MS = 600;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -570,6 +571,23 @@ const CheckIn = () => {
           console.warn(`[ITO-DIAG] followup network issue on attempt ${attempt + 1}. Retrying in ${retryDelay}ms.`);
           await sleep(retryDelay);
         }
+      }
+
+      if (!followUpData && isLikelyNetworkFetchError(lastAttemptError)) {
+        console.warn("[ITO-DIAG] followup fetch transport failed after retries. Falling back to invoke().");
+        const { data: invokeData, error: invokeError } = await supabase.functions.invoke("ito-followup", {
+          body: followUpBody,
+        });
+
+        if (invokeError) {
+          throw new Error(invokeError.message || "The assistant couldn't respond right now. Please try again.");
+        }
+
+        if (invokeData && typeof (invokeData as { error?: unknown }).error === "string") {
+          throw new Error((invokeData as { error: string }).error);
+        }
+
+        followUpData = (invokeData as { response?: unknown } | null) ?? null;
       }
 
       if (!followUpData) {
