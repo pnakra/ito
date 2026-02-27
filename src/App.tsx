@@ -10,6 +10,7 @@ import After from "./pages/After";
 import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Demo from "./pages/Demo";
+import ReleaseNotes from "./pages/ReleaseNotes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/release-notes" element={<ReleaseNotes />} />
           {/* Legacy routes — commented out, no longer surfaced in UI */}
           {/* <Route path="/avoid-line" element={<Before />} /> */}
           {/* <Route path="/crossed-line" element={<After />} /> */}

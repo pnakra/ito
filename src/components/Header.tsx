@@ -19,6 +19,12 @@ const Header = () => {
             Demo
           </Link>
           <Link
+            to="/release-notes"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Updates
+          </Link>
+          <Link
             to="/about"
             className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
           >
