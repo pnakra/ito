@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RiskBadge from "@/components/RiskBadge";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { Loader2, Send, Eye, X, Check, MessageCircle } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
@@ -48,11 +48,18 @@ const Chat = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke("analyze-ito", {
-        body: { scenario: input }
-      });
-
-      if (error) throw error;
+      const data = await invokeEdgeFunctionWithRetry<{
+        riskLevel: RiskLevel;
+        assessment: string;
+        whatsHappening: string[];
+        whatNotToDo: string[];
+        whatToDoInstead: string[];
+        realTalk: string;
+      }>(
+        "analyze-ito",
+        { scenario: input },
+        { maxRetries: 3, baseDelayMs: 600, label: "analyze-ito" },
+      );
 
       const assistantMessage: Message = {
         role: "assistant",

@@ -20,7 +20,7 @@ import MoveSelection, { type MoveType, MOVE_OPTIONS } from "@/components/prevent
 import MutualityGrounding from "@/components/prevention/MutualityGrounding";
 import { classifyRisk, formatSelectionsForAI, type DecisionState } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
-import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
@@ -236,14 +236,14 @@ const Before = () => {
       const formattedSelections = formatSelectionsForAI(decisions, flaggedWords, moveLabel);
       setInitialContext(formattedSelections);
       
-      const { data, error } = await supabase.functions.invoke("analyze-ito", {
-        body: { 
+      const data = await invokeEdgeFunctionWithRetry<{ signalLabel?: string; why?: string[]; suggestion?: string }>(
+        "analyze-ito",
+        {
           scenario: formattedSelections,
-          precomputedRiskLevel: riskLevel
-        }
-      });
-
-      if (error) throw error;
+          precomputedRiskLevel: riskLevel,
+        },
+        { maxRetries: 3, baseDelayMs: 600, label: "analyze-ito" },
+      );
 
       setAnalysis({
         riskLevel: riskLevel,
@@ -286,18 +286,16 @@ const Before = () => {
     logFreetext("before", "follow-up", message);
     
     try {
-      const { data: followUpData, error: invokeError } = await supabase.functions.invoke("ito-followup", {
-        body: {
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: string }>(
+        "ito-followup",
+        {
           message,
           conversationHistory: chatMessages,
           initialContext,
           riskLevel: riskResult?.level || "yellow",
         },
-      });
-
-      if (invokeError) {
-        throw new Error(invokeError.message || "The assistant couldn't respond right now. Please try again.");
-      }
+        { maxRetries: 3, baseDelayMs: 600, label: "ito-followup" },
+      );
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
