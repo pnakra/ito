@@ -1,3 +1,4 @@
+// v2 — hardened retry + direct fallback
 import { supabase } from "@/integrations/supabase/client";
 
 interface RetryOptions {
