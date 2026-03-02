@@ -15,10 +15,10 @@ const RefusalCard = ({ onReset }: RefusalCardProps) => {
       </div>
       
       <div className="text-center space-y-4">
-        <h2 className="text-lg font-medium">I can't help you continue here.</h2>
+        <h2 className="text-lg font-medium">This can't go further.</h2>
         
         <p className="text-muted-foreground text-sm">
-          Clear boundaries were set. The safest move is to stop.
+          Boundaries were set. The move here is to stop.
         </p>
         
         <div className="pt-4">

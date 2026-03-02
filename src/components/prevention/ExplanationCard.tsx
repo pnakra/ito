@@ -19,7 +19,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-body">Breaking this down for you...</p>
+        <p className="text-muted-foreground text-body">Thinking...</p>
       </div>
     );
   }
@@ -30,7 +30,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
     <div className="space-y-6 animate-fade-in">
       <div className="bg-card shadow-card p-5 rounded-lg">
         <p className="text-caption text-muted-foreground text-center">
-          This is a reflection tool, not a permission slip. Only they can tell you what they want.
+          This isn't permission. Only they can tell you what they want.
         </p>
       </div>
 

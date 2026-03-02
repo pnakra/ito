@@ -19,22 +19,22 @@ const About = () => {
             <h1 className="text-h1 mb-4">What is ito?</h1>
             <div className="space-y-4 text-muted-foreground text-body">
               <p>
-                <strong className="text-foreground">ito</strong> helps you figure out if something is okay before you do it — or make sense of something that already happened.
+                <strong className="text-foreground">ito</strong> is for the moment when you're not sure if something was okay, or if something you're about to do is okay.
               </p>
               <p>
-                You describe the situation, and ito gives you honest feedback. Not a lecture. Not a guilt trip. Just a straight answer about what's actually going on.
+                You write what's going on, and you get an honest read. No lecture. No guilt trip. Just a straight take.
               </p>
             </div>
           </div>
 
           <div className="bg-card shadow-card rounded-lg p-5">
-            <h2 className="text-h2 mb-3">Why does this exist?</h2>
+            <h2 className="text-h2 mb-3">Why?</h2>
             <div className="space-y-3 text-muted-foreground text-body">
               <p>
-                Most people don't set out to hurt someone. But in the moment, it's easy to miss things — especially when you're caught up, or when alcohol is involved, or when you're not sure what the other person actually wants.
+                Most people don't set out to hurt someone. But it's easy to miss things in the moment, especially when you're caught up, or drinking, or when you're not sure what the other person actually wants.
               </p>
               <p>
-                ito is a way to pause and think clearly before something goes wrong.
+                This is a way to pause and think before something goes wrong.
               </p>
             </div>
           </div>
@@ -43,22 +43,22 @@ const About = () => {
             <h2 className="text-h2 mb-3">How it works</h2>
             <div className="space-y-3 text-muted-foreground text-body">
               <p>
-                You answer a few questions or write out what's happening in your own words. ito looks at the situation and tells you what it sees — things you might be missing, things that could be off, or things to think about.
+                Write what's happening in your own words, or answer a few questions. ito looks at the situation and tells you what it sees. Things you might be missing. Things that could be off.
               </p>
               <p>
-                It won't tell you what to do. It won't give you permission. It just helps you see the situation more clearly.
+                It won't tell you what to do. It won't give you permission. It just helps you see things more clearly.
               </p>
             </div>
           </div>
 
           <div className="bg-card shadow-card rounded-lg p-5">
-            <h2 className="text-h2 mb-3">Nobody will know you used this</h2>
+            <h2 className="text-h2 mb-3">Nobody will know</h2>
             <div className="space-y-3 text-muted-foreground text-body">
               <p>
                 No login. No account. No name, no email, nothing.
               </p>
               <p>
-                What you type is used to give you a response and then it's gone. There's no way for anyone to trace it back to you.
+                What you type gets used for the response and then it's gone. There's no way to trace it back to you.
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ const About = () => {
                   Is this actually anonymous?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  Yes. No personal info is collected. No IP tracking, no login, no cookies following you around. There is no way to connect anything back to you.
+                  Yes. No personal info is collected. No IP tracking, no login, no cookies following you around. Nothing connects back to you.
                 </AccordionContent>
               </AccordionItem>
 
@@ -80,25 +80,25 @@ const About = () => {
                   Is this going to lecture me?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. It talks to you like a friend who's being real with you — not a teacher, not a counselor, not someone trying to make you feel bad.
+                  No. It talks to you like someone who's being real with you, not someone trying to make you feel bad.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  Can I use this to check if something is okay to do?
+                  Can this tell me if something is okay to do?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  You can use it to think through a situation, but it will never tell you "go ahead." Only the other person can tell you what they want. ito helps you figure out if you're actually paying attention to that.
+                  It can help you think through a situation, but it'll never say "go ahead." Only the other person can tell you what they want.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="border-border/50">
                 <AccordionTrigger className="text-left text-body hover:no-underline">
-                  What if something already happened to me?
+                  What if something already happened?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  ito can help you think through that too. It won't blame you or tell you what you should have done. It just helps you understand what happened.
+                  You can think through that too. It won't blame you or tell you what you should have done. It just helps you understand what happened.
                 </AccordionContent>
               </AccordionItem>
 
@@ -107,7 +107,7 @@ const About = () => {
                   Who made this?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  ito was built by people who work in sexual violence prevention. It's designed to actually help — not to collect data, sell anything, or report anyone.
+                  People who care about this stuff. It's not trying to collect data, sell anything, or report anyone.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

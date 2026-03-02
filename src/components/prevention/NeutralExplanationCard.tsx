@@ -88,7 +88,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
       )}
 
       <p className="text-[15px] text-muted-foreground text-center italic">
-        Consent can change at any time. If they hesitate, go quiet, or pull back — that's your cue to stop.
+        If they hesitate, go quiet, or pull back, that's your cue to stop.
       </p>
     </div>
   );

@@ -34,7 +34,7 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-body">Looking at your situation...</p>
+        <p className="text-muted-foreground text-body">Thinking...</p>
       </div>
     );
   }

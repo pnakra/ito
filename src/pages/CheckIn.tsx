@@ -515,7 +515,7 @@ const CheckIn = () => {
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
       if (!responseText) {
-        throw new Error("The assistant returned an empty response. Please try again.");
+        throw new Error("Empty response. Try again.");
       }
 
       const assistantMessage = { role: "assistant" as const, content: responseText };
@@ -524,7 +524,7 @@ const CheckIn = () => {
     } catch (error) {
       console.error("Error in follow-up:", error);
       const userFacingError = isLikelyTransientEdgeError(error)
-        ? "We hit a temporary connection issue. Please tap Send again in a few seconds."
+        ? "Connection issue. Tap Send again in a few seconds."
         : error instanceof Error && error.message
           ? error.message
           : "I’m having trouble right now. Can you try again?";
@@ -725,7 +725,7 @@ function getClarificationGap(missing: "timing" | "age" | "physical" | "intent"):
       return {
         id: "timing-clarification",
         category: "clarification",
-        question: "Quick question before I answer — did this already happen, or are you deciding what to do?",
+        question: "Quick question — did this already happen, or are you deciding what to do?",
         priority: 1,
         safetyRelevant: true,
       };
@@ -733,7 +733,7 @@ function getClarificationGap(missing: "timing" | "age" | "physical" | "intent"):
       return {
         id: "age-clarification",
         category: "age",
-        question: "How old are you both, roughly? This helps me give better advice.",
+        question: "How old are you both, roughly?",
         priority: 2,
         safetyRelevant: true,
       };
