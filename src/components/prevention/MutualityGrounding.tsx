@@ -1,5 +1,6 @@
 import { HelpCircle } from "lucide-react";
-import type { MoveType } from "./MoveSelection";
+
+type MoveType = "sit-closer" | "hold-hands" | "kiss" | "touch-over" | "touch-under" | "sex" | "have-sex" | "not-sure" | "other";
 
 interface MutualityGroundingProps {
   selectedMove: MoveType | null;
