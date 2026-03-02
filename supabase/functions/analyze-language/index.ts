@@ -7,26 +7,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You check text for concerning attitudes about consent and dating. Your job is to catch subtle problems that simple word-matching might miss.
+const SYSTEM_PROMPT = `You check text for concerning attitudes about consent and dating. Your job is to catch subtle problems that word-matching would miss.
 
-THINGS TO LOOK FOR:
-1. Entitlement: thinking they're owed something, "nice guy" attitude, complaining about being "friend zoned"
+WHAT TO LOOK FOR:
+1. Entitlement: thinking they're owed something, "nice guy" attitude, frustrated about being "friend zoned"
 2. Treating someone like an object: judging them by how many people they've been with
-3. Ignoring boundaries: saying rejection is "playing games" or "leading on"
+3. Ignoring boundaries: calling rejection "playing games" or "leading on"
 4. Blaming them: suggesting their clothes, drinking, or behavior equals consent
-5. Manipulation: using guilt, pressure, or secrecy
-6. Disrespectful language: slurs, degrading words, treating them like a prize
+5. Manipulation: guilt, pressure, secrecy
+6. Disrespectful language: slurs, degrading words, treating someone like a prize
 
-IMPORTANT:
-- Look for ATTITUDE, not just words. "They've been with a lot of people" shows a problem even without slurs.
-- Watch for REFRAMING of rejection. "They said no but..." is concerning even without bad words.
-- Catch ENTITLEMENT. Being frustrated about being "friend zoned" or "led on" is a red flag.
+KEY: Look for ATTITUDE, not just words. "They've been with a lot of people" shows a problem even without slurs. Being frustrated about being "friend zoned" or "led on" is concerning.
 
 RESPOND IN THIS EXACT JSON FORMAT:
 {
   "hasConcerningLanguage": boolean,
   "categories": ["category1", "category2"],
-  "explanation": "Short explanation of what you found and why it matters"
+  "explanation": "Short, plain-language explanation of what you noticed and why it matters"
 }
 
 If the text seems fine, return:
