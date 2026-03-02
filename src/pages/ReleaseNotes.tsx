@@ -14,6 +14,34 @@ interface ReleaseEntry {
 
 const releases: ReleaseEntry[] = [
   {
+    week: "Week of Mar 2",
+    date: "2026-03-02",
+    highlights: [
+      "Complete visual identity overhaul: dark-first theme with cool slate palette",
+      "Mobile layout optimization for above-the-fold visibility",
+    ],
+    details: [
+      {
+        category: "UX & Design",
+        items: [
+          "Replaced parchment/teal color system with dark-first cool slate palette (HSL 220 12% 8% background, 215 18% 55% accent)",
+          "Switched typography from Instrument Serif to Geist Sans globally for a non-institutional feel",
+          "Added dark mode toggle (Sun/Moon) in header via next-themes, dark by default with light mode opt-in",
+          "Optimized landing page layout: reduced top padding on mobile (4vh vs 10vh desktop) so headline, demo card, and CTA all fit above the fold",
+          "Shrunk homepage demo card to 380px on mobile (460px desktop) to prevent CTA from being pushed below viewport",
+          "Fixed demo page scenario cards using opacity-based colors (red-500/10, amber-500/25) instead of hardcoded light-mode values",
+        ],
+      },
+      {
+        category: "Infrastructure",
+        items: [
+          "Simplified page metadata: stripped academic subtitles, brand reduced to 'ito'",
+          "Loaded Geist font via Google Fonts CDN with display=swap for performance",
+        ],
+      },
+    ],
+  },
+  {
     week: "Week of Feb 24",
     date: "2026-02-27",
     highlights: [
@@ -105,11 +133,11 @@ const releases: ReleaseEntry[] = [
         ],
       },
       {
-        category: "Design System",
+        category: "Design System (v1 — since replaced)",
         items: [
-          "Established warm parchment color palette with deep teal (#2d6a5f) primary",
-          "Configured Instrument Serif for headlines, Inter for body text",
-          "Built semantic token system: signal-stop (red), signal-pause (yellow), signal-clear (green)",
+          "Established initial warm parchment palette with deep teal (#2d6a5f) primary (replaced in Mar 2 update)",
+          "Configured Instrument Serif for headlines, Inter for body text (replaced with Geist Sans)",
+          "Built semantic token system: signal-stop (red), signal-pause (yellow), signal-clear",
           "Created custom card, button, and input components with rounded-[14px] and shadow-card styling",
         ],
       },
