@@ -148,8 +148,8 @@ const HomepageDemo = () => {
           <span className="text-[13px] text-muted-foreground">What's on your mind?</span>
         </div>
 
-        <div className="px-5 pb-5 space-y-3 overflow-hidden">
-          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[100px] text-[15px] text-foreground leading-[1.7]">
+        <div className="px-5 pb-5 space-y-3 overflow-hidden flex-1">
+          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[80px] sm:min-h-[100px] text-[15px] text-foreground leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
               <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
