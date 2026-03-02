@@ -155,29 +155,39 @@ const HomepageDemo = () => {
         </div>
 
         <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-hidden flex-1">
-          <div className="rounded-[10px] border border-input bg-background p-3 sm:p-4 min-h-[70px] sm:min-h-[100px] text-[14px] sm:text-[15px] text-foreground leading-[1.6] sm:leading-[1.7]">
-            {displayedText}
-            {phase === "typing" && (
-              <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
-            )}
-            {!displayedText && phase === "typing" && (
-              <span className="text-muted-foreground/50 text-[15px]">
-                Tell me what's going on...
-              </span>
-            )}
-          </div>
-
-          <div className="flex justify-end">
-            <div
-              className={`text-[13px] px-4 py-2 rounded-[14px] font-semibold transition-all duration-200 ${
-                phase === "submitting" || phase.startsWith("result") || phase === "reading" || (phase === "typing" && charIndex === scenario.text.length)
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground opacity-40"
-              }`}
-            >
-              Go →
+          {/* Input area — collapses to single line when results show */}
+          {phase === "typing" || phase === "submitting" ? (
+            <div className="rounded-[10px] border border-input bg-background p-3 sm:p-4 min-h-[70px] sm:min-h-[100px] text-[14px] sm:text-[15px] text-foreground leading-[1.6] sm:leading-[1.7]">
+              {displayedText}
+              {phase === "typing" && (
+                <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
+              )}
+              {!displayedText && phase === "typing" && (
+                <span className="text-muted-foreground/50 text-[15px]">
+                  Tell me what's going on...
+                </span>
+              )}
             </div>
-          </div>
+          ) : (
+            <div className="rounded-[10px] border border-input bg-background px-3 py-2 text-[12px] text-muted-foreground leading-[1.5] line-clamp-2 transition-all duration-300">
+              {displayedText}
+            </div>
+          )}
+
+          {/* Go button — only during typing/submitting */}
+          {(phase === "typing" || phase === "submitting") && (
+            <div className="flex justify-end">
+              <div
+                className={`text-[13px] px-4 py-2 rounded-[14px] font-semibold transition-all duration-200 ${
+                  phase === "submitting" || (phase === "typing" && charIndex === scenario.text.length)
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground opacity-40"
+                }`}
+              >
+                Go →
+              </div>
+            </div>
+          )}
 
           {/* Loading: typing dots */}
           {phase === "submitting" && (
