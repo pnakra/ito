@@ -56,7 +56,7 @@ const releases: ReleaseEntry[] = [
           "Fixed protocol error where consecutive 'user' role messages violated Anthropic's message alternation requirement",
           "Added retry loop (up to 2 retries) in analyze-ito for transient API failures",
           "Added JSON normalization layer in analyze-narrative to sanitize Claude output",
-          "All 7 edge functions now consistently use Claude: analyze-ito, ito-followup, analyze-narrative, analyze-crossed-line, analyze-someone-crossed, crossed-line-followup, analyze-language",
+          "All active edge functions now consistently use Claude: analyze-ito, ito-followup, analyze-narrative, analyze-language",
         ],
       },
     ],
