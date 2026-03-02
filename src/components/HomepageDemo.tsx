@@ -141,15 +141,19 @@ const HomepageDemo = () => {
     return () => clearTimeout(t);
   }, [phase]);
 
+  // DESIGN CONSTRAINT: Card uses min-h (not fixed h) so content never clips on mobile.
+  // Mobile (default): min-h-[380px], tighter padding (px-4, p-3, space-y-2).
+  // Desktop (sm+): min-h-[460px], standard padding (px-5, p-4, space-y-3).
+  // Any new scenario text MUST fit within these bounds — test on 375px viewport.
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden h-[380px] sm:h-[460px]">
-        <div className="px-5 pt-4 pb-1">
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden min-h-[380px] sm:min-h-[460px]">
+        <div className="px-4 sm:px-5 pt-3 sm:pt-4 pb-1">
           <span className="text-[13px] text-muted-foreground">What's on your mind?</span>
         </div>
 
-        <div className="px-5 pb-5 space-y-3 overflow-hidden flex-1">
-          <div className="rounded-[10px] border border-input bg-background p-4 min-h-[80px] sm:min-h-[100px] text-[15px] text-foreground leading-[1.7]">
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-hidden flex-1">
+          <div className="rounded-[10px] border border-input bg-background p-3 sm:p-4 min-h-[70px] sm:min-h-[100px] text-[14px] sm:text-[15px] text-foreground leading-[1.6] sm:leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
               <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
@@ -186,7 +190,7 @@ const HomepageDemo = () => {
 
           {/* Staggered result */}
           {(phase === "result-badge" || phase === "result-points" || phase === "result-tension" || phase === "reading") && (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* Badge */}
               <div className="inline-flex animate-fade-in">
                 <span className="bg-accent text-primary border-[1.5px] border-primary text-[13px] py-1.5 px-3 rounded-full font-semibold">
