@@ -24,7 +24,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 flex flex-col justify-start pt-[12vh]">
+      <main className="flex-1 flex flex-col justify-start pt-[4vh] sm:pt-[10vh]">
         <section className="container mx-auto px-5 flex flex-col items-center">
 
           <h1 className="text-h1 mb-3 text-foreground text-center min-h-[1.2em]">
@@ -33,7 +33,7 @@ const Index = () => {
 
           {!cardsVisible && (
             <p
-              className={`text-[15px] text-muted-foreground text-center mb-8 transition-all duration-300 ${
+              className={`text-[15px] text-muted-foreground text-center mb-4 sm:mb-8 transition-all duration-300 ${
                 headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
               } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
               style={{ transitionDelay: headlineComplete ? "100ms" : "0ms" }}
