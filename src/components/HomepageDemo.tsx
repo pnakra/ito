@@ -141,18 +141,18 @@ const HomepageDemo = () => {
     return () => clearTimeout(t);
   }, [phase]);
 
-  // DESIGN CONSTRAINT: Card uses min-h (not fixed h) so content never clips on mobile.
-  // Mobile (default): min-h-[380px], tighter padding (px-4, p-3, space-y-2).
-  // Desktop (sm+): min-h-[460px], standard padding (px-5, p-4, space-y-3).
-  // Any new scenario text MUST fit within these bounds — test on 375px viewport.
+  // DESIGN CONSTRAINT: Card uses FIXED height so the CTA button below never shifts.
+  // Content overflow is handled via internal scrolling (overflow-y-auto).
+  // Mobile (default): h-[380px], tighter padding. Desktop (sm+): h-[460px].
+  // Any new scenario MUST be tested on 375px viewport to verify no layout shift.
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
-      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden min-h-[380px] sm:min-h-[460px]">
-        <div className="px-4 sm:px-5 pt-3 sm:pt-4 pb-1">
+      <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden h-[380px] sm:h-[460px] flex flex-col">
+        <div className="px-4 sm:px-5 pt-3 sm:pt-4 pb-1 shrink-0">
           <span className="text-[13px] text-muted-foreground">What's on your mind?</span>
         </div>
 
-        <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-hidden flex-1">
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-y-auto flex-1">
           <div className="rounded-[10px] border border-input bg-background p-3 sm:p-4 min-h-[70px] sm:min-h-[100px] text-[14px] sm:text-[15px] text-foreground leading-[1.6] sm:leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
