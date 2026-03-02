@@ -12,22 +12,22 @@ const SCENARIOS: DemoScenario[] = [
   {
     text: "she said yes earlier but seemed distant the whole time and i don't know if i should have stopped",
     signal: "yellow",
-    label: "Something's off",
+    label: "Something feels off",
     points: [
-      "You noticed hesitation but continued anyway.",
-      "A 'yes' said while seeming distant isn't enthusiasm.",
-      "The fact that you're asking matters.",
+      "You noticed she seemed off but kept going.",
+      "A 'yes' from someone who seems distant isn't the same as enthusiasm.",
+      "The fact that you're asking says something good about you.",
     ],
-    tension: "You're deciding what their behavior meant, instead of asking them.",
+    tension: "You're deciding what her behavior meant instead of asking her.",
   },
   {
     text: "i want to message them asking to hook up but we haven't talked in a while and i'm not sure they'd be into it",
     signal: "neutral",
     label: "You're guessing",
     points: [
-      "You're reading silence as ambiguity, not as a no.",
-      "There's a gap between what you want and what you know they want.",
-      "Asking directly removes the guesswork — and the risk.",
+      "You're reading silence as a maybe, not a no.",
+      "There's a gap between what you want and what you actually know they want.",
+      "Asking them directly removes the guesswork and the risk.",
     ],
     tension: "You're about to act on a hope, not a signal.",
   },
@@ -145,7 +145,7 @@ const HomepageDemo = () => {
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
       <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden" style={{ height: '460px' }}>
         <div className="px-5 pt-4 pb-1">
-          <span className="text-[13px] text-muted-foreground">What's going on?</span>
+          <span className="text-[13px] text-muted-foreground">What's on your mind?</span>
         </div>
 
         <div className="px-5 pb-5 space-y-3 overflow-hidden">

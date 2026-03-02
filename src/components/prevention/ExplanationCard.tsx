@@ -30,7 +30,7 @@ const ExplanationCard = ({ analysis, isLoading }: ExplanationCardProps) => {
     <div className="space-y-6 animate-fade-in">
       <div className="bg-card shadow-card p-5 rounded-lg">
         <p className="text-caption text-muted-foreground text-center">
-          This is a reflection tool, not a permission slip. Only the other person can give consent.
+          This is a reflection tool, not a permission slip. Only they can tell you what they want.
         </p>
       </div>
 

@@ -50,9 +50,9 @@ const ConversationalChat = ({
   return (
     <div className="animate-fade-in space-y-6">
       <div>
-        <h2 className="text-h2 mb-1">Let's talk through it</h2>
+        <h2 className="text-h2 mb-1">Keep going</h2>
         <p className="text-muted-foreground text-body">
-          Share more, ask questions, or clarify anything.
+          Ask anything or tell me more.
         </p>
       </div>
 

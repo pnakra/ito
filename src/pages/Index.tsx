@@ -24,12 +24,23 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 flex flex-col justify-start pt-[10vh]">
+      <main className="flex-1 flex flex-col justify-start pt-[12vh]">
         <section className="container mx-auto px-5 flex flex-col items-center">
 
-          <h1 className="text-h1 mb-8 text-foreground text-center min-h-[1.2em]">
+          <h1 className="text-h1 mb-3 text-foreground text-center min-h-[1.2em]">
             <TypewriterText text="is this ok?" delay={70} onComplete={() => setHeadlineComplete(true)} />
           </h1>
+
+          {!cardsVisible && (
+            <p
+              className={`text-[15px] text-muted-foreground text-center mb-8 transition-all duration-300 ${
+                headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+              } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
+              style={{ transitionDelay: headlineComplete ? "100ms" : "0ms" }}
+            >
+              No judgment. No lectures. Just an honest read.
+            </p>
+          )}
 
           {!cardsVisible && (
             <div
@@ -52,7 +63,7 @@ const Index = () => {
                 onClick={handleReady}
                 className="bg-primary text-primary-foreground px-6 py-3 rounded-[14px] text-[15px] font-semibold hover:bg-primary/90 active:scale-[0.97] transition-all"
               >
-                Try it out
+                What's on your mind?
               </button>
             </div>
           )}
@@ -66,9 +77,9 @@ const Index = () => {
                 >
                   <div className="flex-1 min-w-0">
                     <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                      Write it out
+                      Just say it
                     </h2>
-                    <p className="text-muted-foreground text-[14px]">Describe what happened or what you're thinking about</p>
+                    <p className="text-muted-foreground text-[14px]">Write it out like you'd text a friend</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
@@ -79,9 +90,9 @@ const Index = () => {
                 >
                   <div className="flex-1 min-w-0">
                     <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                      Answer a few questions
+                      Help me think through it
                     </h2>
-                    <p className="text-muted-foreground text-[14px]">Not sure where to start? We'll walk you through it</p>
+                    <p className="text-muted-foreground text-[14px]">A few quick questions to get started</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>

@@ -5,9 +5,9 @@ import { ArrowRight } from "lucide-react";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
-  "Write it like a text to a friend.",
-  "Something happened or might happen?",
-  "What feels off?",
+  "Write it like you'd text a friend.",
+  "Something feel off?",
+  "What's on your mind?",
 ];
 
 interface NarrativeInputProps {
@@ -55,7 +55,8 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
   return (
     <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
-      <h1 className="text-h1 mb-6 text-foreground text-center">is this ok?</h1>
+      <h1 className="text-h1 mb-2 text-foreground text-center">is this ok?</h1>
+      <p className="text-[14px] text-muted-foreground text-center mb-6">No judgment. Just say what's going on.</p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
         <Textarea
@@ -77,7 +78,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
               size="sm"
               className="w-auto px-5 h-10"
             >
-              Continue <ArrowRight className="ml-1 w-3.5 h-3.5" />
+              Go <ArrowRight className="ml-1 w-3.5 h-3.5" />
             </Button>
           </div>
         )}
@@ -87,9 +88,9 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       {!text && !isLoading && (
         <div className="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
-            "She said yes earlier but now she seems off",
-            "I keep thinking about whether I pushed too hard",
-            "We've hooked up before but this time felt different",
+            "She said yes but something felt off",
+            "I'm not sure if I went too far",
+            "They haven't texted back and I'm overthinking it",
           ].map((prompt) => (
             <button
               key={prompt}
@@ -114,14 +115,14 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       {/* Privacy + guided mode */}
       <div className="mt-6 flex flex-col items-center gap-3">
         <p className="text-[13px] text-muted-foreground">
-          Anonymous. No data is stored long-term.
+          Totally anonymous. Nothing is saved.
         </p>
 
         <button
           onClick={onGuidedMode}
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          Not sure where to start? <span className="text-primary font-medium">Answer a few questions</span>
+          Not sure what to say? <span className="text-primary font-medium">We'll help</span>
         </button>
       </div>
     </div>

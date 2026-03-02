@@ -13,7 +13,7 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
   return (
     <div className="animate-fade-in space-y-3 pt-6">
       <p className="text-[15px] text-muted-foreground text-center mb-4">
-        Did that track?
+        Does that land?
       </p>
 
       <div className="flex gap-3">
@@ -22,7 +22,7 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
           className="flex-1 text-center border-[1.5px] border-border rounded-[12px] px-4 py-3 transition-all duration-150 active:scale-[0.98] hover:border-primary/40"
         >
           <MessageSquare className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
-          <span className="text-[14px] font-medium block text-foreground">Share more</span>
+          <span className="text-[14px] font-medium block text-foreground">Tell me more</span>
         </button>
 
         <button
@@ -30,7 +30,7 @@ const PostExplanationChoice = ({ onDone, onContinue, isActive }: PostExplanation
           className="flex-1 text-center border-[1.5px] border-border rounded-[12px] px-4 py-3 transition-all duration-150 active:scale-[0.98] hover:border-primary/40"
         >
           <CheckCircle className="w-4 h-4 text-muted-foreground mx-auto mb-1.5" />
-          <span className="text-[14px] font-medium block text-foreground">Makes sense</span>
+          <span className="text-[14px] font-medium block text-foreground">Yeah, got it</span>
         </button>
       </div>
     </div>
