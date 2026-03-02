@@ -8,26 +8,29 @@ interface DemoScenario {
   tension: string;
 }
 
+// DESIGN CONSTRAINT: Each scenario must fit a 380px-tall card on a 375px-wide viewport.
+// Input text: max ~90 chars. Points: max 3, each max ~55 chars. Tension: max ~50 chars.
+// Test on mobile before committing any copy changes.
 const SCENARIOS: DemoScenario[] = [
   {
-    text: "she said yes earlier but seemed distant the whole time and i don't know if i should have stopped",
+    text: "she said yes but seemed distant the whole time and i don't know if i should've stopped",
     signal: "yellow",
     label: "Something feels off",
     points: [
       "You noticed she seemed off but kept going.",
-      "A 'yes' from someone who seems distant isn't the same as enthusiasm.",
-      "The fact that you're asking says something good about you.",
+      "A 'yes' from someone distant isn't enthusiasm.",
+      "The fact that you're asking says something.",
     ],
-    tension: "You're deciding what her behavior meant instead of asking her.",
+    tension: "You're deciding what she meant instead of asking.",
   },
   {
-    text: "i want to message them asking to hook up but we haven't talked in a while and i'm not sure they'd be into it",
+    text: "i want to hit them up to hook up but we haven't talked in a while and idk if they'd be into it",
     signal: "neutral",
     label: "You're guessing",
     points: [
       "You're reading silence as a maybe, not a no.",
-      "There's a gap between what you want and what you actually know they want.",
-      "Asking them directly removes the guesswork and the risk.",
+      "There's a gap between what you want and what you know.",
+      "Asking directly removes the guesswork.",
     ],
     tension: "You're about to act on a hope, not a signal.",
   },
@@ -142,9 +145,8 @@ const HomepageDemo = () => {
   }, [phase]);
 
   // DESIGN CONSTRAINT: Card uses FIXED height so the CTA button below never shifts.
-  // Content overflow is handled via internal scrolling (overflow-y-auto).
-  // Mobile (default): h-[380px], tighter padding. Desktop (sm+): h-[460px].
-  // Any new scenario MUST be tested on 375px viewport to verify no layout shift.
+  // Content must be authored to fit — no internal scrolling, no overflow.
+  // See SCENARIOS copy constraints above. Test on 375px viewport.
   return (
     <div ref={containerRef} className="w-full max-w-sm mx-auto" onClick={() => { if (!hasStartedRef.current) { hasStartedRef.current = true; setVisible(true); } }}>
       <div className="relative rounded-[16px] bg-card shadow-card overflow-hidden h-[380px] sm:h-[460px] flex flex-col">
@@ -152,7 +154,7 @@ const HomepageDemo = () => {
           <span className="text-[13px] text-muted-foreground">What's on your mind?</span>
         </div>
 
-        <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-y-auto flex-1">
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-2 sm:space-y-3 overflow-hidden flex-1">
           <div className="rounded-[10px] border border-input bg-background p-3 sm:p-4 min-h-[70px] sm:min-h-[100px] text-[14px] sm:text-[15px] text-foreground leading-[1.6] sm:leading-[1.7]">
             {displayedText}
             {phase === "typing" && (
