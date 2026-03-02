@@ -169,7 +169,7 @@ const HomepageDemo = () => {
                   : "bg-muted text-muted-foreground opacity-40"
               }`}
             >
-              Continue →
+              Go →
             </div>
           </div>
 

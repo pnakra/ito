@@ -52,7 +52,7 @@ const ConversationalChat = ({
       <div>
         <h2 className="text-h2 mb-1">Keep going</h2>
         <p className="text-muted-foreground text-body">
-          Ask anything or tell me more.
+          Say more if you want.
         </p>
       </div>
 

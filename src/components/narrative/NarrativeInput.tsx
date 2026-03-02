@@ -56,7 +56,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
   return (
     <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
       <h1 className="text-h1 mb-2 text-foreground text-center">is this ok?</h1>
-      <p className="text-[14px] text-muted-foreground text-center mb-6">No judgment. Just say what's going on.</p>
+      <p className="text-[14px] text-muted-foreground text-center mb-6">Say what's going on. No one's watching.</p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
         <Textarea
@@ -122,7 +122,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
           onClick={onGuidedMode}
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          Not sure what to say? <span className="text-primary font-medium">We'll help</span>
+          Not sure what to say? <span className="text-primary font-medium">Try guided questions</span>
         </button>
       </div>
     </div>

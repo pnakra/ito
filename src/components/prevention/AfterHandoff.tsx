@@ -13,9 +13,9 @@ const AfterHandoff = ({ isActive }: AfterHandoffProps) => {
 
   return (
     <div className="border border-border/50 rounded-md p-4 animate-fade-in">
-      <h3 className="text-sm font-medium mb-1">Did something already happen?</h3>
+      <h3 className="text-sm font-medium mb-1">Already happened?</h3>
       <p className="text-muted-foreground text-sm mb-3">
-        If you're thinking you might have already gone too far, there's a different space for that.
+        If you're thinking you might have already gone too far, you can think through that instead.
       </p>
       <Button
         variant="outline"

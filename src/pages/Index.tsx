@@ -38,7 +38,7 @@ const Index = () => {
               } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
               style={{ transitionDelay: headlineComplete ? "100ms" : "0ms" }}
             >
-              No judgment. No lectures. Just an honest read.
+               No judgment. No lectures. Just an honest read.
             </p>
           )}
 

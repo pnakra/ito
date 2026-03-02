@@ -36,7 +36,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
     return (
       <div className="py-12 flex flex-col items-center justify-center gap-3 animate-fade-in">
         <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        <p className="text-muted-foreground text-sm">Taking a moment to think through this...</p>
+        <p className="text-muted-foreground text-sm">Thinking...</p>
       </div>
     );
   }
@@ -165,7 +165,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
 
       {isComplete && (
         <p className="text-sm text-muted-foreground text-center italic">
-          Thinking about this doesn't make you a bad person. It means you're trying to do better.
+          You're here thinking about it. That counts for something.
         </p>
       )}
     </div>

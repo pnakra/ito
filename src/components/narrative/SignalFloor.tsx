@@ -55,10 +55,10 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
     <div className="animate-fade-in space-y-8">
       <div>
         <h2 className="text-question mb-1">
-          A few quick questions for better advice
+          A few quick things
         </h2>
         <p className="text-muted-foreground text-[15px]">
-          Skip whatever you want.
+          Skip whatever.
         </p>
       </div>
 
