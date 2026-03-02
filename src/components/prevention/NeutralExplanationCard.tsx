@@ -55,7 +55,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
     <div className="space-y-6">
       <div className="bg-card shadow-card rounded-[16px] p-5">
         <p className="text-[13px] text-muted-foreground text-center">
-          The absence of a red flag is not the presence of consent. Only the other person can tell you what they want.
+          No red flags doesn't mean it's all good. Only they can tell you what they want.
         </p>
       </div>
 
@@ -88,7 +88,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
       )}
 
       <p className="text-[15px] text-muted-foreground text-center italic">
-        Consent can change at any time. If they hesitate, go quiet, or pull back, that's your cue to stop.
+        Consent can change at any time. If they hesitate, go quiet, or pull back — that's your cue to stop.
       </p>
     </div>
   );

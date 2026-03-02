@@ -126,7 +126,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
         <div className="pt-6 pb-4">
           {/* Step content */}
           {step === 1 && (
-            <StepLayout question="Did this already happen, or is it still being figured out?">
+            <StepLayout question="Is this something that already happened, or something you're figuring out?">
               <div className="flex flex-col gap-2.5">
                 {TIMING_OPTIONS.map(opt => (
                   <OptionButton
@@ -145,7 +145,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
             <StepLayout question="Who's the other person?">
               <Select value={relationship} onValueChange={setRelationship} disabled={isLoading}>
                 <SelectTrigger className="h-[56px] bg-card shadow-card border-0 rounded-[12px] text-[15px]">
-                  <SelectValue placeholder="Choose one" />
+                  <SelectValue placeholder="Pick one" />
                 </SelectTrigger>
                 <SelectContent>
                   {RELATIONSHIP_OPTIONS.map(opt => (
@@ -164,7 +164,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
                 <Textarea
                   value={whatHappened}
                   onChange={(e) => setWhatHappened(e.target.value.slice(0, maxLength))}
-                  placeholder="Just describe it in your own words"
+                  placeholder="Just say it however it comes out"
                   className="min-h-[140px] resize-none"
                   disabled={isLoading}
                 />
@@ -225,11 +225,11 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
           )}
 
           {step === 6 && (
-            <StepLayout question="What are you worried about?">
+            <StepLayout question="Anything you're worried about?">
               <Textarea
                 value={worried}
                 onChange={(e) => setWorried(e.target.value.slice(0, maxLength))}
-                placeholder="Anything on your mind about this?"
+                placeholder="Whatever's on your mind"
                 className="min-h-[120px] resize-none"
                 disabled={isLoading}
               />

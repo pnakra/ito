@@ -38,7 +38,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           <h2 className={`text-h2 ${
             isRed ? "text-signal-stop" : "text-signal-pause"
           }`}>
-            {isRed ? "Stop and think" : "Something's off"}
+            {isRed ? "Hold on" : "Something feels off"}
           </h2>
           
           <p className="text-body text-foreground/90">
@@ -55,7 +55,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
                 : "border-signal-pause/30 text-signal-pause hover:bg-signal-pause/5"
             }`}
           >
-            See what this means for you
+            Show me what you see
           </Button>
         </div>
       </div>
