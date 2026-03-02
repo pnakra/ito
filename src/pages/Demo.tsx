@@ -80,25 +80,25 @@ const SCENARIOS: DemoScenario[] = [
 
 const colorMap = {
   neutral: {
-    bg: "bg-muted",
+    bg: "bg-muted/50",
     border: "border-border",
     dot: "bg-muted-foreground",
     text: "text-foreground",
     hover: "hover:border-muted-foreground",
   },
   yellow: {
-    bg: "bg-amber-50",
-    border: "border-amber-200",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/25",
     dot: "bg-amber-500",
-    text: "text-amber-700",
-    hover: "hover:border-amber-400",
+    text: "text-amber-400 dark:text-amber-400 text-amber-700",
+    hover: "hover:border-amber-500/50",
   },
   red: {
-    bg: "bg-red-50",
-    border: "border-red-200",
+    bg: "bg-red-500/10",
+    border: "border-red-500/25",
     dot: "bg-red-500",
-    text: "text-red-700",
-    hover: "hover:border-red-400",
+    text: "text-red-400 dark:text-red-400 text-red-700",
+    hover: "hover:border-red-500/50",
   },
 };
 
