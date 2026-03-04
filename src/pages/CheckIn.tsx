@@ -87,6 +87,8 @@ const CheckIn = () => {
   const [detectedTiming, setDetectedTiming] = useState<"before" | "after" | "unclear">("unclear");
   // Ref stores the resolved timing synchronously so stop-moment acknowledge uses the correct value
   const resolvedTimingRef = useRef<"before" | "after" | "unclear">("unclear");
+  // Ref stores structuredSignals synchronously for use in fetchExplanation
+  const structuredSignalsRef = useRef<StructuredSignals>({});
   
   // Gap detection
   const [gaps, setGaps] = useState<DetectedGap[]>([]);
@@ -207,6 +209,9 @@ const CheckIn = () => {
     
     recordRun(riskResult.level, hasFlaggedWords);
     
+    // Resolve and lock timing immediately — all downstream paths read from ref, not state
+    resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
+    
     const remainingGaps = gapResult.gaps.filter(gap => {
       if (gap.id === "timing" && signals.timing) return false;
       if (gap.id === "age" && (signals.ageUser || signals.ageOther)) return false;
@@ -220,13 +225,11 @@ const CheckIn = () => {
     }
     
     if (riskResult.level === "red" || riskResult.level === "yellow") {
-      resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
       setPhase("stop-moment");
       return;
     }
 
-    const effectiveTiming = resolveEffectiveTiming(signals, gapResult.detectedTiming);
-    fetchExplanation(cumulativeText, riskResult.level, effectiveTiming);
+    fetchExplanation(cumulativeText, riskResult.level, resolvedTimingRef.current);
   }, [coercivePatternCount, recordRun, resolveEffectiveTiming]);
 
   // Handle initial narrative submission — go to signal floor
@@ -259,6 +262,7 @@ const CheckIn = () => {
   // Handle signal floor submission
   const handleSignalFloorSubmit = (signals: StructuredSignals) => {
     setStructuredSignals(signals);
+    structuredSignalsRef.current = signals;
     
     const signalText = serializeSignals(signals);
     const newHistory = signalText ? [...narrativeHistory, signalText] : [...narrativeHistory];
@@ -297,13 +301,14 @@ const CheckIn = () => {
       return;
     }
     
-    fetchExplanation(cumulativeText, result.level, detectedTiming);
+    fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
   };
 
   // Handle guided mode submission
   const handleGuidedSubmit = (text: string, signals: StructuredSignals) => {
     logFreetext("before", "guided-mode", text);
     setStructuredSignals(signals);
+    structuredSignalsRef.current = signals;
     
     const newHistory = [...narrativeHistory, text];
     setNarrativeHistory(newHistory);
@@ -343,8 +348,7 @@ const CheckIn = () => {
         return;
       }
       
-      const effectiveTiming = resolveEffectiveTiming(structuredSignals, gapResult.detectedTiming);
-      fetchExplanation(cumulativeText, result.level, effectiveTiming);
+      fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
     } else {
       handleFollowUpSkip();
     }
@@ -359,8 +363,7 @@ const CheckIn = () => {
       return;
     }
     
-    const effectiveTiming = resolveEffectiveTiming(structuredSignals, detectedTiming);
-    fetchExplanation(cumulativeText, effectiveRisk, effectiveTiming);
+    fetchExplanation(cumulativeText, effectiveRisk, resolvedTimingRef.current);
   };
 
   // Handle stop moment acknowledgment
@@ -384,7 +387,7 @@ const CheckIn = () => {
           precomputedRiskLevel: riskLevel,
           detectedTiming: timing,
           isFollowUp: narrativeHistory.length > 1,
-          structuredSignals,
+          structuredSignals: structuredSignalsRef.current,
         },
         {
           maxRetries: 3,
@@ -556,6 +559,7 @@ const CheckIn = () => {
     setRiskResult(null);
     setDetectedTiming("unclear");
     resolvedTimingRef.current = "unclear";
+    structuredSignalsRef.current = {};
     setGaps([]);
     setAnalysis(null);
     setAfterAnalysis(null);
