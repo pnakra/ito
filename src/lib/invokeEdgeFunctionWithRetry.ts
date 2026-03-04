@@ -1,5 +1,5 @@
 // v2 — hardened retry + direct fallback
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 interface RetryOptions {
   maxRetries?: number;
