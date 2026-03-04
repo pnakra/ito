@@ -1,47 +1,28 @@
 
 
-## Plan: Create `docs/SYSTEM_CARD.md`
+## Problem
 
-This will be a single new file consolidating the full safety architecture into a standard System Card format suitable for sharing with your reviewer.
+`submissionLogger.ts` uses the client-side Supabase SDK to INSERT directly. This creates two problems:
+1. It depends on whichever `VITE_SUPABASE_URL` is baked into the Vercel build — if that doesn't match the DB you're checking, rows go to the wrong place
+2. Errors are silently swallowed with `console.error`, making debugging impossible
 
-### What the document will contain
+Meanwhile, `logVisit.ts` works differently — it calls a **Lovable Cloud edge function** (`log-visit`) that uses `EXTERNAL_SUPABASE_SERVICE_ROLE_KEY` to write to your external Supabase with the service role, bypassing RLS entirely. This is the pattern that actually works reliably for production.
 
-**Section 1 — Overview**: What ito is, what it is not (not a permission system, not a therapist), the two flows (Before/After).
+## Plan
 
-**Section 2 — Model Details**: Claude Sonnet 4 (`claude-sonnet-4-20250514`), pinned version, called via edge functions with locked severity levels. Seven edge functions listed with purposes.
+### 1. Create a `log-submission` edge function
+Mirror the `log-visit` pattern: accept submission data via POST, use `EXTERNAL_SUPABASE_SERVICE_ROLE_KEY` to INSERT into the external Supabase `submissions` table with service role privileges (bypasses RLS entirely).
 
-**Section 3 — The 10 Non-Negotiable Safety Invariants**: Verbatim from the codebase comments in `analyze-ito/index.ts` (lines 20-30), numbered and explained.
+### 2. Rewrite `submissionLogger.ts` to call the edge function
+Instead of using the Supabase JS client directly, call the edge function via `fetch` the same way `logVisit.ts` does — using `VITE_SUPABASE_PROJECT_ID` to build the URL. This ensures production always hits the Lovable Cloud edge function, which writes to the external DB.
 
-**Section 4 — Mandatory Harm-Minimization Check**: The 5-question internal verification pass the LLM must run before returning output (lines 33-38 of `analyze-ito`).
+### 3. Add visible error logging
+If the edge function call fails, log the status code and response body to console so you can actually see what went wrong.
 
-**Section 5 — Deterministic Auto-Fail Conditions**: The full regex taxonomy from `riskClassification.ts`, organized by category:
-- Immediate RED (incapacitation/force): `passed out`, `asleep`, `unconscious`, `forced`, `hold them down`, `won't remember`, `she was asking for it`
-- RED (derogatory/objectifying): `slut`, `whore`, `thot`, `skank`, `easy`, `gets around`, `owes me`
-- RED (reported pressure): `kept pushing`, `wouldn't stop`, `wouldn't let me leave`, `talked me into`, `pressured me`
-- YELLOW (entitlement/manipulation): `deserve`, `friend zoned`, `nice guy`, `playing hard to get`, `led me on`, `don't be a tease`
+## Technical details
 
-**Section 6 — Risk Classification Logic**: The deterministic decision tree from `classifyRisk()` — consent signal × momentum × context factors × flag words. Explains that risk is computed client-side before any LLM call, and the LLM receives a locked severity it cannot downgrade.
-
-**Section 7 — Architectural Safeguards**:
-- High-water-mark: risk only escalates within a session, never resets
-- Session pattern detection: `SessionPatternWarning` after 2+ yellow/red runs, `RefusalCard` after 2+ coercive-flagged runs
-- No Green Light policy: neutral gray styling, "No flag" label, mandatory disclaimers
-- Two-pass analysis: static regex first, then AI language analysis
-- Anti-coaching constraints in yellow/red prompts
-- Banned terms list (clinical labels, specific phrases)
-
-**Section 8 — Server-Side Security**: Rate limiting (5-15 req/min), input validation (5000 char limit), RLS policies (INSERT-only for anon), retry logic with graceful degradation.
-
-**Section 9 — Copy Constraints**: No clinical labels, no first-person pronouns from AI, mandatory disclaimers on every outcome, "One way they might have experienced this" framing for After flow.
-
-**Section 10 — Known Gaps / Red-Team Surface**: What has NOT been done:
-- No automated eval suite (30 PRD scenarios exist but are manual)
-- No formal prompt injection testing on free-text fields
-- No post-LLM output validation (banned phrase checking server-side)
-- Session tracking is `sessionStorage`-based (bypassable via incognito)
-- No CI/CD regression testing on prompt changes
-- Model behavior variability (pinned but not version-locked against deprecation)
-
-### Implementation
-One new file: `docs/SYSTEM_CARD.md`. No code changes.
+- The edge function will read `EXTERNAL_SUPABASE_URL` and `EXTERNAL_SUPABASE_SERVICE_ROLE_KEY` from secrets (already configured)
+- Uses service role = bypasses all RLS, so the permissive/restrictive policy issue becomes irrelevant
+- No changes needed to the external Supabase schema or policies
+- The Lovable Cloud `submissions` table will no longer receive direct inserts (all production data goes to external DB via the edge function)
 
