@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Eye, ArrowRight, ChevronRight, Heart, Repeat } from "lucide-react";
+import { Loader2, Eye, ArrowRight, ChevronRight, Heart, Repeat, AlertTriangle } from "lucide-react";
 
 interface ReflectionResult {
   clarityCheck: string;
@@ -8,6 +8,7 @@ interface ReflectionResult {
   yourPatterns: string;
   accountabilitySteps: string;
   avoidingRepetition: string;
+  nextSteps?: string;
 }
 
 interface AfterExplanationCardProps {
@@ -16,9 +17,9 @@ interface AfterExplanationCardProps {
   onComplete?: () => void;
 }
 
-type RevealStep = "clarityCheck" | "perspective" | "patterns" | "accountability" | "forward" | "complete";
+type RevealStep = "clarityCheck" | "perspective" | "patterns" | "accountability" | "nextSteps" | "forward" | "complete";
 
-const ALL_STEPS: RevealStep[] = ["clarityCheck", "perspective", "patterns", "accountability", "forward", "complete"];
+const ALL_STEPS: RevealStep[] = ["clarityCheck", "perspective", "patterns", "accountability", "nextSteps", "forward", "complete"];
 
 const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("clarityCheck");
@@ -27,6 +28,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
     if (!results) return ALL_STEPS;
     return ALL_STEPS.filter(step => {
       if (step === "patterns" && !results.yourPatterns?.trim()) return false;
+      if (step === "nextSteps" && !results.nextSteps?.trim()) return false;
       if (step === "forward" && !results.avoidingRepetition?.trim()) return false;
       return true;
     });
@@ -53,6 +55,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
     for (let i = fromIndex + 1; i < ALL_STEPS.length; i++) {
       const step = ALL_STEPS[i];
       if (step === "patterns" && !results.yourPatterns?.trim()) continue;
+      if (step === "nextSteps" && !results.nextSteps?.trim()) continue;
       if (step === "forward" && !results.avoidingRepetition?.trim()) continue;
       return step;
     }
@@ -76,6 +79,7 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
       case "perspective": return "What they might have experienced";
       case "patterns": return "Patterns to notice";
       case "accountability": return "What you can do now";
+      case "nextSteps": return "Before you see them again";
       case "forward": return "Going forward";
       case "complete": return "Got it";
       default: return "Next";
@@ -92,8 +96,8 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
             <div
               key={step}
               className={`h-1 rounded-full transition-all duration-300 ${
-                i <= completedSteps 
-                  ? "w-6 bg-primary" 
+                i <= completedSteps
+                  ? "w-6 bg-primary"
                   : "w-1.5 bg-muted-foreground/30"
               }`}
             />
@@ -144,6 +148,16 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
         </div>
       )}
 
+      {currentStepIndex >= ALL_STEPS.indexOf("nextSteps") && results.nextSteps?.trim() && (
+        <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-md animate-fade-in">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            <h3 className="font-semibold text-sm">Before you see them again</h3>
+          </div>
+          <p className="text-sm whitespace-pre-wrap">{results.nextSteps}</p>
+        </div>
+      )}
+
       {currentStepIndex >= ALL_STEPS.indexOf("forward") && results.avoidingRepetition?.trim() && (
         <div className="bg-accent/10 border border-accent/20 p-4 rounded-md animate-fade-in">
           <h3 className="font-semibold mb-2 text-sm">Going forward</h3>
@@ -153,11 +167,11 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
 
       {showNext && (
         <div className="flex justify-center pt-2">
-          <Button 
-            onClick={handleNext} 
+          <Button
+            onClick={handleNext}
             className="px-6 active:scale-[0.97]"
           >
-            {getNextLabel()} 
+            {getNextLabel()}
             <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
           </Button>
         </div>
