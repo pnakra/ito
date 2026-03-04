@@ -1,9 +1,9 @@
-import { supabase } from "./supabase";
+const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 type FlowType = "before" | "after-crossed" | "after-someone-crossed";
 type StepType = "choice" | "freetext" | "ai_response";
 
-// Generate a session ID that persists for the current page session
 let currentSessionId: string | null = null;
 let currentMessageIndex = 0;
 
@@ -48,28 +48,35 @@ export async function logSubmission({
       ? choiceValue.join(", ")
       : choiceValue;
 
-    const { error } = await supabase.from("submissions").insert([
+    const response = await fetch(
+      `https://${PROJECT_ID}.supabase.co/functions/v1/log-submission`,
       {
-        id: crypto.randomUUID(), // REQUIRED for your schema
-        created_at: new Date().toISOString(), // ensure timestamp
-
-        session_id: getSessionId(),
-        flow_type: flowType,
-        step_name: stepName,
-        step_type: stepType,
-        choice_value: choiceString || null,
-        freetext_value: freetextValue || null,
-        ai_response_summary: aiResponseSummary || null,
-        metadata: metadata ?? {},
-        message_index: getNextMessageIndex()
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${ANON_KEY}`,
+          apikey: ANON_KEY,
+        },
+        body: JSON.stringify({
+          session_id: getSessionId(),
+          flow_type: flowType,
+          step_name: stepName,
+          step_type: stepType,
+          choice_value: choiceString || null,
+          freetext_value: freetextValue || null,
+          ai_response_summary: aiResponseSummary || null,
+          metadata: metadata ?? {},
+          message_index: getNextMessageIndex(),
+        }),
       }
-    ]);
+    );
 
-    if (error) {
-      console.error("Failed to log submission:", error);
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(`[submissionLogger] Failed (${response.status}):`, body);
     }
   } catch (err) {
-    console.error("Submission logging error:", err);
+    console.error("[submissionLogger] Network error:", err);
   }
 }
 
