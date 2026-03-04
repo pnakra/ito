@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
@@ -85,6 +85,8 @@ const CheckIn = () => {
   
   // Flow routing
   const [detectedTiming, setDetectedTiming] = useState<"before" | "after" | "unclear">("unclear");
+  // Ref stores the resolved timing synchronously so stop-moment acknowledge uses the correct value
+  const resolvedTimingRef = useRef<"before" | "after" | "unclear">("unclear");
   
   // Gap detection
   const [gaps, setGaps] = useState<DetectedGap[]>([]);
@@ -218,10 +220,11 @@ const CheckIn = () => {
     }
     
     if (riskResult.level === "red" || riskResult.level === "yellow") {
+      resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
       setPhase("stop-moment");
       return;
     }
-    
+
     const effectiveTiming = resolveEffectiveTiming(signals, gapResult.detectedTiming);
     fetchExplanation(cumulativeText, riskResult.level, effectiveTiming);
   }, [coercivePatternCount, recordRun, resolveEffectiveTiming]);
@@ -363,8 +366,7 @@ const CheckIn = () => {
   // Handle stop moment acknowledgment
   const handleStopMomentAcknowledge = () => {
     const cumulativeText = getCumulativeText();
-    const effectiveTiming = resolveEffectiveTiming(structuredSignals, detectedTiming);
-    fetchExplanation(cumulativeText, riskHighWaterMark, effectiveTiming);
+    fetchExplanation(cumulativeText, riskHighWaterMark, resolvedTimingRef.current);
   };
 
   // Fetch AI explanation
@@ -553,6 +555,7 @@ const CheckIn = () => {
     setRiskHighWaterMark("green");
     setRiskResult(null);
     setDetectedTiming("unclear");
+    resolvedTimingRef.current = "unclear";
     setGaps([]);
     setAnalysis(null);
     setAfterAnalysis(null);
