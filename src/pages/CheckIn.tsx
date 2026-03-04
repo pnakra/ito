@@ -218,9 +218,19 @@ const CheckIn = () => {
       if (gap.id === "age" && (signals.ageUser || signals.ageOther)) return false;
       return true;
     });
-    
-    if (remainingGaps.length > 0 && !gapResult.hasMinimumSafetyContext && riskResult.level !== "red") {
-      setGaps(remainingGaps);
+
+    // For "both" timing, substances is always safety-critical regardless of hasMinimumSafetyContext
+    // A "said yes but something felt off" situation reads very differently if drinking was involved
+    const isBothFlow = signals.timing === "both";
+    const substancesGapPresent = remainingGaps.some(g => g.id === "substances");
+    const hasMinimumContext = gapResult.hasMinimumSafetyContext && !(isBothFlow && substancesGapPresent);
+
+    if (remainingGaps.length > 0 && !hasMinimumContext && riskResult.level !== "red") {
+      // For both flow, only surface the substances gap if that's the only thing missing
+      const gapsToAsk = isBothFlow && substancesGapPresent
+        ? remainingGaps.filter(g => g.id === "substances")
+        : remainingGaps;
+      setGaps(gapsToAsk);
       setPhase("follow-up-questions");
       return;
     }
