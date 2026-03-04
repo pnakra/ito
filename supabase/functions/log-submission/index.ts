@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const generatedId = crypto.randomUUID();
     console.log("Inserting submission with id:", generatedId);
 
-    const { error } = await supabase.from("submissions").insert({
+    const { data, error, status, statusText } = await supabase.from("submissions").insert({
       id: generatedId,
       session_id: body.session_id,
       flow_type: body.flow_type,
@@ -36,7 +36,9 @@ Deno.serve(async (req) => {
       ai_response_summary: body.ai_response_summary || null,
       metadata: body.metadata ?? {},
       message_index: body.message_index ?? 0,
-    });
+    }).select();
+
+    console.log("Insert response - status:", status, statusText, "data:", JSON.stringify(data), "error:", JSON.stringify(error));
 
     if (error) {
       console.error("Submission insert error:", error);
