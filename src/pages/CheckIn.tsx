@@ -54,6 +54,7 @@ interface AfterAnalysisData {
   accountabilitySteps: string;
   avoidingRepetition: string;
   yourPatterns: string;
+  nextSteps?: string;
 }
 
 const cleanText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
@@ -414,6 +415,7 @@ const CheckIn = () => {
       const yourPatterns = cleanText(data?.yourPatterns);
       const accountabilitySteps = cleanText(data?.accountabilitySteps);
       const avoidingRepetition = cleanText(data?.avoidingRepetition);
+      const nextSteps = cleanText(data?.nextSteps);
 
       console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck);
       console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
@@ -425,6 +427,7 @@ const CheckIn = () => {
           yourPatterns,
           accountabilitySteps: accountabilitySteps || "For now, pause and give them space while you reflect.",
           avoidingRepetition,
+          ...(nextSteps ? { nextSteps } : {}),
         };
         console.log("[ITO-DIAG] Setting afterAnalysis:", JSON.stringify(afterObj));
         setAfterAnalysis(afterObj);
