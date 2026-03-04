@@ -19,8 +19,11 @@ Deno.serve(async (req) => {
       Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const generatedId = crypto.randomUUID();
+    console.log("Inserting submission with id:", generatedId);
+
     const { error } = await supabase.from("submissions").insert({
-      id: crypto.randomUUID(),
+      id: generatedId,
       session_id: body.session_id,
       flow_type: body.flow_type,
       step_name: body.step_name,
