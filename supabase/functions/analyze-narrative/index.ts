@@ -1,6 +1,39 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { checkRateLimit, getClientIP, createRateLimitResponse } from "../_shared/rate-limiter.ts";
+
+// ─── INLINED RATE LIMITER ────────────────────────────────────────────────────
+interface RateLimitEntry { count: number; resetTime: number; }
+const rateLimitStore = new Map<string, RateLimitEntry>();
+interface RateLimitConfig { maxRequests: number; windowMs: number; }
+
+function getClientIP(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const realIP = req.headers.get("x-real-ip");
+  if (realIP) return realIP;
+  const userAgent = req.headers.get("user-agent") || "unknown";
+  const acceptLang = req.headers.get("accept-language") || "unknown";
+  let hash = 0;
+  for (const ch of userAgent + acceptLang) { hash = ((hash << 5) - hash) + ch.charCodeAt(0); hash = hash & hash; }
+  return `fp-${Math.abs(hash).toString(36)}`;
+}
+
+function checkRateLimit(clientIP: string, config: RateLimitConfig): { allowed: boolean; resetIn: number } {
+  const now = Date.now();
+  if (Math.random() < 0.1) { for (const [k, e] of rateLimitStore) { if (now > e.resetTime) rateLimitStore.delete(k); } }
+  const entry = rateLimitStore.get(clientIP);
+  if (!entry || now > entry.resetTime) { rateLimitStore.set(clientIP, { count: 1, resetTime: now + config.windowMs }); return { allowed: true, resetIn: config.windowMs }; }
+  if (entry.count >= config.maxRequests) return { allowed: false, resetIn: entry.resetTime - now };
+  entry.count++;
+  return { allowed: true, resetIn: entry.resetTime - now };
+}
+
+function createRateLimitResponse(resetIn: number): Response {
+  return new Response(JSON.stringify({ error: "Too many requests. Please try again later.", retryAfter: Math.ceil(resetIn / 1000) }), {
+    status: 429, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "Retry-After": Math.ceil(resetIn / 1000).toString() }
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
