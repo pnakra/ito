@@ -109,13 +109,18 @@ HARM-MINIMIZATION CHECK — before returning output, internally evaluate:
 - Does it contain more than one concrete action?
 - If YES to any: regenerate with stronger clarity.
 
+TIMING CONTEXT — read carefully before responding:
+- If TIMING is "both" (something happened AND more may happen): the user is in an ongoing situation. They need BOTH retrospective accountability AND forward-looking guidance for the specific situation they're about to re-enter. Generate the nextSteps field.
+- If TIMING is "after" (pure retrospective): something happened and it's over. Focus on processing and general future behavior. Omit nextSteps or return null.
+
 RESPOND IN THIS EXACT JSON FORMAT:
 {
   "clarityCheck": "What happened, said plainly — 1-3 sentences. Honest, not harsh.",
   "otherPersonPerspective": "One way they might have experienced it — framed as possibility, not fact.",
   "perspectiveDisclaimer": "A brief reminder that only they know how they feel.",
-  "accountabilitySteps": "One concrete thing to do now.",
-  "avoidingRepetition": "One thing to notice or change going forward."
+  "accountabilitySteps": "One concrete thing to do now about what already happened.",
+  "avoidingRepetition": "One general pattern to notice or change going forward.",
+  "nextSteps": "ONLY for 'both' timing: specific guidance for the active upcoming situation — what to do or say before they're alone with this person again. Null if pure retrospective."
 }`;
 
 const MAX_RETRIES = 2;
@@ -166,6 +171,7 @@ serve(async (req) => {
     }
 
     const isAfterFlow = detectedTiming === "after";
+    const isBothTiming = structuredSignals?.timing === "both";
     const systemPrompt = isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE;
 
     // Build Anthropic messages array (user/assistant only, system goes in separate param)
@@ -180,7 +186,7 @@ serve(async (req) => {
     }
 
     const severityReminder = isAfterFlow
-      ? `This is an AFTER situation — something already happened. Give the honest read. Do not minimize or excuse. Do not give tactical language to rationalize the behavior.`
+      ? `This is an AFTER situation — something already happened. TIMING: ${isBothTiming ? "both (something happened AND more may happen — generate the nextSteps field with specific guidance for the upcoming situation)" : "after (pure retrospective — omit nextSteps or return null)"}. Give the honest read. Do not minimize or excuse. Do not give tactical language to rationalize the behavior.`
       : precomputedRiskLevel === "red"
       ? `SEVERITY: LOCKED RED (DO NOT CHANGE). This is a STOP situation. Interrupt momentum. Do not coach or suggest alternatives to proceeding.`
       : precomputedRiskLevel === "yellow"
@@ -246,12 +252,14 @@ serve(async (req) => {
         let result: Record<string, unknown>;
 
         if (isAfterFlow) {
+          const nextSteps = clean(parsed.nextSteps);
           result = {
             clarityCheck: clean(parsed.clarityCheck) || "Something important happened here.",
             otherPersonPerspective: clean(parsed.otherPersonPerspective) || "They may see this differently.",
             perspectiveDisclaimer: clean(parsed.perspectiveDisclaimer) || "Only they know how they feel.",
             accountabilitySteps: clean(parsed.accountabilitySteps) || "Pause and reflect before acting.",
             avoidingRepetition: clean(parsed.avoidingRepetition) || "Notice the pattern and name it.",
+            ...(isBothTiming && nextSteps ? { nextSteps } : {}),
             detectedTiming: "after",
           };
         } else {
