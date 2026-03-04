@@ -135,7 +135,9 @@ const CheckIn = () => {
 
       const text = parts.join("\n\n");
       if (text.trim()) {
-        // Skip straight to analysis with pre-filled data
+        // Log demo session the same way a normal session would
+        logFreetext("before", "narrative-input", narrative || "");
+        logChoice("before", "signal-floor", JSON.stringify({ ...signals, _demo: true }));
         setNarrativeHistory([text]);
         setStructuredSignals(signals);
         if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
