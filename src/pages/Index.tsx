@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import TypewriterText from "@/components/TypewriterText";
 import HomepageDemo from "@/components/HomepageDemo";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PenLine, GitFork } from "lucide-react";
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
