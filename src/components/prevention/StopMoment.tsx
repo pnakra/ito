@@ -25,13 +25,17 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           </button>
         )}
         <div className="flex flex-col items-center text-center space-y-6">
-          <div className={`p-4 rounded-xl ${
+          <div className={`p-5 rounded-xl ${
             isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"
-          }`}>
+          }`} style={{
+            boxShadow: isRed
+              ? '0 0 24px 4px hsla(0, 50%, 50%, 0.15)'
+              : '0 0 24px 4px hsla(40, 55%, 50%, 0.15)'
+          }}>
             {isRed ? (
-              <Hand className="w-10 h-10 text-signal-stop" strokeWidth={1.5} />
+              <Hand className="w-12 h-12 text-signal-stop" strokeWidth={1.5} />
             ) : (
-              <Pause className="w-10 h-10 text-signal-pause" strokeWidth={1.5} />
+              <Pause className="w-12 h-12 text-signal-pause" strokeWidth={1.5} />
             )}
           </div>
           
