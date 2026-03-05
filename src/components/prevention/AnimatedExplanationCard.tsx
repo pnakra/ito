@@ -67,7 +67,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       )}
 
       {/* Why lines — staggered fade */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {analysis.why.map((point, i) => (
           <div
             key={i}
