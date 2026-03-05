@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Hand, Pause, HelpCircle } from "lucide-react";
+import type { RiskLevel } from "@/types/risk";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -14,14 +15,34 @@ interface ConversationalChatProps {
   onDone: () => void;
   isLoading: boolean;
   isActive: boolean;
+  riskLevel?: RiskLevel;
 }
+
+const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; className: string }> = {
+  red: {
+    label: "Stop and think",
+    icon: Hand,
+    className: "bg-red-500/10 text-red-400 border border-red-500/25",
+  },
+  yellow: {
+    label: "Something's off",
+    icon: Pause,
+    className: "bg-amber-500/10 text-amber-400 border border-amber-500/25",
+  },
+  green: {
+    label: "No flag",
+    icon: HelpCircle,
+    className: "bg-muted text-muted-foreground border border-border",
+  },
+};
 
 const ConversationalChat = ({ 
   messages, 
   onSendMessage, 
   onDone, 
   isLoading, 
-  isActive 
+  isActive,
+  riskLevel,
 }: ConversationalChatProps) => {
   const [input, setInput] = useState("");
   const maxLength = 500;
@@ -47,12 +68,25 @@ const ConversationalChat = ({
     }
   };
 
+  const pill = riskLevel ? riskPillConfig[riskLevel] : null;
+
   return (
     <div className="animate-fade-in space-y-6">
       <div>
+        {pill && (
+          <div className="mb-4">
+            <span className={`${pill.className} text-[13px] py-1.5 px-3 rounded-full font-semibold inline-flex items-center gap-1.5 leading-none`}>
+              <pill.icon className="w-3.5 h-3.5 shrink-0" />
+              {pill.label}
+            </span>
+          </div>
+        )}
         <h2 className="text-h2 mb-1">Keep going</h2>
         <p className="text-muted-foreground text-body">
           Say more if you want.
+        </p>
+        <p className="text-muted-foreground/70 text-[13px] mt-1">
+          Still here. Take your time.
         </p>
       </div>
 
@@ -102,11 +136,10 @@ const ConversationalChat = ({
         </span>
         <div className="flex items-center gap-2">
           <Button 
-            variant="ghost" 
+            variant="outline" 
             onClick={onDone}
             disabled={isLoading}
             size="sm"
-            className="text-muted-foreground text-caption"
           >
             Done
           </Button>
