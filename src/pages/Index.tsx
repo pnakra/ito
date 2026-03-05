@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import TypewriterText from "@/components/TypewriterText";
 import HomepageDemo from "@/components/HomepageDemo";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PenLine, GitFork } from "lucide-react";
 
 const Index = () => {
   const [headlineComplete, setHeadlineComplete] = useState(false);
@@ -73,26 +73,32 @@ const Index = () => {
               <div className="space-y-3">
                 <Link
                   to="/check-in"
-                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
+                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99] border-l-[3px] border-l-warning"
                 >
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                      Just say it
-                    </h2>
-                    <p className="text-muted-foreground text-[14px]">Write it out like you'd text a friend</p>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <PenLine className="w-5 h-5 text-warning flex-shrink-0" />
+                    <div>
+                      <h2 className="text-[16px] font-medium mb-1 text-foreground">
+                        Just say it
+                      </h2>
+                      <p className="text-muted-foreground text-[14px]">Write it out like you'd text a friend</p>
+                    </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
 
                 <Link
                   to="/check-in?mode=guided"
-                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99]"
+                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99] border-l-[3px] border-l-primary"
                 >
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                      Help me think through it
-                    </h2>
-                    <p className="text-muted-foreground text-[14px]">A few quick questions to get started</p>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <GitFork className="w-5 h-5 text-primary flex-shrink-0" />
+                    <div>
+                      <h2 className="text-[16px] font-medium mb-1 text-foreground">
+                        Help me think through it
+                      </h2>
+                      <p className="text-muted-foreground text-[14px]">A few quick questions to get started</p>
+                    </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
                 </Link>
