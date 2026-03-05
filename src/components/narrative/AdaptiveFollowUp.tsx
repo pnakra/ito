@@ -44,18 +44,6 @@ const AdaptiveFollowUp = ({ gaps, onSubmit, onSkip, isLoading }: AdaptiveFollowU
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Progress dots */}
-      <div className="flex justify-center gap-2">
-        {gaps.map((_, i) => (
-          <div
-            key={i}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === currentIndex ? "bg-primary" : i < currentIndex ? "bg-primary/40" : "bg-border"
-            }`}
-          />
-        ))}
-      </div>
-
       <div className="space-y-8">
         <label className="text-h2 block">{currentGap.question}</label>
         <Textarea

@@ -256,18 +256,6 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
 
       {/* Bottom: dots + continue + skip */}
       <div className="mt-auto pb-8 pt-6 space-y-4">
-        {/* Dot progress */}
-        <div className="flex justify-center gap-2">
-          {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                i + 1 === step ? "bg-primary" : "bg-input"
-              }`}
-            />
-          ))}
-        </div>
-
         <Button
           onClick={next}
           disabled={!canContinue() && !isOptional}
