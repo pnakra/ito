@@ -1,6 +1,91 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { checkRateLimit, getClientIP, createRateLimitResponse } from "../_shared/rate-limiter.ts";
+
+// =============================================================================
+// INLINED RATE LIMITER (previously _shared/rate-limiter.ts)
+// =============================================================================
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+}
+
+const DEFAULT_CONFIG: RateLimitConfig = {
+  maxRequests: 10,
+  windowMs: 60 * 1000,
+};
+
+function getClientIP(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  const realIP = req.headers.get("x-real-ip");
+  if (realIP) return realIP;
+  const userAgent = req.headers.get("user-agent") || "unknown";
+  const acceptLang = req.headers.get("accept-language") || "unknown";
+  return `fingerprint-${hashString(userAgent + acceptLang)}`;
+}
+
+function hashString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function checkRateLimit(
+  clientIP: string,
+  config: RateLimitConfig = DEFAULT_CONFIG
+): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  if (Math.random() < 0.1) cleanupExpiredEntries(now);
+  const entry = rateLimitStore.get(clientIP);
+  if (!entry || now > entry.resetTime) {
+    rateLimitStore.set(clientIP, { count: 1, resetTime: now + config.windowMs });
+    return { allowed: true, remaining: config.maxRequests - 1, resetIn: config.windowMs };
+  }
+  if (entry.count >= config.maxRequests) {
+    return { allowed: false, remaining: 0, resetIn: entry.resetTime - now };
+  }
+  entry.count++;
+  rateLimitStore.set(clientIP, entry);
+  return { allowed: true, remaining: config.maxRequests - entry.count, resetIn: entry.resetTime - now };
+}
+
+function cleanupExpiredEntries(now: number): void {
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (now > entry.resetTime) rateLimitStore.delete(key);
+  }
+}
+
+function createRateLimitResponse(resetIn: number): Response {
+  return new Response(
+    JSON.stringify({
+      error: "Too many requests. Please try again later.",
+      retryAfter: Math.ceil(resetIn / 1000),
+    }),
+    {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+        "Retry-After": Math.ceil(resetIn / 1000).toString(),
+      },
+    }
+  );
+}
+// =============================================================================
+// END INLINED RATE LIMITER
+// =============================================================================
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -114,27 +199,23 @@ serve(async (req) => {
       throw new Error("Service configuration error");
     }
 
-    // Build Anthropic messages array (user/assistant only)
     const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
-    // Add initial context as first user message if this is the first follow-up
     if (conversationHistory.length === 0 && initialContext) {
       messages.push({
         role: "user",
-        content: `[Initial situation shared by user]\n${initialContext}\n\n[Risk level assigned: ${riskLevel}]\n\nREMINDER: Do not lower the risk level. Do not give permission to proceed.`
+        content: `[Initial situation shared by user]\n${initialContext}\n\n[Risk level assigned: ${riskLevel}]\n\nREMINDER: Do not lower the risk level. Do not give permission to proceed.`,
       });
       messages.push({
         role: "assistant",
-        content: "I hear you. What else is on your mind about this?"
+        content: "I hear you. What else is on your mind about this?",
       });
     }
 
-    // Add conversation history
     for (const msg of conversationHistory) {
       messages.push(msg);
     }
 
-    // Add current message
     messages.push({ role: "user", content: message });
 
     console.log("[ito-followup] Calling Claude, messages:", messages.length);
