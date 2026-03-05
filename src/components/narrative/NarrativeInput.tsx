@@ -55,8 +55,40 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
   return (
     <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
-      <h1 className="text-h1 mb-2 text-foreground text-center">is this ok?</h1>
-      <p className="text-[14px] text-muted-foreground text-center mb-6">Say what's going on. No one's watching.</p>
+      <div className="relative inline-flex flex-col items-center mb-2">
+        <h1
+          className="text-foreground text-center"
+          style={{
+            fontFamily: '"Newsreader", "Georgia", serif',
+            fontSize: '32px',
+            fontWeight: 400,
+            lineHeight: 1.2,
+            letterSpacing: '-0.3px',
+            fontStyle: 'italic',
+          }}
+        >
+          is this ok?
+        </h1>
+        {/* Hand-drawn underline */}
+        <svg
+          className="mt-1 text-primary/30"
+          width="120"
+          height="8"
+          viewBox="0 0 120 8"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M2 5.5C20 2.5 40 6 60 3.5C80 1 100 5.5 118 3"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      </div>
+      <p className="text-[14px] text-muted-foreground text-center mb-6" style={{ lineHeight: 1.8 }}>
+        Say what's going on. No one's watching.
+      </p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
         <Textarea
@@ -70,18 +102,21 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
           disabled={isLoading}
         />
 
-        {showButton && (
-          <div className="flex justify-end animate-fade-in">
-            <Button
-              onClick={handleSubmit}
-              disabled={!text.trim() || isLoading}
-              size="sm"
-              className="w-auto px-5 h-10"
-            >
-              Go <ArrowRight className="ml-1 w-3.5 h-3.5" />
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center justify-between">
+          <span className="text-[12px] text-muted-foreground/50">anonymous. nothing saved.</span>
+          {showButton ? (
+            <div className="animate-fade-in">
+              <Button
+                onClick={handleSubmit}
+                disabled={!text.trim() || isLoading}
+                size="sm"
+                className="w-auto px-5 h-10"
+              >
+                Go <ArrowRight className="ml-1 w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ) : <div />}
+        </div>
       </div>
 
       {/* Scenario prompts */}
