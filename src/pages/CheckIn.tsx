@@ -724,6 +724,7 @@ const CheckIn = () => {
             onDone={handleFollowUpDone}
             isLoading={isLoading}
             isActive={phase === "follow-up-chat"}
+            riskLevel={riskHighWaterMark}
           />
 
           {/* Outcome */}
