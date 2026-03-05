@@ -27,9 +27,36 @@ const Index = () => {
       <main className="flex-1 flex flex-col justify-start pt-[4vh] sm:pt-[10vh]">
         <section className="container mx-auto px-5 flex flex-col items-center">
 
-          <h1 className="text-h1 mb-3 text-foreground text-center min-h-[1.2em]">
-            <TypewriterText text="is this ok?" delay={70} onComplete={() => setHeadlineComplete(true)} />
-          </h1>
+          <div className="flex flex-col items-center mb-3 min-h-[1.2em]">
+            <h1
+              className="text-foreground text-center"
+              style={{
+                fontFamily: '"Newsreader", "Georgia", serif',
+                fontSize: '32px',
+                fontWeight: 400,
+                lineHeight: 1.2,
+                letterSpacing: '-0.3px',
+                fontStyle: 'italic',
+              }}
+            >
+              <TypewriterText text="is this ok?" delay={70} onComplete={() => setHeadlineComplete(true)} />
+            </h1>
+            <svg
+              className="mt-1 text-primary/30"
+              width="120"
+              height="8"
+              viewBox="0 0 120 8"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2 5.5C20 2.5 40 6 60 3.5C80 1 100 5.5 118 3"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
 
           {!cardsVisible && (
             <p
