@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import ConsentModal from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
@@ -70,6 +71,7 @@ const MAX_FOLLOWUP_RETRIES = 5;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
+  const [consentGiven, setConsentGiven] = useState(false);
   const [phase, setPhase] = useState<FlowPhase>(
     searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
   );
@@ -588,6 +590,19 @@ const CheckIn = () => {
   const isNeutralRisk = riskHighWaterMark === "green";
   const showUncertaintyOptions = riskHighWaterMark === "yellow" || riskHighWaterMark === "red";
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
+
+  if (!consentGiven) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 container mx-auto px-5 py-8">
+          <div className="max-w-2xl mx-auto">
+            <ConsentModal onConsentGiven={() => setConsentGiven(true)} />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
