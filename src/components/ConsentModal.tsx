@@ -1,15 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 const CONSENT_KEY = "ito_consent_given";
 const STORAGE = sessionStorage;
@@ -19,14 +9,12 @@ interface ConsentModalProps {
 }
 
 const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
-  const [open, setOpen] = useState(false);
-  const [understood, setUnderstood] = useState(false);
-  const [loggingConsent, setLoggingConsent] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     const hasConsented = STORAGE.getItem(CONSENT_KEY);
     if (!hasConsented) {
-      setOpen(true);
+      setShow(true);
     } else {
       onConsentGiven();
     }
@@ -34,74 +22,68 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
 
   const handleAccept = () => {
     STORAGE.setItem(CONSENT_KEY, new Date().toISOString());
-    setOpen(false);
+    setShow(false);
     onConsentGiven();
   };
 
-  const canProceed = understood && loggingConsent;
+  const handleDecline = () => {
+    window.location.href = "/";
+  };
+
+  if (!show) return null;
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent 
-        className="sm:max-w-md [&>button]:hidden"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-base">Heads up</DialogTitle>
-          <DialogDescription className="text-left space-y-2.5 pt-2 text-sm">
-            <p>
-              This is a <strong className="text-foreground">research prototype</strong> — not a finished product. We're testing how tools like this can help people think through confusing situations.
-            </p>
-            <p>
-              Your responses are <strong className="text-foreground">logged anonymously</strong> to improve the tool. No names, emails, or IP addresses.
-            </p>
-            <p>
-              This isn't a crisis service. If you need help now, hit{" "}
-              <a href="/resources" className="text-primary underline underline-offset-2 hover:no-underline">
-                resources
-              </a>.
-            </p>
-          </DialogDescription>
-        </DialogHeader>
+    <div className="min-h-[calc(100vh-60px)] flex flex-col justify-start pt-[10vh] animate-fade-in">
+      <div className="max-w-md mx-auto w-full space-y-6">
+        <h1
+          className="text-foreground"
+          style={{
+            fontFamily: '"Newsreader", "Georgia", serif',
+            fontSize: '26px',
+            fontWeight: 400,
+            lineHeight: 1.3,
+            letterSpacing: '-0.2px',
+            fontStyle: 'italic',
+          }}
+        >
+          Before you start with ito
+        </h1>
 
-        <div className="space-y-3 py-3">
-          <div className="flex items-start space-x-3">
-            <Checkbox
-              id="understood"
-              checked={understood}
-              onCheckedChange={(checked) => setUnderstood(checked === true)}
-              className="mt-0.5"
-            />
-            <Label htmlFor="understood" className="text-sm font-normal leading-relaxed cursor-pointer">
-              I understand this is a prototype, not professional support
-            </Label>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <Checkbox
-              id="logging"
-              checked={loggingConsent}
-              onCheckedChange={(checked) => setLoggingConsent(checked === true)}
-              className="mt-0.5"
-            />
-            <Label htmlFor="logging" className="text-sm font-normal leading-relaxed cursor-pointer">
-              OK with anonymous logging for research
-            </Label>
-          </div>
+        <div className="space-y-4 text-[14.5px] text-muted-foreground leading-relaxed">
+          <p>
+            ito is an AI, not a real person. It can be helpful to talk to, but it can also get things wrong sometimes. It doesn't have all the information about you or your life.
+          </p>
+          <p>
+            ito is here to help you think about safer relationships, consent, and how to support friends. It is not therapy and it is not an emergency or crisis service.
+          </p>
+          <p>
+            Please don't share your full name, address, school, phone number, or anything else that could identify you or someone you know.
+          </p>
+          <p>
+            We may look at anonymized conversations to make ito better and to understand what kinds of support are most helpful for teens. We will not sell your information or use it for advertising.
+          </p>
+          <p>
+            If you are in immediate danger, or if you feel like you might hurt yourself or someone else, please do not rely on ito. In the U.S., you can call or text{" "}
+            <a href="tel:988" className="text-primary underline underline-offset-2 hover:no-underline font-medium">988</a>
+            {" "}for mental health support, or call{" "}
+            <a href="tel:911" className="text-primary underline underline-offset-2 hover:no-underline font-medium">911</a>
+            {" "}in an emergency. (If you are outside the U.S., use the emergency number in your country.)
+          </p>
+          <p className="text-muted-foreground/70 text-[13px]">
+            By tapping "I agree & continue," you're saying you understand what ito is, how your information may be used, and that you want to keep going.
+          </p>
         </div>
 
-        <DialogFooter>
-          <Button 
-            onClick={handleAccept} 
-            disabled={!canProceed}
-            className="w-full"
-          >
-            Got it
+        <div className="space-y-3 pt-2">
+          <Button onClick={handleAccept}>
+            I agree & continue
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <Button variant="ghost" onClick={handleDecline} className="w-full text-muted-foreground">
+            I don't want to continue
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
