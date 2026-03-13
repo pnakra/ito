@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import ConsentModal from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
