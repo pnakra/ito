@@ -33,48 +33,49 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
   if (!show) return null;
 
   return (
-    <div className="min-h-[calc(100vh-60px)] flex flex-col justify-start pt-[10vh] animate-fade-in">
-      <div className="max-w-md mx-auto w-full space-y-6">
-        <h1
+    <div className="flex flex-col justify-start pt-[4vh] animate-fade-in">
+      <div className="max-w-md mx-auto w-full space-y-4">
+        <h2
           className="text-foreground"
           style={{
             fontFamily: '"Newsreader", "Georgia", serif',
-            fontSize: '26px',
+            fontSize: '22px',
             fontWeight: 400,
             lineHeight: 1.3,
             letterSpacing: '-0.2px',
             fontStyle: 'italic',
           }}
         >
-          Before you start with ito
-        </h1>
+          Before you start
+        </h2>
 
-        <div className="space-y-4 text-[14.5px] text-muted-foreground leading-relaxed">
-          <p>
-            ito is an AI, not a real person. It can be helpful to talk to, but it can also get things wrong sometimes. It doesn't have all the information about you or your life.
-          </p>
-          <p>
-            ito is here to help you think about safer relationships, consent, and how to support friends. It is not therapy and it is not an emergency or crisis service.
-          </p>
-          <p>
-            Please don't share your full name, address, school, phone number, or anything else that could identify you or someone you know.
-          </p>
-          <p>
-            We may look at anonymized conversations to make ito better and to understand what kinds of support are most helpful for teens. We will not sell your information or use it for advertising.
-          </p>
-          <p>
-            If you are in immediate danger, or if you feel like you might hurt yourself or someone else, please do not rely on ito. In the U.S., you can call or text{" "}
+        <ul className="space-y-2.5 text-[13.5px] text-muted-foreground leading-relaxed list-disc pl-4">
+          <li>
+            ito is an <span className="text-foreground">AI, not a real person</span>. It can help you think, but it can get things wrong and doesn't know your full situation.
+          </li>
+          <li>
+            This is <span className="text-foreground">not therapy or a crisis service</span>. It's a tool for thinking through consent, boundaries, and relationships.
+          </li>
+          <li>
+            <span className="text-foreground">Don't share identifying info</span> — names, schools, addresses, or phone numbers (yours or anyone else's).
+          </li>
+          <li>
+            Anonymized conversations may be reviewed to improve ito. Nothing is sold or used for ads.
+          </li>
+          <li>
+            If you're in danger or crisis, contact{" "}
             <a href="tel:988" className="text-primary underline underline-offset-2 hover:no-underline font-medium">988</a>
-            {" "}for mental health support, or call{" "}
+            {" "}(call/text) or{" "}
             <a href="tel:911" className="text-primary underline underline-offset-2 hover:no-underline font-medium">911</a>
-            {" "}in an emergency. (If you are outside the U.S., use the emergency number in your country.)
-          </p>
-          <p className="text-muted-foreground/70 text-[13px]">
-            By tapping "I agree & continue," you're saying you understand what ito is, how your information may be used, and that you want to keep going.
-          </p>
-        </div>
+            {" "}in the U.S.
+          </li>
+        </ul>
 
-        <div className="space-y-3 pt-2">
+        <p className="text-[12px] text-muted-foreground/60 leading-relaxed">
+          By continuing, you're saying you understand what ito is and how your info may be used.
+        </p>
+
+        <div className="space-y-2.5 pt-1">
           <Button onClick={handleAccept}>
             I agree & continue
           </Button>
