@@ -22,12 +22,6 @@ const Header = () => {
           >
             About
           </Link>
-          <Link
-            to="/about"
-            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            About
-          </Link>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
