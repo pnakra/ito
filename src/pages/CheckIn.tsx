@@ -71,6 +71,7 @@ const MAX_FOLLOWUP_RETRIES = 5;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
+  const [consentGiven, setConsentGiven] = useState(false);
   const [phase, setPhase] = useState<FlowPhase>(
     searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
   );
