@@ -17,16 +17,10 @@ const Header = () => {
         
         <div className="flex items-center gap-4">
           <Link
-            to="/demo"
+            to="/about"
             className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
           >
-            Demo
-          </Link>
-          <Link
-            to="/release-notes"
-            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Updates
+            About
           </Link>
           <Link
             to="/about"
