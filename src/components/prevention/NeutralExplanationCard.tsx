@@ -55,7 +55,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
     <div className="space-y-6">
       <div className="bg-card shadow-card rounded-[16px] p-5">
         <p className="text-[13px] text-muted-foreground text-center">
-          No red flags doesn't mean it's all good. Only they can tell you what they want.
+          Looks clear so far. Keep paying attention to how she's actually responding — that matters more than any signal.
         </p>
       </div>
 
@@ -88,7 +88,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
       )}
 
       <p className="text-[15px] text-muted-foreground text-center italic">
-        If they hesitate, go quiet, or pull back, that's your cue to stop.
+        You're thinking about it. That's already more than most guys do.
       </p>
     </div>
   );
