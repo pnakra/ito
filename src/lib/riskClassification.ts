@@ -15,90 +15,103 @@ export interface RiskClassification {
   flaggedWords?: string[];
 }
 
-// Problematic words/phrases that indicate concerning attitudes
-// This is a FAST first-pass - AI-powered detection catches nuanced patterns
-// CRITICAL SAFETY: These patterns trigger IMMEDIATE risk escalation regardless of AI interpretation
-const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow" }[] = [
-  // === IMMEDIATE RED FLAG (non-consensual indicators) ===
-  { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming", severity: "red" },
-  { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries", severity: "red" },
-  { pattern: /\bwon'?t\s*remember\b/i, category: "exploitation", severity: "red" },
-  { pattern: /\bpassed\s*out\b/i, category: "incapacitation", severity: "red" },
-  { pattern: /\basleep\b/i, category: "incapacitation", severity: "red" },
-  { pattern: /\bunconscious\b/i, category: "incapacitation", severity: "red" },
+// Language patterns that indicate concerning attitudes or harmful framing.
+// Split into two groups:
+// - ESCALATING: these trigger immediate risk level changes (force, incapacitation, reported violations)
+// - CONTEXTUAL: these are detected and passed silently to the AI as context, but do NOT escalate risk on their own
+// This is a FAST first-pass — AI-powered detection catches nuanced patterns on top of this.
+
+const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow"; escalates: boolean }[] = [
+  // === IMMEDIATE RED FLAG — escalating (non-consensual indicators) ===
+  { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming", severity: "red", escalates: true },
+  { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries", severity: "red", escalates: true },
+  { pattern: /\bwon'?t\s*remember\b/i, category: "exploitation", severity: "red", escalates: true },
+  { pattern: /\bpassed\s*out\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\basleep\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\bunconscious\b/i, category: "incapacitation", severity: "red", escalates: true },
   // Tense-aware: only fire on present/future intoxication, not retrospective "we were drunk"
-  { pattern: /\btoo\s*(drunk|wasted|high)\b/i, category: "incapacitation", severity: "red" },
-  // Retrospective intoxication handled separately below (not an immediate red trigger)
-  { pattern: /\bforce[d]?\b/i, category: "force", severity: "red" },
-  { pattern: /\bmake\s*(her|him|them)\b.*\b(do|have|give)\b/i, category: "coercion", severity: "red" },
-  { pattern: /\bhold\s*(her|him|them)\s*down\b/i, category: "force", severity: "red" },
-  { pattern: /\bcan'?t\s*say\s*no\b/i, category: "coercion", severity: "red" },
-  { pattern: /\bwon'?t\s*say\s*no\b/i, category: "coercion", severity: "red" },
-  { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red" },
-  { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red" },
-  
-  // === RED FLAG (derogatory/objectifying language — indicates harmful framing) ===
-  { pattern: /\bslut\b/i, category: "derogatory label", severity: "red" },
-  { pattern: /\bwhore\b/i, category: "derogatory label", severity: "red" },
-  { pattern: /\bho[e]?\b/i, category: "derogatory label", severity: "red" },
-  { pattern: /\bthot\b/i, category: "derogatory label", severity: "red" },
-  { pattern: /\bskank\b/i, category: "derogatory label", severity: "red" },
-  { pattern: /\beasy\b/i, category: "objectifying assumption", severity: "red" },
-  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption", severity: "red" },
-  
-  // === YELLOW FLAG (concerning attitudes) ===
-  
-  // Entitlement
-  { pattern: /\bowes?\s*me\b/i, category: "entitlement", severity: "red" },
-  { pattern: /\bdeserve\b/i, category: "entitlement", severity: "yellow" },
-  { pattern: /\bfriend\s*zone[d]?\b/i, category: "entitlement", severity: "yellow" },
-  { pattern: /\bnice\s*guy\b/i, category: "entitlement", severity: "yellow" },
-  
-  // Victim blaming / dismissing boundaries  
-  { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries", severity: "yellow" },
-  { pattern: /\bled\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow" },
-  { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow" },
-  { pattern: /\bteasing\s*me\b/i, category: "dismissing boundaries", severity: "yellow" },
-  { pattern: /\bwanting\s*it\b/i, category: "dismissing boundaries", severity: "yellow" },
-  
-  // Secrecy/manipulation
-  { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation", severity: "yellow" },
-  { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation", severity: "yellow" },
-  { pattern: /\bout\s*of\s*(your|her|his|their)\s*league\b/i, category: "manipulation", severity: "yellow" },
-  
-  // Coercion/pressure
-  { pattern: /\bjust\s*let\s*me\b/i, category: "coercion", severity: "yellow" },
-  { pattern: /\bcome\s*on\b/i, category: "pressure", severity: "yellow" },
-  { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure", severity: "yellow" },
-  
-  // === REPORTED PRESSURE (victim perspective — someone else doing it to them) ===
-  { pattern: /\b(he|she|they)\s*kept\s*(pushing|asking|trying|pressuring)\b/i, category: "reported pressure", severity: "red" },
-  { pattern: /\b(he|she|they)\s*wouldn'?t\s*(stop|take\s*no|listen|back\s*off|leave\s*me\s*alone)\b/i, category: "reported pressure", severity: "red" },
-  { pattern: /\b(pressured|guilted|coerced|guilt(ed|\s*trip))\s*me\b/i, category: "reported pressure", severity: "red" },
-  { pattern: /\b(made|forced|talked)\s*me\s*(into|to)\b/i, category: "reported pressure", severity: "red" },
-  { pattern: /\b(wouldn'?t|won'?t|didn'?t)\s*(let\s*me\s*(leave|go|say\s*no|stop))\b/i, category: "reported pressure", severity: "red" },
-  { pattern: /\bi\s*(said|told)\s*(no|stop|him|her|them)\s*(but|and)\s*(he|she|they)\s*(kept|continued|didn'?t\s*(stop|listen))\b/i, category: "reported boundary violation", severity: "red" },
+  { pattern: /\btoo\s*(drunk|wasted|high)\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\bforce[d]?\b/i, category: "force", severity: "red", escalates: true },
+  { pattern: /\bmake\s*(her|him|them)\b.*\b(do|have|give)\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\bhold\s*(her|him|them)\s*down\b/i, category: "force", severity: "red", escalates: true },
+  { pattern: /\bcan'?t\s*say\s*no\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\bwon'?t\s*say\s*no\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red", escalates: true },
+  { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red", escalates: true },
+
+  // === REPORTED PRESSURE — escalating (victim perspective) ===
+  { pattern: /\b(he|she|they)\s*kept\s*(pushing|asking|trying|pressuring)\b/i, category: "reported pressure", severity: "red", escalates: true },
+  { pattern: /\b(he|she|they)\s*wouldn'?t\s*(stop|take\s*no|listen|back\s*off|leave\s*me\s*alone)\b/i, category: "reported pressure", severity: "red", escalates: true },
+  { pattern: /\b(pressured|guilted|coerced|guilt(ed|\s*trip))\s*me\b/i, category: "reported pressure", severity: "red", escalates: true },
+  { pattern: /\b(made|forced|talked)\s*me\s*(into|to)\b/i, category: "reported pressure", severity: "red", escalates: true },
+  { pattern: /\b(wouldn'?t|won'?t|didn'?t)\s*(let\s*me\s*(leave|go|say\s*no|stop))\b/i, category: "reported pressure", severity: "red", escalates: true },
+  { pattern: /\bi\s*(said|told)\s*(no|stop|him|her|them)\s*(but|and)\s*(he|she|they)\s*(kept|continued|didn'?t\s*(stop|listen))\b/i, category: "reported boundary violation", severity: "red", escalates: true },
+
+  // === CONTEXTUAL ONLY — detected and passed silently to AI, do NOT escalate risk ===
+  // Derogatory/objectifying language — emotional context, not a consent violation signal on its own
+  { pattern: /\bslut\b/i, category: "derogatory label", severity: "red", escalates: false },
+  { pattern: /\bwhore\b/i, category: "derogatory label", severity: "red", escalates: false },
+  { pattern: /\bho[e]?\b/i, category: "derogatory label", severity: "red", escalates: false },
+  { pattern: /\bthot\b/i, category: "derogatory label", severity: "red", escalates: false },
+  { pattern: /\bskank\b/i, category: "derogatory label", severity: "red", escalates: false },
+  { pattern: /\beasy\b/i, category: "objectifying assumption", severity: "yellow", escalates: false },
+  { pattern: /\bgets\s*around\b/i, category: "objectifying assumption", severity: "yellow", escalates: false },
+
+  // Entitlement — attitudinal, handled through conversation not escalation
+  { pattern: /\bowes?\s*me\b/i, category: "entitlement", severity: "yellow", escalates: false },
+  { pattern: /\bdeserve\b/i, category: "entitlement", severity: "yellow", escalates: false },
+  { pattern: /\bfriend\s*zone[d]?\b/i, category: "entitlement", severity: "yellow", escalates: false },
+  { pattern: /\bnice\s*guy\b/i, category: "entitlement", severity: "yellow", escalates: false },
+
+  // Dismissing boundaries — attitudinal
+  { pattern: /\bplaying\s*hard\s*to\s*get\b/i, category: "dismissing boundaries", severity: "yellow", escalates: false },
+  { pattern: /\bled\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow", escalates: false },
+  { pattern: /\bleading\s*me\s*on\b/i, category: "dismissing boundaries", severity: "yellow", escalates: false },
+  { pattern: /\bteasing\s*me\b/i, category: "dismissing boundaries", severity: "yellow", escalates: false },
+  { pattern: /\bwanting\s*it\b/i, category: "dismissing boundaries", severity: "yellow", escalates: false },
+
+  // Secrecy/manipulation — attitudinal
+  { pattern: /\bwon'?t\s*tell\b/i, category: "secrecy/manipulation", severity: "yellow", escalates: false },
+  { pattern: /\bnobody\s*will\s*know\b/i, category: "secrecy/manipulation", severity: "yellow", escalates: false },
+  { pattern: /\bout\s*of\s*(your|her|his|their)\s*league\b/i, category: "manipulation", severity: "yellow", escalates: false },
+
+  // Pressure — attitudinal
+  { pattern: /\bjust\s*let\s*me\b/i, category: "pressure", severity: "yellow", escalates: false },
+  { pattern: /\bcome\s*on\b/i, category: "pressure", severity: "yellow", escalates: false },
+  { pattern: /\bdon'?t\s*be\s*(like\s*that|a\s*tease)\b/i, category: "pressure", severity: "yellow", escalates: false },
 ];
 
-// Detect flag words in additional context
-// Returns both the flagged categories and the highest severity level found
-export function detectFlagWords(text: string): { categories: string[]; hasRedFlag: boolean } {
-  if (!text?.trim()) return { categories: [], hasRedFlag: false };
-  
+// Detect flag words in additional context.
+// Returns:
+// - categories: all matched categories (both escalating and contextual)
+// - hasRedFlag: true only if an ESCALATING red pattern was matched
+// - contextualCategories: attitudinal/non-escalating matches for silent AI context
+export function detectFlagWords(text: string): {
+  categories: string[];
+  hasRedFlag: boolean;
+  contextualCategories: string[];
+} {
+  if (!text?.trim()) return { categories: [], hasRedFlag: false, contextualCategories: [] };
+
   const flagged: string[] = [];
+  const contextual: string[] = [];
   let hasRedFlag = false;
-  
-  for (const { pattern, category, severity } of FLAG_WORDS) {
+
+  for (const { pattern, category, severity, escalates } of FLAG_WORDS) {
     if (pattern.test(text)) {
       if (!flagged.includes(category)) {
         flagged.push(category);
       }
-      if (severity === "red") {
+      if (escalates && severity === "red") {
         hasRedFlag = true;
+      }
+      if (!escalates && !contextual.includes(category)) {
+        contextual.push(category);
       }
     }
   }
-  return { categories: flagged, hasRedFlag };
+
+  return { categories: flagged, hasRedFlag, contextualCategories: contextual };
 }
 
 // Check if momentum indicates physical intent
@@ -109,16 +122,20 @@ function hasPhysicalMomentum(momentum: string | null): boolean {
 // Hard-coded rules for risk classification - the LLM does NOT determine this
 export function classifyRisk(decisions: DecisionState): RiskClassification {
   const { consentSignal, contextFactors, momentum, additionalContext } = decisions;
-  
+
   // Check for flag words in free text
   const flagResult = detectFlagWords(additionalContext);
   const flaggedWords = flagResult.categories;
-  const hasFlagWords = flaggedWords.length > 0;
+  // Only escalating matches count toward risk logic
   const hasImmediateRedFlag = flagResult.hasRedFlag;
-  
+  // Escalating flag words only (not contextual-only)
+  const hasEscalatingFlagWords = flaggedWords.filter(c =>
+    FLAG_WORDS.some(f => f.category === c && f.escalates)
+  ).length > 0;
+
   const isPhysicalMomentum = hasPhysicalMomentum(momentum);
-  
-  // CRITICAL SAFETY: Immediate red flag from keyword triggers - NO AI interpretation
+
+  // CRITICAL SAFETY: Immediate red flag from escalating keyword triggers - NO AI interpretation
   if (hasImmediateRedFlag) {
     return {
       level: "red",
@@ -127,7 +144,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // RED FLAG conditions - immediate stop
   if (consentSignal === "said-no") {
     return {
@@ -137,9 +154,9 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
-  // Flag words with physical momentum = automatic red
-  if (hasFlagWords && isPhysicalMomentum) {
+
+  // Escalating flag words with physical momentum = automatic red
+  if (hasEscalatingFlagWords && isPhysicalMomentum) {
     return {
       level: "red",
       stopMessage: "Stop. The way you're thinking about this situation is a problem.",
@@ -147,7 +164,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // No response escalates based on momentum
   if (consentSignal === "no-response") {
     if (isPhysicalMomentum) {
@@ -165,7 +182,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Mixed signals + physical momentum = red
   if (consentSignal === "mixed-signals") {
     if (isPhysicalMomentum) {
@@ -176,8 +193,8 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
         flaggedWords
       };
     }
-    // Flag words escalate mixed signals to red
-    if (hasFlagWords) {
+    // Only escalating flag words push mixed signals to red
+    if (hasEscalatingFlagWords) {
       return {
         level: "red",
         stopMessage: "Stop. Mixed signals plus concerning assumptions is a red flag.",
@@ -192,11 +209,11 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Context factors escalate risk
   const hasAlcohol = contextFactors.includes("alcohol");
   const riskFactorCount = contextFactors.filter(f => f !== "none").length;
-  
+
   // Alcohol + physical momentum = always red
   if (hasAlcohol && isPhysicalMomentum) {
     return {
@@ -206,7 +223,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Multiple risk factors = red
   if (riskFactorCount >= 2) {
     return {
@@ -216,17 +233,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
-  // Flag words alone escalate to yellow minimum
-  if (hasFlagWords) {
-    return {
-      level: "yellow",
-      stopMessage: "Pause. Some of how you're thinking about this needs to be addressed.",
-      reasoning: "Your framing includes assumptions that could lead to harm.",
-      flaggedWords
-    };
-  }
-  
+
   // Single risk factor with physical momentum = yellow
   if (riskFactorCount === 1 && isPhysicalMomentum) {
     return {
@@ -236,7 +243,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Clear positive signals with no risk factors
   if ((consentSignal === "clear-yes" || consentSignal === "enthusiastic-actions") && riskFactorCount === 0) {
     return {
@@ -246,7 +253,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Clear positive but has a risk factor
   if ((consentSignal === "clear-yes" || consentSignal === "enthusiastic-actions") && riskFactorCount > 0) {
     return {
@@ -256,7 +263,7 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
       flaggedWords
     };
   }
-  
+
   // Default to yellow for uncertainty
   return {
     level: "yellow",
@@ -283,7 +290,7 @@ export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: s
     "no-response": "Quiet or not responding",
     "said-no": "They said no or pulled away"
   };
-  
+
   const factorLabels: Record<string, string> = {
     "alcohol": "Alcohol or drugs are involved",
     "experience-gap": "Significant experience gap",
@@ -299,31 +306,32 @@ export function formatSelectionsForAI(decisions: DecisionState, flaggedWords?: s
     "slow-down": "Wanting to slow things down",
     "dont-know": "Not sure where this is heading"
   };
-  
+
   const lines = [];
-  
+
   // Add the move context at the top if provided
   if (moveLabel) {
     lines.push(`Move being considered: ${moveLabel}`);
   }
-  
+
   lines.push(
     `Current situation: ${orientationLabels[decisions.orientation || ""] || "Not specified"}`,
     `What they're doing/saying: ${signalLabels[decisions.consentSignal || ""] || "Not specified"}`,
-    `Complicating factors: ${decisions.contextFactors.length > 0 
+    `Complicating factors: ${decisions.contextFactors.length > 0
       ? decisions.contextFactors.map(f => factorLabels[f] || f).join(", ")
       : "None selected"}`,
     `Direction this feels like it's heading: ${momentumLabels[decisions.momentum || ""] || "Not specified"}`
   );
-  
+
   if (decisions.additionalContext?.trim()) {
     lines.push(`\nAdditional context from the user:\n"${decisions.additionalContext.trim()}"`);
   }
-  
+
+  // Attitudinal/contextual language is passed silently — do not call it out directly.
+  // The AI uses this to understand where the user is emotionally and redirect toward humanization.
   if (flaggedWords && flaggedWords.length > 0) {
-    lines.push(`\nFLAGGED: ${flaggedWords.join(", ")}`);
-    lines.push("IMPORTANT: The user used problematic language/framing. Call out what they said directly without using system labels like 'FLAGGED' in your response.");
+    lines.push(`\nLANGUAGE CONTEXT (do not reference directly): The user used language suggesting charged emotions or attitudes (${flaggedWords.join(", ")}). Use this as silent context to understand where he's at. Do not address the language. Redirect toward his feelings or her humanity.`);
   }
-  
+
   return lines.join("\n");
 }
