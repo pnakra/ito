@@ -7,23 +7,26 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You check text for concerning attitudes about consent and dating. Your job is to catch subtle problems that word-matching would miss.
+const SYSTEM_PROMPT = `You check text for serious consent-related warning signs. Your job is to catch subtle patterns that word-matching might miss.
 
 WHAT TO LOOK FOR:
-1. Entitlement: thinking they're owed something, "nice guy" attitude, frustrated about being "friend zoned"
-2. Treating someone like an object: judging them by how many people they've been with
-3. Ignoring boundaries: calling rejection "playing games" or "leading on"
-4. Blaming them: suggesting their clothes, drinking, or behavior equals consent
-5. Manipulation: guilt, pressure, secrecy
-6. Disrespectful language: slurs, degrading words, treating someone like a prize
+1. Incapacitation: signs that someone is or was drunk, high, asleep, passed out, or otherwise unable to consent
+2. Force or coercion: physical force, threats, not taking no for an answer, pressuring someone past their limits
+3. Reported boundary violations: the user describing something being done to them without consent — someone who wouldn't stop, who kept pushing, who ignored a no
+4. Exploitation: planning to take advantage of someone's vulnerability or impaired state
 
-KEY: Look for ATTITUDE, not just words. "They've been with a lot of people" shows a problem even without slurs. Being frustrated about being "friend zoned" or "led on" is concerning.
+DO NOT FLAG:
+- Degrading or derogatory language on its own — this is emotional context, not a consent violation signal
+- Entitlement language, frustration, jealousy, or dismissive attitudes — these are noted elsewhere and handled through conversation
+- Anything that is purely attitudinal without indicating actual harm, force, or incapacitation
+
+KEY: Only flag patterns that indicate real incapacitation, force, or reported violations. Attitudinal language is detected separately and the AI mentor handles it through conversation — not escalation.
 
 RESPOND IN THIS EXACT JSON FORMAT:
 {
   "hasConcerningLanguage": boolean,
   "categories": ["category1", "category2"],
-  "explanation": "Short, plain-language explanation of what you noticed and why it matters"
+  "explanation": "Short, plain-language explanation of the specific signal detected"
 }
 
 If the text seems fine, return:
@@ -82,7 +85,7 @@ serve(async (req) => {
         max_tokens: 512,
         system: SYSTEM_PROMPT,
         messages: [
-          { role: "user", content: `Analyze this text for concerning attitudes:\n\n"${text}"` },
+          { role: "user", content: `Analyze this text for serious consent-related warning signs:\n\n"${text}"` },
         ],
       }),
     });
