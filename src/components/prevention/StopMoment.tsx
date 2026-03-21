@@ -7,9 +7,10 @@ interface StopMomentProps {
   stopMessage: string;
   onAcknowledge: () => void;
   onDismiss?: () => void;
+  isCrisis?: boolean;
 }
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis }: StopMomentProps) => {
   const isRed = riskLevel === "red";
   
   return (
