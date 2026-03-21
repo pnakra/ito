@@ -43,7 +43,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
           <h2 className={`text-h2 ${
             isRed ? "text-signal-stop" : "text-signal-pause"
           }`}>
-            {isRed ? "Hold on" : "Something feels off"}
+            {isCrisis ? "Hey — we see you." : isRed ? "Hold on" : "Something feels off"}
           </h2>
           
           <p className="text-body text-foreground/90">
