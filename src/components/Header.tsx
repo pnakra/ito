@@ -16,6 +16,13 @@ const Header = () => {
         </Link>
         
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => { window.location.href = "https://weather.com"; }}
+            className="text-[12px] text-muted-foreground/60 hover:text-muted-foreground border border-border rounded-md px-2.5 py-1 transition-colors"
+            aria-label="Quick exit — leaves this page immediately"
+          >
+            Exit
+          </button>
           <Link
             to="/about"
             className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
