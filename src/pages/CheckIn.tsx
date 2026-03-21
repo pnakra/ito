@@ -675,6 +675,7 @@ const CheckIn = () => {
               riskLevel={riskHighWaterMark as RiskLevel}
               stopMessage={riskResult.stopMessage}
               onAcknowledge={handleStopMomentAcknowledge}
+              isCrisis={riskResult.isCrisis}
             />
           )}
 

@@ -149,11 +149,17 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
 
   // CRITICAL SAFETY: Immediate red flag from escalating keyword triggers - NO AI interpretation
   if (hasImmediateRedFlag) {
+    const isCrisisFlag = flaggedWords.some(c => c === "self-harm");
     return {
       level: "red",
-      stopMessage: "Stop. What you've described includes serious red flags that indicate harm.",
-      reasoning: "Your description contains language associated with non-consensual or harmful behavior.",
-      flaggedWords
+      stopMessage: isCrisisFlag
+        ? "You don't have to figure this out alone right now."
+        : "Stop. What you've described includes serious red flags that indicate harm.",
+      reasoning: isCrisisFlag
+        ? "You mentioned something that made us want to check in on you directly."
+        : "Your description contains language associated with non-consensual or harmful behavior.",
+      flaggedWords,
+      isCrisis: isCrisisFlag
     };
   }
 

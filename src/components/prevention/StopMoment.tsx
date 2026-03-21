@@ -64,7 +64,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
           </Button>
           {isRed && (
             <div className="w-full space-y-2 pt-2">
-              <p className="text-[12px] text-muted-foreground text-center">If someone is in danger right now:</p>
+              <p className="text-[12px] text-muted-foreground text-center">{isCrisis ? "You can talk to someone right now:" : "If someone is in danger right now:"}</p>
               <a
                 href="tel:988"
                 className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors"
