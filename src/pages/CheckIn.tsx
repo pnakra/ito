@@ -710,10 +710,6 @@ const CheckIn = () => {
             />
           )}
 
-          {/* After Handoff suggestion */}
-          {(phase === "explanation" || phase === "after-explanation") && !isLoading && explanationComplete && (
-            <AfterHandoff isActive={shouldShowAfterHandoff} />
-          )}
 
           {/* Mutuality Grounding (before-flow only) */}
           {phase === "explanation" && !isLoading && analysis && explanationComplete && (
