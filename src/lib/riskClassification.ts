@@ -39,6 +39,17 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red", escalates: true },
   { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red", escalates: true },
 
+  // === SELF-HARM / CRISIS — escalating (life-safety) ===
+  { pattern: /\bkill\s*(my)?self\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bwant\s*to\s*die\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bwish\s*i\s*(was|were)\s*dead\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bdon'?t\s*want\s*to\s*(be\s*here|live)\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bcut\s*(my)?self\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bhurt\s*(my)?self\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bsuicid(e|al)\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bending\s*(it|my\s*life)\b/i, category: "self-harm", severity: "red", escalates: true },
+  { pattern: /\bno\s*reason\s*to\s*(live|be\s*here)\b/i, category: "self-harm", severity: "red", escalates: true },
+
   // === REPORTED PRESSURE — escalating (victim perspective) ===
   { pattern: /\b(he|she|they)\s*kept\s*(pushing|asking|trying|pressuring)\b/i, category: "reported pressure", severity: "red", escalates: true },
   { pattern: /\b(he|she|they)\s*wouldn'?t\s*(stop|take\s*no|listen|back\s*off|leave\s*me\s*alone)\b/i, category: "reported pressure", severity: "red", escalates: true },
