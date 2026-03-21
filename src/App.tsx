@@ -10,7 +10,9 @@ import About from "./pages/About";
 import Resources from "./pages/Resources";
 import Demo from "./pages/Demo";
 import ReleaseNotes from "./pages/ReleaseNotes";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -21,16 +23,20 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/check-in" element={<CheckIn />} />
-            <Route path="/chat" element={<CheckIn />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/release-notes" element={<ReleaseNotes />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="flex flex-col min-h-screen">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/chat" element={<CheckIn />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/release-notes" element={<ReleaseNotes />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
