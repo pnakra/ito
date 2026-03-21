@@ -61,6 +61,29 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           >
             Show me what you see
           </Button>
+          {isRed && (
+            <div className="w-full space-y-2 pt-2">
+              <p className="text-[12px] text-muted-foreground text-center">If someone is in danger right now:</p>
+              <a
+                href="tel:988"
+                className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors"
+              >
+                Call or text 988 — Crisis Lifeline
+              </a>
+              <a
+                href="tel:18006564673"
+                className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors"
+              >
+                Call RAINN — 1-800-656-4673
+              </a>
+              <a
+                href="sms:741741?body=HELLO"
+                className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors"
+              >
+                Text HOME to 741741 — Crisis Text Line
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>
