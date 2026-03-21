@@ -84,7 +84,7 @@ const CheckIn = () => {
   
   // High-water-mark risk — can only stay same or increase
   const [riskHighWaterMark, setRiskHighWaterMark] = useState<RiskLevel>("green");
-  const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string; flaggedWords?: string[] } | null>(null);
+  const [riskResult, setRiskResult] = useState<{ level: RiskLevel; stopMessage: string; flaggedWords?: string[]; isCrisis?: boolean } | null>(null);
   
   // Flow routing
   const [detectedTiming, setDetectedTiming] = useState<"before" | "after" | "unclear">("unclear");
