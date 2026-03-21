@@ -103,7 +103,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
         />
 
         <div className="flex items-center justify-between">
-          <span className="text-[12px] text-muted-foreground/50">anonymous. nothing saved.</span>
+          <span className="text-[12px] text-muted-foreground/50">anonymous. not linked to you.</span>
           {showButton ? (
             <div className="animate-fade-in">
               <Button
