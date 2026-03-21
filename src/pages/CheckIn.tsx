@@ -201,7 +201,7 @@ const CheckIn = () => {
   const proceedWithSignals = useCallback((
     cumulativeText: string,
     signals: StructuredSignals,
-    riskResult: { level: RiskLevel; stopMessage: string; flaggedWords?: string[] },
+    riskResult: { level: RiskLevel; stopMessage: string; flaggedWords?: string[]; isCrisis?: boolean },
     gapResult: ReturnType<typeof detectGaps>
   ) => {
     const hasFlaggedWords = (riskResult.flaggedWords?.length ?? 0) > 0;
