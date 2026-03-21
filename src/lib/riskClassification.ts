@@ -13,6 +13,7 @@ export interface RiskClassification {
   stopMessage: string;
   reasoning: string;
   flaggedWords?: string[];
+  isCrisis?: boolean;
 }
 
 // Language patterns that indicate concerning attitudes or harmful framing.
