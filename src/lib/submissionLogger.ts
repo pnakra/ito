@@ -69,6 +69,7 @@ export async function logSubmission({
           ai_response_summary: aiResponseSummary || null,
           metadata: metadata ?? {},
           message_index: getNextMessageIndex(),
+          anon_id: getAnonymousId(),
         }),
       }
     );
