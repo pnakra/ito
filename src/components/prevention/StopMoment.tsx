@@ -7,9 +7,10 @@ interface StopMomentProps {
   stopMessage: string;
   onAcknowledge: () => void;
   onDismiss?: () => void;
+  isCrisis?: boolean;
 }
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis }: StopMomentProps) => {
   const isRed = riskLevel === "red";
   
   return (
@@ -42,7 +43,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           <h2 className={`text-h2 ${
             isRed ? "text-signal-stop" : "text-signal-pause"
           }`}>
-            {isRed ? "Hold on" : "Something feels off"}
+            {isCrisis ? "Hey — we see you." : isRed ? "Hold on" : "Something feels off"}
           </h2>
           
           <p className="text-body text-foreground/90">
@@ -63,7 +64,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss }: StopMo
           </Button>
           {isRed && (
             <div className="w-full space-y-2 pt-2">
-              <p className="text-[12px] text-muted-foreground text-center">If someone is in danger right now:</p>
+              <p className="text-[12px] text-muted-foreground text-center">{isCrisis ? "You can talk to someone right now:" : "If someone is in danger right now:"}</p>
               <a
                 href="tel:988"
                 className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors"
