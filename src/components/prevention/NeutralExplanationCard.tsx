@@ -87,9 +87,6 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
         </div>
       )}
 
-      <p className="text-[15px] text-muted-foreground text-center italic">
-        You're thinking about it. That's already more than most guys do.
-      </p>
     </div>
   );
 };
