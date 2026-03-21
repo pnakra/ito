@@ -55,7 +55,7 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
     <div className="space-y-6">
       <div className="bg-card shadow-card rounded-[16px] p-5">
         <p className="text-[13px] text-muted-foreground text-center">
-          Looks clear so far. Keep paying attention to how she's actually responding — that matters more than any signal.
+          Keep paying attention to how she's actually responding — that matters more than any signal.
         </p>
       </div>
 
