@@ -1,3 +1,5 @@
+import { getAnonymousId } from "./anonymousId";
+
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -67,6 +69,7 @@ export async function logSubmission({
           ai_response_summary: aiResponseSummary || null,
           metadata: metadata ?? {},
           message_index: getNextMessageIndex(),
+          anon_id: getAnonymousId(),
         }),
       }
     );
