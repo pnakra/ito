@@ -10,6 +10,8 @@ Deno.serve(async (req) => {
   }
   try {
     const body = await req.json();
+    console.log("Received body keys:", JSON.stringify(Object.keys(body)));
+    console.log("anon_id received:", body.anon_id);
     const extUrl = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
     console.log("Connecting to external DB:", extUrl?.substring(0, 40));
     const supabase = createClient(
