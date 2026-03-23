@@ -21,10 +21,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex flex-col bg-background" style={{ height: '100dvh' }}>
       <Header />
 
-      <main className="flex-1 flex flex-col justify-start pt-[4vh] sm:pt-[10vh]">
+      <main className="flex-1 flex flex-col justify-between py-[4vh]">
         <section className="container mx-auto px-5 flex flex-col items-center">
 
           <div className="flex flex-col items-center mb-3 min-h-[1.2em]">
