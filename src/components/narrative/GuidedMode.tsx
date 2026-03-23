@@ -110,7 +110,7 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
   const isFutureOriented = timing === "deciding";
 
   return (
-    <div className="min-h-[calc(100vh-60px)] flex flex-col">
+    <div className="min-h-[calc(100dvh-60px)] flex flex-col">
       {/* Top bar: back arrow */}
       <div className="pt-4 pb-2">
         <button
