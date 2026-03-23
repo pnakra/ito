@@ -51,23 +51,14 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
 
         <ul className="space-y-2.5 text-[13.5px] text-muted-foreground leading-relaxed list-disc pl-4">
           <li>
-            ito is an <span className="text-foreground">AI, not a real person</span>. It can help you think, but it can get things wrong and doesn't know your full situation.
+            ito is an AI, not a real person. It can help you think, but it can get things wrong and doesn't know your full situation.
           </li>
           <li>
-            This is <span className="text-foreground">not therapy or a crisis service</span>. It's a tool for thinking through consent, boundaries, and relationships.
+            This isn't therapy or a crisis line. If you're in danger or crisis, call or text{" "}
+            <a href="tel:988" className="text-primary underline underline-offset-2 hover:no-underline font-medium">988</a>.
           </li>
           <li>
-            <span className="text-foreground">Don't share identifying info</span> — names, schools, addresses, or phone numbers (yours or anyone else's).
-          </li>
-          <li>
-            Anonymized conversations may be reviewed to improve ito. Nothing is sold or used for ads.
-          </li>
-          <li>
-            If you're in danger or crisis, contact{" "}
-            <a href="tel:988" className="text-primary underline underline-offset-2 hover:no-underline font-medium">988</a>
-            {" "}(call/text) or{" "}
-            <a href="tel:911" className="text-primary underline underline-offset-2 hover:no-underline font-medium">911</a>
-            {" "}in the U.S.
+            Anonymous and private. Nothing you share is linked to you or sold.
           </li>
         </ul>
 
