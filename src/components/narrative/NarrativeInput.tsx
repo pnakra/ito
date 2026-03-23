@@ -148,7 +148,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       )}
 
       {/* Privacy + guided mode */}
-      <div className="mt-6 flex flex-col items-center gap-3">
+      <div className="mt-3 flex flex-col items-center gap-3">
         <p className="text-[13px] text-muted-foreground">
           Totally anonymous. Not linked to you.
         </p>
