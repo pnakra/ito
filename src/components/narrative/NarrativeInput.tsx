@@ -54,7 +54,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
   const showButton = text.trim().length >= minChars;
 
   return (
-    <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
+    <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[4vh]'} animate-fade-in`}>
       <div className="relative inline-flex flex-col items-center mb-2">
         <h1
           className="text-foreground text-center"
@@ -97,7 +97,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
           onChange={(e) => setText(e.target.value.slice(0, maxLength))}
           onKeyDown={handleKeyDown}
           placeholder="What's on your mind?"
-          className="min-h-[140px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
+          className="min-h-[100px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
           style={{ boxShadow: "none" }}
           disabled={isLoading}
         />
@@ -121,7 +121,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
       {/* Scenario prompts */}
       {!text && !isLoading && (
-        <div className="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
+        <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
             "She said yes but something felt off",
             "I'm not sure if I went too far",
@@ -148,7 +148,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       )}
 
       {/* Privacy + guided mode */}
-      <div className="mt-6 flex flex-col items-center gap-3">
+      <div className="mt-3 flex flex-col items-center gap-3">
         <p className="text-[13px] text-muted-foreground">
           Totally anonymous. Not linked to you.
         </p>
