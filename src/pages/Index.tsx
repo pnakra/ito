@@ -24,10 +24,10 @@ const Index = () => {
     <div className="flex flex-col bg-background" style={{ height: '100dvh' }}>
       <Header />
 
-      <main className="flex-1 flex flex-col justify-between py-[4vh]">
+      <main className={`flex-1 flex flex-col ${cardsVisible ? 'justify-center py-[2vh]' : 'justify-between py-[4vh]'}`}>
         <section className="container mx-auto px-5 flex flex-col items-center">
 
-          <div className="flex flex-col items-center mb-3 min-h-[1.2em]">
+          <div className={`flex flex-col items-center ${cardsVisible ? 'mb-2' : 'mb-3'} min-h-[1.2em]`}>
             <h1
               className="text-foreground text-center"
               style={{
