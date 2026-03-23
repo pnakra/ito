@@ -54,7 +54,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
   const showButton = text.trim().length >= minChars;
 
   return (
-    <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[15vh]'} animate-fade-in`}>
+    <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-6' : 'pt-[4vh]'} animate-fade-in`}>
       <div className="relative inline-flex flex-col items-center mb-2">
         <h1
           className="text-foreground text-center"
