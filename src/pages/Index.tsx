@@ -97,6 +97,9 @@ const Index = () => {
 
           {cardsVisible && (
             <div className="w-full max-w-lg mx-auto animate-fade-in">
+              <p className="text-[14px] text-muted-foreground text-center mb-4">
+                For when something felt off, you're not sure how they felt, or you're figuring out your next move.
+              </p>
               <div className="space-y-3">
                 <Link
                   to="/check-in"
