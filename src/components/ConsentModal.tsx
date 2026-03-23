@@ -49,6 +49,10 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
           Before you start
         </h2>
 
+        <p className="text-[14px] text-muted-foreground mb-4">
+          ito helps you think through situations involving other people — physically, romantically, or in between.
+        </p>
+
         <ul className="space-y-2.5 text-[13.5px] text-muted-foreground leading-relaxed list-disc pl-4">
           <li>
             ito is an AI, not a real person. It can help you think, but it can get things wrong and doesn't know your full situation.
