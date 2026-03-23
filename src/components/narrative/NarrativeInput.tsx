@@ -121,7 +121,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
       {/* Scenario prompts */}
       {!text && !isLoading && (
-        <div className="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
+        <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
             "She said yes but something felt off",
             "I'm not sure if I went too far",
