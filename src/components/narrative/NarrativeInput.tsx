@@ -87,7 +87,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
         </svg>
       </div>
       <p className="text-[14px] text-muted-foreground text-center mb-6" style={{ lineHeight: 1.8 }}>
-        Say what's going on. No one's watching.
+        Think of a moment — something that happened, or something you're about to do.
       </p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
