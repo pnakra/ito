@@ -615,18 +615,6 @@ const CheckIn = () => {
   const showUncertaintyOptions = riskHighWaterMark === "yellow" || riskHighWaterMark === "red";
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
-  if (!consentGiven) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 container mx-auto px-5 py-8">
-          <div className="max-w-2xl mx-auto">
-            <ConsentModal onConsentGiven={() => setConsentGiven(true)} />
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
