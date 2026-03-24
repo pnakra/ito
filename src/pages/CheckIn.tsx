@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import ConsentModal from "@/components/ConsentModal";
+import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
@@ -250,6 +250,16 @@ const CheckIn = () => {
 
   // Handle initial narrative submission — go to signal floor
   const handleNarrativeSubmit = (text: string) => {
+    // If user hasn't consented yet this session, show the modal first
+    if (!hasSessionConsent()) {
+      setPendingSubmitText(text);
+      setShowConsentModal(true);
+      return;
+    }
+    processNarrativeSubmit(text);
+  };
+
+  const processNarrativeSubmit = (text: string) => {
     logFreetext("before", "narrative-input", text);
     
     const newHistory = [...narrativeHistory, text];
@@ -273,6 +283,19 @@ const CheckIn = () => {
     }
     
     setPhase("signal-floor");
+  };
+
+  const handleConsentConfirm = () => {
+    setShowConsentModal(false);
+    if (pendingSubmitText) {
+      processNarrativeSubmit(pendingSubmitText);
+      setPendingSubmitText(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentModal(false);
+    setPendingSubmitText(null);
   };
 
   // Handle signal floor submission
