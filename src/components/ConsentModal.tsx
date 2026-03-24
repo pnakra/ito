@@ -5,36 +5,29 @@ const CONSENT_KEY = "ito_consent_given";
 const STORAGE = sessionStorage;
 
 interface ConsentModalProps {
-  onConsentGiven: () => void;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
-const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
-  const [show, setShow] = useState(false);
+/** Returns true if the user has already consented this session. */
+export const hasSessionConsent = (): boolean => {
+  return !!STORAGE.getItem(CONSENT_KEY);
+};
 
-  useEffect(() => {
-    const hasConsented = STORAGE.getItem(CONSENT_KEY);
-    if (!hasConsented) {
-      setShow(true);
-    } else {
-      onConsentGiven();
-    }
-  }, [onConsentGiven]);
+/** Records consent for the current session. */
+export const recordSessionConsent = (): void => {
+  STORAGE.setItem(CONSENT_KEY, new Date().toISOString());
+};
 
-  const handleAccept = () => {
-    STORAGE.setItem(CONSENT_KEY, new Date().toISOString());
-    setShow(false);
-    onConsentGiven();
+const ConsentModal = ({ onConfirm, onCancel }: ConsentModalProps) => {
+  const handleConfirm = () => {
+    recordSessionConsent();
+    onConfirm();
   };
-
-  const handleDecline = () => {
-    window.location.href = "/";
-  };
-
-  if (!show) return null;
 
   return (
-    <div className="flex flex-col justify-start pt-[4vh] animate-fade-in">
-      <div className="max-w-md mx-auto w-full space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in px-5">
+      <div className="bg-card rounded-[16px] shadow-lg max-w-md w-full p-6 space-y-4">
         <h2
           className="text-foreground"
           style={{
@@ -71,11 +64,11 @@ const ConsentModal = ({ onConsentGiven }: ConsentModalProps) => {
         </p>
 
         <div className="space-y-2.5 pt-1">
-          <Button onClick={handleAccept}>
-            I agree & continue
+          <Button onClick={handleConfirm} className="w-full">
+            I understand, continue
           </Button>
-          <Button variant="ghost" onClick={handleDecline} className="w-full text-muted-foreground">
-            I don't want to continue
+          <Button variant="ghost" onClick={onCancel} className="w-full text-muted-foreground">
+            Cancel
           </Button>
         </div>
       </div>
