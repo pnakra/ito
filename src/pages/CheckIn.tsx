@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import ConsentModal from "@/components/ConsentModal";
+import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
@@ -71,7 +71,8 @@ const MAX_FOLLOWUP_RETRIES = 5;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
-  const [consentGiven, setConsentGiven] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [pendingSubmitText, setPendingSubmitText] = useState<string | null>(null);
   const [phase, setPhase] = useState<FlowPhase>(
     searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
   );
@@ -249,6 +250,16 @@ const CheckIn = () => {
 
   // Handle initial narrative submission — go to signal floor
   const handleNarrativeSubmit = (text: string) => {
+    // If user hasn't consented yet this session, show the modal first
+    if (!hasSessionConsent()) {
+      setPendingSubmitText(text);
+      setShowConsentModal(true);
+      return;
+    }
+    processNarrativeSubmit(text);
+  };
+
+  const processNarrativeSubmit = (text: string) => {
     logFreetext("before", "narrative-input", text);
     
     const newHistory = [...narrativeHistory, text];
@@ -272,6 +283,19 @@ const CheckIn = () => {
     }
     
     setPhase("signal-floor");
+  };
+
+  const handleConsentConfirm = () => {
+    setShowConsentModal(false);
+    if (pendingSubmitText) {
+      processNarrativeSubmit(pendingSubmitText);
+      setPendingSubmitText(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentModal(false);
+    setPendingSubmitText(null);
   };
 
   // Handle signal floor submission
@@ -591,22 +615,13 @@ const CheckIn = () => {
   const showUncertaintyOptions = riskHighWaterMark === "yellow" || riskHighWaterMark === "red";
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
-  if (!consentGiven) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <main className="flex-1 container mx-auto px-5 py-8">
-          <div className="max-w-2xl mx-auto">
-            <ConsentModal onConsentGiven={() => setConsentGiven(true)} />
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      {showConsentModal && (
+        <ConsentModal onConfirm={handleConsentConfirm} onCancel={handleConsentCancel} />
+      )}
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
