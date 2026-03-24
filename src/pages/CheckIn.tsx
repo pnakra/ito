@@ -619,6 +619,9 @@ const CheckIn = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
+      {showConsentModal && (
+        <ConsentModal onConfirm={handleConsentConfirm} onCancel={handleConsentCancel} />
+      )}
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
