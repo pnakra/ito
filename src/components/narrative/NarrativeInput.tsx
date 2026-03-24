@@ -87,7 +87,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
         </svg>
       </div>
       <p className="text-[14px] text-muted-foreground text-center mb-6" style={{ lineHeight: 1.8 }}>
-        Think of a moment — something that happened, or something you're about to do.
+        a private space to think through dating, sex, and situations that feel off
       </p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
@@ -123,9 +123,11 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
       {!text && !isLoading && (
         <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
-            "She said yes but something felt off",
+            "They said yes but something felt off",
             "I'm not sure if I went too far",
             "They haven't texted back and I'm overthinking it",
+            "I don't know if what happened was okay",
+            "Things got further than I expected and I feel weird about it",
           ].map((prompt) => (
             <button
               key={prompt}
@@ -149,10 +151,6 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: Narrativ
 
       {/* Privacy + guided mode */}
       <div className="mt-3 flex flex-col items-center gap-3">
-        <p className="text-[13px] text-muted-foreground">
-          Totally anonymous. Not linked to you.
-        </p>
-
         <button
           onClick={onGuidedMode}
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
