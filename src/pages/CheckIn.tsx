@@ -39,7 +39,8 @@ type FlowPhase =
   | "follow-up-chat"
   | "outcome"
   | "outcome-feedback"
-  | "refusal";
+  | "refusal"
+  | "out-of-scope";
 
 interface AnalysisData {
   riskLevel: RiskLevel;
@@ -206,6 +207,12 @@ const CheckIn = () => {
     gapResult: ReturnType<typeof detectGaps>
   ) => {
     const hasFlaggedWords = (riskResult.flaggedWords?.length ?? 0) > 0;
+
+    // Out-of-scope: skip the full flow, show redirect
+    if (gapResult.queryType === "out-of-scope") {
+      setPhase("out-of-scope");
+      return;
+    }
     
     if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(riskResult.level, hasFlaggedWords);
@@ -699,7 +706,31 @@ const CheckIn = () => {
             <RefusalCard onReset={resetFlow} />
           )}
 
-          {/* Before-flow Explanation */}
+          {/* Out of Scope */}
+          {phase === "out-of-scope" && (
+            <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+              <p className="text-base font-medium text-foreground">
+                This one might be outside what ito does best.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ito is built for thinking through situations with another person — consent, boundaries, and how you both feel. What you described sounds more like a different kind of question.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                If something is going on that you want to talk through, a trusted adult, school counselor, or one of these resources might be a better fit:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-none">
+                <li><a href="https://www.loveisrespect.org" target="_blank" rel="noopener noreferrer" className="underline">loveisrespect.org</a> — relationship questions, texting support</li>
+                <li><a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="underline">Crisis Text Line</a> — text HOME to 741741</li>
+                <li><a href="https://988lifeline.org" target="_blank" rel="noopener noreferrer" className="underline">988 Lifeline</a> — call or text 988</li>
+              </ul>
+              <button
+                onClick={resetFlow}
+                className="text-sm underline text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Try a different question
+              </button>
+            </div>
+          )}
           {phase === "explanation" && (
             isNeutralRisk ? (
               <NeutralExplanationCard
