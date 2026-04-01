@@ -281,7 +281,7 @@ const CheckIn = () => {
     setNarrativeHistory(newHistory);
     
     const cumulativeText = newHistory.join("\n\n");
-    const { riskResult: result } = runSafetyClassification(cumulativeText);
+    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     
@@ -294,6 +294,17 @@ const CheckIn = () => {
     if (result.level === "red") {
       recordRun(result.level, hasFlaggedWords);
       setPhase("stop-moment");
+      return;
+    }
+
+    if (gapResult.queryType === "out-of-scope") {
+      setPhase("out-of-scope");
+      return;
+    }
+
+    if (gapResult.queryType === "relational") {
+      recordRun(result.level, hasFlaggedWords);
+      fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
       return;
     }
     
