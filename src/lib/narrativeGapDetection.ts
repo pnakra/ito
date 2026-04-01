@@ -14,11 +14,14 @@ export interface DetectedGap {
   safetyRelevant: boolean; // true = feeds into deterministic safety rules
 }
 
+export type QueryType = "encounter" | "relational" | "out-of-scope";
+
 interface GapDetectionResult {
   gaps: DetectedGap[];
   detectedTiming: "before" | "after" | "unclear";
   flagWords: ReturnType<typeof detectFlagWords>;
   hasMinimumSafetyContext: boolean;
+  queryType: QueryType;
 }
 
 // Timing detection patterns
@@ -59,6 +62,49 @@ const PHYSICAL_INTENT_PATTERNS = [
   /\b(kiss|sex|touch|hook\s*up|make\s*out|physical|intimat|sleep with|go further|escalat)\b/i,
 ];
 
+// ─── QUERY TYPE CLASSIFIER ────────────────────────────────────────────────────
+// Runs before gap detection to determine whether this narrative is about
+// a physical/sexual encounter, a relational dynamic, or something out of scope.
+// This gates which follow-up questions are relevant to surface.
+
+const ENCOUNTER_PATTERNS = [
+  /\b(kiss|kissing|make\s*out|hook\s*up|hooking\s*up|sex|sexual|sleep\s*with|slept\s*with|touch(ed|ing)|physical|intimat|go\s*further|went\s*further|escalat|fool\s*around|fingering|oral|blow\s*job|hand\s*job|penetrat|naked|undress|clothes\s*off|in\s*bed\s*with|bedroom)\b/i,
+];
+
+const RELATIONAL_PATTERNS = [
+  /\b(control(s|ling)?|jealous|possessive|manipulat|gaslight|cheating|cheated|flirting|simp(ing)?|friendzone|leading\s*me\s*on|talking\s*stage|situationship|post(ing)?|picture|photo|bikini|social\s*media|instagram|snapchat|dm|text(ing)?|message)\b/i,
+  /\b(boyfriend|girlfriend|partner|crush|ex|talking\s*to|dating|relationship|breakup|broke\s*up|trust|boundaries|respect)\b/i,
+];
+
+// Signals that suggest no interpersonal situation at all
+const OUT_OF_SCOPE_PATTERNS = [
+  /\b(homework|test|exam|grade|school\s*work|assignment|essay|teacher\s*gave|class\s*project)\b/i,
+  /\b(recipe|cook|food|workout|exercise|gym|diet|health|medical|doctor)\b/i,
+  /\b(game|gaming|minecraft|fortnite|movie|show|anime|song|music|band)\b/i,
+];
+
+export function classifyQueryType(text: string): QueryType {
+  // Out of scope: clearly not interpersonal/relationship territory
+  if (hasMatch(text, OUT_OF_SCOPE_PATTERNS) && !hasMatch(text, ENCOUNTER_PATTERNS) && !hasMatch(text, RELATIONAL_PATTERNS)) {
+    return "out-of-scope";
+  }
+
+  // Encounter: physical/sexual context signals present
+  if (hasMatch(text, ENCOUNTER_PATTERNS)) {
+    return "encounter";
+  }
+
+  // Relational: interpersonal but no physical signals
+  if (hasMatch(text, RELATIONAL_PATTERNS)) {
+    return "relational";
+  }
+
+  // Default: treat as encounter so we don't under-ask safety questions
+  // when the situation is ambiguous. Better to ask than miss something.
+  return "encounter";
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 function detectTiming(text: string): "before" | "after" | "unclear" {
   const lowerText = text.toLowerCase();
   let beforeScore = 0;
@@ -84,10 +130,23 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
   const text = narrativeText.trim();
   const flagWords = detectFlagWords(text);
   const detectedTiming = detectTiming(text);
+  const queryType = classifyQueryType(text);
 
   const gaps: DetectedGap[] = [];
 
+  // Out-of-scope: skip all gap questions, return early with redirect signal
+  if (queryType === "out-of-scope") {
+    return {
+      gaps: [],
+      detectedTiming,
+      flagWords,
+      hasMinimumSafetyContext: false,
+      queryType,
+    };
+  }
+
   // 1. Timing unclear — need to know before/after to route correctly
+  // Applies to both encounter and relational queries
   if (detectedTiming === "unclear") {
     gaps.push({
       id: "timing",
@@ -98,50 +157,56 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
     });
   }
 
-  // 2. No consent signals mentioned
-  if (!hasMatch(text, CONSENT_SIGNAL_PATTERNS)) {
-    gaps.push({
-      id: "consent-signal",
-      category: "consent-signal",
-      question: detectedTiming === "before"
-        ? "How are they responding so far? Have they said or shown anything about how they feel?"
-        : "How did they respond when it happened?",
-      priority: 2,
-      safetyRelevant: true,
-    });
-  }
+  // The questions below only apply to encounter-type queries.
+  // Relational queries (control, jealousy, social dynamics) don't need
+  // substance checks or physical momentum questions — asking them creates
+  // confusing noise and produces false safety signals.
+  if (queryType === "encounter") {
+    // 2. No consent signals mentioned
+    if (!hasMatch(text, CONSENT_SIGNAL_PATTERNS)) {
+      gaps.push({
+        id: "consent-signal",
+        category: "consent-signal",
+        question: detectedTiming === "before"
+          ? "How are they responding so far? Have they said or shown anything about how they feel?"
+          : "How did they respond when it happened?",
+        priority: 2,
+        safetyRelevant: true,
+      });
+    }
 
-  // 3. No substance mention but physical context detected
-  if (!hasMatch(text, SUBSTANCE_PATTERNS) && hasMatch(text, PHYSICAL_INTENT_PATTERNS)) {
-    gaps.push({
-      id: "substances",
-      category: "substances",
-      question: "Quick check — is anyone drinking or using anything?",
-      priority: 3,
-      safetyRelevant: true, // Feeds into deterministic "alcohol + physical = red"
-    });
-  }
+    // 3. No substance mention but physical context detected
+    if (!hasMatch(text, SUBSTANCE_PATTERNS) && hasMatch(text, PHYSICAL_INTENT_PATTERNS)) {
+      gaps.push({
+        id: "substances",
+        category: "substances",
+        question: "Quick check — is anyone drinking or using anything?",
+        priority: 3,
+        safetyRelevant: true, // Feeds into deterministic "alcohol + physical = red"
+      });
+    }
 
-  // 4. No age context
-  if (!hasMatch(text, AGE_MENTION_PATTERNS)) {
-    gaps.push({
-      id: "age",
-      category: "age",
-      question: "How old are you both? Roughly is fine.",
-      priority: 4,
-      safetyRelevant: true, // Age gap triggers deterministic rules
-    });
-  }
+    // 4. No age context
+    if (!hasMatch(text, AGE_MENTION_PATTERNS)) {
+      gaps.push({
+        id: "age",
+        category: "age",
+        question: "How old are you both? Roughly is fine.",
+        priority: 4,
+        safetyRelevant: true, // Age gap triggers deterministic rules
+      });
+    }
 
-  // 5. Power dynamic not mentioned but might be relevant
-  if (!hasMatch(text, POWER_PATTERNS) && hasMatch(text, PHYSICAL_INTENT_PATTERNS)) {
-    gaps.push({
-      id: "power-dynamic",
-      category: "power-dynamic",
-      question: "Is there any kind of power difference here? Like one of you being older, in charge, or more experienced?",
-      priority: 5,
-      safetyRelevant: true,
-    });
+    // 5. Power dynamic not mentioned but might be relevant
+    if (!hasMatch(text, POWER_PATTERNS) && hasMatch(text, PHYSICAL_INTENT_PATTERNS)) {
+      gaps.push({
+        id: "power-dynamic",
+        category: "power-dynamic",
+        question: "Is there any kind of power difference here? Like one of you being older, in charge, or more experienced?",
+        priority: 5,
+        safetyRelevant: true,
+      });
+    }
   }
 
   // Sort by priority
@@ -151,15 +216,17 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
   const selectedGaps = gaps.slice(0, 4);
 
   // Minimum safety context = we know timing + at least one consent signal
-  const hasMinimumSafetyContext =
-    detectedTiming !== "unclear" &&
-    hasMatch(text, CONSENT_SIGNAL_PATTERNS);
+  // For relational queries, timing alone is enough to proceed
+  const hasMinimumSafetyContext = queryType === "relational"
+    ? detectedTiming !== "unclear"
+    : detectedTiming !== "unclear" && hasMatch(text, CONSENT_SIGNAL_PATTERNS);
 
   return {
     gaps: selectedGaps,
     detectedTiming,
     flagWords,
     hasMinimumSafetyContext,
+    queryType,
   };
 }
 
