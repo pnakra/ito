@@ -208,7 +208,7 @@ const CheckIn = () => {
   ) => {
     const hasFlaggedWords = (riskResult.flaggedWords?.length ?? 0) > 0;
 
-    // Out-of-scope: skip the full flow, show redirect
+// Out-of-scope: skip the full flow, show redirect
     if (gapResult.queryType === "out-of-scope") {
       setPhase("out-of-scope");
       return;
