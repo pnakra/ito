@@ -213,6 +213,14 @@ const CheckIn = () => {
       setPhase("out-of-scope");
       return;
     }
+
+    // Relational: not a consent encounter, skip follow-up questions entirely
+    if (gapResult.queryType === "relational") {
+      recordRun(riskResult.level, hasFlaggedWords);
+      resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
+      fetchExplanation(cumulativeText, riskResult.level, resolvedTimingRef.current);
+      return;
+    }
     
     if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
       recordRun(riskResult.level, hasFlaggedWords);
