@@ -44,7 +44,7 @@ const Index = () => {
               fontStyle: "italic",
             }}
           >
-            Is this ok?
+            is this ok?
           </h1>
 
           <p
