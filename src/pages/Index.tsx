@@ -2,141 +2,103 @@ import { useState, useEffect } from "react";
 import { logVisit } from "@/lib/logVisit";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
-import TypewriterText from "@/components/TypewriterText";
-import HomepageDemo from "@/components/HomepageDemo";
-import { ArrowRight, PenLine, GitFork } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+
+const MESSAGES = [
+  { text: "We were hooking up but then they pushed me away", align: "left" as const },
+  { text: "Do they want me to kiss them when I see them next?", align: "right" as const },
+  { text: "My friend had sex with them and thinks I can too", align: "left" as const },
+];
 
 const Index = () => {
-  const [headlineComplete, setHeadlineComplete] = useState(false);
-  const [cardsVisible, setCardsVisible] = useState(false);
-  const [demoExiting, setDemoExiting] = useState(false);
+  const [visibleMessages, setVisibleMessages] = useState(0);
 
   useEffect(() => {
     logVisit();
   }, []);
 
-  const handleReady = () => {
-    setDemoExiting(true);
-    setTimeout(() => setCardsVisible(true), 250);
-  };
+  // Stagger message appearance
+  useEffect(() => {
+    if (visibleMessages < MESSAGES.length) {
+      const delay = visibleMessages === 0 ? 600 : 1200;
+      const t = setTimeout(() => setVisibleMessages((v) => v + 1), delay);
+      return () => clearTimeout(t);
+    }
+  }, [visibleMessages]);
 
   return (
-    <div className="flex flex-col bg-background" style={{ height: '100dvh' }}>
+    <div className="flex flex-col bg-background" style={{ height: "100dvh" }}>
       <Header />
 
-      <main className={`flex-1 flex flex-col ${cardsVisible ? 'justify-center py-[2vh]' : 'justify-between py-[4vh]'}`}>
-        <section className="container mx-auto px-5 flex flex-col items-center">
+      <main className="flex-1 flex flex-col justify-between px-5 pb-6 pt-4 container mx-auto max-w-md">
+        {/* Top: headline + subtitle */}
+        <div>
+          <h1
+            className="text-foreground"
+            style={{
+              fontFamily: '"Newsreader", "Georgia", serif',
+              fontSize: "42px",
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: "-0.5px",
+              fontStyle: "italic",
+            }}
+          >
+            Is this ok?
+          </h1>
 
-          <div className={`flex flex-col items-center ${cardsVisible ? 'mb-2' : 'mb-3'} min-h-[1.2em]`}>
-            <h1
-              className="text-foreground text-center"
-              style={{
-                fontFamily: '"Newsreader", "Georgia", serif',
-                fontSize: '32px',
-                fontWeight: 400,
-                lineHeight: 1.2,
-                letterSpacing: '-0.3px',
-                fontStyle: 'italic',
-              }}
-            >
-              <TypewriterText text="is this ok?" delay={70} onComplete={() => setHeadlineComplete(true)} />
-            </h1>
-            <svg
-              className="mt-1 text-primary/30"
-              width="120"
-              height="8"
-              viewBox="0 0 120 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M2 5.5C20 2.5 40 6 60 3.5C80 1 100 5.5 118 3"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+          <p
+            className="text-foreground mt-4 font-semibold"
+            style={{ fontSize: "20px", lineHeight: 1.35 }}
+          >
+            Get an honest perspective on sex, dating, and everything in between.
+          </p>
 
-          {!cardsVisible && (
-            <p
-              className={`text-[15px] text-muted-foreground text-center mb-4 sm:mb-8 transition-all duration-300 ${
-                headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-              } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
-              style={{ transitionDelay: headlineComplete ? "100ms" : "0ms" }}
-            >
-               No judgment. No lectures. Just an honest read.
-            </p>
-          )}
+          <p className="text-muted-foreground mt-2 text-[15px]">
+            <span className="font-bold text-foreground">100% anonymous.</span>
+          </p>
+        </div>
 
-          {!cardsVisible && (
+        {/* Middle: iMessage-style bubbles */}
+        <div className="flex flex-col gap-3 my-6">
+          {MESSAGES.map((msg, i) => (
             <div
-              className={`w-full max-w-sm mx-auto transition-all duration-200 ${
-                headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-              } ${demoExiting ? "opacity-0 -translate-y-2 pointer-events-none" : ""}`}
+              key={i}
+              className={`flex ${msg.align === "right" ? "justify-end" : "justify-start"}`}
             >
-              <HomepageDemo />
-            </div>
-          )}
-
-          {!cardsVisible && (
-            <div
-              className={`mt-6 flex flex-col items-center gap-2 transition-all duration-300 ${
-                headlineComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-              } ${demoExiting ? "opacity-0 pointer-events-none" : ""}`}
-              style={{ transitionDelay: headlineComplete ? "150ms" : "0ms" }}
-            >
-              <button
-                onClick={handleReady}
-                className="bg-primary text-primary-foreground px-6 py-3 rounded-[14px] text-[15px] font-semibold hover:bg-primary/90 active:scale-[0.97] transition-all"
+              <div
+                className={`max-w-[75%] rounded-2xl px-4 py-3 text-[15px] leading-snug transition-all duration-500 ${
+                  i < visibleMessages
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3"
+                } ${
+                  msg.align === "right"
+                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    : "bg-muted text-foreground rounded-bl-md"
+                }`}
+                style={{ transitionDelay: `${i * 150}ms` }}
               >
-                What's on your mind?
-              </button>
-            </div>
-          )}
-
-          {cardsVisible && (
-            <div className="w-full max-w-lg mx-auto animate-fade-in">
-              <p className="text-[14px] text-muted-foreground text-center mb-4">
-                For when something felt off, you're not sure how they felt, or you're figuring out your next move.
-              </p>
-              <div className="space-y-3">
-                <Link
-                  to="/check-in"
-                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99] border-l-[3px] border-l-warning"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <PenLine className="w-5 h-5 text-warning flex-shrink-0" />
-                    <div>
-                      <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                        Just say it
-                      </h2>
-                      <p className="text-muted-foreground text-[14px]">Write it out like you'd text a friend</p>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
-                </Link>
-
-                <Link
-                  to="/check-in?mode=guided"
-                  className="group bg-card shadow-card rounded-[16px] p-5 hover:shadow-md transition-all duration-150 flex items-center text-left active:scale-[0.99] border-l-[3px] border-l-primary"
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <GitFork className="w-5 h-5 text-primary flex-shrink-0" />
-                    <div>
-                      <h2 className="text-[16px] font-medium mb-1 text-foreground">
-                        Help me think through it
-                      </h2>
-                      <p className="text-muted-foreground text-[14px]">A few quick questions to get started</p>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0 ml-3 transition-colors" />
-                </Link>
+                {msg.text}
               </div>
             </div>
-          )}
+          ))}
+        </div>
 
-        </section>
+        {/* Bottom: input hint + CTA */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2 bg-muted rounded-full px-4 py-3 opacity-50">
+            <span className="text-muted-foreground text-[15px]">
+              ✏️ What's on your mind? Type here...
+            </span>
+          </div>
+
+          <Link
+            to="/check-in"
+            className="flex items-center justify-center gap-2 bg-foreground text-background rounded-2xl px-6 py-4 text-[16px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all"
+          >
+            Get an honest read <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </main>
     </div>
   );
