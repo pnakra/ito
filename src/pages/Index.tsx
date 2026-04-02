@@ -86,12 +86,6 @@ const Index = () => {
 
         {/* Bottom: input hint + CTA */}
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 bg-muted rounded-full px-4 py-3 opacity-50">
-            <span className="text-muted-foreground text-[15px]">
-              ✏️ What's on your mind? Type here...
-            </span>
-          </div>
-
           <Link
             to="/check-in"
             className="flex items-center justify-center gap-2 bg-foreground text-background rounded-2xl px-6 py-4 text-[16px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all"
