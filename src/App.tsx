@@ -12,6 +12,8 @@ import Resources from "./pages/Resources";
 import Demo from "./pages/Demo";
 import ReleaseNotes from "./pages/ReleaseNotes";
 import Privacy from "./pages/Privacy";
+import Blog from "./pages/Blog";
+import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
 
@@ -34,6 +36,8 @@ const App = () => (
               <Route path="/demo" element={<Demo />} />
               <Route path="/release-notes" element={<ReleaseNotes />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogArticle />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
