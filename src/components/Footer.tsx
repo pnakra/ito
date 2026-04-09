@@ -7,9 +7,14 @@ const Footer = () => {
         <p className="text-xs text-muted-foreground/60">
           © 2026 Override Labs
         </p>
-        <Link to="/privacy" className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
-          Privacy Policy
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/blog" className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+            Resources
+          </Link>
+          <Link to="/privacy" className="text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors">
+            Privacy Policy
+          </Link>
+        </div>
       </div>
     </footer>
   );

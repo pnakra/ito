@@ -24,6 +24,12 @@ const Header = () => {
             Exit
           </button>
           <Link
+            to="/blog"
+            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Resources
+          </Link>
+          <Link
             to="/about"
             className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
           >
