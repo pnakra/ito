@@ -19,10 +19,10 @@ import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
-import { detectGaps, narrativeToDecisionState, type DetectedGap } from "@/lib/narrativeGapDetection";
+import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
 import { classifyRisk, detectFlagWords, formatSelectionsForAI } from "@/lib/riskClassification";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
-import { logChoice, logFreetext, logAIResponse, resetSessionId } from "@/lib/submissionLogger";
+import { logChoice, logFreetext, logAIResponse, logSubmission, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
 import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/invokeEdgeFunctionWithRetry";
@@ -40,7 +40,10 @@ type FlowPhase =
   | "outcome"
   | "outcome-feedback"
   | "refusal"
-  | "out-of-scope";
+  | "out-of-scope"
+  | "crisis"
+  | "distress"
+  | "relational-lite";
 
 interface AnalysisData {
   riskLevel: RiskLevel;
@@ -214,6 +217,18 @@ const CheckIn = () => {
       return;
     }
 
+    if (gapResult.queryType === "crisis") {
+      logSubmission({ flowType: "before", stepName: "crisis-redirect", stepType: "choice", metadata: { flag: "crisis" } });
+      setPhase("crisis");
+      return;
+    }
+
+    if (gapResult.queryType === "distress") {
+      logSubmission({ flowType: "before", stepName: "distress-redirect", stepType: "choice", metadata: { flag: "distress" } });
+      setPhase("distress");
+      return;
+    }
+
     // Relational: not a consent encounter, skip follow-up questions entirely
     if (gapResult.queryType === "relational") {
       recordRun(riskResult.level, hasFlaggedWords);
@@ -276,6 +291,12 @@ const CheckIn = () => {
 
   const processNarrativeSubmit = (text: string) => {
     logFreetext("before", "narrative-input", text);
+
+    // Flag victim/perpetrator submissions for monitoring (no behavior change)
+    const submissionFlag = detectSubmissionFlag(text);
+    if (submissionFlag) {
+      logSubmission({ flowType: "before", stepName: "narrative-input", stepType: "freetext", freetextValue: text, metadata: { flag: submissionFlag } });
+    }
     
     const newHistory = [...narrativeHistory, text];
     setNarrativeHistory(newHistory);
@@ -297,8 +318,26 @@ const CheckIn = () => {
       return;
     }
 
+    if (gapResult.queryType === "crisis") {
+      logSubmission({ flowType: "before", stepName: "crisis-redirect", stepType: "choice", metadata: { flag: "crisis", narrative: text.slice(0, 200) } });
+      setPhase("crisis");
+      return;
+    }
+
+    if (gapResult.queryType === "distress") {
+      logSubmission({ flowType: "before", stepName: "distress-redirect", stepType: "choice", metadata: { flag: "distress", narrative: text.slice(0, 200) } });
+      setPhase("distress");
+      return;
+    }
+
     if (gapResult.queryType === "out-of-scope") {
       setPhase("out-of-scope");
+      return;
+    }
+
+    if (gapResult.queryType === "relational-lite") {
+      recordRun(result.level, hasFlaggedWords);
+      fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
       return;
     }
 
@@ -742,6 +781,52 @@ const CheckIn = () => {
                 <li><a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="underline">Crisis Text Line</a> — text HOME to 741741</li>
                 <li><a href="https://988lifeline.org" target="_blank" rel="noopener noreferrer" className="underline">988 Lifeline</a> — call or text 988</li>
               </ul>
+              <button
+                onClick={resetFlow}
+                className="text-sm underline text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Try a different question
+              </button>
+            </div>
+          )}
+
+          {/* Crisis */}
+          {phase === "crisis" && (
+            <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+              <p className="text-base font-medium text-foreground">
+                That sounds really heavy.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ito is built for thinking through confusing dating and sexual situations — it's not the right tool for what you're going through right now. You deserve real support.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                If you're in a hard place, please reach out:
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-none">
+                <li><a href="https://988lifeline.org" target="_blank" rel="noopener noreferrer" className="underline">988 Suicide and Crisis Lifeline</a> — call or text 988, available 24/7</li>
+                <li><a href="https://crisistextline.org" target="_blank" rel="noopener noreferrer" className="underline">Crisis Text Line</a> — text HOME to 741741</li>
+              </ul>
+              <button
+                onClick={resetFlow}
+                className="text-sm underline text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Try a different question
+              </button>
+            </div>
+          )}
+
+          {/* Distress */}
+          {phase === "distress" && (
+            <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+              <p className="text-base font-medium text-foreground">
+                That feeling is real.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                ito is built for thinking through confusing dating and sexual situations — it's not the right fit for what you're going through right now. If things feel heavy, talking to someone can help more than this tool can.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                A school counselor, a trusted adult, or a warmline are good places to start. You can also reach the 988 Lifeline anytime by calling or texting 988.
+              </p>
               <button
                 onClick={resetFlow}
                 className="text-sm underline text-muted-foreground hover:text-foreground transition-colors"
