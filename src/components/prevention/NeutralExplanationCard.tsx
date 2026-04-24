@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Info } from "lucide-react";
 
 interface NeutralAnalysisData {
   signalLabel: string;
@@ -14,16 +13,14 @@ interface NeutralExplanationCardProps {
 }
 
 const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExplanationCardProps) => {
-  const [showBadge, setShowBadge] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);
 
   useEffect(() => {
     if (!analysis || isLoading) return;
 
-    const t1 = setTimeout(() => setShowBadge(true), 200);
     const lineTimers = analysis.why.map((_, i) =>
-      setTimeout(() => setVisibleLines(i + 1), 550 + i * 150)
+      setTimeout(() => setVisibleLines(i + 1), 400 + i * 150)
     );
     const t2 = setTimeout(() => {
       setShowCallout(true);
@@ -31,7 +28,6 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
     }, 1200);
 
     return () => {
-      clearTimeout(t1);
       clearTimeout(t2);
       lineTimers.forEach(clearTimeout);
     };
@@ -59,15 +55,6 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
         </p>
       </div>
 
-      {showBadge && (
-        <div className="flex justify-center animate-scale-in" style={{ animationDuration: "350ms" }}>
-          <div className="bg-muted text-muted-foreground border-[1.5px] border-border rounded-full py-2 px-5 font-semibold text-[16px] tracking-[-0.2px] inline-flex items-center gap-2 shadow-badge leading-none">
-            <Info className="w-4 h-4 shrink-0" />
-            <span className="leading-tight">{analysis.signalLabel}</span>
-          </div>
-        </div>
-      )}
-
       <div className="space-y-2.5">
         {analysis.why.map((point, i) => (
           <p
@@ -86,7 +73,6 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
           <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
         </div>
       )}
-
     </div>
   );
 };
