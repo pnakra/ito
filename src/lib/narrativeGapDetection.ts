@@ -14,7 +14,7 @@ export interface DetectedGap {
   safetyRelevant: boolean; // true = feeds into deterministic safety rules
 }
 
-export type QueryType = "encounter" | "relational" | "out-of-scope";
+export type QueryType = "encounter" | "relational" | "relational-lite" | "crisis" | "distress" | "out-of-scope";
 
 interface GapDetectionResult {
   gaps: DetectedGap[];
@@ -83,7 +83,55 @@ const OUT_OF_SCOPE_PATTERNS = [
   /\b(game|gaming|minecraft|fortnite|movie|show|anime|song|music|band)\b/i,
 ];
 
+// Active crisis — warrants immediate warm redirect + 988 / Crisis Text Line
+const CRISIS_PATTERNS = [
+  /\b(want\s*to\s*die|wanna\s*die|wish\s*i\s*(was|were)\s*dead)\b/i,
+  /\bkill\s*(my)?self\b/i,
+  /\bsuicid(e|al)\b/i,
+  /\b(ending\s*(it|my\s*life)|end\s*it\s*all)\b/i,
+  /\bno\s*reason\s*to\s*(live|be\s*here)\b/i,
+  /\bdon'?t\s*want\s*to\s*(be\s*here|live)\b/i,
+  /\b(fucking\s*)?(kill|murder)\s*me\b/i,
+  /\bhurt\s*(my)?self\b/i,
+  /\bcut\s*(my)?self\b/i,
+  /\bself\s*harm\b/i,
+];
+
+// Emotional distress — not active crisis but clearly not a consent/dating question
+const DISTRESS_PATTERNS = [
+  /\bi('m|\s*am)\s*(so\s*)?(depressed|anxious|lonely|broken|numb|hopeless|worthless|devastated)\b/i,
+  /\bi\s*think\s*i('m|\s*am)\s*depressed\b/i,
+  /\b(can'?t\s*cope|can'?t\s*go\s*on|falling\s*apart|breaking\s*down)\b/i,
+  /\b(thought\s*about|thinking\s*about)\s*(cutting|hurting\s*myself|self\s*harm)\b/i,
+  /\bi\s*(just\s*)?(want|need)\s*a\s*(boyfriend|girlfriend|bf|gf)\b/i,
+  /\bim\s+lonely\b/i,
+  /\bi'?m\s+so\s+lonely\b/i,
+];
+
+// Relational-lite — relationship adjacent but clearly not a consent/encounter question
+// (e.g. "will she think I'm a simp", "they ghosted me", "does he like me")
+const RELATIONAL_LITE_PATTERNS = [
+  /\bthink\s+i('?m|\s*am)\s*a?\s*simp\b/i,
+  /\bsimp\s+(if|for|because)\b/i,
+  /\bwill\s+(she|he|they)\s+think\b/i,
+  /\b(haven'?t|hasn'?t)\s+texted?\s+back\b/i,
+  /\bover\s*thinking\s+it\b/i,
+  /\bghostd?\s+(me|after)\b/i,
+  /\bidk\s+if\s+(he|she|they)\s+like[ds]?\s+me\b/i,
+  /\b(does|do)\s+(he|she|they)\s+like\s+me\b/i,
+];
+
 export function classifyQueryType(text: string): QueryType {
+  // Crisis: active mental health emergency — check first, always wins
+  if (hasMatch(text, CRISIS_PATTERNS)) {
+    return "crisis";
+  }
+
+  // Distress: emotional difficulty but not active crisis
+  if (hasMatch(text, DISTRESS_PATTERNS) && !hasMatch(text, ENCOUNTER_PATTERNS) && !hasMatch(text, RELATIONAL_PATTERNS)) {
+    return "distress";
+  }
+
   // Out of scope: clearly not interpersonal/relationship territory
   if (hasMatch(text, OUT_OF_SCOPE_PATTERNS) && !hasMatch(text, ENCOUNTER_PATTERNS) && !hasMatch(text, RELATIONAL_PATTERNS)) {
     return "out-of-scope";
@@ -92,6 +140,12 @@ export function classifyQueryType(text: string): QueryType {
   // Encounter: physical/sexual context signals present
   if (hasMatch(text, ENCOUNTER_PATTERNS)) {
     return "encounter";
+  }
+
+  // Relational-lite: relationship-adjacent but not a consent/encounter question
+  // Check before full relational to catch "will she think I'm a simp" etc.
+  if (hasMatch(text, RELATIONAL_LITE_PATTERNS) && !hasMatch(text, RELATIONAL_PATTERNS)) {
+    return "relational-lite";
   }
 
   // Relational: interpersonal but no physical signals
@@ -134,8 +188,8 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
 
   const gaps: DetectedGap[] = [];
 
-  // Out-of-scope: skip all gap questions, return early with redirect signal
-  if (queryType === "out-of-scope") {
+  // Crisis/distress/out-of-scope/relational-lite: skip all gap questions, return early
+  if (queryType === "out-of-scope" || queryType === "crisis" || queryType === "distress" || queryType === "relational-lite") {
     return {
       gaps: [],
       detectedTiming,
@@ -231,8 +285,32 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
 }
 
 /**
- * Maps narrative + follow-up answers into a DecisionState-like structure
- * that classifyRisk() can consume.
+ * Detect if a narrative describes the user as a victim or as acknowledging perpetration.
+ * Used for Supabase flagging only — does not change flow behavior.
+ */
+export type SubmissionFlag = "victim" | "perpetrator_acknowledgment" | null;
+
+const VICTIM_PATTERNS = [
+  /\bi('?m|\s*was)\s*(not\s*sure|unsure)\s*if\s*(i\s*was\s*)?pressured/i,
+  /\b(he|she|they)\s*(pressured|forced|made)\s*me\b/i,
+  /\bi\s*(was|got)\s*(sexually\s*)?(assaulted|raped|violated)\b/i,
+  /\bi\s*think\s*i\s*was\s*(sexually\s*)?assaulted\b/i,
+  /\bi\s*(didn'?t|did\s*not)\s*(want|consent)\s*(to\s*it|to\s*that|but)\b/i,
+  /\bsomething\s*(was\s*done\s*to\s*me|happened\s*to\s*me)\b/i,
+];
+
+const PERPETRATOR_PATTERNS = [
+  /\bi\s*think\s*i\s*(sexually\s*)?assaulted\b/i,
+  /\bdid\s*i\s*(sexually\s*)?assault\b/i,
+  /\bi('?m|\s*am)\s*not\s*sure\s*if\s*(what\s*i\s*did|i)\s*(was|is)\s*(okay|ok|right|wrong)/i,
+  /\bi\s*(may\s*have|might\s*have|think\s*i)\s*(hurt|harmed|violated|assaulted)\s*(her|him|them|someone)\b/i,
+];
+
+export function detectSubmissionFlag(text: string): SubmissionFlag {
+  if (VICTIM_PATTERNS.some(p => p.test(text))) return "victim";
+  if (PERPETRATOR_PATTERNS.some(p => p.test(text))) return "perpetrator_acknowledgment";
+  return null;
+}
  */
 export function narrativeToDecisionState(
   cumulativeText: string,
