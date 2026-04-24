@@ -311,6 +311,10 @@ export function detectSubmissionFlag(text: string): SubmissionFlag {
   if (PERPETRATOR_PATTERNS.some(p => p.test(text))) return "perpetrator_acknowledgment";
   return null;
 }
+
+/**
+ * Maps narrative + follow-up answers into a DecisionState-like structure
+ * that classifyRisk() can consume.
  */
 export function narrativeToDecisionState(
   cumulativeText: string,
