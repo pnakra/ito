@@ -15,10 +15,12 @@ interface NarrativeInputProps {
   onGuidedMode: () => void;
   isLoading: boolean;
   compact?: boolean;
+  initialValue?: string;
+  hideSuggestions?: boolean;
 }
 
-const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact }: NarrativeInputProps) => {
-  const [text, setText] = useState("");
+const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
+  const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const maxLength = 3000;
