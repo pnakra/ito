@@ -80,6 +80,26 @@ const CheckIn = () => {
   const [phase, setPhase] = useState<FlowPhase>(
     searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
   );
+
+  // External handoff: prefill the narrative textarea via ?situation= query param.
+  // Read once on mount, then strip from URL so refresh doesn't overwrite edits.
+  const [prefillSituation] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("situation");
+    return raw ? raw.slice(0, 2000) : "";
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("situation")) {
+      params.delete("situation");
+      const qs = params.toString();
+      const newUrl = window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, []);
   
   // Cumulative narrative context — NEVER reset, only append
   const [narrativeHistory, setNarrativeHistory] = useState<string[]>([]);
@@ -717,6 +737,8 @@ const CheckIn = () => {
               onGuidedMode={() => setPhase("guided-mode")}
               isLoading={isLoading}
               compact={shouldShowPatternWarning}
+              initialValue={prefillSituation}
+              hideSuggestions={!!prefillSituation}
             />
           )}
 
