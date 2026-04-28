@@ -737,6 +737,8 @@ const CheckIn = () => {
               onGuidedMode={() => setPhase("guided-mode")}
               isLoading={isLoading}
               compact={shouldShowPatternWarning}
+              initialValue={prefillSituation}
+              hideSuggestions={!!prefillSituation}
             />
           )}
 
