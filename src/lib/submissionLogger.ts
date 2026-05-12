@@ -9,6 +9,36 @@ type StepType = "choice" | "freetext" | "ai_response";
 let currentSessionId: string | null = null;
 let currentMessageIndex = 0;
 
+// Capture ?src=...&pid=...&sid=... on first load and persist for the session
+// so every submission can be tagged with its referral source (e.g. Prolific).
+type ReferralMeta = { src?: string; pid?: string; sid?: string };
+let referralMeta: ReferralMeta | null = null;
+
+function getReferralMeta(): ReferralMeta {
+  if (referralMeta) return referralMeta;
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = sessionStorage.getItem("referral_meta");
+    if (stored) {
+      referralMeta = JSON.parse(stored);
+      return referralMeta!;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const meta: ReferralMeta = {};
+    const src = params.get("src");
+    const pid = params.get("pid");
+    const sid = params.get("sid");
+    if (src) meta.src = src;
+    if (pid) meta.pid = pid;
+    if (sid) meta.sid = sid;
+    referralMeta = meta;
+    sessionStorage.setItem("referral_meta", JSON.stringify(meta));
+    return meta;
+  } catch {
+    return {};
+  }
+}
+
 function getSessionId(): string {
   if (!currentSessionId) {
     currentSessionId = crypto.randomUUID();
@@ -67,7 +97,7 @@ export async function logSubmission({
           choice_value: choiceString || null,
           freetext_value: freetextValue || null,
           ai_response_summary: aiResponseSummary || null,
-          metadata: metadata ?? {},
+          metadata: { ...getReferralMeta(), ...(metadata ?? {}) },
           message_index: getNextMessageIndex(),
           anon_id: getAnonymousId(),
         }),
