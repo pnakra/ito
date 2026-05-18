@@ -50,6 +50,7 @@ interface AnalysisData {
   signalLabel: string;
   why: string[];
   suggestion: string;
+  followUpQuestion?: string;
 }
 
 interface AfterAnalysisData {
@@ -60,6 +61,7 @@ interface AfterAnalysisData {
   avoidingRepetition: string;
   yourPatterns: string;
   nextSteps?: string;
+  followUpQuestion?: string;
 }
 
 const cleanText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
