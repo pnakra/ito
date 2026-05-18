@@ -959,9 +959,13 @@ const CheckIn = () => {
           {/* Proactive ito follow-up question + immediate input
               Renders below the initial analysis, before the Done/Continue choice.
               Submitting jumps straight into the chat phase with seeded context. */}
+          {/* Gated to neutral ('No flag') risk only. For Red/Yellow, continuing
+              the conversation with a proactive prompt risks legitimizing coercive
+              framing — interruption is the correct posture there. */}
           {(phase === "explanation" || phase === "after-explanation") &&
             !isLoading &&
             explanationComplete &&
+            riskHighWaterMark === "green" &&
             (phase === "after-explanation"
               ? afterAnalysis?.followUpQuestion
               : analysis?.followUpQuestion) && (
