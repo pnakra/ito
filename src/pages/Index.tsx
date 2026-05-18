@@ -5,9 +5,9 @@ import Header from "@/components/Header";
 import { ArrowRight } from "lucide-react";
 
 const MESSAGES = [
-  { text: "We were hooking up but then they pushed me away", align: "left" as const },
-  { text: "Do they want me to kiss them when I see them next?", align: "right" as const },
-  { text: "My friend had sex with them and thinks I can too", align: "left" as const },
+  { text: "we were hooking up and they pushed me away, do i bring it up next time i see them?", align: "left" as const },
+  { text: "they got quiet halfway through and i kept going, should i say something?", align: "right" as const },
+  { text: "they're texting me again after last weekend and i don't know what they want", align: "left" as const },
 ];
 
 const Index = () => {
