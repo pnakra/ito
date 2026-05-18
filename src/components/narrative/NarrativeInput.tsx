@@ -10,8 +10,10 @@ const PLACEHOLDER_ROTATIONS = [
   "What's on your mind?",
 ];
 
+export type EntryMethod = "typed" | "chip_unedited" | "chip_edited";
+
 interface NarrativeInputProps {
-  onSubmit: (text: string) => void;
+  onSubmit: (text: string, entryMethod: EntryMethod) => void;
   onGuidedMode: () => void;
   isLoading: boolean;
   compact?: boolean;
@@ -23,6 +25,10 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Tracks which chip (if any) seeded the textarea. Used to distinguish
+  // chip_unedited vs chip_edited submissions for entry-method analytics
+  // and to drive the chip-aware proactive follow-up question.
+  const seedChipRef = useRef<string | null>(null);
   const maxLength = 3000;
   const minChars = 10;
 
@@ -40,9 +46,17 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
     return () => clearTimeout(timer);
   }, []);
 
+  const resolveEntryMethod = (): EntryMethod => {
+    const trimmed = text.trim();
+    const seed = seedChipRef.current?.trim();
+    if (!seed) return "typed";
+    if (trimmed === seed) return "chip_unedited";
+    return "chip_edited";
+  };
+
   const handleSubmit = () => {
     if (text.trim() && !isLoading) {
-      onSubmit(text.trim());
+      onSubmit(text.trim(), resolveEntryMethod());
     }
   };
 
@@ -51,6 +65,20 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
       e.preventDefault();
       handleSubmit();
     }
+  };
+
+  const handleChipTap = (prompt: string) => {
+    seedChipRef.current = prompt;
+    setText(prompt);
+    // Defer focus + cursor placement until after React paints the new value,
+    // otherwise selection range races state and lands at position 0.
+    requestAnimationFrame(() => {
+      const el = textareaRef.current;
+      if (!el) return;
+      el.focus();
+      const end = prompt.length;
+      try { el.setSelectionRange(end, end); } catch { /* noop */ }
+    });
   };
 
   const showButton = text.trim().length >= minChars;
@@ -96,7 +124,11 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
         <Textarea
           ref={textareaRef}
           value={text}
-          onChange={(e) => setText(e.target.value.slice(0, maxLength))}
+          onChange={(e) => {
+            // Once the user starts typing, they may diverge from the seed —
+            // resolveEntryMethod() handles comparison at submit time.
+            setText(e.target.value.slice(0, maxLength));
+          }}
           onKeyDown={handleKeyDown}
           placeholder="What's on your mind?"
           className="min-h-[100px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
@@ -121,7 +153,9 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
         </div>
       </div>
 
-      {/* Scenario prompts */}
+      {/* Scenario prompts. Tapping a chip seeds the textarea and parks the
+          cursor at the end — never auto-submits. Encourages users to add
+          one personalizing detail before submitting. */}
       {!text && !isLoading && !hideSuggestions && (
         <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
@@ -133,7 +167,7 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
           ].map((prompt) => (
             <button
               key={prompt}
-              onClick={() => setText(prompt)}
+              onClick={() => handleChipTap(prompt)}
               className="text-[14px] text-muted-foreground bg-[hsl(var(--muted))] hover:bg-[hsl(var(--accent))] hover:text-foreground px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug"
             >
               {prompt}
