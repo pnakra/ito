@@ -91,7 +91,8 @@
     --accent-foreground: 220 5% 85%;
 
     --muted: 220 10% 15%;
-    --muted-foreground: 220 5% 50%;
+    /* #9CA0A8 on #121417 ≈ 7.0:1 — passes AA on bg/card/muted surfaces */
+    --muted-foreground: 220 8% 65%;
 
     --destructive: 0 50% 45%;
     --destructive-foreground: 0 0% 100%;
@@ -102,7 +103,7 @@
     --warning: 35 50% 45%;
     --warning-foreground: 0 0% 10%;
 
-    --signal-stop: 0 50% 45%;
+    --signal-stop: 0 70% 65%;
     --signal-stop-foreground: 0 0% 100%;
     --signal-pause: 40 55% 45%;
     --signal-pause-foreground: 0 0% 10%;

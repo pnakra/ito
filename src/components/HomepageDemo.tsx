@@ -163,7 +163,7 @@ const HomepageDemo = () => {
                 <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
               )}
               {!displayedText && phase === "typing" && (
-                <span className="text-muted-foreground/50 text-[15px]">
+                <span className="text-muted-foreground text-[15px]">
                   Tell me what's going on...
                 </span>
               )}

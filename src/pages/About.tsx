@@ -114,7 +114,7 @@ const About = () => {
           </div>
 
           <div className="text-center pt-4">
-            <p className="text-caption text-muted-foreground/60">
+            <p className="text-caption text-muted-foreground">
               © {new Date().getFullYear()} ito
             </p>
           </div>

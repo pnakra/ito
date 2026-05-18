@@ -52,7 +52,7 @@ const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
           {disclaimer}
         </p>
       )}
-      <p className="text-[13px] text-muted-foreground/70 text-center max-w-[260px]">
+      <p className="text-[13px] text-muted-foreground text-center max-w-[260px]">
         This is a reflection tool, not a ruling. Only the other person can give consent.
       </p>
     </div>

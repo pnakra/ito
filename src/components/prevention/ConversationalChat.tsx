@@ -85,7 +85,7 @@ const ConversationalChat = ({
         <p className="text-muted-foreground text-body">
           Say more if you want.
         </p>
-        <p className="text-muted-foreground/70 text-[13px] mt-1">
+        <p className="text-muted-foreground text-[13px] mt-1">
           Still here. Take your time.
         </p>
       </div>
