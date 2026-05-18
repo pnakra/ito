@@ -92,7 +92,9 @@ const ItoProactiveFollowUp = ({ question, onSubmit, isLoading }: ItoProactiveFol
           "sticky bottom-2 z-20 md:static md:bottom-auto",
           // Safe-area inset so iOS home indicator doesn't clip it
           "[padding-bottom:calc(1rem+env(safe-area-inset-bottom))] md:[padding-bottom:1rem]",
-          showAttention ? "animate-pulse ring-1 ring-primary/40 motion-reduce:animate-none" : "",
+          // Soft attention: a one-shot gentle fade-in highlight, no looping pulse.
+          "transition-shadow duration-700 ease-out motion-reduce:transition-none",
+          showAttention ? "ring-1 ring-primary/25" : "ring-0 ring-transparent",
         ].join(" ")}
       >
         <Textarea
