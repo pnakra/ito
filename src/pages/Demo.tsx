@@ -178,11 +178,11 @@ const SCENARIOS: DemoScenario[] = [
   },
   {
     id: "green-result",
-    label: "Green result — copy check",
+    label: "No-flag result — copy check",
     color: "neutral",
-    tagline: "Tests: green card shows new empowerment copy, not disclaimer copy",
+    tagline: "Tests: No-flag card shows the new neutral copy, not disclaimer copy",
     description:
-      "A clearly consensual scenario. Tests that the green result card shows the new copy — 'Looks clear so far...' and 'You're thinking about it...' — not the old disclaimer.",
+      "A clearly consensual scenario. Tests that the No-flag result card shows the new copy — 'Looks clear so far...' and 'You're thinking about it...' — not the old disclaimer.",
     signals: {
       timing: "deciding",
       relationship: "partner",
