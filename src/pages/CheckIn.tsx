@@ -534,6 +534,7 @@ const CheckIn = () => {
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
       const suggestion = cleanText(data?.suggestion);
+      const followUpQuestion = cleanText(data?.followUpQuestion);
 
       const clarityCheck = cleanText(data?.clarityCheck);
       const otherPersonPerspective = cleanText(data?.otherPersonPerspective);
@@ -542,7 +543,7 @@ const CheckIn = () => {
       const avoidingRepetition = cleanText(data?.avoidingRepetition);
       const nextSteps = cleanText(data?.nextSteps);
 
-      console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck);
+      console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck, "followUpQuestion:", followUpQuestion);
       console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
 
       if (isAfter) {
@@ -553,6 +554,7 @@ const CheckIn = () => {
           accountabilitySteps: accountabilitySteps || "For now, pause and give them space while you reflect.",
           avoidingRepetition,
           ...(nextSteps ? { nextSteps } : {}),
+          ...(followUpQuestion ? { followUpQuestion } : {}),
         };
         console.log("[ITO-DIAG] Setting afterAnalysis:", JSON.stringify(afterObj));
         setAfterAnalysis(afterObj);
@@ -562,6 +564,7 @@ const CheckIn = () => {
           signalLabel,
           why: why.length > 0 ? why : ["Something feels unclear here, so it’s best to pause and check in directly."],
           suggestion: suggestion || "Pause and ask them directly what they want right now.",
+          ...(followUpQuestion ? { followUpQuestion } : {}),
         };
         console.log("[ITO-DIAG] Setting analysis:", JSON.stringify(beforeObj));
         setAnalysis(beforeObj);
