@@ -956,6 +956,26 @@ const CheckIn = () => {
             />
           )}
 
+          {/* Proactive ito follow-up question + immediate input
+              Renders below the initial analysis, before the Done/Continue choice.
+              Submitting jumps straight into the chat phase with seeded context. */}
+          {(phase === "explanation" || phase === "after-explanation") &&
+            !isLoading &&
+            explanationComplete &&
+            (phase === "after-explanation"
+              ? afterAnalysis?.followUpQuestion
+              : analysis?.followUpQuestion) && (
+            <ItoProactiveFollowUp
+              question={
+                (phase === "after-explanation"
+                  ? afterAnalysis?.followUpQuestion
+                  : analysis?.followUpQuestion) || ""
+              }
+              onSubmit={handleProactiveFollowUpSubmit}
+              isLoading={isLoading}
+            />
+          )}
+
           {/* Post-explanation choice */}
           {(phase === "explanation" || phase === "after-explanation") && !isLoading && explanationComplete && (
             <PostExplanationChoice
