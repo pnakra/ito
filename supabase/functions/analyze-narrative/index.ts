@@ -363,13 +363,12 @@ serve(async (req) => {
         } else {
           const why = cleanArr(parsed.why);
           const modelFollowUp = clean(parsed.followUpQuestion);
-          // Chip-aware follow-up: when a user submitted an unedited chip and
-          // the result is No-flag, the model's deep-cut question is wasted —
-          // the situation isn't theirs. Override with a question that
-          // gracefully invites their real situation (or lets them bail).
+          // Chip-aware follow-up: when a user submitted an unedited chip the
+          // situation isn't really theirs — the model's deep-cut question is
+          // wasted on a synthetic scenario. Override regardless of risk level
+          // with a question that invites their real situation (or lets them bail).
           const isChipUnedited = entryMethod === "chip_unedited";
-          const isNoFlag = precomputedRiskLevel === "green";
-          const followUpQuestion = (isChipUnedited && isNoFlag)
+          const followUpQuestion = isChipUnedited
             ? "that one was a starting point — is anything actually on your mind right now, or were you just trying ito out?"
             : (modelFollowUp || "Is there anything about how they're acting that's making you uncertain?");
           result = {
