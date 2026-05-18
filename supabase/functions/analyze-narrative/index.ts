@@ -250,6 +250,7 @@ serve(async (req) => {
       conversationHistory,
       isFollowUp,
       structuredSignals,
+      entryMethod,
     } = await req.json();
 
     if (!narrativeText?.trim()) {
@@ -361,12 +362,21 @@ serve(async (req) => {
           };
         } else {
           const why = cleanArr(parsed.why);
-          const followUpQuestion = clean(parsed.followUpQuestion);
+          const modelFollowUp = clean(parsed.followUpQuestion);
+          // Chip-aware follow-up: when a user submitted an unedited chip and
+          // the result is No-flag, the model's deep-cut question is wasted —
+          // the situation isn't theirs. Override with a question that
+          // gracefully invites their real situation (or lets them bail).
+          const isChipUnedited = entryMethod === "chip_unedited";
+          const isNoFlag = precomputedRiskLevel === "green";
+          const followUpQuestion = (isChipUnedited && isNoFlag)
+            ? "that one was a starting point — is anything actually on your mind right now, or were you just trying ito out?"
+            : (modelFollowUp || "Is there anything about how they're acting that's making you uncertain?");
           result = {
             signalLabel: clean(parsed.signalLabel) || "Check in with them",
             why: why.length > 0 ? why : ["Something feels unclear here."],
             suggestion: clean(parsed.suggestion) || "Pause and ask them directly.",
-            followUpQuestion: followUpQuestion || "Is there anything about how they're acting that's making you uncertain?",
+            followUpQuestion,
             detectedTiming: "before",
           };
         }
