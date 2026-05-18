@@ -8,66 +8,67 @@
 
 @layer base {
   :root {
-    /* Light mode (opt-in) */
-    --background: 0 0% 98%;
-    --foreground: 220 10% 12%;
+    /* Light mode (default) — tuned for WCAG AA on small text */
+    --background: 0 0% 99%;
+    --foreground: 220 15% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 10% 12%;
+    --card-foreground: 220 15% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 10% 12%;
+    --popover-foreground: 220 15% 10%;
 
-    /* Primary: Cool slate accent */
-    --primary: 215 20% 45%;
+    /* Primary: darker slate so white text meets 4.5:1 even at small sizes */
+    --primary: 215 28% 32%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 8% 94%;
-    --secondary-foreground: 220 10% 40%;
+    --secondary: 220 10% 92%;
+    --secondary-foreground: 220 15% 22%;
 
-    --accent: 215 15% 92%;
-    --accent-foreground: 220 10% 12%;
+    --accent: 215 18% 88%;
+    --accent-foreground: 220 15% 12%;
 
-    --muted: 220 8% 93%;
-    --muted-foreground: 220 6% 50%;
+    --muted: 220 10% 92%;
+    /* #5A6068 on white ≈ 7.0:1 — passes AA for body and placeholder */
+    --muted-foreground: 220 10% 36%;
 
-    --destructive: 0 50% 50%;
+    --destructive: 0 65% 38%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 145 30% 42%;
+    --success: 145 45% 28%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 35 55% 50%;
-    --warning-foreground: 0 0% 10%;
+    --warning: 35 80% 32%;
+    --warning-foreground: 0 0% 100%;
 
-    /* Signal colors */
-    --signal-stop: 0 55% 50%;
+    /* Signal colors — darkened so foregrounds and labels meet AA */
+    --signal-stop: 0 65% 38%;
     --signal-stop-foreground: 0 0% 100%;
-    --signal-pause: 40 65% 50%;
-    --signal-pause-foreground: 0 0% 10%;
-    --signal-clear: 215 20% 45%;
+    --signal-pause: 35 85% 28%;
+    --signal-pause-foreground: 0 0% 100%;
+    --signal-clear: 215 28% 32%;
     --signal-clear-foreground: 0 0% 100%;
 
-    --border: 220 8% 88%;
-    --input: 220 8% 88%;
-    --ring: 215 20% 45%;
+    --border: 220 10% 82%;
+    --input: 220 10% 78%;
+    --ring: 215 28% 32%;
 
     --radius: 0.75rem;
 
-    --callout: 220 10% 94%;
-    --callout-foreground: 220 10% 20%;
+    --callout: 220 12% 90%;
+    --callout-foreground: 220 15% 18%;
 
-    --warm: 220 8% 92%;
-    --warm-foreground: 220 8% 35%;
+    --warm: 220 10% 90%;
+    --warm-foreground: 220 12% 28%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 10% 25%;
-    --sidebar-primary: 215 20% 45%;
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 220 15% 20%;
+    --sidebar-primary: 215 28% 32%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 8% 95%;
-    --sidebar-accent-foreground: 220 10% 30%;
-    --sidebar-border: 220 8% 88%;
-    --sidebar-ring: 215 20% 45%;
+    --sidebar-accent: 220 10% 92%;
+    --sidebar-accent-foreground: 220 15% 22%;
+    --sidebar-border: 220 10% 82%;
+    --sidebar-ring: 215 28% 32%;
   }
 
   .dark {
