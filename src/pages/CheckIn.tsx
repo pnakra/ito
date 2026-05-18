@@ -980,8 +980,13 @@ const CheckIn = () => {
             />
           )}
 
-          {/* Post-explanation choice */}
-          {(phase === "explanation" || phase === "after-explanation") && !isLoading && explanationComplete && (
+          {/* Post-explanation choice — suppressed for No-flag, where the proactive
+              follow-up already gives the user a clear next move (type back, or
+              just leave). Avoids stacking two CTAs and reads less like a survey. */}
+          {(phase === "explanation" || phase === "after-explanation") &&
+            !isLoading &&
+            explanationComplete &&
+            riskHighWaterMark !== "green" && (
             <PostExplanationChoice
               onDone={handlePostExplanationDone}
               onContinue={handlePostExplanationContinue}
