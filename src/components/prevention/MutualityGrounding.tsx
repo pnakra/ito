@@ -97,7 +97,7 @@ const MutualityGrounding = ({ selectedMove, showUncertaintyOptions, isActive }: 
               </li>
             ))}
           </ul>
-          <p className="text-[10px] text-muted-foreground/70 mt-3 italic">
+          <p className="text-[10px] text-muted-foreground mt-3 italic">
             If asking feels awkward, that might be a sign you're not ready.
           </p>
         </div>

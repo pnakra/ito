@@ -59,7 +59,7 @@ const ConsentModal = ({ onConfirm, onCancel }: ConsentModalProps) => {
           </li>
         </ul>
 
-        <p className="text-[12px] text-muted-foreground/60 leading-relaxed">
+        <p className="text-[12px] text-muted-foreground leading-relaxed">
           By continuing, you're saying you understand what ito is and how your info may be used.
         </p>
 
