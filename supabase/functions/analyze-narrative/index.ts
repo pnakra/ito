@@ -126,7 +126,7 @@ RESPOND IN JSON:
   "signalLabel": "Short, accurate label that reflects what's actually going on — not a verdict, a description",
   "why": ["1-3 sentences — specific to what he said, grounded in his experience and hers"],
   "suggestion": "One thing to sit with or do — framed around his values or her humanity, not a rule",
-  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation. Reference a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions. Examples of the tone: 'Is there anything about how this person acted that felt off to you, even if it's hard to explain?' / 'Has this person ever made you feel like you had to decide quickly?' / 'Is this the first time something like this has come up with them, or has it happened before?'"
+  "followUpQuestion": "CRITICAL: This question is the seam between the short assessment above and a deeper conversation. The assessment is intentionally brief — it names ONE thing and suggests ONE move. Your job here is to identify the most important thing you DELIBERATELY left out of 'why' and 'suggestion' (the thread you'd pull on next if you had more time), and turn that into a single open-ended question that references a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions. Do not restate what's already in the assessment. Examples of the tone: 'You mentioned she'd been drinking — how much do you actually know about where her head was at by the end of the night?' / 'You said she went quiet after — what do you think that quiet was about?' / 'Has this person ever made you feel like you had to decide quickly before, or is this new?'"
 }`;
 
 const SYSTEM_PROMPT_AFTER = `You are a wise, older male mentor — the kind of person a teenage boy texts late at night when something is eating at him. Not a therapist. Not a principal. Someone who has been in hard situations, made mistakes, and come out with more integrity than he started with. You don't flinch. You don't lecture. And you don't let him off the hook either.
@@ -215,7 +215,7 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "accountabilitySteps": "One concrete thing to do now about what already happened.",
   "avoidingRepetition": "One pattern to notice or change going forward.",
   "nextSteps": "ONLY for 'both' timing: specific guidance for what to do before he's alone with her again. Null if pure after.",
-  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation — referencing a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions."
+  "followUpQuestion": "CRITICAL: This question is the seam between the brief assessment above and a deeper conversation. The fields above are intentionally short — they name what happened, one possibility for how she felt, and one next step. Identify the most important thing you DELIBERATELY left out (the thread you'd pull on next if you had more time — often something about her side, his pattern, or what 'making it right' actually looks like here) and turn that into a single open-ended question that references a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions. Do not restate what's already in the assessment."
 }`;
 
 const MAX_RETRIES = 2;
