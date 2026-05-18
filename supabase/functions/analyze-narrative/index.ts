@@ -348,6 +348,7 @@ serve(async (req) => {
 
         if (isAfterFlow) {
           const nextSteps = clean(parsed.nextSteps);
+          const followUpQuestion = clean(parsed.followUpQuestion);
           result = {
             clarityCheck: clean(parsed.clarityCheck) || "Something important happened here.",
             otherPersonPerspective: clean(parsed.otherPersonPerspective) || "She may see this differently.",
@@ -355,14 +356,17 @@ serve(async (req) => {
             accountabilitySteps: clean(parsed.accountabilitySteps) || "Pause and reflect before acting.",
             avoidingRepetition: clean(parsed.avoidingRepetition) || "Notice the pattern and name it.",
             ...(isBothTiming && nextSteps ? { nextSteps } : {}),
+            followUpQuestion: followUpQuestion || "Is there anything about what happened that's still sitting with you?",
             detectedTiming: "after",
           };
         } else {
           const why = cleanArr(parsed.why);
+          const followUpQuestion = clean(parsed.followUpQuestion);
           result = {
             signalLabel: clean(parsed.signalLabel) || "Check in with them",
             why: why.length > 0 ? why : ["Something feels unclear here."],
             suggestion: clean(parsed.suggestion) || "Pause and ask them directly.",
+            followUpQuestion: followUpQuestion || "Is there anything about how they're acting that's making you uncertain?",
             detectedTiming: "before",
           };
         }
