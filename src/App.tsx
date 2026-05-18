@@ -16,6 +16,7 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
+import MobileThemeToggle from "./components/MobileThemeToggle";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
+            <MobileThemeToggle />
           </div>
         </BrowserRouter>
         <Analytics />
