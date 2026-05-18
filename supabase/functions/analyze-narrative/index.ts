@@ -214,7 +214,8 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "perspectiveDisclaimer": "A brief reminder that only she knows how she actually felt.",
   "accountabilitySteps": "One concrete thing to do now about what already happened.",
   "avoidingRepetition": "One pattern to notice or change going forward.",
-  "nextSteps": "ONLY for 'both' timing: specific guidance for what to do before he's alone with her again. Null if pure after."
+  "nextSteps": "ONLY for 'both' timing: specific guidance for what to do before he's alone with her again. Null if pure after.",
+  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation — referencing a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions."
 }`;
 
 const MAX_RETRIES = 2;
