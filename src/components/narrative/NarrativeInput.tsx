@@ -130,7 +130,11 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
             setText(e.target.value.slice(0, maxLength));
           }}
           onKeyDown={handleKeyDown}
-          placeholder="What's on your mind?"
+          placeholder={
+            seedChipRef.current
+              ? "add what's actually happening for you…"
+              : "What's on your mind?"
+          }
           className="min-h-[100px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
           style={{ boxShadow: "none" }}
           disabled={isLoading}
