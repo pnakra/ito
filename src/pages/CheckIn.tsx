@@ -530,6 +530,7 @@ const CheckIn = () => {
           detectedTiming: timing,
           isFollowUp: narrativeHistory.length > 1,
           structuredSignals: structuredSignalsRef.current,
+          entryMethod: entryMethodRef.current,
         },
         {
           maxRetries: 3,
