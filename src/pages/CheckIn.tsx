@@ -12,6 +12,7 @@ import AnimatedExplanationCard from "@/components/prevention/AnimatedExplanation
 import NeutralExplanationCard from "@/components/prevention/NeutralExplanationCard";
 import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
 import ConversationalChat from "@/components/prevention/ConversationalChat";
+import ItoProactiveFollowUp from "@/components/prevention/ItoProactiveFollowUp";
 import MutualityGrounding from "@/components/prevention/MutualityGrounding";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
@@ -50,6 +51,7 @@ interface AnalysisData {
   signalLabel: string;
   why: string[];
   suggestion: string;
+  followUpQuestion?: string;
 }
 
 interface AfterAnalysisData {
@@ -60,6 +62,7 @@ interface AfterAnalysisData {
   avoidingRepetition: string;
   yourPatterns: string;
   nextSteps?: string;
+  followUpQuestion?: string;
 }
 
 const cleanText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
@@ -532,6 +535,7 @@ const CheckIn = () => {
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
       const suggestion = cleanText(data?.suggestion);
+      const followUpQuestion = cleanText(data?.followUpQuestion);
 
       const clarityCheck = cleanText(data?.clarityCheck);
       const otherPersonPerspective = cleanText(data?.otherPersonPerspective);
@@ -540,7 +544,7 @@ const CheckIn = () => {
       const avoidingRepetition = cleanText(data?.avoidingRepetition);
       const nextSteps = cleanText(data?.nextSteps);
 
-      console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck);
+      console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck, "followUpQuestion:", followUpQuestion);
       console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
 
       if (isAfter) {
@@ -551,6 +555,7 @@ const CheckIn = () => {
           accountabilitySteps: accountabilitySteps || "For now, pause and give them space while you reflect.",
           avoidingRepetition,
           ...(nextSteps ? { nextSteps } : {}),
+          ...(followUpQuestion ? { followUpQuestion } : {}),
         };
         console.log("[ITO-DIAG] Setting afterAnalysis:", JSON.stringify(afterObj));
         setAfterAnalysis(afterObj);
@@ -560,6 +565,7 @@ const CheckIn = () => {
           signalLabel,
           why: why.length > 0 ? why : ["Something feels unclear here, so it’s best to pause and check in directly."],
           suggestion: suggestion || "Pause and ask them directly what they want right now.",
+          ...(followUpQuestion ? { followUpQuestion } : {}),
         };
         console.log("[ITO-DIAG] Setting analysis:", JSON.stringify(beforeObj));
         setAnalysis(beforeObj);
@@ -607,6 +613,64 @@ const CheckIn = () => {
     setPhase("follow-up-chat");
   };
 
+  // Proactive follow-up: user responds to ito's seeded question.
+  // Seed the chat with [ito's question, user reply], jump straight into chat phase,
+  // then fetch ito's next turn.
+  const handleProactiveFollowUpSubmit = async (userText: string) => {
+    const question = (detectedTiming === "after"
+      ? afterAnalysis?.followUpQuestion
+      : analysis?.followUpQuestion) || "";
+    if (!question) return;
+
+    const seededHistory = [
+      { role: "assistant" as const, content: question },
+      { role: "user" as const, content: userText },
+    ];
+    setChatMessages(seededHistory);
+    setPhase("follow-up-chat");
+    setIsLoading(true);
+
+    const newHistory = [...narrativeHistory, userText];
+    setNarrativeHistory(newHistory);
+    const cumulativeText = newHistory.join("\n\n");
+    runSafetyClassification(cumulativeText);
+    logFreetext("before", "proactive-follow-up", userText);
+
+    try {
+      const followUpBody = {
+        message: userText,
+        conversationHistory: [{ role: "assistant" as const, content: question }],
+        initialContext: cumulativeText,
+        riskLevel: riskHighWaterMark,
+      };
+
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+        "ito-followup",
+        followUpBody,
+        {
+          maxRetries: MAX_FOLLOWUP_RETRIES,
+          baseDelayMs: 900,
+          label: "ito-followup",
+        },
+      );
+
+      const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
+      if (!responseText) throw new Error("Empty response. Try again.");
+
+      setChatMessages(prev => [...prev, { role: "assistant" as const, content: responseText }]);
+      logAIResponse("before", "proactive-follow-up-response", responseText);
+    } catch (error) {
+      console.error("Error in proactive follow-up:", error);
+      const userFacingError = isLikelyTransientEdgeError(error)
+        ? "Connection issue. Tap Send again in a few seconds."
+        : error instanceof Error && error.message
+          ? error.message
+          : "I’m having trouble right now. Can you try again?";
+      setChatMessages(prev => [...prev, { role: "assistant" as const, content: userFacingError }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Follow-up chat
   const handleFollowUpSubmit = async (message: string) => {
     const userMessage = { role: "user" as const, content: message };
@@ -889,6 +953,26 @@ const CheckIn = () => {
               selectedMove={null}
               showUncertaintyOptions={showUncertaintyOptions}
               isActive={true}
+            />
+          )}
+
+          {/* Proactive ito follow-up question + immediate input
+              Renders below the initial analysis, before the Done/Continue choice.
+              Submitting jumps straight into the chat phase with seeded context. */}
+          {(phase === "explanation" || phase === "after-explanation") &&
+            !isLoading &&
+            explanationComplete &&
+            (phase === "after-explanation"
+              ? afterAnalysis?.followUpQuestion
+              : analysis?.followUpQuestion) && (
+            <ItoProactiveFollowUp
+              question={
+                (phase === "after-explanation"
+                  ? afterAnalysis?.followUpQuestion
+                  : analysis?.followUpQuestion) || ""
+              }
+              onSubmit={handleProactiveFollowUpSubmit}
+              isLoading={isLoading}
             />
           )}
 

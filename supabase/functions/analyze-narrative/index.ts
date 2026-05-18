@@ -125,7 +125,8 @@ RESPOND IN JSON:
 {
   "signalLabel": "Short, accurate label that reflects what's actually going on — not a verdict, a description",
   "why": ["1-3 sentences — specific to what he said, grounded in his experience and hers"],
-  "suggestion": "One thing to sit with or do — framed around his values or her humanity, not a rule"
+  "suggestion": "One thing to sit with or do — framed around his values or her humanity, not a rule",
+  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation. Reference a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions. Examples of the tone: 'Is there anything about how this person acted that felt off to you, even if it's hard to explain?' / 'Has this person ever made you feel like you had to decide quickly?' / 'Is this the first time something like this has come up with them, or has it happened before?'"
 }`;
 
 const SYSTEM_PROMPT_AFTER = `You are a wise, older male mentor — the kind of person a teenage boy texts late at night when something is eating at him. Not a therapist. Not a principal. Someone who has been in hard situations, made mistakes, and come out with more integrity than he started with. You don't flinch. You don't lecture. And you don't let him off the hook either.
@@ -213,7 +214,8 @@ RESPOND IN THIS EXACT JSON FORMAT:
   "perspectiveDisclaimer": "A brief reminder that only she knows how she actually felt.",
   "accountabilitySteps": "One concrete thing to do now about what already happened.",
   "avoidingRepetition": "One pattern to notice or change going forward.",
-  "nextSteps": "ONLY for 'both' timing: specific guidance for what to do before he's alone with her again. Null if pure after."
+  "nextSteps": "ONLY for 'both' timing: specific guidance for what to do before he's alone with her again. Null if pure after.",
+  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation — referencing a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions."
 }`;
 
 const MAX_RETRIES = 2;
@@ -346,6 +348,7 @@ serve(async (req) => {
 
         if (isAfterFlow) {
           const nextSteps = clean(parsed.nextSteps);
+          const followUpQuestion = clean(parsed.followUpQuestion);
           result = {
             clarityCheck: clean(parsed.clarityCheck) || "Something important happened here.",
             otherPersonPerspective: clean(parsed.otherPersonPerspective) || "She may see this differently.",
@@ -353,14 +356,17 @@ serve(async (req) => {
             accountabilitySteps: clean(parsed.accountabilitySteps) || "Pause and reflect before acting.",
             avoidingRepetition: clean(parsed.avoidingRepetition) || "Notice the pattern and name it.",
             ...(isBothTiming && nextSteps ? { nextSteps } : {}),
+            followUpQuestion: followUpQuestion || "Is there anything about what happened that's still sitting with you?",
             detectedTiming: "after",
           };
         } else {
           const why = cleanArr(parsed.why);
+          const followUpQuestion = clean(parsed.followUpQuestion);
           result = {
             signalLabel: clean(parsed.signalLabel) || "Check in with them",
             why: why.length > 0 ? why : ["Something feels unclear here."],
             suggestion: clean(parsed.suggestion) || "Pause and ask them directly.",
+            followUpQuestion: followUpQuestion || "Is there anything about how they're acting that's making you uncertain?",
             detectedTiming: "before",
           };
         }
