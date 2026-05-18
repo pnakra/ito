@@ -130,15 +130,19 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
             setText(e.target.value.slice(0, maxLength));
           }}
           onKeyDown={handleKeyDown}
-          placeholder={
-            seedChipRef.current
-              ? "add what's actually happening for you…"
-              : "What's on your mind?"
-          }
+          placeholder="What's on your mind?"
           className="min-h-[100px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
           style={{ boxShadow: "none" }}
           disabled={isLoading}
         />
+
+        {/* Chip-seed nudge: visible while the textarea still matches the
+            seeded chip text, encouraging the user to personalize before submit. */}
+        {seedChipRef.current && text.trim() === seedChipRef.current.trim() && (
+          <p className="text-[12px] text-muted-foreground italic animate-fade-in">
+            this is a starting point — the more it sounds like your situation, the more useful the reflection
+          </p>
+        )}
 
         <div className="flex items-center justify-between">
           <span className="text-[12px] text-muted-foreground">anonymous. not linked to you.</span>
