@@ -12,6 +12,7 @@ import AnimatedExplanationCard from "@/components/prevention/AnimatedExplanation
 import NeutralExplanationCard from "@/components/prevention/NeutralExplanationCard";
 import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
 import ConversationalChat from "@/components/prevention/ConversationalChat";
+import ItoProactiveFollowUp from "@/components/prevention/ItoProactiveFollowUp";
 import MutualityGrounding from "@/components/prevention/MutualityGrounding";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
