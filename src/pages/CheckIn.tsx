@@ -80,6 +80,10 @@ const CheckIn = () => {
   const [searchParams] = useSearchParams();
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingSubmitText, setPendingSubmitText] = useState<string | null>(null);
+  // Entry method for the current submission ("typed" | "chip_unedited" | "chip_edited").
+  // Held in a ref so it survives consent-modal interception and reaches the edge function.
+  const entryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
+  const pendingEntryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
   const [phase, setPhase] = useState<FlowPhase>(
     searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
   );
@@ -302,23 +306,34 @@ const CheckIn = () => {
   }, [coercivePatternCount, recordRun, resolveEffectiveTiming]);
 
   // Handle initial narrative submission — go to signal floor
-  const handleNarrativeSubmit = (text: string) => {
+  const handleNarrativeSubmit = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited" = "typed") => {
     // If user hasn't consented yet this session, show the modal first
     if (!hasSessionConsent()) {
       setPendingSubmitText(text);
+      pendingEntryMethodRef.current = entryMethod;
       setShowConsentModal(true);
       return;
     }
-    processNarrativeSubmit(text);
+    processNarrativeSubmit(text, entryMethod);
   };
 
-  const processNarrativeSubmit = (text: string) => {
+  const processNarrativeSubmit = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited" = "typed") => {
+    entryMethodRef.current = entryMethod;
     logFreetext("before", "narrative-input", text);
+
+    // Always log entry method on the first narrative submission so we can
+    // measure chip_unedited vs chip_edited vs typed conversion downstream.
+    logSubmission({
+      flowType: "before",
+      stepName: "narrative-input-entry",
+      stepType: "choice",
+      metadata: { entry_method: entryMethod },
+    });
 
     // Flag victim/perpetrator submissions for monitoring (no behavior change)
     const submissionFlag = detectSubmissionFlag(text);
     if (submissionFlag) {
-      logSubmission({ flowType: "before", stepName: "narrative-input", stepType: "freetext", freetextValue: text, metadata: { flag: submissionFlag } });
+      logSubmission({ flowType: "before", stepName: "narrative-input", stepType: "freetext", freetextValue: text, metadata: { flag: submissionFlag, entry_method: entryMethod } });
     }
     
     const newHistory = [...narrativeHistory, text];
@@ -376,7 +391,7 @@ const CheckIn = () => {
   const handleConsentConfirm = () => {
     setShowConsentModal(false);
     if (pendingSubmitText) {
-      processNarrativeSubmit(pendingSubmitText);
+      processNarrativeSubmit(pendingSubmitText, pendingEntryMethodRef.current);
       setPendingSubmitText(null);
     }
   };
