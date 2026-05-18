@@ -125,7 +125,8 @@ RESPOND IN JSON:
 {
   "signalLabel": "Short, accurate label that reflects what's actually going on — not a verdict, a description",
   "why": ["1-3 sentences — specific to what he said, grounded in his experience and hers"],
-  "suggestion": "One thing to sit with or do — framed around his values or her humanity, not a rule"
+  "suggestion": "One thing to sit with or do — framed around his values or her humanity, not a rule",
+  "followUpQuestion": "A single, specific, open-ended question that would deepen understanding of THIS situation. Reference a concrete detail he gave. Sound like a curious older sibling, not a survey. One sentence. No yes/no questions. Examples of the tone: 'Is there anything about how this person acted that felt off to you, even if it's hard to explain?' / 'Has this person ever made you feel like you had to decide quickly?' / 'Is this the first time something like this has come up with them, or has it happened before?'"
 }`;
 
 const SYSTEM_PROMPT_AFTER = `You are a wise, older male mentor — the kind of person a teenage boy texts late at night when something is eating at him. Not a therapist. Not a principal. Someone who has been in hard situations, made mistakes, and come out with more integrity than he started with. You don't flinch. You don't lecture. And you don't let him off the hook either.
