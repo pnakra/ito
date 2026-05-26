@@ -102,8 +102,10 @@ export type Database = {
           fail_count: number
           finished_at: string | null
           id: string
+          next_index: number
           notes: string | null
           pass_count: number
+          payload: Json | null
           prompt_version_tag: string | null
           started_at: string
           total_count: number
@@ -115,8 +117,10 @@ export type Database = {
           fail_count?: number
           finished_at?: string | null
           id?: string
+          next_index?: number
           notes?: string | null
           pass_count?: number
+          payload?: Json | null
           prompt_version_tag?: string | null
           started_at?: string
           total_count?: number
@@ -128,8 +132,10 @@ export type Database = {
           fail_count?: number
           finished_at?: string | null
           id?: string
+          next_index?: number
           notes?: string | null
           pass_count?: number
+          payload?: Json | null
           prompt_version_tag?: string | null
           started_at?: string
           total_count?: number
