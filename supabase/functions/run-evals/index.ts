@@ -259,7 +259,7 @@ async function processScenario(
       tier: scenario.tier,
       input_text: scenario.input,
       expected_risk_level: scenario.expects.risk_level,
-      actual_risk_level: cls.riskLevel,
+      actual_risk_level: actualRiskLevel,
       classification_pass: classificationPass,
       expected_refusal: scenario.expects.refusal_fires,
       refusal_fired: refusalFired,
