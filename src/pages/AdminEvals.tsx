@@ -157,11 +157,21 @@ export default function AdminEvals() {
     try {
       const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS } =
         await import("@/eval/scenarios");
+      // Run the production classifier client-side for each scenario so the
+      // eval harness measures the same risk decision the real app makes,
+      // not a naive proxy via analyze-language.
+      const { classifyRisk } = await import("@/lib/riskClassification");
+      const { narrativeToDecisionState } = await import("@/lib/narrativeGapDetection");
+      const scenariosWithActual = ALL_SCENARIOS.map((s) => {
+        const decisionState = narrativeToDecisionState(s.input, s.flow);
+        const classified = classifyRisk(decisionState);
+        return { ...s, precomputedActual: classified.level };
+      });
       const r = await fetch(`${FN_BASE}/run-evals`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
         body: JSON.stringify({
-          scenarios: ALL_SCENARIOS,
+          scenarios: scenariosWithActual,
           promptVersionTag: tag || null,
           forbiddenPhrases: GLOBAL_FORBIDDEN_PHRASES,
           forbiddenPatterns: GLOBAL_FORBIDDEN_PATTERNS,
