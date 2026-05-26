@@ -313,19 +313,36 @@ export default function AdminEvals() {
                 const completed = r.pass_count + r.fail_count;
                 return (
                   <div
-                    className={`rounded border px-3 py-2 text-sm flex items-center gap-2 ${
+                    className={`rounded border px-3 py-2 text-sm flex items-center justify-between gap-3 ${
                       done ? "border-border text-muted-foreground" : "border-destructive/40 text-foreground"
                     }`}
                   >
-                    <span className={`inline-block w-2 h-2 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-block w-2 h-2 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                      {done ? (
+                        <span>
+                          complete · finished {new Date(r.finished_at!).toLocaleTimeString()} · {completed}/{r.total_count} scored
+                        </span>
+                      ) : (
+                        <span>
+                          running · {completed}/{r.total_count} scored · auto-refreshing every 4s
+                        </span>
+                      )}
+                    </div>
                     {done ? (
-                      <span>
-                        complete · finished {new Date(r.finished_at!).toLocaleTimeString()} · {completed}/{r.total_count} scored
-                      </span>
+                      <button
+                        onClick={() => deleteRun(r.id)}
+                        className="text-xs px-2 py-1 rounded border border-border hover:border-destructive hover:text-destructive"
+                      >
+                        delete
+                      </button>
                     ) : (
-                      <span>
-                        running · {completed}/{r.total_count} scored · auto-refreshing every 4s
-                      </span>
+                      <button
+                        onClick={() => cancelRun(r.id)}
+                        className="text-xs px-2 py-1 rounded border border-destructive/60 text-destructive hover:bg-destructive/10"
+                      >
+                        cancel
+                      </button>
                     )}
                   </div>
                 );
