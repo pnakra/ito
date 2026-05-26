@@ -205,6 +205,9 @@ export default function AdminEvals() {
       setSelectedRun(null);
     }
     await loadHistory(passcode);
+  }
+
+
 
   if (!authed) {
     return (
