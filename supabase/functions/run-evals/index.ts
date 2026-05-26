@@ -42,6 +42,10 @@ interface ScenarioIn {
   tier: string;
   input: string;
   flow: "before" | "after";
+  // Risk level the production classifier (classifyRisk in src/lib) decides
+  // for this input. The client computes this before sending so the eval
+  // measures the same decision the real app makes.
+  precomputedActual?: "green" | "yellow" | "red";
   expects: {
     risk_level: "green" | "yellow" | "red";
     refusal_fires: boolean;
