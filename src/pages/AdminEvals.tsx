@@ -110,12 +110,15 @@ export default function AdminEvals() {
     if (selectedRunId && passcode) loadRun(passcode, selectedRunId);
   }, [selectedRunId, passcode]);
 
-  // Poll the selected run + history while it's still in progress (finished_at == null).
+  // Poll the selected run + history while a recent run is still in progress.
   useEffect(() => {
     if (!authed || !passcode) return;
+    const RECENT_MS = 15 * 60 * 1000;
+    const isRecentlyRunning = (startedAt: string, finishedAt: string | null) =>
+      !finishedAt && Date.now() - new Date(startedAt).getTime() < RECENT_MS;
     const inProgress =
-      (selectedRun && !selectedRun.run.finished_at) ||
-      history.some((h) => !h.finished_at);
+      (selectedRun && isRecentlyRunning(selectedRun.run.started_at, selectedRun.run.finished_at)) ||
+      history.some((h) => isRecentlyRunning(h.started_at, h.finished_at));
     if (!inProgress) return;
     const id = setInterval(() => {
       loadHistory(passcode);
