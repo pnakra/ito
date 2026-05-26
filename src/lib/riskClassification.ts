@@ -26,19 +26,37 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   // === IMMEDIATE RED FLAG — escalating (non-consensual indicators) ===
   { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming", severity: "red", escalates: true },
   { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries", severity: "red", escalates: true },
+  { pattern: /\b(i\s*know\s*)?she\s*wants?\s*it\b/i, category: "dismissing boundaries", severity: "red", escalates: true },
   { pattern: /\bwon'?t\s*remember\b/i, category: "exploitation", severity: "red", escalates: true },
   { pattern: /\bpassed\s*out\b/i, category: "incapacitation", severity: "red", escalates: true },
   { pattern: /\basleep\b/i, category: "incapacitation", severity: "red", escalates: true },
   { pattern: /\bunconscious\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\bblackout\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\b(is|was|getting|got|been)\s*wasted\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\bnot\s*(really\s*)?(moving|responsive|aware|coherent)\b/i, category: "incapacitation", severity: "red", escalates: true },
+  { pattern: /\bslipped\s*(something|a\s*pill|a\s*drug|in\s*her\s*drink)\b/i, category: "drugged", severity: "red", escalates: true },
   // Tense-aware: only fire on present/future intoxication, not retrospective "we were drunk"
   { pattern: /\btoo\s*(drunk|wasted|high)\b/i, category: "incapacitation", severity: "red", escalates: true },
   { pattern: /\bforce[d]?\b/i, category: "force", severity: "red", escalates: true },
   { pattern: /\bmake\s*(her|him|them)\b.*\b(do|have|give)\b/i, category: "coercion", severity: "red", escalates: true },
-  { pattern: /\bhold\s*(her|him|them)\s*down\b/i, category: "force", severity: "red", escalates: true },
-  { pattern: /\bcan'?t\s*say\s*no\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\bdoes?\s*what\s*i\s*want\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\bhold(ing)?\s*(her|him|them)\s*(down|phone|stuff|things)\b/i, category: "force", severity: "red", escalates: true },
+  { pattern: /\bcan'?t\s*(say\s*no|text\s*anyone|leave|call\s*anyone)\b/i, category: "coercion", severity: "red", escalates: true },
   { pattern: /\bwon'?t\s*say\s*no\b/i, category: "coercion", severity: "red", escalates: true },
+  { pattern: /\b(keeps?|kept)\s*saying\s*no\b/i, category: "ignoring no", severity: "red", escalates: true },
   { pattern: /\bno\s*one\s*will\s*believe\b/i, category: "threat", severity: "red", escalates: true },
+  { pattern: /\btell\s*(everyone|everybody|people|her\s*parents|the\s*school)\b/i, category: "threat", severity: "red", escalates: true },
   { pattern: /\bkeep\s*(it|this)\s*secret\b/i, category: "secrecy/coercion", severity: "red", escalates: true },
+  // Minors — under 18 explicit
+  { pattern: /\b(she'?s|he'?s|they'?re|shes|hes)\s+(1[0-7])\b(?!\s*(months?|weeks?))/i, category: "minor", severity: "red", escalates: true },
+  { pattern: /\b(1[0-7])\s+(year|yr)s?\s*old\b/i, category: "minor", severity: "red", escalates: true },
+  { pattern: /\b(1[0-7])\s+and\s+i'?m\s+\d+\b/i, category: "minor", severity: "red", escalates: true },
+  // Ownership / dehumanization
+  { pattern: /\bi\s*own\s*(her|him|them)\b/i, category: "ownership", severity: "red", escalates: true },
+  { pattern: /\bshe'?s\s*mine\b/i, category: "ownership", severity: "red", escalates: true },
+  // Stalking
+  { pattern: /\bshow(ing)?\s*up\s*(at\s*(her|his|their)\s*(work|job|workplace|house|home|school|place)|unannounced)\b/i, category: "stalking", severity: "red", escalates: true },
+  { pattern: /\bwhere\s*she\s*(works|lives)\b/i, category: "stalking", severity: "red", escalates: true },
 
   // === SELF-HARM / CRISIS — escalating (life-safety) ===
   { pattern: /\bkill\s*(my)?self\b/i, category: "self-harm", severity: "red", escalates: true },
