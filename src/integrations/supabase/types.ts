@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      eval_results: {
+        Row: {
+          actual_risk_level: string | null
+          classification_pass: boolean
+          created_at: string
+          deterministic_pass: boolean
+          error: string | null
+          expected_refusal: boolean
+          expected_risk_level: string
+          forbidden_phrase_hits: Json
+          id: string
+          input_text: string
+          latency_ms: number | null
+          missing_themes: Json
+          raw_response: Json | null
+          refusal_fired: boolean
+          refusal_pass: boolean
+          run_id: string
+          scenario_id: string
+          tier: string
+          tone_rationale: string | null
+          tone_score: number | null
+          tone_violations: Json
+        }
+        Insert: {
+          actual_risk_level?: string | null
+          classification_pass?: boolean
+          created_at?: string
+          deterministic_pass?: boolean
+          error?: string | null
+          expected_refusal?: boolean
+          expected_risk_level: string
+          forbidden_phrase_hits?: Json
+          id?: string
+          input_text: string
+          latency_ms?: number | null
+          missing_themes?: Json
+          raw_response?: Json | null
+          refusal_fired?: boolean
+          refusal_pass?: boolean
+          run_id: string
+          scenario_id: string
+          tier: string
+          tone_rationale?: string | null
+          tone_score?: number | null
+          tone_violations?: Json
+        }
+        Update: {
+          actual_risk_level?: string | null
+          classification_pass?: boolean
+          created_at?: string
+          deterministic_pass?: boolean
+          error?: string | null
+          expected_refusal?: boolean
+          expected_risk_level?: string
+          forbidden_phrase_hits?: Json
+          id?: string
+          input_text?: string
+          latency_ms?: number | null
+          missing_themes?: Json
+          raw_response?: Json | null
+          refusal_fired?: boolean
+          refusal_pass?: boolean
+          run_id?: string
+          scenario_id?: string
+          tier?: string
+          tone_rationale?: string | null
+          tone_score?: number | null
+          tone_violations?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eval_results_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "eval_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eval_runs: {
+        Row: {
+          avg_tone_score: number | null
+          created_at: string
+          fail_count: number
+          finished_at: string | null
+          id: string
+          notes: string | null
+          pass_count: number
+          prompt_version_tag: string | null
+          started_at: string
+          total_count: number
+        }
+        Insert: {
+          avg_tone_score?: number | null
+          created_at?: string
+          fail_count?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          pass_count?: number
+          prompt_version_tag?: string | null
+          started_at?: string
+          total_count?: number
+        }
+        Update: {
+          avg_tone_score?: number | null
+          created_at?: string
+          fail_count?: number
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          pass_count?: number
+          prompt_version_tag?: string | null
+          started_at?: string
+          total_count?: number
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           ai_response_summary: string | null

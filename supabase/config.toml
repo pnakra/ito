@@ -32,3 +32,12 @@ verify_jwt = false
 
 [functions.log-submission]
 verify_jwt = false
+
+[functions.verify-eval-access]
+verify_jwt = false
+
+[functions.run-evals]
+verify_jwt = false
+
+[functions.fetch-evals]
+verify_jwt = false
