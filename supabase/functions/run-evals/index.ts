@@ -395,6 +395,7 @@ serve(async (req) => {
         pass_count: passCount,
         fail_count: failCount,
         avg_tone_score: avgTone,
+        notes: cancelled ? "[cancelled]" : null,
       })
       .eq("id", runId);
   };
