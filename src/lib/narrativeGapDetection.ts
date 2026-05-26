@@ -363,8 +363,10 @@ export function narrativeToDecisionState(
     contextFactors.push("emotional-pressure"); // maps to a context factor that won't auto-red with physical
   }
   if (hasMatch(text, POWER_PATTERNS)) contextFactors.push("age-imbalance");
-  if (/\b(first time|never done|experience|virgin|new to)\b/i.test(text)) contextFactors.push("experience-gap");
-  if (/\b(have to|obligated|owe|guilt|pressure|expected)\b/i.test(text)) contextFactors.push("emotional-pressure");
+  // Tightened: only true sexual-experience gap, not generic "first time at her place" or "bad experience"
+  if (/\b(first time (having sex|hooking up|doing this|with (a |anyone))|never done this before|i'?m a virgin|she'?s a virgin|new to (sex|this kind of))\b/i.test(text)) contextFactors.push("experience-gap");
+  // Tightened: don't match "no pressure" or "without pressure"; require pressure framing on someone
+  if (/\b(have to|obligated|owe me|guilt(ed|ing|\s*trip))\b/i.test(text) || /(?<!no\s)(?<!without\s)(?<!zero\s)\bpressur(e|ing|ed)\b/i.test(text) || /\bexpect(ed|s|ing)\s+(her|him|them|me)\s+to\b/i.test(text)) contextFactors.push("emotional-pressure");
   if (contextFactors.length === 0) contextFactors.push("none");
 
   // Map momentum
