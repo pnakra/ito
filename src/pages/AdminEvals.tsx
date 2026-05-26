@@ -307,6 +307,30 @@ export default function AdminEvals() {
             <div className="space-y-6">
               {!selectedRun && <p className="text-sm text-muted-foreground">select a run to view details</p>}
 
+              {selectedRun && (() => {
+                const r = selectedRun.run;
+                const done = !!r.finished_at;
+                const completed = r.pass_count + r.fail_count;
+                return (
+                  <div
+                    className={`rounded border px-3 py-2 text-sm flex items-center gap-2 ${
+                      done ? "border-border text-muted-foreground" : "border-destructive/40 text-foreground"
+                    }`}
+                  >
+                    <span className={`inline-block w-2 h-2 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                    {done ? (
+                      <span>
+                        complete · finished {new Date(r.finished_at!).toLocaleTimeString()} · {completed}/{r.total_count} scored
+                      </span>
+                    ) : (
+                      <span>
+                        running · {completed}/{r.total_count} scored · auto-refreshing every 4s
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+
               {selectedRun && (
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
