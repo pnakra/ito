@@ -277,6 +277,8 @@ export default function AdminEvals() {
                 {history.map((h) => {
                   const passRate = h.total_count > 0 ? Math.round((h.pass_count / h.total_count) * 100) : 0;
                   const active = h.id === selectedRunId;
+                  const done = !!h.finished_at;
+                  const completed = h.pass_count + h.fail_count;
                   return (
                     <li key={h.id}>
                       <button
@@ -285,9 +287,15 @@ export default function AdminEvals() {
                           active ? "border-foreground/60 bg-foreground/5" : "border-border hover:border-foreground/40"
                         }`}
                       >
-                        <div className="font-mono">{new Date(h.started_at).toLocaleString()}</div>
-                        <div className="text-muted-foreground">
-                          {h.prompt_version_tag || "(no tag)"} · {passRate}% pass · tone {h.avg_tone_score?.toFixed(2) ?? "-"}
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                          <span className="font-mono">{new Date(h.started_at).toLocaleString()}</span>
+                        </div>
+                        <div className="text-muted-foreground mt-1">
+                          {h.prompt_version_tag || "(no tag)"} ·{" "}
+                          {done
+                            ? `done · ${passRate}% pass · tone ${h.avg_tone_score?.toFixed(2) ?? "-"}`
+                            : `running ${completed}/${h.total_count}`}
                         </div>
                       </button>
                     </li>
@@ -298,6 +306,30 @@ export default function AdminEvals() {
 
             <div className="space-y-6">
               {!selectedRun && <p className="text-sm text-muted-foreground">select a run to view details</p>}
+
+              {selectedRun && (() => {
+                const r = selectedRun.run;
+                const done = !!r.finished_at;
+                const completed = r.pass_count + r.fail_count;
+                return (
+                  <div
+                    className={`rounded border px-3 py-2 text-sm flex items-center gap-2 ${
+                      done ? "border-border text-muted-foreground" : "border-destructive/40 text-foreground"
+                    }`}
+                  >
+                    <span className={`inline-block w-2 h-2 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                    {done ? (
+                      <span>
+                        complete · finished {new Date(r.finished_at!).toLocaleTimeString()} · {completed}/{r.total_count} scored
+                      </span>
+                    ) : (
+                      <span>
+                        running · {completed}/{r.total_count} scored · auto-refreshing every 4s
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
 
               {selectedRun && (
                 <>
