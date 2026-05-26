@@ -181,6 +181,31 @@ export default function AdminEvals() {
     }
   }
 
+  async function cancelRun(runId: string) {
+    if (!confirm("Cancel this run? It'll stop after the current scenario.")) return;
+    await fetch(`${FN_BASE}/fetch-evals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
+      body: JSON.stringify({ mode: "cancel", runId }),
+    });
+    await loadHistory(passcode);
+    await loadRun(passcode, runId);
+  }
+
+  async function deleteRun(runId: string) {
+    if (!confirm("Delete this run and all its results? This can't be undone.")) return;
+    const r = await fetch(`${FN_BASE}/fetch-evals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
+      body: JSON.stringify({ mode: "delete", runId }),
+    });
+    if (!r.ok) return;
+    if (selectedRunId === runId) {
+      setSelectedRunId(null);
+      setSelectedRun(null);
+    }
+    await loadHistory(passcode);
+
   if (!authed) {
     return (
       <>
