@@ -97,6 +97,7 @@ export type Database = {
       eval_runs: {
         Row: {
           avg_tone_score: number | null
+          cancel_requested: boolean
           created_at: string
           fail_count: number
           finished_at: string | null
@@ -109,6 +110,7 @@ export type Database = {
         }
         Insert: {
           avg_tone_score?: number | null
+          cancel_requested?: boolean
           created_at?: string
           fail_count?: number
           finished_at?: string | null
@@ -121,6 +123,7 @@ export type Database = {
         }
         Update: {
           avg_tone_score?: number | null
+          cancel_requested?: boolean
           created_at?: string
           fail_count?: number
           finished_at?: string | null

@@ -96,6 +96,67 @@ serve(async (req) => {
     });
   }
 
+  if (mode === "cancel") {
+    if (!body.runId) {
+      return new Response(JSON.stringify({ error: "missing_runId" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { error } = await supabase
+      .from("eval_runs")
+      .update({ cancel_requested: true })
+      .eq("id", body.runId)
+      .is("finished_at", null);
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    return new Response(JSON.stringify({ ok: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (mode === "delete") {
+    if (!body.runId) {
+      return new Response(JSON.stringify({ error: "missing_runId" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // Only allow deleting finished runs to avoid orphaning a live background loop.
+    const { data: run } = await supabase
+      .from("eval_runs")
+      .select("id, finished_at")
+      .eq("id", body.runId)
+      .maybeSingle();
+    if (!run) {
+      return new Response(JSON.stringify({ error: "run_not_found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!run.finished_at) {
+      return new Response(JSON.stringify({ error: "run_not_finished" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    await supabase.from("eval_results").delete().eq("run_id", body.runId);
+    const { error } = await supabase.from("eval_runs").delete().eq("id", body.runId);
+    if (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    return new Response(JSON.stringify({ ok: true }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   return new Response(JSON.stringify({ error: "unknown_mode" }), {
     status: 400,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
