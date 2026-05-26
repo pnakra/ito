@@ -278,8 +278,20 @@ serve(async (req) => {
     let passCount = 0;
     let failCount = 0;
     const toneScores: number[] = [];
+    let cancelled = false;
 
     for (const scenario of input.scenarios) {
+      // Check cancel flag before doing any work for this scenario.
+      const { data: runState } = await supabase
+        .from("eval_runs")
+        .select("cancel_requested")
+        .eq("id", runId)
+        .maybeSingle();
+      if (runState?.cancel_requested) {
+        cancelled = true;
+        break;
+      }
+
       const started = Date.now();
       try {
         const cls = await callAnalyzeLanguage(scenario.input);
