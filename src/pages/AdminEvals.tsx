@@ -277,6 +277,8 @@ export default function AdminEvals() {
                 {history.map((h) => {
                   const passRate = h.total_count > 0 ? Math.round((h.pass_count / h.total_count) * 100) : 0;
                   const active = h.id === selectedRunId;
+                  const done = !!h.finished_at;
+                  const completed = h.pass_count + h.fail_count;
                   return (
                     <li key={h.id}>
                       <button
@@ -285,9 +287,15 @@ export default function AdminEvals() {
                           active ? "border-foreground/60 bg-foreground/5" : "border-border hover:border-foreground/40"
                         }`}
                       >
-                        <div className="font-mono">{new Date(h.started_at).toLocaleString()}</div>
-                        <div className="text-muted-foreground">
-                          {h.prompt_version_tag || "(no tag)"} · {passRate}% pass · tone {h.avg_tone_score?.toFixed(2) ?? "-"}
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${done ? "bg-foreground/40" : "bg-destructive animate-pulse"}`} />
+                          <span className="font-mono">{new Date(h.started_at).toLocaleString()}</span>
+                        </div>
+                        <div className="text-muted-foreground mt-1">
+                          {h.prompt_version_tag || "(no tag)"} ·{" "}
+                          {done
+                            ? `done · ${passRate}% pass · tone ${h.avg_tone_score?.toFixed(2) ?? "-"}`
+                            : `running ${completed}/${h.total_count}`}
                         </div>
                       </button>
                     </li>
