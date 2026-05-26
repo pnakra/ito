@@ -52,6 +52,14 @@ function ResultBadge({ pass, label }: { pass: boolean; label: string }) {
 
 export default function AdminEvals() {
   const [authed, setAuthed] = useState(false);
+  useEffect(() => {
+    document.title = "Eval harness";
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    const prev = meta.content;
+    meta.content = "noindex,nofollow";
+    return () => { meta!.content = prev; };
+  }, []);
   const [passcode, setPasscode] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
@@ -159,10 +167,6 @@ export default function AdminEvals() {
   if (!authed) {
     return (
       <>
-        <Helmet>
-          <title>Restricted</title>
-          <meta name="robots" content="noindex,nofollow" />
-        </Helmet>
         <main className="min-h-[100dvh] flex items-center justify-center px-6 bg-background">
           <form onSubmit={submitPasscode} className="w-full max-w-sm space-y-4">
             <h1 className="font-serif text-2xl text-foreground">Restricted</h1>
@@ -212,10 +216,6 @@ export default function AdminEvals() {
 
   return (
     <>
-      <Helmet>
-        <title>Eval harness</title>
-        <meta name="robots" content="noindex,nofollow" />
-      </Helmet>
       <main className="min-h-[100dvh] bg-background text-foreground px-6 py-10 pb-12">
         <div className="max-w-5xl mx-auto space-y-8">
           <header className="flex items-baseline justify-between border-b border-border pb-4">
