@@ -412,7 +412,7 @@ export default function AdminEvals() {
 
               {selectedRun && (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                     <div className="border border-border rounded p-3">
                       <div className="text-xs text-muted-foreground">pass rate</div>
                       <div className="font-serif text-2xl">
@@ -432,7 +432,15 @@ export default function AdminEvals() {
                     </div>
                     <div className="border border-border rounded p-3">
                       <div className="text-xs text-muted-foreground">avg tone</div>
-                      <div className="font-serif text-2xl">{selectedRun.run.avg_tone_score?.toFixed(2) ?? "-"}/5</div>
+                      <div className="font-serif text-2xl">{selectedRun.run.avg_tone_score?.toFixed(2) ?? "-"}<span className="text-sm text-muted-foreground">/5</span></div>
+                    </div>
+                    <div className="border border-border rounded p-3">
+                      <div className="text-xs text-muted-foreground">no sycophancy</div>
+                      <div className="font-serif text-2xl">{overall?.syc ?? "-"}<span className="text-sm text-muted-foreground">/5</span></div>
+                    </div>
+                    <div className="border border-border rounded p-3">
+                      <div className="text-xs text-muted-foreground">redirect</div>
+                      <div className="font-serif text-2xl">{overall?.red ?? "-"}<span className="text-sm text-muted-foreground">/5</span></div>
                     </div>
                   </div>
 
@@ -445,7 +453,9 @@ export default function AdminEvals() {
                             <th className="text-right p-2">n</th>
                             <th className="text-right p-2">classification</th>
                             <th className="text-right p-2">refusal</th>
-                            <th className="text-right p-2">avg tone</th>
+                            <th className="text-right p-2">tone</th>
+                            <th className="text-right p-2">no-syc</th>
+                            <th className="text-right p-2">redirect</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -456,12 +466,15 @@ export default function AdminEvals() {
                               <td className="p-2 text-right font-mono">{t.clsPass}/{t.n}</td>
                               <td className="p-2 text-right font-mono">{t.refPass}/{t.n}</td>
                               <td className="p-2 text-right font-mono">{t.toneAvg ?? "-"}</td>
+                              <td className="p-2 text-right font-mono">{t.sycAvg ?? "-"}</td>
+                              <td className="p-2 text-right font-mono">{t.redAvg ?? "-"}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
                   )}
+
 
                   <div className="space-y-3">
                     <h2 className="text-sm uppercase tracking-wider text-muted-foreground">
