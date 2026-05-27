@@ -80,6 +80,37 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\b(wouldn'?t|won'?t|didn'?t)\s*(let\s*me\s*(leave|go|say\s*no|stop))\b/i, category: "reported pressure", severity: "red", escalates: true },
   { pattern: /\bi\s*(said|told)\s*(no|stop|him|her|them)\s*(but|and)\s*(he|she|they)\s*(kept|continued|didn'?t\s*(stop|listen))\b/i, category: "reported boundary violation", severity: "red", escalates: true },
 
+  // === PREMEDITATED INCAPACITATION — escalating (planning to impair) ===
+  { pattern: /\b(get|getting|gonna\s+get|going\s+to\s+get|plan\s+to\s+get)\s+(her|him|them)\s+(really\s+|so\s+|super\s+|extra\s+|fully\s+|properly\s+)?(drunk|wasted|high|fucked\s*up|blackout|hammered|loaded|smashed)\b/i, category: "premeditated incapacitation", severity: "red", escalates: true },
+
+  // === WORKPLACE / AUTHORITY POWER DYNAMIC — escalating in sexual/romantic context ===
+  { pattern: /\bmy\s+(direct\s+)?report\b[\s\S]{0,80}\b(asked\s+me\s+out|flirt|hook|date\s+me|sleep|kiss|come\s+on(to)?\s+me|wants?\s+me)\b/i, category: "workplace power", severity: "red", escalates: true },
+  { pattern: /\b(my\s+)?(subordinate|employee|intern|student|player|mentee)\b[\s\S]{0,80}\b(asked\s+me\s+out|flirt|hook|date\s+me|sleep|kiss|wants?\s+me|came\s+on(to)?\s+me)\b/i, category: "workplace power", severity: "red", escalates: true },
+  { pattern: /\b(reports?\s+to\s+me|i'?m\s+(her|his|their)\s+(boss|manager|supervisor|coach|teacher))\b[\s\S]{0,80}\b(asked\s+me\s+out|flirt|hook|date|sleep|kiss|wants?\s+me)\b/i, category: "workplace power", severity: "red", escalates: true },
+
+  // === TOKEN-RESISTANCE MYTH — escalating (no doesn't really mean no) ===
+  { pattern: /\bsay(s|ing)?\s+no\s+(a\s+(few|couple)\s+times?|several\s+times|first|at\s+first|before|repeatedly)\s+(before|until)\s+(yes|saying\s+yes|she\s+(says\s+)?yes)\b/i, category: "token resistance myth", severity: "red", escalates: true },
+  { pattern: /\bno\s+doesn'?t\s+(really\s+)?mean\s+no\b/i, category: "token resistance myth", severity: "red", escalates: true },
+  { pattern: /\b(when|if)\s+(she|he|they)\s+says?\s+no\s+it\s+doesn'?t\s+(really\s+)?mean\s+no\b/i, category: "token resistance myth", severity: "red", escalates: true },
+  { pattern: /\bsupposed\s+to\s+say\s+no\s+(a\s+few\s+times?|before\s+yes|first)\b/i, category: "token resistance myth", severity: "red", escalates: true },
+
+  // === IMAGE-BASED ABUSE — escalating (non-consensual sharing of intimate imagery) ===
+  { pattern: /\b(send|sending|sent|post(ing)?|share|sharing|leak(ing)?|drop|spread|forward(ing)?|upload(ing)?)\s+(her|his|their|the|those|these)\s+(nudes?|naked\s+(pics?|photos?|images?)|intimate\s+(pics?|photos?|images?)|sex\s+(tape|video))\b/i, category: "image-based abuse", severity: "red", escalates: true },
+  { pattern: /\bhave\s+(her|his|their)\s+nudes?\b[\s\S]{0,80}\b(send|sending|post|sharing|share|leak|drop|use|threaten)\b/i, category: "image-based abuse", severity: "red", escalates: true },
+  { pattern: /\b(revenge\s+porn|leak\s+(her|his|their)\s+(nudes?|pics?|photos?))\b/i, category: "image-based abuse", severity: "red", escalates: true },
+
+  // === POST-HOC DISCLOSURE OF NON-CONSENT — escalating (third-party report of harm) ===
+  { pattern: /\b(she|he|they)\s+(told|telling|been\s+telling|has\s+been\s+telling|is\s+telling)\s+(people|her\s+friends|his\s+friends|their\s+friends|others|everyone|someone)\s+[\s\S]{0,40}\b(didn'?t|did\s+not|never)\s+want(ed)?\s+(to|it)\b/i, category: "post-hoc disclosure", severity: "red", escalates: true },
+  { pattern: /\b(someone|a\s+friend|her\s+friend|his\s+friend)\s+(told|said)\s+me\s+[\s\S]{0,60}\b(she|he|they)\s+(didn'?t|did\s+not)\s+want(ed)?\s+(to|it)\b/i, category: "post-hoc disclosure", severity: "red", escalates: true },
+
+  // === REGRETFUL PERPETRATOR — escalating (user admits boundary violation, even with remorse) ===
+  { pattern: /\bi\s+(pushed\s+past|pushed\s+through|ignored)\s+(her|him|them)\s+(when|after)\s+(she|he|they)\s+(said|told|seemed)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
+  { pattern: /\bi\s+(kept\s+going|didn'?t\s+stop|continued|kept\s+pushing)\s+(after|when|even\s+though|even\s+after)\s+(she|he|they)\s+(said|told\s+me|asked\s+me\s+to)\s+(stop|maybe|wait|no|slow\s+down)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
+  { pattern: /\bshe\s+said\s+(maybe\s+we\s+should\s+stop|we\s+should\s+stop|stop|wait)\b[\s\S]{0,60}\bi\s+(kept|didn'?t|finished|continued)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
+  { pattern: /\bshe\s+said\s+(she\s+)?(wasn'?t\s+sure|wasn'?t\s+into\s+it)\b[\s\S]{0,80}\bi\s+(pushed|kept|continued|didn'?t\s+stop)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
+
+
+
   // === CONTEXTUAL ONLY — detected and passed silently to AI, do NOT escalate risk ===
   // Derogatory/objectifying language — emotional context, not a consent violation signal on its own
   { pattern: /\bslut\b/i, category: "derogatory label", severity: "red", escalates: false },

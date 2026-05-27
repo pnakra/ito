@@ -379,6 +379,18 @@ export function narrativeToDecisionState(
   if (/\b(first time (having sex|hooking up|doing this|with (a |anyone))|never done this before|i'?m a virgin|she'?s a virgin|new to (sex|this kind of))\b/i.test(text)) contextFactors.push("experience-gap");
   // Tightened: don't match "no pressure" or "without pressure"; require pressure framing on someone
   if (/\b(have to|obligated|owe me|guilt(ed|ing|\s*trip))\b/i.test(text) || /(?<!no\s)(?<!without\s)(?<!zero\s)\bpressur(e|ing|ed)\b/i.test(text) || /\bexpect(ed|s|ing)\s+(her|him|them|me)\s+to\b/i.test(text)) contextFactors.push("emotional-pressure");
+  // Emotional vulnerability: grief, recent breakup, expressed neediness — counts
+  // as a complicating factor even when the other person initiates ("asked me to
+  // stay over"). Prevents auto-green on enthusiastic-action signals when the
+  // backdrop is impaired judgment from distress.
+  if (
+    /\b(crying|sobbing|in\s+tears|broke\s+down)\s+(about|over|because\s+of)\s+(her|his|their)\s+(ex|breakup|boyfriend|girlfriend|partner|mom|dad|family)\b/i.test(text) ||
+    /\b(just|recently)\s+(broke\s+up|got\s+dumped|lost\s+(her|his|their))\b/i.test(text) ||
+    /\bneeds?\s+someone\s+tonight\b/i.test(text) ||
+    /\b(she|he|they)('?s|\s+is|\s+was)\s+(really\s+)?(upset|devastated|wrecked|a\s+mess|not\s+ok|going\s+through\s+(a\s+lot|it))\b/i.test(text)
+  ) {
+    if (!contextFactors.includes("emotional-pressure")) contextFactors.push("emotional-pressure");
+  }
   if (contextFactors.length === 0) contextFactors.push("none");
 
   // Map momentum
