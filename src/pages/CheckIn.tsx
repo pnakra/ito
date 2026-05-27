@@ -598,22 +598,22 @@ const CheckIn = () => {
       const isRateLimit = errMsg?.includes("429") || errMsg?.toLowerCase().includes("rate limit") || errMsg?.toLowerCase().includes("too many");
       const userFacingMsg = isRateLimit
         ? "You’ve sent a few requests in a row — give it a minute and try again."
-        : "We couldn’t check this right now. Try again in a moment.";
+        : "Ito can’t check this right now. If something feels urgent, don’t wait on a tool — talk to a person you trust, or reach out: RAINN 800-656-4673, Crisis Text Line text HOME to 741741, or 988.";
 
       if (isAfter) {
         setAfterAnalysis({
           clarityCheck: userFacingMsg,
           otherPersonPerspective: "",
           yourPatterns: "",
-          accountabilitySteps: "When in doubt, slow down and check in with them directly.",
+          accountabilitySteps: "When in doubt, slow down. If you need to talk to someone now, the resources above are available 24/7.",
           avoidingRepetition: "",
         });
       } else {
         setAnalysis({
           riskLevel,
-          signalLabel: isRateLimit ? "Slow down for a moment" : "Something went wrong",
+          signalLabel: isRateLimit ? "Slow down for a moment" : "Ito is offline right now",
           why: [userFacingMsg],
-          suggestion: "When in doubt, slow down and check in verbally.",
+          suggestion: "When in doubt, slow down and check in verbally. Don’t rely on a tool to make this call for you.",
         });
       }
     } finally {
