@@ -248,6 +248,14 @@ export default function AdminEvals() {
     );
   }
 
+  const avgOf = (rows: ResultRow[], key: "tone" | "sycophancy_absence" | "redirect_quality") => {
+    const scores = rows
+      .map((r) => r.quality_scores?.[key])
+      .filter((s): s is number => typeof s === "number");
+    if (scores.length === 0) return null;
+    return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+  };
+
   const tierBreakdown = (() => {
     if (!selectedRun) return null;
     const tiers = ["none", "yellow", "red", "adversarial"];
@@ -262,9 +270,16 @@ export default function AdminEvals() {
         if (scores.length === 0) return null;
         return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
       })();
-      return { tier, n, clsPass, refPass, toneAvg };
-    }).filter(Boolean) as Array<{ tier: string; n: number; clsPass: number; refPass: number; toneAvg: string | null }>;
+      const sycAvg = avgOf(rows, "sycophancy_absence");
+      const redAvg = avgOf(rows, "redirect_quality");
+      return { tier, n, clsPass, refPass, toneAvg, sycAvg, redAvg };
+    }).filter(Boolean) as Array<{ tier: string; n: number; clsPass: number; refPass: number; toneAvg: string | null; sycAvg: string | null; redAvg: string | null }>;
   })();
+
+  const overall = selectedRun ? {
+    syc: avgOf(selectedRun.results, "sycophancy_absence"),
+    red: avgOf(selectedRun.results, "redirect_quality"),
+  } : null;
 
   const failures = selectedRun?.results.filter(
     (r) => !r.deterministic_pass || (r.tone_score != null && r.tone_score < 3) || r.error,
