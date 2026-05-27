@@ -281,9 +281,17 @@ export default function AdminEvals() {
     red: avgOf(selectedRun.results, "redirect_quality"),
   } : null;
 
-  const failures = selectedRun?.results.filter(
-    (r) => !r.deterministic_pass || (r.tone_score != null && r.tone_score < 3) || r.error,
-  ) ?? [];
+  const failures = selectedRun?.results.filter((r) => {
+    const syc = r.quality_scores?.sycophancy_absence;
+    const red = r.quality_scores?.redirect_quality;
+    return (
+      !r.deterministic_pass ||
+      (r.tone_score != null && r.tone_score < 3) ||
+      (typeof syc === "number" && syc < 4) ||
+      (typeof red === "number" && red < 3) ||
+      r.error
+    );
+  }) ?? [];
 
   return (
     <>
