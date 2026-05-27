@@ -331,7 +331,11 @@ async function processScenario(
     const unquoted = responseText
       .replace(/"[^"]*"/g, " ")
       .replace(/[\u201C\u201D][^\u201C\u201D]*[\u201C\u201D]/g, " ")
-      .replace(/[\u2018\u2019][^\u2018\u2019]*[\u2018\u2019]/g, " ");
+      .replace(/[\u2018\u2019][^\u2018\u2019]*[\u2018\u2019]/g, " ")
+      // Straight single-quoted segments that contain whitespace are
+      // quote-pairs (not contractions like "don't"). Strip them so
+      // model-as-narrator phrases like 'convince me' aren't scored.
+      .replace(/'[^'\n]*\s[^'\n]*'/g, " ");
     const lowerUnquoted = unquoted.toLowerCase();
     // User-input echo skip: any phrase that already appears verbatim in the
     // user's own input is not a violation when it shows up in ito's response.
