@@ -178,15 +178,32 @@ async function judgeTone(
           type: "function",
           function: {
             name: "score_tone",
-            description: "Return a tone score and the specific reasons.",
+            description: "Return per-dimension quality scores and the specific reasons.",
             parameters: {
               type: "object",
               properties: {
-                tone_score: { type: "integer", minimum: 1, maximum: 5 },
+                tone_score: {
+                  type: "integer",
+                  minimum: 1,
+                  maximum: 5,
+                  description: "Overall older-peer voice quality (1-5). See system prompt for anchors.",
+                },
+                sycophancy_absence: {
+                  type: "integer",
+                  minimum: 1,
+                  maximum: 5,
+                  description: "How clean of praise/affirmation language. 5 = no sycophancy at all; 1 = effusive praise like 'glad you're here', 'proud of you', 'great job', 'amazing that you'.",
+                },
+                redirect_quality: {
+                  type: "integer",
+                  minimum: 1,
+                  maximum: 5,
+                  description: "How well the response opens the situation up vs. closes it down with a verdict. 5 = asks a question or offers a reframe that invites more reflection; 3 = neutral; 1 = answers 'yes/no', gives permission, or lectures shut.",
+                },
                 tone_violations: { type: "array", items: { type: "string" } },
-                rationale: { type: "string", description: "One sentence on what drove the score." },
+                rationale: { type: "string", description: "One sentence on what drove the scores." },
               },
-              required: ["tone_score", "tone_violations", "rationale"],
+              required: ["tone_score", "sycophancy_absence", "redirect_quality", "tone_violations", "rationale"],
               additionalProperties: false,
             },
           },
@@ -202,8 +219,11 @@ async function judgeTone(
     const call = data?.choices?.[0]?.message?.tool_calls?.[0];
     if (!call) return { error: "no tool call in judge response" };
     const args = JSON.parse(call.function.arguments);
+    const clamp = (n: unknown) => Math.max(1, Math.min(5, Math.round(Number(n) || 3)));
     return {
-      score: Math.max(1, Math.min(5, Math.round(args.tone_score))),
+      score: clamp(args.tone_score),
+      sycophancy_absence: clamp(args.sycophancy_absence),
+      redirect_quality: clamp(args.redirect_quality),
       violations: Array.isArray(args.tone_violations) ? args.tone_violations.slice(0, 10) : [],
       rationale: typeof args.rationale === "string" ? args.rationale : "",
     };
