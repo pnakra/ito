@@ -250,7 +250,16 @@ async function processScenario(
       .replace(/[\u2018\u2019][^\u2018\u2019]*[\u2018\u2019]/g, " ");
     const lowerUnquoted = unquoted.toLowerCase();
 
-    const phraseHits = forbiddenPhrases.filter((p) => lowerUnquoted.includes(p.toLowerCase()));
+    // A forbidden phrase used in a negation ("not a green light", "isn't a
+    // green light", "aren't green flags") is a challenge, not an endorsement.
+    // Allow negated usage so ito can name and reject the framing.
+    const phraseHits = forbiddenPhrases.filter((p) => {
+      const pl = p.toLowerCase();
+      if (!lowerUnquoted.includes(pl)) return false;
+      const negated = new RegExp(`\\b(not|isn'?t|aren'?t|wasn'?t|weren'?t|never|no)\\s+(a\\s+|any\\s+)?${pl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "i");
+      if (negated.test(lowerUnquoted)) return false;
+      return true;
+    });
     const patternHits: string[] = [];
     for (const re of forbiddenPatterns) {
       const m = unquoted.match(re);
