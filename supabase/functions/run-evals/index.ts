@@ -267,7 +267,16 @@ async function processScenario(
     const patternHits: string[] = [];
     for (const re of forbiddenPatterns) {
       const m = unquoted.match(re);
-      if (m) patternHits.push(m[0]);
+      if (!m) continue;
+      // Skip pattern hits in example/quoted-voice contexts. The AI sometimes
+      // voices what a "no" might sound like ("ask me differently", "tell me
+      // later"), where "me" is the woman speaking, not the AI. Skip when the
+      // match immediately follows a speech-verb like ask/tell/call/show.
+      const idx = m.index ?? 0;
+      const ctx = unquoted.slice(Math.max(0, idx - 25), idx + m[0].length).toLowerCase();
+      if (/\b(ask|tell|call|show|teach|text|trust|believe)\s*$/.test(unquoted.slice(Math.max(0, idx - 15), idx + 1).toLowerCase())) continue;
+      if (/\b(ask|tell|call|show|teach|text|trust|believe)\b\s*\S{0,3}$/.test(ctx)) continue;
+      patternHits.push(m[0]);
     }
     // Theme matching: each scenario lists concept words ito should address.
     // A theme is "present" via full substring, 4-char stem prefix, or short
