@@ -503,6 +503,12 @@ export default function AdminEvals() {
                           {f.tone_score != null && f.tone_score < 3 && (
                             <ResultBadge pass={false} label={`tone ${f.tone_score}/5`} />
                           )}
+                          {typeof f.quality_scores?.sycophancy_absence === "number" && f.quality_scores.sycophancy_absence < 4 && (
+                            <ResultBadge pass={false} label={`sycophancy ${f.quality_scores.sycophancy_absence}/5`} />
+                          )}
+                          {typeof f.quality_scores?.redirect_quality === "number" && f.quality_scores.redirect_quality < 3 && (
+                            <ResultBadge pass={false} label={`redirect ${f.quality_scores.redirect_quality}/5`} />
+                          )}
                           {f.error && <ResultBadge pass={false} label="error" />}
                         </summary>
                         <div className="mt-3 space-y-2 text-sm">
