@@ -25,6 +25,9 @@ export interface RiskClassification {
 const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow"; escalates: boolean }[] = [
   // === IMMEDIATE RED FLAG — escalating (non-consensual indicators) ===
   { pattern: /\bshe\s*(was\s*)?asking\s*for\s*it\b/i, category: "victim blaming", severity: "red", escalates: true },
+  // Crying during/after sex — strong signal of harm
+  { pattern: /\b(was\s+)?crying\s+(after|afterward|afterwards|during|the\s+whole\s+time|throughout)\b/i, category: "crying during/after", severity: "red", escalates: true },
+  { pattern: /\bshe\s+(was\s+)?(crying|sobbing|in\s+tears)\s+(after|afterward|the\s+next|when\s+i)\b/i, category: "crying during/after", severity: "red", escalates: true },
   { pattern: /\bmeans?\s*yes\b/i, category: "dismissing boundaries", severity: "red", escalates: true },
   { pattern: /\b(i\s*know\s*)?she\s*wants?\s*it\b/i, category: "dismissing boundaries", severity: "red", escalates: true },
   { pattern: /\bwon'?t\s*remember\b/i, category: "exploitation", severity: "red", escalates: true },

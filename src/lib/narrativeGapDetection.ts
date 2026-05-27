@@ -326,24 +326,36 @@ export function narrativeToDecisionState(
   // "I don't want X" = user setting their OWN boundary (healthy, not "said-no")
   // "They said no" / "They pulled away" = OTHER person refusing (said-no)
   let consentSignal: string | null = null;
-  
-  // Other person explicitly refused or withdrew
-  if (/\b(they|he|she)\s+(said\s+no|said\s+stop|pulled\s+away|refused|pushed\s+me\s+away)\b/i.test(text)) {
+
+  // Pressure-then-yes: "kept asking ... finally said yes" = coerced consent, NOT enthusiastic
+  const pressureThenYes = /\b(kept|keep|been)\s+(asking|pushing|trying|bugging|begging)\b[\s\S]{0,80}?\b(finally|eventually|just)\s+(said\s+)?(yes|ok|okay|fine|agreed)\b/i.test(text);
+
+  // Past-no qualifier: "said no last weekend/time/before" — old refusal, not current signal
+  const pastNoQualifier = /\b(said\s+no|said\s+stop|told\s+me\s+no)\s+(last\s+(weekend|week|night|time|month)|before|previously|the\s+other\s+(day|night|time)|a\s+(while|few\s+(days|weeks))\s+(ago|back))\b/i.test(text);
+
+  // Other person explicitly refused or withdrew (current/unqualified only)
+  if (!pastNoQualifier && /\b(they|he|she)\s+(said\s+no|said\s+stop|pulled\s+away|refused|pushed\s+me\s+away)\b/i.test(text)) {
     consentSignal = "said-no";
-  } else if (/\bsaid\s+(no|stop)\s+to\s+(me|him|her|them)\b/i.test(text)) {
+  } else if (!pastNoQualifier && /\bsaid\s+(no|stop)\s+to\s+(me|him|her|them)\b/i.test(text)) {
     consentSignal = "said-no";
   // Other person went silent/non-responsive
   } else if (/\b(they|he|she)\s+(didn't say anything|went\s+quiet|froze|didn't respond|was\s+silent|stopped\s+responding)\b/i.test(text)) {
     consentSignal = "no-response";
   } else if (/\b(didn't say anything|silent|quiet|didn't respond|froze|frozen)\b/i.test(text) && !/\bi\s+(was|went|am|feel|felt)\s+(quiet|silent|frozen|froze)\b/i.test(text)) {
     consentSignal = "no-response";
+  // Pressure-then-yes overrides enthusiastic mapping
+  } else if (pressureThenYes) {
+    consentSignal = "mixed-signals";
+  // Past-no plus current activity = mixed signals (consent from before doesn't carry forward)
+  } else if (pastNoQualifier) {
+    consentSignal = "mixed-signals";
   // Mixed signals from other person
   } else if (/\b(mixed|hard to tell|sometimes|not sure how they feel|confused about (their|his|her))\b/i.test(text)) {
     consentSignal = "mixed-signals";
-  // Other person showing enthusiasm
-  } else if (/\b(they|he|she)\s+(is|was|seems?|seemed)\s+(enthusiastic|into it|excited)\b/i.test(text) || /\b(said yes|agreed|nodded|asked me to)\b/i.test(text)) {
+  // Other person showing enthusiasm (includes contractions: she's, he's, they're)
+  } else if (/\b(they|he|she)(?:'s|\s+is|\s+was|\s+seems?|\s+seemed|\s+feels?|\s+felt)\s+(enthusiastic|into\s+it|excited|down|ready|eager)\b/i.test(text) || /\b(they're|theyre)\s+(enthusiastic|into\s+it|excited|down|ready)\b/i.test(text) || /\b(said\s+yes|agreed|nodded|asked\s+me\s+to|brought\s+it\s+up\s+first|initiated)\b/i.test(text)) {
     consentSignal = "enthusiastic-actions";
-  } else if (/\b(clear yes|explicitly|verbally agreed|told me to)\b/i.test(text)) {
+  } else if (/\b(clear\s+yes|explicitly|verbally\s+agreed|told\s+me\s+to)\b/i.test(text)) {
     consentSignal = "clear-yes";
   }
   // NOTE: "I don't want X" / "I wasn't into it" = user's own feelings, NOT other person's consent signal
