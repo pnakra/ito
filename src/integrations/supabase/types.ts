@@ -28,6 +28,7 @@ export type Database = {
           input_text: string
           latency_ms: number | null
           missing_themes: Json
+          quality_scores: Json
           raw_response: Json | null
           refusal_fired: boolean
           refusal_pass: boolean
@@ -51,6 +52,7 @@ export type Database = {
           input_text: string
           latency_ms?: number | null
           missing_themes?: Json
+          quality_scores?: Json
           raw_response?: Json | null
           refusal_fired?: boolean
           refusal_pass?: boolean
@@ -74,6 +76,7 @@ export type Database = {
           input_text?: string
           latency_ms?: number | null
           missing_themes?: Json
+          quality_scores?: Json
           raw_response?: Json | null
           refusal_fired?: boolean
           refusal_pass?: boolean
