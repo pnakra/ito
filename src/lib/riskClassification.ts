@@ -97,6 +97,9 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   // === IMAGE-BASED ABUSE — escalating (non-consensual sharing of intimate imagery) ===
   { pattern: /\b(send|sending|sent|post(ing)?|share|sharing|leak(ing)?|drop|spread|forward(ing)?|upload(ing)?)\s+(her|his|their|the|those|these)\s+(nudes?|naked\s+(pics?|photos?|images?)|intimate\s+(pics?|photos?|images?)|sex\s+(tape|video))\b/i, category: "image-based abuse", severity: "red", escalates: true },
   { pattern: /\bhave\s+(her|his|their)\s+nudes?\b[\s\S]{0,80}\b(send|sending|post|sharing|share|leak|drop|use|threaten)\b/i, category: "image-based abuse", severity: "red", escalates: true },
+  // Catches "have nudes... sending them to her sister/family/anyone" where the
+  // object is a pronoun referring back to the earlier-mentioned intimate images.
+  { pattern: /\b(nudes?|naked\s+(pics?|photos?|images?)|intimate\s+(pics?|photos?|images?)|sex\s+(tape|video))\b[\s\S]{0,120}\b(send(ing)?|post(ing)?|shar(e|ing)|leak(ing)?|drop(ping)?|forward(ing)?|upload(ing)?)\s+(them|those|these|it)\b/i, category: "image-based abuse", severity: "red", escalates: true },
   { pattern: /\b(revenge\s+porn|leak\s+(her|his|their)\s+(nudes?|pics?|photos?))\b/i, category: "image-based abuse", severity: "red", escalates: true },
 
   // === POST-HOC DISCLOSURE OF NON-CONSENT — escalating (third-party report of harm) ===
