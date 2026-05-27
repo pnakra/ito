@@ -55,7 +55,7 @@ const Index = () => {
           </p>
 
           <p className="text-muted-foreground mt-2 text-[15px]">
-            <span className="font-bold text-foreground">100% anonymous.</span>
+            <span className="font-bold text-foreground">100% anonymous.</span> Works like incognito — nothing is saved, nothing is tied to you.
           </p>
         </div>
 
