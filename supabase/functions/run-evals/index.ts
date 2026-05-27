@@ -258,7 +258,7 @@ async function processScenario(
       const escaped = pl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const negated = new RegExp(`\\b(not|isn'?t|aren'?t|wasn'?t|weren'?t|never|no)\\s+(a\\s+|any\\s+)?${escaped}`, "i");
       if (negated.test(lowerUnquoted)) return false;
-      const reflective = new RegExp(`\\b(feeling|sense|idea|notion|belief|thought|thinking|talking about|saying|tell you|told you|hear|heard|need(ing)?|want(ing)? someone to (say|tell|confirm))\\b[^.?!]{0,40}\\b${escaped}`, "i");
+      const reflective = new RegExp(`\\b(feeling|sense|idea|notion|belief|thought|thinking|talking about|saying|tell you|told you|hear|heard|reading|read|treat(ing)?|interpret(ing)?|mistak(e|ing|en) (it|that|this) (as|for)|seeing (it|that|this) as|as a|need(ing)?|want(ing)? someone to (say|tell|confirm))\\b[^.?!]{0,40}\\b${escaped}`, "i");
       if (reflective.test(lowerUnquoted)) return false;
       const singleQuoted = new RegExp(`(^|[\\s(\\[])'${escaped}[,.!?]?'`, "i");
       if (singleQuoted.test(responseText)) return false;
