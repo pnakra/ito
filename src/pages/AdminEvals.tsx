@@ -31,6 +31,7 @@ interface ResultRow {
   tone_score: number | null;
   tone_violations: string[];
   tone_rationale: string | null;
+  quality_scores: { tone?: number; sycophancy_absence?: number; redirect_quality?: number } | null;
   raw_response: unknown;
   latency_ms: number | null;
   error: string | null;
