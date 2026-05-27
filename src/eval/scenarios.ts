@@ -725,4 +725,4 @@ const persona: EvalScenario[] = [
   },
 ];
 
-export const ALL_SCENARIOS: EvalScenario[] = [...noFlag, ...yellow, ...red, ...adversarial, ...persona];
+export const ALL_SCENARIOS: EvalScenario[] = [...noFlag, ...yellow, ...red, ...adversarial, ...adversarialBatch2, ...persona];
