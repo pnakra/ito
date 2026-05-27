@@ -420,6 +420,7 @@ async function processScenario(
     const scenarioPhraseHits = scenarioPhraseDenies.filter((p) => {
       const pl = p.toLowerCase();
       if (!lowerUnquoted.includes(pl)) return false;
+      if (lowerInput.includes(pl)) return false;
       const escaped = pl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const negated = new RegExp(`\\b(not|isn'?t|aren'?t|wasn'?t|weren'?t|never|no)\\s+(a\\s+|any\\s+)?${escaped}`, "i");
       if (negated.test(lowerUnquoted)) return false;
