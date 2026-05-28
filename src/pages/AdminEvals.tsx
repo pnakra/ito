@@ -54,7 +54,7 @@ function ResultBadge({ pass, label }: { pass: boolean; label: string }) {
 export default function AdminEvals() {
   const [authed, setAuthed] = useState(false);
   useEffect(() => {
-    document.title = "Eval harness";
+    document.title = "Safety evals";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     const prev = meta.content;
@@ -298,17 +298,42 @@ export default function AdminEvals() {
       <main className="min-h-[100dvh] bg-background text-foreground px-6 py-10 pb-12">
         <div className="max-w-5xl mx-auto space-y-8">
           <header className="flex items-baseline justify-between border-b border-border pb-4">
-            <h1 className="font-serif text-3xl">eval harness</h1>
-            <button
-              onClick={() => {
-                sessionStorage.removeItem(SESSION_KEY);
-                setAuthed(false);
-                setPasscode("");
-              }}
-              className="text-xs text-muted-foreground hover:text-foreground"
-            >
-              lock
-            </button>
+            <h1 className="font-serif text-3xl">safety evals</h1>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={async () => {
+                  const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS } =
+                    await import("@/eval/scenarios");
+                  const payload = {
+                    exported_at: new Date().toISOString(),
+                    total: ALL_SCENARIOS.length,
+                    global_forbidden_phrases: GLOBAL_FORBIDDEN_PHRASES,
+                    global_forbidden_patterns: GLOBAL_FORBIDDEN_PATTERNS,
+                    scenarios: ALL_SCENARIOS,
+                  };
+                  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `ito-safety-evals-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+              >
+                export scenarios
+              </button>
+              <button
+                onClick={() => {
+                  sessionStorage.removeItem(SESSION_KEY);
+                  setAuthed(false);
+                  setPasscode("");
+                }}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                lock
+              </button>
+            </div>
           </header>
 
           <section className="space-y-3">
