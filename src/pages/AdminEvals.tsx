@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
-const FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
-const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const EVAL_PROJECT_ID = "ochulsnvnqcbzqnlkazu";
+const EVAL_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Im9jaHVsc252bnFjYnpxbmxrYXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzOTY1NTUsImV4cCI6MjA3Nzk3MjU1NX0.dBLDOTsv5s0axzzSmeNkLTGK0vJt58yC-2mUAXv889Q";
+const FN_BASE = `https://${EVAL_PROJECT_ID}.supabase.co/functions/v1`;
+const ANON_KEY = EVAL_PUBLISHABLE_KEY;
 const AUTH_HEADERS = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 const SESSION_KEY = "ito_eval_auth_v1";
 
