@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 const FN_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+const AUTH_HEADERS = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
 const SESSION_KEY = "ito_eval_auth_v1";
 
 interface RunSummary {
