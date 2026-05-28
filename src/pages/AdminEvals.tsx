@@ -85,7 +85,7 @@ export default function AdminEvals() {
   async function loadHistory(pc: string) {
     const r = await fetch(`${FN_BASE}/fetch-evals`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-eval-passcode": pc },
+      headers: { ...AUTH_HEADERS, "Content-Type": "application/json", "x-eval-passcode": pc },
       body: JSON.stringify({ mode: "history", limit: 20 }),
     });
     if (!r.ok) return;
@@ -97,7 +97,7 @@ export default function AdminEvals() {
     setSelectedRun(null);
     const r = await fetch(`${FN_BASE}/fetch-evals`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-eval-passcode": pc },
+      headers: { ...AUTH_HEADERS, "Content-Type": "application/json", "x-eval-passcode": pc },
       body: JSON.stringify({ mode: "run", runId }),
     });
     if (!r.ok) return;
@@ -137,7 +137,7 @@ export default function AdminEvals() {
     try {
       const r = await fetch(`${FN_BASE}/verify-eval-access`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...AUTH_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ passcode }),
       });
       const data = await r.json();
@@ -172,7 +172,7 @@ export default function AdminEvals() {
       });
       const r = await fetch(`${FN_BASE}/run-evals`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
+        headers: { ...AUTH_HEADERS, "Content-Type": "application/json", "x-eval-passcode": passcode },
         body: JSON.stringify({
           scenarios: scenariosWithActual,
           promptVersionTag: tag || null,
@@ -198,7 +198,7 @@ export default function AdminEvals() {
     if (!confirm("Cancel this run? It'll stop after the current scenario.")) return;
     await fetch(`${FN_BASE}/fetch-evals`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
+      headers: { ...AUTH_HEADERS, "Content-Type": "application/json", "x-eval-passcode": passcode },
       body: JSON.stringify({ mode: "cancel", runId }),
     });
     await loadHistory(passcode);
@@ -209,7 +209,7 @@ export default function AdminEvals() {
     if (!confirm("Delete this run and all its results? This can't be undone.")) return;
     const r = await fetch(`${FN_BASE}/fetch-evals`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-eval-passcode": passcode },
+      headers: { ...AUTH_HEADERS, "Content-Type": "application/json", "x-eval-passcode": passcode },
       body: JSON.stringify({ mode: "delete", runId }),
     });
     if (!r.ok) return;
