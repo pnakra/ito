@@ -29,7 +29,7 @@ const App = () => (
         <BrowserRouter>
           <div className="flex flex-col min-h-screen">
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Navigate to="/check-in" replace />} />
               <Route path="/check-in" element={<CheckIn />} />
               <Route path="/chat" element={<CheckIn />} />
               <Route path="/about" element={<About />} />
