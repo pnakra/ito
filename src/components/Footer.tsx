@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="border-t border-border/30 mt-auto">
       <div className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-y-2">
         <p className="text-xs text-muted-foreground">
-          © 2026 Override Labs
+          © 2026
         </p>
         <div className="flex items-center gap-4 flex-wrap">
           <a
