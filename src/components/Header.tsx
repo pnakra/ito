@@ -10,9 +10,20 @@ const Header = () => {
       <nav className="container mx-auto px-5 py-3 flex items-center justify-between">
         <Link 
           to="/" 
-          className="hover:opacity-80 transition-opacity"
+          className="hover:opacity-80 transition-opacity flex flex-col items-start leading-none"
         >
           <span className="text-[20px] font-medium tracking-[-0.5px] text-foreground">ito</span>
+          <span
+            className="text-muted-foreground"
+            style={{
+              fontFamily: '"Newsreader", "Georgia", serif',
+              fontSize: '11px',
+              fontStyle: 'italic',
+              letterSpacing: '-0.3px',
+            }}
+          >
+            is this ok?
+          </span>
         </Link>
         
         <div className="flex items-center gap-4">
