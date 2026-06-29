@@ -583,7 +583,7 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
   );
 }
 
-/* Tiny ITO mark for inline contexts */
+/* Tiny ito mark for inline contexts */
 function ItoMarkSmall() {
   return (
     <div style={{
