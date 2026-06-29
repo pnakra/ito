@@ -628,7 +628,7 @@ function ItoQuickRead({
           fontSize: 18, fontWeight: 500, lineHeight: 1.4, color: C.itoInk,
           fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
         }}>
-          Jordan's pushing for an image late at night and saying you owe them because they sent one before.
+          Jalen's pushing you to come over late, and now turning your hesitation into a thing about you.
         </div>
 
         <div style={{
@@ -638,9 +638,9 @@ function ItoQuickRead({
         }}>
           A few things to notice:
           <ul style={{ margin: "8px 0 0 18px", padding: 0 }}>
-            <li>"no one's gonna see it" isn't something Jordan can actually promise.</li>
-            <li>"I've sent you stuff before" is pressure, not a reason.</li>
-            <li>You don't owe a reply right now.</li>
+            <li>"u always do this" reframes a normal no as a pattern problem.</li>
+            <li>"it's not that deep" makes your hesitation the issue, not the ask.</li>
+            <li>You said you're tired and have stuff in the morning. Both still true.</li>
           </ul>
         </div>
       </div>
