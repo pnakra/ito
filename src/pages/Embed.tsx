@@ -67,17 +67,22 @@ const storyFriends = [
   { id: "leo",    initial: "L", grad: ["#C8B6FF", "#8A7BFF"], label: "Leo" },
 ];
 
-// Conversation with Jordan — ambiguous → pressuring
-const jordanThread = [
-  { from: "them", text: "you home rn?", time: "11:42 PM" },
-  { from: "me",   text: "yeah just got back", time: "11:43 PM" },
-  { from: "them", text: "parents asleep?", time: "11:43 PM" },
-  { from: "me",   text: "ya why", time: "11:44 PM" },
-  { from: "them", text: "send me something", time: "11:45 PM" },
-  { from: "them", text: "you know what i mean 😉", time: "11:45 PM" },
-  { from: "them", text: "cmon don't be weird about it. i've sent you stuff before", time: "11:46 PM" },
-  { from: "them", text: "no one's gonna see it it's literally just me", time: "11:46 PM" },
+// Conversation with Jalen — hangout pressure, ambiguous → mild guilt-trip
+const jalenThread = [
+  { from: "them", text: "yo what u doing later", time: "10:48 PM" },
+  { from: "me",   text: "idk prob just chilling, kinda tired tbh", time: "10:51 PM" },
+  { from: "them", text: "come thruuu", time: "10:52 PM" },
+  { from: "them", text: "my roommate's gone for the weekend", time: "10:52 PM" },
+  { from: "me",   text: "hmm maybe. how late we talking", time: "10:55 PM" },
+  { from: "them", text: "doesn't matter, whenever. i'll be up 🙂", time: "10:56 PM" },
+  { from: "me",   text: "i kinda have stuff in the morning", time: "11:14 PM" },
+  { from: "them", text: "u always do this lol", time: "11:21 PM" },
+  { from: "them", text: "like i feel like every time i ask u find a reason", time: "11:22 PM" },
+  { from: "them", text: "just come for an hour. it's not that deep", time: "11:23 PM" },
 ];
+
+// Jalen's avatar gradient (kept consistent with inbox style)
+const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
 
 export default function Embed() {
   const [screen, setScreen] = useState<Screen>("inbox");
@@ -413,13 +418,14 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
           <ChevronLeft size={26} color={C.text} />
         </button>
         <div style={{
-          width: 34, height: 34, borderRadius: 17,
-          background: "linear-gradient(135deg,#FF8A65,#FF4D8D)",
+          width: 36, height: 36, borderRadius: 18,
+          background: `linear-gradient(135deg, ${JALEN_GRAD[0]}, ${JALEN_GRAD[1]})`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontWeight: 700, fontSize: 14, color: "#fff",
+          boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.25)",
         }}>J</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: -0.2 }}>Jordan M.</div>
+          <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: -0.2 }}>Jalen</div>
           <div style={{ fontSize: 11, color: C.online, fontWeight: 600 }}>● active now</div>
         </div>
         <button style={iconBtn()}><Phone size={20} color={C.text} /></button>
@@ -427,41 +433,83 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "14px 12px" }}>
-        {jordanThread.map((m, i) => {
-          const prev = jordanThread[i - 1];
+      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "12px 12px 8px" }}>
+        {/* Day divider */}
+        <div style={{
+          textAlign: "center", fontSize: 11, color: C.subtext,
+          fontWeight: 600, margin: "4px 0 10px", letterSpacing: 0.3,
+        }}>
+          Today
+        </div>
+
+        {jalenThread.map((m, i) => {
+          const prev = jalenThread[i - 1];
           const grouped = prev && prev.from === m.from;
+          const next = jalenThread[i + 1];
+          const isLastOfGroup = !next || next.from !== m.from;
           return (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                justifyContent: m.from === "me" ? "flex-end" : "flex-start",
-                marginBottom: 3,
-                marginTop: grouped ? 0 : 6,
-              }}
-            >
-              <div style={{
-                maxWidth: "76%",
-                padding: "9px 14px",
-                borderRadius: 22,
-                borderBottomRightRadius: m.from === "me" && !grouped ? 6 : 22,
-                borderBottomLeftRadius: m.from === "them" && !grouped ? 6 : 22,
-                background: m.from === "me" ? C.bubbleOut : C.bubbleIn,
-                color: m.from === "me" ? "#fff" : C.text,
-                fontSize: 14.5,
-                lineHeight: 1.35,
-                fontWeight: m.from === "me" ? 500 : 400,
-              }}>
-                {m.text}
+            <div key={i}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: m.from === "me" ? "flex-end" : "flex-start",
+                  marginBottom: 3,
+                  marginTop: grouped ? 0 : 8,
+                }}
+              >
+                <div style={{
+                  maxWidth: "76%",
+                  padding: "9px 14px",
+                  borderRadius: 22,
+                  borderBottomRightRadius: m.from === "me" && isLastOfGroup ? 6 : 22,
+                  borderBottomLeftRadius: m.from === "them" && isLastOfGroup ? 6 : 22,
+                  background: m.from === "me" ? C.bubbleOut : C.bubbleIn,
+                  color: m.from === "me" ? "#fff" : C.text,
+                  fontSize: 14.5,
+                  lineHeight: 1.35,
+                  fontWeight: m.from === "me" ? 500 : 400,
+                }}>
+                  {m.text}
+                </div>
               </div>
+              {isLastOfGroup && (
+                <div style={{
+                  fontSize: 10.5, color: C.subtext, fontWeight: 500,
+                  textAlign: m.from === "me" ? "right" : "left",
+                  padding: m.from === "me" ? "2px 6px 0 0" : "2px 0 0 6px",
+                }}>
+                  {m.time}
+                </div>
+              )}
             </div>
           );
         })}
+
+        {/* Typing indicator (subtle continuing pressure) */}
+        <div style={{ display: "flex", justifyContent: "flex-start", marginTop: 10 }}>
+          <div style={{
+            background: C.bubbleIn, borderRadius: 18,
+            padding: "10px 14px", display: "flex", gap: 4, alignItems: "center",
+          }}>
+            {[0, 1, 2].map((n) => (
+              <span key={n} style={{
+                width: 6, height: 6, borderRadius: 3, background: "#A8AEB7",
+                display: "inline-block",
+                animation: `typing 1.2s ${n * 0.15}s infinite ease-in-out`,
+              }} />
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-3px); }
+          }
+        `}</style>
       </div>
 
-      {/* ITO inline suggestion */}
-      <div style={{ padding: "0 12px 8px" }}>
+      {/* ITO inline suggestion — sits right above composer */}
+      <div style={{ padding: "4px 12px 8px" }}>
         <button
           onClick={onAskIto}
           style={{
@@ -471,30 +519,25 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
             cursor: "pointer", textAlign: "left",
           }}
         >
-          <div style={{
-            width: 30, height: 30, borderRadius: 15, background: C.itoInk,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <Shield size={15} color="#fff" />
-          </div>
+          <ItoMarkSmall />
           <div style={{ flex: 1 }}>
             <div style={{
               fontSize: 13.5, fontWeight: 600, color: C.itoInk,
               fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
             }}>
-              Ask ITO before you reply
+              Ask ITO before sending
             </div>
             <div style={{ fontSize: 11.5, color: "#6F6657", marginTop: 1 }}>
-              Private. Jordan won't see this.
+              Private. Jalen won't see this.
             </div>
           </div>
           <ArrowRight size={16} color={C.itoInk} />
         </button>
       </div>
 
-      {/* Composer */}
+      {/* Composer — user has typed a draft */}
       <div style={{
-        padding: "8px 10px 10px", display: "flex", alignItems: "center",
+        padding: "8px 10px 10px", display: "flex", alignItems: "flex-end",
         gap: 8, borderTop: `1px solid ${C.border}`,
       }}>
         <button style={{
@@ -506,19 +549,60 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
           <Camera size={20} color="#fff" strokeWidth={2.2} />
         </button>
         <div style={{
-          flex: 1, background: C.surface, borderRadius: 22,
-          padding: "9px 14px", fontSize: 14, color: C.subtext,
-          display: "flex", alignItems: "center", gap: 10,
+          flex: 1, background: "#fff", border: `1.5px solid ${C.accent}`,
+          borderRadius: 20, padding: "8px 12px", fontSize: 14,
+          display: "flex", alignItems: "center", gap: 8,
+          boxShadow: `0 0 0 3px ${C.accent}1A`,
         }}>
-          <span style={{ flex: 1 }}>Message…</span>
-          <Sticker size={18} />
-          <ImageIcon size={18} />
-          <Mic size={18} />
+          <span style={{
+            flex: 1, color: C.text, lineHeight: 1.35,
+          }}>
+            ok fine i'll come for a bit but i can't stay late
+            <span style={{
+              display: "inline-block", width: 1.5, height: 16,
+              background: C.accent, marginLeft: 2, marginBottom: -3,
+              animation: "caret 1s steps(2) infinite",
+            }} />
+          </span>
         </div>
+        <button style={{
+          width: 40, height: 40, borderRadius: 20,
+          background: C.accent, border: "none", display: "flex",
+          alignItems: "center", justifyContent: "center", cursor: "pointer",
+          flexShrink: 0,
+        }}>
+          <Send size={18} color="#fff" />
+        </button>
+        <style>{`
+          @keyframes caret { 50% { opacity: 0; } }
+        `}</style>
       </div>
     </div>
   );
 }
+
+/* Tiny ITO mark for inline contexts */
+function ItoMarkSmall() {
+  return (
+    <div style={{
+      width: 30, height: 30, borderRadius: 9,
+      background: `linear-gradient(160deg, ${C.itoInk} 0%, #1B2C44 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      flexShrink: 0,
+    }}>
+      <svg width="18" height="18" viewBox="0 0 26 26" fill="none">
+        <path d="M7 6.5 C 5 6.5, 4 8, 4 10 L 4 16 C 4 18, 5 19.5, 7 19.5"
+              stroke="#FAF7F0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M19 6.5 C 21 6.5, 22 8, 22 10 L 22 16 C 22 18, 21 19.5, 19 19.5"
+              stroke="#FAF7F0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M13 8.5 L 13.9 12.1 L 17.5 13 L 13.9 13.9 L 13 17.5 L 12.1 13.9 L 8.5 13 L 12.1 12.1 Z"
+              fill={C.accent} />
+      </svg>
+    </div>
+  );
+}
+
+
 
 /* ---------------- ITO Quick Read sheet ---------------- */
 
@@ -544,7 +628,7 @@ function ItoQuickRead({
           fontSize: 18, fontWeight: 500, lineHeight: 1.4, color: C.itoInk,
           fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
         }}>
-          Jordan's pushing for an image late at night and saying you owe them because they sent one before.
+          Jalen's pushing you to come over late, and now turning your hesitation into a thing about you.
         </div>
 
         <div style={{
@@ -554,9 +638,9 @@ function ItoQuickRead({
         }}>
           A few things to notice:
           <ul style={{ margin: "8px 0 0 18px", padding: 0 }}>
-            <li>"no one's gonna see it" isn't something Jordan can actually promise.</li>
-            <li>"I've sent you stuff before" is pressure, not a reason.</li>
-            <li>You don't owe a reply right now.</li>
+            <li>"u always do this" reframes a normal no as a pattern problem.</li>
+            <li>"it's not that deep" makes your hesitation the issue, not the ask.</li>
+            <li>You said you're tired and have stuff in the morning. Both still true.</li>
           </ul>
         </div>
       </div>
@@ -581,9 +665,9 @@ function ItoQuickRead({
 function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
   const [picked, setPicked] = useState<number | null>(null);
   const options = [
-    { label: "Hold the line", text: "not sending anything tonight. if that's a problem that's on you." },
-    { label: "Name what's happening", text: "you're pushing pretty hard rn and it doesn't feel good. i'm gonna stop." },
-    { label: "Exit the conversation", text: "going to sleep. ttyl." },
+    { label: "Hold your no",          text: "i'm gonna stay in tonight. i wasn't being weird, i'm just tired." },
+    { label: "Name the pressure",     text: "saying 'u always do this' is kinda making me not want to come more, not less." },
+    { label: "Offer a different time", text: "not tonight. wanna do something tmrw afternoon instead?" },
   ];
 
   return (
