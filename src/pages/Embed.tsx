@@ -47,12 +47,24 @@ const C = {
 };
 
 const friends = [
-  { id: "jordan", name: "Jordan M.", initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true, story: true },
-  { id: "maya",   name: "Maya",      initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true, story: true },
-  { id: "devon",  name: "Devon",     initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false },
-  { id: "riley",  name: "Riley + 4", initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false },
-  { id: "sam",    name: "Sam",       initial: "S", grad: ["#FFD6E0", "#FF8FB1"], last: "you: lol fr", time: "1h", unread: 0, online: false, story: true },
-  { id: "alex",   name: "Alex K.",   initial: "A", grad: ["#B5E48C", "#76C893"], last: "📸 sent a snap", time: "3h", unread: 0, online: false, story: false },
+  { id: "jordan",  name: "Jordan M.",      initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true,  story: true,  delivered: false },
+  { id: "maya",    name: "Maya",           initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true,  story: true,  delivered: true },
+  { id: "devon",   name: "Devon",          initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false, delivered: false },
+  { id: "riley",   name: "Riley + 4",      initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false, delivered: true },
+  { id: "sam",     name: "Sam",            initial: "S", grad: ["#FFD6E0", "#FF8FB1"], last: "you: lol fr", time: "1h", unread: 0, online: false, story: true,  delivered: true },
+  { id: "alex",    name: "Alex K.",        initial: "A", grad: ["#B5E48C", "#76C893"], last: "📸 sent a snap", time: "3h", unread: 0, online: false, story: false, delivered: true },
+  { id: "noor",    name: "Noor",           initial: "N", grad: ["#FFD580", "#FF9F45"], last: "wait you saw that too??", time: "5h", unread: 3, online: false, story: true,  delivered: false },
+  { id: "studio",  name: "art ppl 🎨",     initial: "✿", grad: ["#F2A6FF", "#B16CFF"], last: "Tasha: bring the polaroids", time: "yday", unread: 0, online: false, story: false, delivered: true },
+  { id: "kai",     name: "Kai",            initial: "K", grad: ["#FFB199", "#FF6F61"], last: "ok bet", time: "yday", unread: 0, online: false, story: false, delivered: true },
+];
+
+const storyFriends = [
+  { id: "maya",   initial: "M", grad: ["#7CC4FF", "#5B8DEF"], label: "Maya" },
+  { id: "jordan", initial: "J", grad: ["#FF8A65", "#FF4D8D"], label: "Jordan" },
+  { id: "noor",   initial: "N", grad: ["#FFD580", "#FF9F45"], label: "Noor" },
+  { id: "sam",    initial: "S", grad: ["#FFD6E0", "#FF8FB1"], label: "Sam" },
+  { id: "tasha",  initial: "T", grad: ["#A0E7E5", "#54B8B5"], label: "Tasha" },
+  { id: "leo",    initial: "L", grad: ["#C8B6FF", "#8A7BFF"], label: "Leo" },
 ];
 
 // Conversation with Jordan — ambiguous → pressuring
