@@ -4,6 +4,7 @@ import {
   Send, ChevronLeft, Plus, Image as ImageIcon,
   Smile, Mic, Phone, Video, Shield,
   ArrowRight, X, Pause, Hand, Sticker, SquarePen,
+  Copy, Check,
 } from "lucide-react";
 
 /**
