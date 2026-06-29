@@ -711,7 +711,7 @@ function ItoMarkMedium() {
 
 /* ---------------- ITO Reply suggestions ---------------- */
 
-function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
+function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose: () => void; onEscalate: () => void }) {
   const [copied, setCopied] = useState<number | null>(null);
   const [used, setUsed] = useState<number | null>(null);
 
