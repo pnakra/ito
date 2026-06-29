@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  Search, Camera, MessageCircle, User, Home,
-  Send, ChevronLeft, Sparkles, Plus, Image as ImageIcon,
-  Smile, Mic, Phone, Video, MoreVertical, Shield,
-  ArrowRight, X, Heart, Pause, Hand,
+  Search, Camera, MessageCircle, User, MapPin,
+  Send, ChevronLeft, Plus, Image as ImageIcon,
+  Smile, Mic, Phone, Video, Shield,
+  ArrowRight, X, Pause, Hand, Sticker,
 } from "lucide-react";
 
 /**
  * Loop — fictional consumer messaging app with embedded ITO.
  * Standalone mobile-first clickable prototype at /embed.
- * Self-contained styling (light theme, no inheritance from app design system).
+ * Camera-first youth-social vibe; ITO is the calmer help layer inside it.
  */
 
 type Screen =
@@ -20,39 +20,47 @@ type Screen =
   | "ito-escalation"
   | "ask-ito-direct";
 
-const COLORS = {
+// Loop host app — vivid aqua, youthful and fast. Not Snap yellow, not generic startup blue.
+const C = {
   bg: "#FFFFFF",
-  surface: "#F5F6F8",
-  text: "#0E1116",
-  subtext: "#6B7280",
-  border: "#ECEEF1",
-  accent: "#FF5A3C", // Loop brand — warm coral, not Snap yellow
-  accentSoft: "#FFE9E3",
+  surface: "#F4F6F8",
+  surface2: "#EEF1F4",
+  text: "#0B1220",
+  subtext: "#6A7280",
+  border: "#E7EAEE",
+  // Loop host accent
+  accent: "#00C7B7",        // vivid aqua
+  accentDeep: "#019A8E",
+  accentSoft: "#DEFBF7",
+  pop: "#FF4D8D",           // secondary pop pink for unread + accents
+  // Bubbles
   bubbleIn: "#F1F2F4",
-  bubbleOut: "#FF5A3C",
-  // ITO sub-brand inside Loop — calmer, slate
-  itoBg: "#0F1B2D",
-  itoSoft: "#EEF2F7",
-  itoAccent: "#3E6FA8",
-  warn: "#E8A23C",
-  alert: "#D14545",
+  bubbleOut: "#00C7B7",
+  online: "#22D07A",
+  // ITO sub-brand — softer, grounded, calmer
+  itoInk: "#0E1A2B",
+  itoSoft: "#F5F1EA",       // warm sand, distinct from Loop's cool greys
+  itoSoftDeep: "#EBE4D6",
+  itoAccent: "#3D5E8C",
+  warn: "#C97A1A",
+  alert: "#C73838",
 };
 
 const friends = [
-  { id: "jordan", name: "Jordan M.", initial: "J", color: "#FFB347", last: "haha you up?", time: "now", unread: 2, online: true },
-  { id: "maya", name: "Maya", initial: "M", color: "#9EC5FF", last: "ok see u there 🩷", time: "2m", unread: 0, online: true },
-  { id: "devon", name: "Devon", initial: "D", color: "#C8B6FF", last: "send the pic lol", time: "12m", unread: 1, online: false },
-  { id: "riley", name: "Riley + 4", initial: "R", color: "#A8E6CF", last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false },
-  { id: "sam", name: "Sam", initial: "S", color: "#FFD6E0", last: "you: lol fr", time: "1h", unread: 0, online: false },
-  { id: "alex", name: "Alex K.", initial: "A", color: "#B5E48C", last: "🎥 sent a snap", time: "3h", unread: 0, online: false },
+  { id: "jordan", name: "Jordan M.", initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true, story: true },
+  { id: "maya",   name: "Maya",      initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true, story: true },
+  { id: "devon",  name: "Devon",     initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false },
+  { id: "riley",  name: "Riley + 4", initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false },
+  { id: "sam",    name: "Sam",       initial: "S", grad: ["#FFD6E0", "#FF8FB1"], last: "you: lol fr", time: "1h", unread: 0, online: false, story: true },
+  { id: "alex",   name: "Alex K.",   initial: "A", grad: ["#B5E48C", "#76C893"], last: "📸 sent a snap", time: "3h", unread: 0, online: false, story: false },
 ];
 
 // Conversation with Jordan — ambiguous → pressuring
 const jordanThread = [
   { from: "them", text: "you home rn?", time: "11:42 PM" },
-  { from: "me", text: "yeah just got back", time: "11:43 PM" },
+  { from: "me",   text: "yeah just got back", time: "11:43 PM" },
   { from: "them", text: "parents asleep?", time: "11:43 PM" },
-  { from: "me", text: "ya why", time: "11:44 PM" },
+  { from: "me",   text: "ya why", time: "11:44 PM" },
   { from: "them", text: "send me something", time: "11:45 PM" },
   { from: "them", text: "you know what i mean 😉", time: "11:45 PM" },
   { from: "them", text: "cmon don't be weird about it. i've sent you stuff before", time: "11:46 PM" },
@@ -61,24 +69,24 @@ const jordanThread = [
 
 export default function Embed() {
   const [screen, setScreen] = useState<Screen>("inbox");
-  const [tab, setTab] = useState<"feed" | "camera" | "chats" | "you">("chats");
+  const [tab, setTab] = useState<"map" | "chats" | "camera" | "stories" | "you">("chats");
 
   return (
     <div
-      style={{ background: "#1a1a1a", minHeight: "100vh" }}
+      style={{ background: "#0E0F12", minHeight: "100vh" }}
       className="flex items-center justify-center p-6"
     >
-      {/* iPhone 15 Pro frame: 393 x 852 css px */}
+      {/* iPhone 15 Pro frame */}
       <div
         style={{
           width: 393,
           height: 852,
-          background: COLORS.bg,
+          background: C.bg,
           borderRadius: 48,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.4), 0 0 0 12px #111 inset, 0 0 0 14px #2a2a2a",
+          boxShadow: "0 30px 80px rgba(0,0,0,0.55), 0 0 0 12px #111 inset, 0 0 0 14px #2a2a2a",
           overflow: "hidden",
           position: "relative",
-          color: COLORS.text,
+          color: C.text,
           fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
         }}
       >
@@ -92,7 +100,7 @@ export default function Embed() {
         <div style={{
           height: 54, display: "flex", justifyContent: "space-between",
           alignItems: "flex-end", padding: "0 28px 6px", fontSize: 15,
-          fontWeight: 600, color: COLORS.text,
+          fontWeight: 600, color: C.text,
         }}>
           <span>9:41</span>
           <span style={{ fontSize: 13 }}>• • • •</span>
@@ -100,7 +108,7 @@ export default function Embed() {
 
         {/* Screen content */}
         <div style={{
-          position: "absolute", top: 54, left: 0, right: 0, bottom: 84,
+          position: "absolute", top: 54, left: 0, right: 0, bottom: 78,
           overflow: "hidden",
         }}>
           {screen === "inbox" && <Inbox onOpen={(id) => {
@@ -114,7 +122,7 @@ export default function Embed() {
           {screen === "ask-ito-direct" && <AskItoDirect onBack={() => setScreen("inbox")} />}
         </div>
 
-        {/* ITO bottom sheets — overlay above conversation */}
+        {/* ITO bottom sheets */}
         {screen === "ito-quickread" && (
           <ItoQuickRead
             onClose={() => setScreen("conversation")}
@@ -159,79 +167,95 @@ export default function Embed() {
 /* ---------------- Inbox ---------------- */
 
 function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
+  const stories = friends.filter((f) => f.story);
+
   return (
-    <div style={{ height: "100%", overflowY: "auto", background: COLORS.bg }}>
-      {/* Header */}
+    <div style={{ height: "100%", overflowY: "auto", background: C.bg }}>
+      {/* Top bar — lightweight, no big logo */}
       <div style={{
-        padding: "8px 20px 12px", display: "flex",
+        padding: "6px 18px 10px", display: "flex",
         justifyContent: "space-between", alignItems: "center",
       }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 18, background: "#222",
-          color: "#fff", display: "flex", alignItems: "center",
-          justifyContent: "center", fontWeight: 700, fontSize: 14,
-        }}>YO</div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <button style={iconBtn()}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 16,
+            background: `linear-gradient(135deg, ${C.accent}, ${C.accentDeep})`,
+            color: "#fff", display: "flex", alignItems: "center",
+            justifyContent: "center", fontWeight: 700, fontSize: 12,
+          }}>YO</div>
+        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.8, color: C.text }}>Loop</span>
           <span style={{
-            width: 28, height: 28, borderRadius: 14, background: COLORS.accent,
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontSize: 13, fontWeight: 800,
-          }}>L</span>
-          <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5 }}>Loop</span>
+            width: 7, height: 7, borderRadius: 4, background: C.accent,
+            display: "inline-block", marginLeft: 2, marginTop: 8,
+          }} />
         </div>
-        <Search size={22} color={COLORS.text} />
+
+        <button style={iconBtn()}>
+          <Search size={22} color={C.text} strokeWidth={2.2} />
+        </button>
       </div>
 
-      {/* Search */}
-      <div style={{ padding: "0 16px 12px" }}>
-        <div style={{
-          background: COLORS.surface, borderRadius: 14, padding: "10px 14px",
-          display: "flex", alignItems: "center", gap: 10, color: COLORS.subtext,
-          fontSize: 14,
-        }}>
-          <Search size={16} />
-          <span>Search friends</span>
-        </div>
+      {/* Stories rail — friends with a "today" ring */}
+      <div style={{
+        display: "flex", gap: 14, padding: "2px 18px 14px",
+        overflowX: "auto", scrollbarWidth: "none",
+      }}>
+        <AddStory />
+        {stories.map((s) => (
+          <StoryAvatar key={s.id} grad={s.grad} initial={s.initial} label={s.name.split(" ")[0]} />
+        ))}
       </div>
 
-      {/* Ask ITO pinned */}
-      <div style={{ padding: "0 12px 6px" }}>
+      {/* Ask ITO pinned — clearly different surface */}
+      <div style={{ padding: "0 14px 8px" }}>
         <button
           onClick={() => onOpen("ask-ito")}
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 12,
-            padding: "12px 12px", background: COLORS.itoSoft, border: "none",
-            borderRadius: 16, cursor: "pointer", textAlign: "left",
+            padding: "12px 12px", background: C.itoSoft,
+            border: `1px solid ${C.itoSoftDeep}`,
+            borderRadius: 18, cursor: "pointer", textAlign: "left",
           }}
         >
           <div style={{
-            width: 48, height: 48, borderRadius: 24, background: COLORS.itoBg,
+            width: 44, height: 44, borderRadius: 22, background: C.itoInk,
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#fff", flexShrink: 0,
           }}>
-            <Shield size={22} strokeWidth={2} />
+            <Shield size={20} strokeWidth={2} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontWeight: 700, fontSize: 15, color: COLORS.text }}>Ask ITO</span>
               <span style={{
-                fontSize: 10, fontWeight: 700, padding: "2px 6px",
-                background: COLORS.itoBg, color: "#fff", borderRadius: 6,
-                letterSpacing: 0.3,
+                fontWeight: 700, fontSize: 14.5, color: C.itoInk,
+                fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+              }}>Ask ITO</span>
+              <span style={{
+                fontSize: 9.5, fontWeight: 700, padding: "2px 6px",
+                background: "#fff", color: C.itoInk, borderRadius: 6,
+                border: `1px solid ${C.itoSoftDeep}`, letterSpacing: 0.4,
               }}>PRIVATE</span>
             </div>
-            <div style={{ fontSize: 13, color: COLORS.subtext, marginTop: 2 }}>
-              Private help before you reply.
+            <div style={{ fontSize: 12.5, color: "#6F6657", marginTop: 2 }}>
+              Quiet help before you reply. Only you see this.
             </div>
           </div>
-          <ArrowRight size={18} color={COLORS.subtext} />
+          <ArrowRight size={18} color={C.itoInk} />
         </button>
       </div>
 
+      {/* Section label */}
       <div style={{
-        padding: "14px 20px 6px", fontSize: 12, fontWeight: 700,
-        color: COLORS.subtext, letterSpacing: 0.5, textTransform: "uppercase",
-      }}>Chats</div>
+        padding: "10px 20px 4px", fontSize: 11.5, fontWeight: 700,
+        color: C.subtext, letterSpacing: 0.6, textTransform: "uppercase",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+      }}>
+        <span>Chats</span>
+        <Plus size={16} color={C.subtext} />
+      </div>
 
       {/* Friends list */}
       {friends.map((f) => (
@@ -240,42 +264,44 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
           onClick={() => onOpen(f.id)}
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 12,
-            padding: "10px 16px", background: "transparent", border: "none",
+            padding: "9px 18px", background: "transparent", border: "none",
             cursor: "pointer", textAlign: "left",
           }}
         >
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative", flexShrink: 0 }}>
             <div style={{
-              width: 52, height: 52, borderRadius: 26, background: f.color,
+              width: 50, height: 50, borderRadius: 25,
+              background: `linear-gradient(135deg, ${f.grad[0]}, ${f.grad[1]})`,
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontWeight: 700, color: "#1a1a1a", fontSize: 18,
+              fontWeight: 700, color: "#fff", fontSize: 18,
+              boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.25)",
             }}>{f.initial}</div>
             {f.online && (
               <div style={{
-                position: "absolute", bottom: 1, right: 1, width: 13, height: 13,
-                borderRadius: 7, background: "#3DD68C", border: "2px solid #fff",
+                position: "absolute", bottom: 0, right: 0, width: 13, height: 13,
+                borderRadius: 7, background: C.online, border: "2.5px solid #fff",
               }} />
             )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: 15, color: COLORS.text }}>{f.name}</span>
-              <span style={{ fontSize: 12, color: COLORS.subtext }}>{f.time}</span>
+              <span style={{ fontWeight: 600, fontSize: 15, color: C.text, letterSpacing: -0.2 }}>{f.name}</span>
+              <span style={{ fontSize: 11.5, color: C.subtext, fontWeight: 500 }}>{f.time}</span>
             </div>
             <div style={{
               display: "flex", justifyContent: "space-between",
-              alignItems: "center", marginTop: 2,
+              alignItems: "center", marginTop: 2, gap: 8,
             }}>
               <span style={{
-                fontSize: 13.5, color: f.unread ? COLORS.text : COLORS.subtext,
+                fontSize: 13, color: f.unread ? C.text : C.subtext,
                 fontWeight: f.unread ? 600 : 400,
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                maxWidth: 220,
+                flex: 1, minWidth: 0,
               }}>{f.last}</span>
               {f.unread > 0 && (
                 <span style={{
-                  background: COLORS.accent, color: "#fff", borderRadius: 10,
-                  minWidth: 20, height: 20, padding: "0 6px", fontSize: 12,
+                  background: C.pop, color: "#fff", borderRadius: 10,
+                  minWidth: 18, height: 18, padding: "0 6px", fontSize: 11,
                   fontWeight: 700, display: "inline-flex", alignItems: "center",
                   justifyContent: "center",
                 }}>{f.unread}</span>
@@ -289,6 +315,45 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
   );
 }
 
+function AddStory() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
+      <div style={{
+        width: 58, height: 58, borderRadius: 29, background: C.surface,
+        border: `2px dashed ${C.border}`, display: "flex",
+        alignItems: "center", justifyContent: "center", color: C.subtext,
+      }}>
+        <Plus size={22} strokeWidth={2.4} />
+      </div>
+      <span style={{ fontSize: 11, color: C.subtext, fontWeight: 500 }}>You</span>
+    </div>
+  );
+}
+
+function StoryAvatar({ grad, initial, label }: { grad: string[]; initial: string; label: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
+      <div style={{
+        width: 62, height: 62, borderRadius: 31, padding: 2.5,
+        background: `conic-gradient(from 210deg, ${C.accent}, ${C.pop}, #FFB347, ${C.accent})`,
+      }}>
+        <div style={{
+          width: "100%", height: "100%", borderRadius: "50%",
+          background: "#fff", padding: 2,
+        }}>
+          <div style={{
+            width: "100%", height: "100%", borderRadius: "50%",
+            background: `linear-gradient(135deg, ${grad[0]}, ${grad[1]})`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 700, color: "#fff", fontSize: 18,
+          }}>{initial}</div>
+        </div>
+      </div>
+      <span style={{ fontSize: 11, color: C.text, fontWeight: 500, maxWidth: 64, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+    </div>
+  );
+}
+
 /* ---------------- Conversation ---------------- */
 
 function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () => void }) {
@@ -298,91 +363,115 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
   }, []);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: COLORS.bg }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.bg }}>
       {/* Header */}
       <div style={{
-        padding: "8px 16px 10px", display: "flex", alignItems: "center",
-        gap: 10, borderBottom: `1px solid ${COLORS.border}`,
+        padding: "6px 12px 10px", display: "flex", alignItems: "center",
+        gap: 8, borderBottom: `1px solid ${C.border}`,
       }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", padding: 4, cursor: "pointer" }}>
-          <ChevronLeft size={26} color={COLORS.text} />
+        <button onClick={onBack} style={iconBtn()}>
+          <ChevronLeft size={26} color={C.text} />
         </button>
         <div style={{
-          width: 36, height: 36, borderRadius: 18, background: "#FFB347",
+          width: 34, height: 34, borderRadius: 17,
+          background: "linear-gradient(135deg,#FF8A65,#FF4D8D)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontWeight: 700, fontSize: 14,
+          fontWeight: 700, fontSize: 14, color: "#fff",
         }}>J</div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Jordan M.</div>
-          <div style={{ fontSize: 11, color: "#3DD68C", fontWeight: 600 }}>● active now</div>
+          <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: -0.2 }}>Jordan M.</div>
+          <div style={{ fontSize: 11, color: C.online, fontWeight: 600 }}>● active now</div>
         </div>
-        <Phone size={20} color={COLORS.text} />
-        <Video size={22} color={COLORS.text} style={{ marginLeft: 14 }} />
+        <button style={iconBtn()}><Phone size={20} color={C.text} /></button>
+        <button style={iconBtn()}><Video size={22} color={C.text} /></button>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "16px 14px" }}>
-        {jordanThread.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              justifyContent: m.from === "me" ? "flex-end" : "flex-start",
-              marginBottom: 6,
-            }}
-          >
-            <div style={{
-              maxWidth: "75%",
-              padding: "9px 14px",
-              borderRadius: 20,
-              background: m.from === "me" ? COLORS.bubbleOut : COLORS.bubbleIn,
-              color: m.from === "me" ? "#fff" : COLORS.text,
-              fontSize: 14.5,
-              lineHeight: 1.35,
-            }}>
-              {m.text}
+      <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "14px 12px" }}>
+        {jordanThread.map((m, i) => {
+          const prev = jordanThread[i - 1];
+          const grouped = prev && prev.from === m.from;
+          return (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: m.from === "me" ? "flex-end" : "flex-start",
+                marginBottom: 3,
+                marginTop: grouped ? 0 : 6,
+              }}
+            >
+              <div style={{
+                maxWidth: "76%",
+                padding: "9px 14px",
+                borderRadius: 22,
+                borderBottomRightRadius: m.from === "me" && !grouped ? 6 : 22,
+                borderBottomLeftRadius: m.from === "them" && !grouped ? 6 : 22,
+                background: m.from === "me" ? C.bubbleOut : C.bubbleIn,
+                color: m.from === "me" ? "#fff" : C.text,
+                fontSize: 14.5,
+                lineHeight: 1.35,
+                fontWeight: m.from === "me" ? 500 : 400,
+              }}>
+                {m.text}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* ITO inline suggestion (because last messages are pressuring) */}
-      <div style={{ padding: "0 14px 8px" }}>
+      {/* ITO inline suggestion */}
+      <div style={{ padding: "0 12px 8px" }}>
         <button
           onClick={onAskIto}
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 10,
-            padding: "10px 14px", background: COLORS.itoSoft,
-            border: `1px solid ${COLORS.border}`, borderRadius: 14,
+            padding: "10px 12px", background: C.itoSoft,
+            border: `1px solid ${C.itoSoftDeep}`, borderRadius: 14,
             cursor: "pointer", textAlign: "left",
           }}
         >
-          <Shield size={18} color={COLORS.itoBg} />
+          <div style={{
+            width: 30, height: 30, borderRadius: 15, background: C.itoInk,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Shield size={15} color="#fff" />
+          </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: COLORS.itoBg }}>
-              Ask ITO before sending
+            <div style={{
+              fontSize: 13.5, fontWeight: 600, color: C.itoInk,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>
+              Ask ITO before you reply
             </div>
-            <div style={{ fontSize: 11.5, color: COLORS.subtext, marginTop: 1 }}>
+            <div style={{ fontSize: 11.5, color: "#6F6657", marginTop: 1 }}>
               Private. Jordan won't see this.
             </div>
           </div>
-          <ArrowRight size={16} color={COLORS.itoBg} />
+          <ArrowRight size={16} color={C.itoInk} />
         </button>
       </div>
 
       {/* Composer */}
       <div style={{
-        padding: "8px 12px 12px", display: "flex", alignItems: "center",
-        gap: 8, borderTop: `1px solid ${COLORS.border}`,
+        padding: "8px 10px 10px", display: "flex", alignItems: "center",
+        gap: 8, borderTop: `1px solid ${C.border}`,
       }}>
-        <Camera size={26} color={COLORS.accent} />
+        <button style={{
+          width: 40, height: 40, borderRadius: 20,
+          background: C.accent, border: "none", display: "flex",
+          alignItems: "center", justifyContent: "center", cursor: "pointer",
+          flexShrink: 0, boxShadow: `0 4px 12px ${C.accent}40`,
+        }}>
+          <Camera size={20} color="#fff" strokeWidth={2.2} />
+        </button>
         <div style={{
-          flex: 1, background: COLORS.surface, borderRadius: 22,
-          padding: "10px 14px", fontSize: 14, color: COLORS.subtext,
-          display: "flex", alignItems: "center", gap: 8,
+          flex: 1, background: C.surface, borderRadius: 22,
+          padding: "9px 14px", fontSize: 14, color: C.subtext,
+          display: "flex", alignItems: "center", gap: 10,
         }}>
           <span style={{ flex: 1 }}>Message…</span>
-          <Smile size={18} />
+          <Sticker size={18} />
           <ImageIcon size={18} />
           <Mic size={18} />
         </div>
@@ -398,51 +487,42 @@ function ItoQuickRead({
 }: { onClose: () => void; onHelpReply: () => void; onEscalate: () => void }) {
   return (
     <Sheet onClose={onClose}>
-      <div style={{ padding: "8px 4px 0", display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 18, background: COLORS.itoBg,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Shield size={18} color="#fff" />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: COLORS.text }}>ITO</div>
-          <div style={{ fontSize: 11.5, color: COLORS.subtext }}>Only you can see this</div>
-        </div>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer" }}>
-          <X size={20} color={COLORS.subtext} />
-        </button>
-      </div>
+      <ItoHeader onClose={onClose} subtitle="Only you can see this" />
 
-      <div style={{ marginTop: 18 }}>
+      <div style={{ marginTop: 16 }}>
         <div style={{
           display: "inline-flex", alignItems: "center", gap: 6,
           padding: "5px 10px", borderRadius: 999,
-          background: "#FFF4E0", color: "#8A5A00",
-          fontSize: 12, fontWeight: 700, marginBottom: 12,
+          background: "#F6E8D4", color: "#8A5A12",
+          fontSize: 11.5, fontWeight: 700, marginBottom: 12,
+          letterSpacing: 0.2,
         }}>
           <Pause size={12} /> Something's off
         </div>
 
-        <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.35, color: COLORS.text }}>
-          Jordan is pushing you for an image late at night and saying you owe them because they sent one before.
+        <div style={{
+          fontSize: 18, fontWeight: 500, lineHeight: 1.4, color: C.itoInk,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+        }}>
+          Jordan's pushing for an image late at night and saying you owe them because they sent one before.
         </div>
 
         <div style={{
-          marginTop: 14, padding: 14, background: COLORS.itoSoft,
-          borderRadius: 14, fontSize: 13.5, lineHeight: 1.5, color: COLORS.text,
+          marginTop: 14, padding: 14, background: C.itoSoft,
+          border: `1px solid ${C.itoSoftDeep}`,
+          borderRadius: 14, fontSize: 13.5, lineHeight: 1.55, color: "#3D3528",
         }}>
           A few things to notice:
           <ul style={{ margin: "8px 0 0 18px", padding: 0 }}>
-            <li>“no one's gonna see it” isn't something Jordan can actually promise.</li>
-            <li>“I've sent you stuff before” is pressure, not a reason.</li>
+            <li>"no one's gonna see it" isn't something Jordan can actually promise.</li>
+            <li>"I've sent you stuff before" is pressure, not a reason.</li>
             <li>You don't owe a reply right now.</li>
           </ul>
         </div>
       </div>
 
       <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
-        <button onClick={onHelpReply} style={primaryBtn(COLORS.itoBg)}>
+        <button onClick={onHelpReply} style={primaryBtn(C.itoInk)}>
           Help me reply
         </button>
         <button onClick={onEscalate} style={ghostBtn()}>
@@ -469,16 +549,19 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
   return (
     <Sheet onClose={onClose}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-          <ChevronLeft size={22} color={COLORS.text} />
+        <button onClick={onBack} style={iconBtn()}>
+          <ChevronLeft size={22} color={C.itoInk} />
         </button>
-        <div style={{ flex: 1, fontWeight: 700, fontSize: 15 }}>Three ways to reply</div>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer" }}>
-          <X size={20} color={COLORS.subtext} />
+        <div style={{
+          flex: 1, fontWeight: 700, fontSize: 16, color: C.itoInk,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+        }}>Three ways to reply</div>
+        <button onClick={onClose} style={iconBtn()}>
+          <X size={20} color={C.subtext} />
         </button>
       </div>
 
-      <div style={{ fontSize: 13, color: COLORS.subtext, marginTop: 6 }}>
+      <div style={{ fontSize: 13, color: "#6F6657", marginTop: 6, lineHeight: 1.4 }}>
         Pick one or use it as a starting point. Nothing sends until you tap send in your own chat.
       </div>
 
@@ -489,15 +572,15 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
             onClick={() => setPicked(i)}
             style={{
               textAlign: "left", padding: 14, borderRadius: 14,
-              border: `1.5px solid ${picked === i ? COLORS.itoBg : COLORS.border}`,
-              background: picked === i ? COLORS.itoSoft : "#fff",
+              border: `1.5px solid ${picked === i ? C.itoInk : C.itoSoftDeep}`,
+              background: picked === i ? C.itoSoft : "#fff",
               cursor: "pointer",
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 700, color: COLORS.itoAccent, letterSpacing: 0.3 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.itoAccent, letterSpacing: 0.5 }}>
               {o.label.toUpperCase()}
             </div>
-            <div style={{ fontSize: 14.5, color: COLORS.text, marginTop: 4, lineHeight: 1.4 }}>
+            <div style={{ fontSize: 14.5, color: C.itoInk, marginTop: 4, lineHeight: 1.4 }}>
               "{o.text}"
             </div>
           </button>
@@ -506,7 +589,7 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 
       <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
         <button
-          style={primaryBtn(COLORS.itoBg)}
+          style={primaryBtn(C.itoInk)}
           disabled={picked === null}
           onClick={onClose}
         >
@@ -524,36 +607,42 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 
 function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
   return (
-    <Sheet onClose={onClose} accent={COLORS.alert}>
+    <Sheet onClose={onClose} accent={C.alert}>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-          <ChevronLeft size={22} color={COLORS.text} />
+        <button onClick={onBack} style={iconBtn()}>
+          <ChevronLeft size={22} color={C.itoInk} />
         </button>
         <div style={{
-          width: 32, height: 32, borderRadius: 16, background: "#FDECEC",
+          width: 32, height: 32, borderRadius: 16, background: "#FBE3E3",
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Hand size={16} color={COLORS.alert} />
+          <Hand size={16} color={C.alert} />
         </div>
-        <div style={{ flex: 1, fontWeight: 700, fontSize: 15 }}>Hold on a sec</div>
-        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer" }}>
-          <X size={20} color={COLORS.subtext} />
+        <div style={{
+          flex: 1, fontWeight: 700, fontSize: 16, color: C.itoInk,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+        }}>Hold on a sec</div>
+        <button onClick={onClose} style={iconBtn()}>
+          <X size={20} color={C.subtext} />
         </button>
       </div>
 
-      <div style={{ marginTop: 14, fontSize: 16, fontWeight: 600, lineHeight: 1.4, color: COLORS.text }}>
+      <div style={{
+        marginTop: 14, fontSize: 16.5, fontWeight: 500, lineHeight: 1.45, color: C.itoInk,
+        fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+      }}>
         What you're describing — being pressured for images, being told you owe it — that's coercion. It's not a normal ask, and you're not overreacting.
       </div>
 
       <div style={{
         marginTop: 14, padding: 14, borderRadius: 14,
-        background: "#FDECEC", color: "#7A1D1D", fontSize: 13.5, lineHeight: 1.5,
+        background: "#FBE3E3", color: "#7A1D1D", fontSize: 13.5, lineHeight: 1.5,
       }}>
         If Jordan has sent you images before and is threatening to share them, or if you're under 18 and being asked for images, there are people who can help — right now, free, and they don't need your name.
       </div>
 
       <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-        <a href="tel:18008435678" style={primaryBtn(COLORS.alert) as any}>
+        <a href="tel:18008435678" style={primaryBtn(C.alert) as any}>
           Call Take It Down — 1-800-843-5678
         </a>
         <a href="sms:741741?body=HELLO" style={ghostBtnAlert() as any}>
@@ -572,30 +661,35 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
 function AskItoDirect({ onBack }: { onBack: () => void }) {
   const [input, setInput] = useState("");
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: COLORS.bg }}>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.itoSoft }}>
       <div style={{
-        padding: "8px 16px 10px", display: "flex", alignItems: "center",
-        gap: 10, borderBottom: `1px solid ${COLORS.border}`,
+        padding: "6px 12px 10px", display: "flex", alignItems: "center",
+        gap: 10, borderBottom: `1px solid ${C.itoSoftDeep}`, background: C.itoSoft,
       }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer" }}>
-          <ChevronLeft size={26} color={COLORS.text} />
+        <button onClick={onBack} style={iconBtn()}>
+          <ChevronLeft size={26} color={C.itoInk} />
         </button>
         <div style={{
-          width: 36, height: 36, borderRadius: 18, background: COLORS.itoBg,
+          width: 34, height: 34, borderRadius: 17, background: C.itoInk,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Shield size={18} color="#fff" />
+          <Shield size={17} color="#fff" />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Ask ITO</div>
-          <div style={{ fontSize: 11.5, color: COLORS.subtext }}>Private. Not stored. Not shared.</div>
+          <div style={{
+            fontWeight: 700, fontSize: 16, color: C.itoInk,
+            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+          }}>Ask ITO</div>
+          <div style={{ fontSize: 11.5, color: "#6F6657" }}>Private. Not stored. Not shared.</div>
         </div>
       </div>
 
-      <div style={{ flex: 1, padding: "20px 18px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "18px 16px", overflowY: "auto" }}>
         <div style={{
-          padding: 14, background: COLORS.itoSoft, borderRadius: 14,
-          fontSize: 14.5, color: COLORS.text, lineHeight: 1.45,
+          padding: 14, background: "#fff", borderRadius: 14,
+          border: `1px solid ${C.itoSoftDeep}`,
+          fontSize: 14.5, color: C.itoInk, lineHeight: 1.5,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
         }}>
           Hey. Tell me what's going on. You can paste a message someone sent, describe a situation, or just type what's bugging you.
         </div>
@@ -609,8 +703,8 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
           ].map((s, i) => (
             <button key={i} onClick={() => setInput(s)} style={{
               textAlign: "left", padding: "10px 14px", borderRadius: 999,
-              border: `1px solid ${COLORS.border}`, background: "#fff",
-              fontSize: 13.5, color: COLORS.text, cursor: "pointer",
+              border: `1px solid ${C.itoSoftDeep}`, background: "#fff",
+              fontSize: 13.5, color: C.itoInk, cursor: "pointer",
             }}>{s}</button>
           ))}
         </div>
@@ -618,11 +712,12 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
 
       <div style={{
         padding: "8px 12px 12px", display: "flex", alignItems: "center",
-        gap: 8, borderTop: `1px solid ${COLORS.border}`,
+        gap: 8, borderTop: `1px solid ${C.itoSoftDeep}`, background: C.itoSoft,
       }}>
         <div style={{
-          flex: 1, background: COLORS.surface, borderRadius: 22,
+          flex: 1, background: "#fff", borderRadius: 22,
           padding: "10px 14px", fontSize: 14, display: "flex", alignItems: "center",
+          border: `1px solid ${C.itoSoftDeep}`,
         }}>
           <input
             value={input}
@@ -630,18 +725,43 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
             placeholder="Type what's going on…"
             style={{
               flex: 1, border: "none", outline: "none", background: "transparent",
-              fontSize: 14, color: COLORS.text,
+              fontSize: 14, color: C.itoInk,
             }}
           />
         </div>
         <button style={{
-          width: 40, height: 40, borderRadius: 20, background: COLORS.itoBg,
+          width: 42, height: 42, borderRadius: 21, background: C.itoInk,
           color: "#fff", border: "none", display: "flex", alignItems: "center",
           justifyContent: "center", cursor: "pointer",
         }}>
           <Send size={18} />
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ---------------- ITO header (shared) ---------------- */
+
+function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{
+        width: 36, height: 36, borderRadius: 18, background: C.itoInk,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <Shield size={18} color="#fff" />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{
+          fontWeight: 700, fontSize: 16, color: C.itoInk,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+        }}>ITO</div>
+        <div style={{ fontSize: 11.5, color: "#6F6657" }}>{subtitle}</div>
+      </div>
+      <button onClick={onClose} style={iconBtn()}>
+        <X size={20} color={C.subtext} />
+      </button>
     </div>
   );
 }
@@ -654,7 +774,7 @@ function Sheet({
   return (
     <div style={{
       position: "absolute", inset: 0, zIndex: 40,
-      background: "rgba(10, 14, 22, 0.45)",
+      background: "rgba(8, 12, 20, 0.5)",
       display: "flex", alignItems: "flex-end",
     }}
     onClick={onClose}
@@ -662,8 +782,8 @@ function Sheet({
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "100%", background: "#fff",
-          borderTopLeftRadius: 26, borderTopRightRadius: 26,
+          width: "100%", background: "#FAF7F0",
+          borderTopLeftRadius: 28, borderTopRightRadius: 28,
           padding: "12px 20px 28px",
           maxHeight: "85%", overflowY: "auto",
           borderTop: accent ? `3px solid ${accent}` : "none",
@@ -671,7 +791,7 @@ function Sheet({
         }}
       >
         <div style={{
-          width: 40, height: 4, background: "#D9DDE3", borderRadius: 2,
+          width: 40, height: 4, background: C.itoSoftDeep, borderRadius: 2,
           margin: "0 auto 10px",
         }} />
         {children}
@@ -683,64 +803,101 @@ function Sheet({
   );
 }
 
-/* ---------------- Tab bar ---------------- */
+/* ---------------- Tab bar — camera-first ---------------- */
 
 function TabBar({ tab, onTab }: { tab: string; onTab: (t: any) => void }) {
-  const items = [
-    { id: "feed", label: "Feed", icon: Home },
-    { id: "camera", label: "Camera", icon: Camera },
+  const left = [
+    { id: "map", label: "Map", icon: MapPin },
     { id: "chats", label: "Chats", icon: MessageCircle },
+  ];
+  const right = [
+    { id: "stories", label: "Stories", icon: ImageIcon },
     { id: "you", label: "You", icon: User },
   ];
+
+  const Item = ({ it }: { it: { id: string; label: string; icon: any } }) => {
+    const Icon = it.icon;
+    const active = tab === it.id;
+    return (
+      <button
+        onClick={() => onTab(it.id)}
+        style={{
+          display: "flex", flexDirection: "column", alignItems: "center",
+          gap: 3, background: "none", border: "none", cursor: "pointer",
+          color: active ? C.text : "#9099A4", padding: "4px 14px",
+        }}
+      >
+        <Icon size={24} strokeWidth={active ? 2.6 : 2} />
+        <span style={{ fontSize: 10.5, fontWeight: active ? 700 : 500 }}>{it.label}</span>
+        <div style={{
+          width: 4, height: 4, borderRadius: 2,
+          background: active ? C.accent : "transparent",
+        }} />
+      </button>
+    );
+  };
+
   return (
     <div style={{
-      position: "absolute", bottom: 0, left: 0, right: 0, height: 84,
-      background: "#fff", borderTop: `1px solid ${COLORS.border}`,
-      display: "flex", justifyContent: "space-around",
-      paddingTop: 10, paddingBottom: 26,
+      position: "absolute", bottom: 0, left: 0, right: 0, height: 78,
+      background: "#fff", borderTop: `1px solid ${C.border}`,
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "0 14px 22px",
     }}>
-      {items.map((it) => {
-        const Icon = it.icon;
-        const active = tab === it.id;
-        return (
-          <button
-            key={it.id}
-            onClick={() => onTab(it.id)}
-            style={{
-              display: "flex", flexDirection: "column", alignItems: "center",
-              gap: 3, background: "none", border: "none", cursor: "pointer",
-              color: active ? COLORS.accent : "#8A92A0",
-            }}
-          >
-            <Icon size={24} strokeWidth={active ? 2.4 : 2} />
-            <span style={{ fontSize: 10.5, fontWeight: 600 }}>{it.label}</span>
-          </button>
-        );
-      })}
+      <div style={{ display: "flex", gap: 4 }}>
+        {left.map((it) => <Item key={it.id} it={it} />)}
+      </div>
+
+      {/* Camera FAB (center, slightly raised) */}
+      <button
+        onClick={() => onTab("camera")}
+        style={{
+          position: "absolute", left: "50%", top: -10,
+          transform: "translateX(-50%)",
+          width: 62, height: 62, borderRadius: 31,
+          background: `linear-gradient(135deg, ${C.accent}, ${C.accentDeep})`,
+          border: "4px solid #fff",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer", boxShadow: `0 8px 20px ${C.accent}55`,
+        }}
+      >
+        <Camera size={26} color="#fff" strokeWidth={2.4} />
+      </button>
+
+      <div style={{ display: "flex", gap: 4 }}>
+        {right.map((it) => <Item key={it.id} it={it} />)}
+      </div>
     </div>
   );
 }
 
 /* ---------------- Buttons ---------------- */
 
+function iconBtn(): React.CSSProperties {
+  return {
+    background: "none", border: "none", padding: 6, cursor: "pointer",
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+  };
+}
 function primaryBtn(bg: string): React.CSSProperties {
   return {
     padding: "14px 16px", borderRadius: 14, background: bg, color: "#fff",
     border: "none", fontWeight: 700, fontSize: 14.5, cursor: "pointer",
     textAlign: "center", textDecoration: "none", display: "block",
+    letterSpacing: -0.1,
   };
 }
 function ghostBtn(): React.CSSProperties {
   return {
     padding: "13px 16px", borderRadius: 14, background: "#fff",
-    color: COLORS.text, border: `1.5px solid ${COLORS.border}`,
+    color: C.itoInk, border: `1.5px solid ${C.itoSoftDeep}`,
     fontWeight: 600, fontSize: 14, cursor: "pointer", textAlign: "center",
   };
 }
 function ghostBtnAlert(): React.CSSProperties {
   return {
     padding: "13px 16px", borderRadius: 14, background: "#fff",
-    color: COLORS.alert, border: `1.5px solid #F5C2C2`,
+    color: C.alert, border: `1.5px solid #F5C2C2`,
     fontWeight: 600, fontSize: 14, cursor: "pointer", textAlign: "center",
     textDecoration: "none", display: "block",
   };
@@ -748,6 +905,6 @@ function ghostBtnAlert(): React.CSSProperties {
 function textBtn(): React.CSSProperties {
   return {
     padding: "10px", background: "none", border: "none",
-    color: COLORS.subtext, fontSize: 13.5, cursor: "pointer", fontWeight: 500,
+    color: "#6F6657", fontSize: 13.5, cursor: "pointer", fontWeight: 500,
   };
 }
