@@ -83,9 +83,9 @@ function flattenStrings(obj: unknown): string {
 }
 
 async function callAnalyzeLanguage(text: string): Promise<{ riskLevel: "green" | "yellow" | "red"; raw: unknown }> {
-  const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-language`, {
+  const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-language`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${EXTERNAL_SERVICE_ROLE_KEY}` },
     body: JSON.stringify({ text }),
   });
   const data = await resp.json().catch(() => ({}));
