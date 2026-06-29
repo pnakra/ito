@@ -344,6 +344,32 @@ function AddStory() {
   );
 }
 
+/* ITO mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
+   Original mark, not derivative of any existing brand. */
+function ItoMark() {
+  return (
+    <div style={{
+      width: 46, height: 46, borderRadius: 14,
+      background: `linear-gradient(160deg, ${C.itoInk} 0%, #1B2C44 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      flexShrink: 0, position: "relative",
+      boxShadow: "0 2px 6px rgba(14, 26, 43, 0.18)",
+    }}>
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* enclosing soft bracket pair = "hold / consider" */}
+        <path d="M7 6.5 C 5 6.5, 4 8, 4 10 L 4 16 C 4 18, 5 19.5, 7 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        <path d="M19 6.5 C 21 6.5, 22 8, 22 10 L 22 16 C 22 18, 21 19.5, 19 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        {/* center: small four-point spark (calm, not glitzy) */}
+        <path d="M13 8.5 L 13.9 12.1 L 17.5 13 L 13.9 13.9 L 13 17.5 L 12.1 13.9 L 8.5 13 L 12.1 12.1 Z"
+              fill={C.accent} />
+      </svg>
+    </div>
+  );
+}
+
+
 function StoryAvatar({ grad, initial, label }: { grad: string[]; initial: string; label: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
