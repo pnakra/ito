@@ -606,7 +606,7 @@ function ItoMarkSmall() {
 
 
 
-/* ---------------- ITO Quick Read sheet ---------------- */
+/* ---------------- ito Quick Read sheet ---------------- */
 
 function ItoQuickRead({
   onClose, onHelpReply, onEscalate,
