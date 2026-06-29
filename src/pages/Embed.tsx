@@ -998,7 +998,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
               border: `1px solid ${C.itoSoftDeep}`, color: C.itoInk,
               fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
             }}>
-              “I need help with a situation with someone. Can you just listen?”
+              "I need help with a situation. Can you listen?"
             </div>
             <div style={{ marginTop: 8 }}>
               If the first person doesn't get it, try another adult.
