@@ -304,6 +304,83 @@ export default function AdminEvals() {
           <header className="flex items-baseline justify-between border-b border-border pb-4">
             <h1 className="font-serif text-3xl">safety evals</h1>
             <div className="flex items-center gap-4">
+              {selectedRun && (
+                <>
+                  <button
+                    onClick={() => {
+                      const payload = {
+                        exported_at: new Date().toISOString(),
+                        run: selectedRun.run,
+                        results: selectedRun.results,
+                      };
+                      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `ito-eval-run-${selectedRun.run.id.slice(0, 8)}.json`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+                  >
+                    export run (json)
+                  </button>
+                  <button
+                    onClick={() => {
+                      const r = selectedRun.run;
+                      const lines: string[] = [];
+                      lines.push(`# ito safety eval run`);
+                      lines.push(``);
+                      lines.push(`- Run ID: ${r.id}`);
+                      lines.push(`- Started: ${r.started_at}`);
+                      lines.push(`- Finished: ${r.finished_at ?? "(in progress)"}`);
+                      lines.push(`- Tag: ${r.prompt_version_tag ?? "(none)"}`);
+                      lines.push(`- Pass / Fail / Total: ${r.pass_count} / ${r.fail_count} / ${r.total_count}`);
+                      lines.push(`- Avg tone: ${r.avg_tone_score?.toFixed(2) ?? "-"}`);
+                      lines.push(``);
+                      lines.push(`---`);
+                      for (const row of selectedRun.results) {
+                        lines.push(``);
+                        lines.push(`## ${row.scenario_id} [${row.tier}]`);
+                        lines.push(``);
+                        lines.push(`**Input:** ${row.input_text}`);
+                        lines.push(``);
+                        lines.push(`- Expected risk: \`${row.expected_risk_level}\` | Actual: \`${row.actual_risk_level ?? "-"}\` | classification ${row.classification_pass ? "PASS" : "FAIL"}`);
+                        lines.push(`- Expected refusal: \`${row.expected_refusal}\` | Fired: \`${row.refusal_fired}\` | refusal ${row.refusal_pass ? "PASS" : "FAIL"}`);
+                        lines.push(`- Deterministic: ${row.deterministic_pass ? "PASS" : "FAIL"} | Tone: ${row.tone_score ?? "-"}/5 | Latency: ${row.latency_ms ?? "-"}ms`);
+                        if (row.quality_scores) {
+                          lines.push(`- Quality: tone=${row.quality_scores.tone ?? "-"} sycophancy_absence=${row.quality_scores.sycophancy_absence ?? "-"} redirect_quality=${row.quality_scores.redirect_quality ?? "-"}`);
+                        }
+                        if (row.missing_themes?.length) lines.push(`- Missing themes: ${row.missing_themes.join(", ")}`);
+                        if (row.forbidden_phrase_hits?.length) lines.push(`- Forbidden phrase hits: ${row.forbidden_phrase_hits.join(", ")}`);
+                        if (row.tone_violations?.length) lines.push(`- Tone violations: ${row.tone_violations.join(", ")}`);
+                        if (row.tone_rationale) lines.push(`- Judge rationale: ${row.tone_rationale}`);
+                        if (row.error) lines.push(`- Error: ${row.error}`);
+                        if (row.raw_response) {
+                          lines.push(``);
+                          lines.push(`<details><summary>Raw model response</summary>`);
+                          lines.push(``);
+                          lines.push("```json");
+                          lines.push(JSON.stringify(row.raw_response, null, 2));
+                          lines.push("```");
+                          lines.push(``);
+                          lines.push(`</details>`);
+                        }
+                      }
+                      const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `ito-eval-run-${selectedRun.run.id.slice(0, 8)}.md`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+                  >
+                    export run (md)
+                  </button>
+                </>
+              )}
               <button
                 onClick={async () => {
                   const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS } =
@@ -338,6 +415,7 @@ export default function AdminEvals() {
                 lock
               </button>
             </div>
+
           </header>
 
           <section className="space-y-3">
