@@ -895,53 +895,195 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 /* ---------------- ITO Higher-risk Escalation ---------------- */
 
 function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    const text = jalenThread.map((m) => `${m.from === "me" ? "You" : "Jalen"}: ${m.text}`).join("\n");
+    void navigator.clipboard.writeText(text);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  };
+
   return (
-    <Sheet onClose={onClose} accent={C.alert}>
+    <Sheet onClose={onClose} tall accent={C.itoInk}>
+      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <button onClick={onBack} style={iconBtn()}>
-          <ChevronLeft size={22} color={C.itoInk} />
+          <ChevronLeft size={24} color={C.itoInk} />
         </button>
         <div style={{
-          width: 32, height: 32, borderRadius: 16, background: "#FBE3E3",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          width: 36, height: 36, borderRadius: 18,
+          background: "#E8E2D6", display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Hand size={16} color={C.alert} />
+          <Hand size={18} color={C.itoInk} />
         </div>
-        <div style={{
-          flex: 1, fontWeight: 700, fontSize: 16, color: C.itoInk,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-        }}>Hold on a sec</div>
+        <div style={{ flex: 1 }}>
+          <div style={{
+            fontWeight: 700, fontSize: 17, color: C.itoInk,
+            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+          }}>
+            This may be crossing a line
+          </div>
+          <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
+            ITO is taking this seriously
+          </div>
+        </div>
         <button onClick={onClose} style={iconBtn()}>
           <X size={20} color={C.subtext} />
         </button>
       </div>
 
-      <div style={{
-        marginTop: 14, fontSize: 16.5, fontWeight: 500, lineHeight: 1.45, color: C.itoInk,
-        fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-      }}>
-        What you're describing — being pressured for images, being told you owe it — that's coercion. It's not a normal ask, and you're not overreacting.
+      {/* Supporting points — plain, direct, not clinical */}
+      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          "Repeated pressure after hesitation is not okay.",
+          "If someone is threatening, coercing, or ignoring your boundaries, this is serious.",
+        ].map((line, i) => (
+          <div key={i} style={{
+            display: "flex", gap: 12, alignItems: "flex-start",
+            padding: "12px 14px", background: "#fff",
+            border: `1px solid ${C.itoSoftDeep}`, borderRadius: 12,
+          }}>
+            <span style={{
+              width: 22, height: 22, borderRadius: 11, flexShrink: 0,
+              background: C.itoInk, color: "#fff",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              fontSize: 11.5, fontWeight: 700, marginTop: 1,
+              fontFamily: '"Newsreader", Georgia, serif',
+            }}>{i + 1}</span>
+            <span style={{
+              fontSize: 14.5, color: C.itoInk, lineHeight: 1.45,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>
+              {line}
+            </span>
+          </div>
+        ))}
       </div>
 
-      <div style={{
-        marginTop: 14, padding: 14, borderRadius: 14,
-        background: "#FBE3E3", color: "#7A1D1D", fontSize: 13.5, lineHeight: 1.5,
-      }}>
-        If Jordan has sent you images before and is threatening to share them, or if you're under 18 and being asked for images, there are people who can help — right now, free, and they don't need your name.
-      </div>
+      {/* Actions */}
+      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Make a safety plan */}
+        <ActionRow
+          icon={<Shield size={18} color={C.itoInk} />}
+          label="Make a safety plan"
+          isOpen={open === "plan"}
+          onToggle={() => setOpen(open === "plan" ? null : "plan")}
+        >
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: "#6F6657", lineHeight: 1.5 }}>
+            <li>You do not have to respond right now.</li>
+            <li>Think of one person you could sit with or call.</li>
+            <li>If you feel unsafe, ask someone you trust to come get you.</li>
+          </ul>
+        </ActionRow>
 
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-        <a href="tel:18008435678" style={primaryBtn(C.alert) as any}>
-          Call Take It Down — 1-800-843-5678
+        {/* Talk to a trusted adult */}
+        <ActionRow
+          icon={<Users size={18} color={C.itoInk} />}
+          label="Talk to a trusted adult"
+          isOpen={open === "adult"}
+          onToggle={() => setOpen(open === "adult" ? null : "adult")}
+        >
+          <div style={{ fontSize: 13, color: "#6F6657", lineHeight: 1.5 }}>
+            You don't need to explain everything at once. Try starting with:
+            <div style={{
+              marginTop: 8, padding: 10, background: C.itoSoft, borderRadius: 10,
+              border: `1px solid ${C.itoSoftDeep}`, color: C.itoInk,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>
+              “I need help with a situation with someone. Can you just listen?”
+            </div>
+            <div style={{ marginTop: 8 }}>
+              If the first person doesn't get it, try another adult.
+            </div>
+          </div>
+        </ActionRow>
+
+        {/* Get crisis help now */}
+        <a href="tel:988" style={primaryBtn(C.itoInk) as any}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <HeartPulse size={18} />
+            <span>Get crisis help now — 988</span>
+          </div>
         </a>
-        <a href="sms:741741?body=HELLO" style={ghostBtnAlert() as any}>
-          Text HOME to 741741 — Crisis Text Line
+        <a href="sms:741741?body=HOME" style={ghostBtn() as any}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            <Phone size={18} />
+            <span>Text HOME to 741741</span>
+          </div>
         </a>
-        <button onClick={onBack} style={textBtn()}>
-          Back to reply options
+
+        {/* Save this conversation */}
+        <button
+          onClick={handleSave}
+          style={{
+            ...ghostBtn(),
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}
+        >
+          {saved ? <Check size={18} color={C.itoInk} /> : <FileText size={18} color={C.itoInk} />}
+          <span>{saved ? "Copied to clipboard" : "Save this conversation"}</span>
         </button>
       </div>
+
+      {/* Reassurance footer */}
+      <div style={{
+        marginTop: 16, padding: "12px 14px", borderRadius: 12,
+        background: "#fff", border: `1px solid ${C.itoSoftDeep}`,
+        fontSize: 12, color: "#6F6657", lineHeight: 1.45,
+      }}>
+        This stays on your device. ITO doesn't notify anyone, and Loop can't see that you opened this.
+      </div>
+
+      <button onClick={onBack} style={{ ...textBtn(), marginTop: 4 }}>
+        Back to reply options
+      </button>
     </Sheet>
+  );
+}
+
+function ActionRow({
+  icon, label, isOpen, onToggle, children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{
+      background: "#fff", border: `1.5px solid ${isOpen ? C.itoInk : C.itoSoftDeep}`,
+      borderRadius: 14, overflow: "hidden", transition: "all 220ms ease",
+    }}>
+      <button
+        onClick={onToggle}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 10,
+          padding: "12px 14px", background: "none", border: "none", cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        {icon}
+        <span style={{
+          flex: 1, fontSize: 14, fontWeight: 700, color: C.itoInk,
+          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+        }}>
+          {label}
+        </span>
+        <ChevronLeft
+          size={18}
+          color={C.subtext}
+          style={{ transform: isOpen ? "rotate(-90deg)" : "rotate(-180deg)", transition: "transform 200ms ease" }}
+        />
+      </button>
+      {isOpen && (
+        <div style={{ padding: "0 14px 14px", borderTop: `1px solid ${C.itoSoftDeep}` }}>
+          <div style={{ paddingTop: 10 }}>{children}</div>
+        </div>
+      )}
+    </div>
   );
 }
 
