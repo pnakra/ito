@@ -32,9 +32,11 @@ const BEFORE_PATTERNS = [
 ];
 
 const AFTER_PATTERNS = [
-  /\b(already|happened|did|went|last night|yesterday|earlier|after)\b/i,
+  /\b(already|happened|did|went|last night|yesterday|earlier|after|last week|last weekend|few days ago|couple days ago)\b/i,
   /\b(regret|worried|feel bad|messed up|went too far|shouldn't have)\b/i,
   /\b(told me|said i|accused|confronted|upset with me)\b/i,
+  // FIX: past-tense physical acts signal "after" even without explicit time words
+  /\b(made out|hooked up|slept together|had sex|kissed|we (did|went|got))\b/i,
 ];
 
 // Context detection patterns
@@ -59,16 +61,14 @@ const CONSENT_SIGNAL_PATTERNS = [
 ];
 
 const PHYSICAL_INTENT_PATTERNS = [
-  /\b(kiss|sex|touch|hook\s*up|make\s*out|physical|intimat|sleep with|go further|escalat)\b/i,
+  /\b(kiss|kissed|sex|touch|hook\s*up|hooked\s*up|make\s*out|made\s*out|physical|intimat|sleep with|slept with|go further|went further|escalat)\b/i,
 ];
 
 // ─── QUERY TYPE CLASSIFIER ────────────────────────────────────────────────────
-// Runs before gap detection to determine whether this narrative is about
-// a physical/sexual encounter, a relational dynamic, or something out of scope.
-// This gates which follow-up questions are relevant to surface.
 
 const ENCOUNTER_PATTERNS = [
-  /\b(kiss|kissing|make\s*out|hook\s*up|hooking\s*up|sex|sexual|sleep\s*with|slept\s*with|touch(ed|ing)|physical|intimat|go\s*further|went\s*further|escalat|fool\s*around|fingering|oral|blow\s*job|hand\s*job|penetrat|naked|undress|clothes\s*off|in\s*bed\s*with|bedroom)\b/i,
+  // FIX: added past-tense forms throughout — made out, hooked up, slept with, kissed, touched, went further, fooled around
+  /\b(kiss(ed|ing)?|make\s*out|made\s*out|hook\s*up|hooked?\s*up|hooking\s*up|sex|sexual|sleep\s*with|slept\s*with|touch(ed|ing)|physical|intimat|go\s*further|went\s*further|escalat|fool(ed)?\s*around|fingering|oral|blow\s*job|hand\s*job|penetrat|naked|undress|clothes\s*off|in\s*bed\s*with|bedroom)\b/i,
 ];
 
 const RELATIONAL_PATTERNS = [
@@ -76,14 +76,12 @@ const RELATIONAL_PATTERNS = [
   /\b(boyfriend|girlfriend|partner|crush|ex|talking\s*to|dating|relationship|breakup|broke\s*up|trust|boundaries|respect)\b/i,
 ];
 
-// Signals that suggest no interpersonal situation at all
 const OUT_OF_SCOPE_PATTERNS = [
   /\b(homework|test|exam|grade|school\s*work|assignment|essay|teacher\s*gave|class\s*project)\b/i,
   /\b(recipe|cook|food|workout|exercise|gym|diet|health|medical|doctor)\b/i,
   /\b(game|gaming|minecraft|fortnite|movie|show|anime|song|music|band)\b/i,
 ];
 
-// Active crisis — warrants immediate warm redirect + 988 / Crisis Text Line
 const CRISIS_PATTERNS = [
   /\b(want\s*to\s*die|wanna\s*die|wish\s*i\s*(was|were)\s*dead)\b/i,
   /\bkill\s*(my)?self\b/i,
@@ -97,7 +95,6 @@ const CRISIS_PATTERNS = [
   /\bself\s*harm\b/i,
 ];
 
-// Emotional distress — not active crisis but clearly not a consent/dating question
 const DISTRESS_PATTERNS = [
   /\bi('m|\s*am)\s*(so\s*)?(depressed|anxious|lonely|broken|numb|hopeless|worthless|devastated)\b/i,
   /\bi\s*think\s*i('m|\s*am)\s*depressed\b/i,
@@ -108,8 +105,6 @@ const DISTRESS_PATTERNS = [
   /\bi'?m\s+so\s+lonely\b/i,
 ];
 
-// Relational-lite — relationship adjacent but clearly not a consent/encounter question
-// (e.g. "will she think I'm a simp", "they ghosted me", "does he like me")
 const RELATIONAL_LITE_PATTERNS = [
   /\bthink\s+i('?m|\s*am)\s*a?\s*simp\b/i,
   /\bsimp\s+(if|for|because)\b/i,
@@ -137,13 +132,14 @@ export function classifyQueryType(text: string): QueryType {
     return "out-of-scope";
   }
 
-  // Encounter: physical/sexual context signals present
+  // Encounter: physical/sexual context signals present — check before relational-lite
+  // so past-tense physical acts ("made out", "hooked up") aren't swallowed by
+  // relational-lite patterns that might also match parts of the narrative
   if (hasMatch(text, ENCOUNTER_PATTERNS)) {
     return "encounter";
   }
 
   // Relational-lite: relationship-adjacent but not a consent/encounter question
-  // Check before full relational to catch "will she think I'm a simp" etc.
   if (hasMatch(text, RELATIONAL_LITE_PATTERNS) && !hasMatch(text, RELATIONAL_PATTERNS)) {
     return "relational-lite";
   }
@@ -154,7 +150,6 @@ export function classifyQueryType(text: string): QueryType {
   }
 
   // Default: treat as encounter so we don't under-ask safety questions
-  // when the situation is ambiguous. Better to ask than miss something.
   return "encounter";
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -173,6 +168,9 @@ function detectTiming(text: string): "before" | "after" | "unclear" {
 
   if (afterScore > beforeScore && afterScore >= 2) return "after";
   if (beforeScore > afterScore && beforeScore >= 1) return "before";
+  // FIX: if only one after signal but no before signals, still call it after
+  // "we made out last week" scores 1 after (past-tense physical) but 0 before
+  if (afterScore >= 1 && beforeScore === 0) return "after";
   return "unclear";
 }
 
@@ -200,7 +198,6 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
   }
 
   // 1. Timing unclear — need to know before/after to route correctly
-  // Applies to both encounter and relational queries
   if (detectedTiming === "unclear") {
     gaps.push({
       id: "timing",
@@ -211,10 +208,6 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
     });
   }
 
-  // The questions below only apply to encounter-type queries.
-  // Relational queries (control, jealousy, social dynamics) don't need
-  // substance checks or physical momentum questions — asking them creates
-  // confusing noise and produces false safety signals.
   if (queryType === "encounter") {
     // 2. No consent signals mentioned
     if (!hasMatch(text, CONSENT_SIGNAL_PATTERNS)) {
@@ -236,7 +229,7 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
         category: "substances",
         question: "Quick check — is anyone drinking or using anything?",
         priority: 3,
-        safetyRelevant: true, // Feeds into deterministic "alcohol + physical = red"
+        safetyRelevant: true,
       });
     }
 
@@ -247,7 +240,7 @@ export function detectGaps(narrativeText: string): GapDetectionResult {
         category: "age",
         question: "How old are you both? Roughly is fine.",
         priority: 4,
-        safetyRelevant: true, // Age gap triggers deterministic rules
+        safetyRelevant: true,
       });
     }
 
@@ -322,67 +315,42 @@ export function narrativeToDecisionState(
 ) {
   const text = cumulativeText.toLowerCase();
 
-  // Map consent signals — IMPORTANT: distinguish user's own boundaries from other person's signals
-  // "I don't want X" = user setting their OWN boundary (healthy, not "said-no")
-  // "They said no" / "They pulled away" = OTHER person refusing (said-no)
   let consentSignal: string | null = null;
 
-  // Pressure-then-yes: "kept asking ... finally said yes" = coerced consent, NOT enthusiastic
   const pressureThenYes = /\b(kept|keep|been)\s+(asking|pushing|trying|bugging|begging)\b[\s\S]{0,80}?\b(finally|eventually|just)\s+(said\s+)?(yes|ok|okay|fine|agreed)\b/i.test(text);
-
-  // Past-no qualifier: "said no last weekend/time/before" — old refusal, not current signal
   const pastNoQualifier = /\b(said\s+no|said\s+stop|told\s+me\s+no)\s+(last\s+(weekend|week|night|time|month)|before|previously|the\s+other\s+(day|night|time)|a\s+(while|few\s+(days|weeks))\s+(ago|back))\b/i.test(text);
 
-  // Other person explicitly refused or withdrew (current/unqualified only)
   if (!pastNoQualifier && /\b(they|he|she)\s+(said\s+no|said\s+stop|pulled\s+away|refused|pushed\s+me\s+away)\b/i.test(text)) {
     consentSignal = "said-no";
   } else if (!pastNoQualifier && /\bsaid\s+(no|stop)\s+to\s+(me|him|her|them)\b/i.test(text)) {
     consentSignal = "said-no";
-  // Other person went silent/non-responsive
   } else if (/\b(they|he|she)\s+(didn't say anything|went\s+quiet|froze|didn't respond|was\s+silent|stopped\s+responding)\b/i.test(text)) {
     consentSignal = "no-response";
   } else if (/\b(didn't say anything|silent|quiet|didn't respond|froze|frozen)\b/i.test(text) && !/\bi\s+(was|went|am|feel|felt)\s+(quiet|silent|frozen|froze)\b/i.test(text)) {
     consentSignal = "no-response";
-  // Pressure-then-yes overrides enthusiastic mapping
   } else if (pressureThenYes) {
     consentSignal = "mixed-signals";
-  // Past-no plus current activity = mixed signals (consent from before doesn't carry forward)
   } else if (pastNoQualifier) {
     consentSignal = "mixed-signals";
-  // Mixed signals from other person
   } else if (/\b(mixed|hard to tell|sometimes|not sure how they feel|confused about (their|his|her))\b/i.test(text)) {
     consentSignal = "mixed-signals";
-  // Other person showing enthusiasm (includes contractions: she's, he's, they're)
   } else if (/\b(they|he|she)(?:'s|\s+is|\s+was|\s+seems?|\s+seemed|\s+feels?|\s+felt)\s+(enthusiastic|into\s+it|excited|down|ready|eager)\b/i.test(text) || /\b(they're|theyre)\s+(enthusiastic|into\s+it|excited|down|ready)\b/i.test(text) || /\b(said\s+yes|agreed|nodded|asked\s+me\s+to|brought\s+it\s+up\s+first|initiated)\b/i.test(text)) {
     consentSignal = "enthusiastic-actions";
   } else if (/\b(clear\s+yes|explicitly|verbally\s+agreed|told\s+me\s+to)\b/i.test(text)) {
     consentSignal = "clear-yes";
   }
-  // NOTE: "I don't want X" / "I wasn't into it" = user's own feelings, NOT other person's consent signal
-  // These are left as consentSignal = null, which defaults to yellow/uncertainty
 
-  // Map context factors
   const contextFactors: string[] = [];
-  // Tense-aware intoxication: retrospective mentions ("we were drunk", "I had been drinking")
-  // in after-flow shouldn't auto-escalate the same way as present-tense
   const hasSubstances = hasMatch(text, SUBSTANCE_PATTERNS);
   const isRetrospective = detectedTiming === "after" || /\b(was|were|had been|got)\s+(drunk|wasted|high|drinking|tipsy|buzzed)\b/i.test(text);
   if (hasSubstances && !isRetrospective) {
     contextFactors.push("alcohol");
   } else if (hasSubstances && isRetrospective) {
-    // Still flag as a factor but at lower weight — push "alcohol" only if combined with other red signals
-    // Don't push it so classifyRisk doesn't auto-red from alcohol+physical alone
-    contextFactors.push("emotional-pressure"); // maps to a context factor that won't auto-red with physical
+    contextFactors.push("emotional-pressure");
   }
   if (hasMatch(text, POWER_PATTERNS)) contextFactors.push("age-imbalance");
-  // Tightened: only true sexual-experience gap, not generic "first time at her place" or "bad experience"
   if (/\b(first time (having sex|hooking up|doing this|with (a |anyone))|never done this before|i'?m a virgin|she'?s a virgin|new to (sex|this kind of))\b/i.test(text)) contextFactors.push("experience-gap");
-  // Tightened: don't match "no pressure" or "without pressure"; require pressure framing on someone
   if (/\b(have to|obligated|owe me|guilt(ed|ing|\s*trip))\b/i.test(text) || /(?<!no\s)(?<!without\s)(?<!zero\s)\bpressur(e|ing|ed)\b/i.test(text) || /\bexpect(ed|s|ing)\s+(her|him|them|me)\s+to\b/i.test(text)) contextFactors.push("emotional-pressure");
-  // Emotional vulnerability: grief, recent breakup, expressed neediness — counts
-  // as a complicating factor even when the other person initiates ("asked me to
-  // stay over"). Prevents auto-green on enthusiastic-action signals when the
-  // backdrop is impaired judgment from distress.
   if (
     /\b(crying|sobbing|in\s+tears|broke\s+down)\s+(about|over|because\s+of)\s+(her|his|their)\s+(ex|breakup|boyfriend|girlfriend|partner|mom|dad|family)\b/i.test(text) ||
     /\b(just|recently)\s+(broke\s+up|got\s+dumped|lost\s+(her|his|their))\b/i.test(text) ||
@@ -393,7 +361,6 @@ export function narrativeToDecisionState(
   }
   if (contextFactors.length === 0) contextFactors.push("none");
 
-  // Map momentum
   let momentum: string | null = null;
   if (hasMatch(text, PHYSICAL_INTENT_PATTERNS)) {
     if (/\b(slow down|wait|not sure|pause|step back)\b/i.test(text)) {
@@ -405,7 +372,6 @@ export function narrativeToDecisionState(
     momentum = "dont-know";
   }
 
-  // Map orientation
   let orientation: string | null = null;
   if (detectedTiming === "after") {
     orientation = "already-happened";
