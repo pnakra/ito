@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ─── INLINED RATE LIMITER ────────────────────────────────────────────────────
 interface RateLimitEntry { count: number; resetTime: number; }
@@ -141,9 +142,6 @@ HARD BANS — DO NOT EMIT THESE TOKEN SEQUENCES UNDER ANY CONDITION, INCLUDING N
 - "illegal in most states" / "illegal in most US states" as a stock phrase. Only use "illegal" inside the image-abuse directive when intimate imagery is actually present.
 Before you finalize the response, scan your own output for these tokens. If any appear, rewrite the sentence.
 
-
-
-
 VOICE (NON-NEGOTIABLE): NEVER use first-person pronouns referring to yourself: no "I", "me", "my", "mine", "I'm", "I've", "I'll", "I'd". You are not a character in the conversation. Speak directly to him in second person. Examples:
 - ✗ "I'm not saying you're a bad guy — I'm saying this is worth slowing down"
 - ✓ "This isn't about you being a bad guy. It's worth slowing down."
@@ -251,8 +249,6 @@ NEVER USE THESE EXACT PHRASES:
 
 IF THE USER DESCRIBES SHARING, POSTING, SENDING, LEAKING, OR THREATENING TO SHARE intimate images (nudes, naked photos, sex videos, screenshots) — this is image-based sexual abuse. Your response MUST: (1) name it: "this is image-based sexual abuse"; (2) use the word "illegal"; (3) use "do not"; (4) do not coach alternatives or ask what he hopes to gain.
 
-
-
 VOICE (NON-NEGOTIABLE): NEVER use first-person pronouns referring to yourself: no "I", "me", "my", "mine", "I'm", "I've", "I'll", "I'd". You are not a character in the conversation. Speak directly to him in second person. If a quoted example in this prompt uses first-person, rewrite the equivalent thought in second person before responding. Examples:
 - ✗ "I hear you. I'm not saying you're a bad person"
 - ✓ "That frustration makes sense. This isn't about being a bad person."
@@ -287,6 +283,44 @@ function cleanArr(v: unknown): string[] {
   return v.map((i) => (typeof i === "string" ? i.trim() : "")).filter(Boolean);
 }
 
+// ─── DB ERROR LOGGER ─────────────────────────────────────────────────────────
+async function logErrorToDB(
+  sessionId: string | undefined,
+  flowType: string,
+  errorMessage: string,
+  errorType: string
+): Promise<void> {
+  if (!sessionId) {
+    console.warn("[analyze-narrative] No sessionId — skipping DB error log");
+    return;
+  }
+  const supabaseUrl = Deno.env.get("EXTERNAL_SUPABASE_URL");
+  const supabaseKey = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn("[analyze-narrative] Missing Supabase env vars — skipping DB error log");
+    return;
+  }
+  try {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { error } = await supabase.from("ito_events").insert({
+      session_id: sessionId,
+      flow_type: flowType,
+      step_name: "narrative-explanation",
+      step_type: "ai_response",
+      ai_response_summary: `ERROR: ${errorMessage}`,
+      metadata: { error: true, error_type: errorType },
+    });
+    if (error) {
+      console.error("[analyze-narrative] DB error log insert failed:", error.message);
+    } else {
+      console.log("[analyze-narrative] Error logged to DB for session:", sessionId);
+    }
+  } catch (dbErr) {
+    console.error("[analyze-narrative] Exception writing error to DB:", dbErr);
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -298,17 +332,40 @@ serve(async (req) => {
     return createRateLimitResponse(rateLimit.resetIn);
   }
 
+  // FIX: Parse body once up front so sessionId is available in the error handler
+  let body: Record<string, unknown> = {};
   try {
-    const {
-      narrativeText,
-      precomputedRiskLevel,
-      detectedTiming,
-      conversationHistory,
-      isFollowUp,
-      structuredSignals,
-      entryMethod,
-    } = await req.json();
+    body = await req.json();
+  } catch (_) {
+    return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
 
+  const {
+    narrativeText,
+    precomputedRiskLevel,
+    detectedTiming,
+    conversationHistory,
+    isFollowUp,
+    structuredSignals,
+    entryMethod,
+    sessionId,  // FIX: captured for DB error logging
+  } = body as {
+    narrativeText?: string;
+    precomputedRiskLevel?: string;
+    detectedTiming?: string;
+    conversationHistory?: Array<{ role: string; content: string }>;
+    isFollowUp?: boolean;
+    structuredSignals?: Record<string, unknown>;
+    entryMethod?: string;
+    sessionId?: string;
+  };
+
+  const resolvedFlowType = detectedTiming === "after" ? "after" : "before";
+
+  try {
     if (!narrativeText?.trim()) {
       return new Response(JSON.stringify({ error: "Narrative text is required" }), {
         status: 400,
@@ -326,13 +383,12 @@ serve(async (req) => {
     const isBothTiming = structuredSignals?.timing === "both";
     const systemPrompt = isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE;
 
-    // Build Anthropic messages array (user/assistant only, system goes in separate param)
     const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
     if (isFollowUp && conversationHistory?.length > 0) {
       for (const msg of conversationHistory) {
         if (msg.role === "user" || msg.role === "assistant") {
-          messages.push({ role: msg.role, content: msg.content });
+          messages.push({ role: msg.role as "user" | "assistant", content: msg.content });
         }
       }
     }
@@ -343,11 +399,20 @@ serve(async (req) => {
       ? `SEVERITY: LOCKED RED (DO NOT CHANGE). This is a STOP situation. Interrupt momentum. Do not coach or suggest alternatives to proceeding.`
       : precomputedRiskLevel === "yellow"
       ? `SEVERITY: LOCKED YELLOW (DO NOT CHANGE). This is an UNCERTAINTY situation. Interrupt ambiguity. Do not imply it is okay to proceed. Do not reassure.`
-      : `SEVERITY: LOCKED GREEN (DO NOT CHANGE). No escalation signals detected. Do NOT give permission or use the phrase "green flag" or "green light." Anchor to clarity and continued communication.`;
+      // FIX: removed "LOCKED GREEN" — color-flag language that contradicts the system prompt ban
+      : `SEVERITY: NO FLAG (DO NOT CHANGE). No escalation signals detected. Do NOT give permission. Anchor to clarity and continued communication.`;
 
-    messages.push({ role: "user", content: `Narrative:\n${narrativeText}\n\n${severityReminder}\n\nRemember: Respond with ONLY the JSON, no other text.` });
+    // FIX: inject structuredSignals so Claude has full context beyond the narrative text
+    const signalContext = structuredSignals && Object.keys(structuredSignals).length > 0
+      ? `\n\nStructured signals: ${JSON.stringify(structuredSignals)}`
+      : "";
 
-    console.log("[analyze-narrative] Calling Claude, isAfter:", isAfterFlow, "messages:", messages.length);
+    messages.push({
+      role: "user",
+      content: `Narrative:\n${narrativeText}${signalContext}\n\n${severityReminder}\n\nRemember: Respond with ONLY the JSON, no other text.`,
+    });
+
+    console.log("[analyze-narrative] Calling Claude, isAfter:", isAfterFlow, "messages:", messages.length, "hasSignals:", !!signalContext, "session:", sessionId ?? "unknown");
 
     let lastError: Error | null = null;
 
@@ -400,7 +465,6 @@ serve(async (req) => {
 
         const parsed = JSON.parse(match[0]);
 
-        // Normalize all fields to ensure clean output
         let result: Record<string, unknown>;
 
         if (isAfterFlow) {
@@ -419,10 +483,6 @@ serve(async (req) => {
         } else {
           const why = cleanArr(parsed.why);
           const modelFollowUp = clean(parsed.followUpQuestion);
-          // Chip-aware follow-up: when a user submitted an unedited chip the
-          // situation isn't really theirs — the model's deep-cut question is
-          // wasted on a synthetic scenario. Override regardless of risk level
-          // with a question that invites their real situation (or lets them bail).
           const isChipUnedited = entryMethod === "chip_unedited";
           const followUpQuestion = isChipUnedited
             ? "that one was a starting point — is anything actually on your mind right now, or were you just trying ito out?"
@@ -436,7 +496,7 @@ serve(async (req) => {
           };
         }
 
-        console.log("[analyze-narrative] Success, keys:", Object.keys(result));
+        console.log("[analyze-narrative] Success, keys:", Object.keys(result), "| session:", sessionId ?? "unknown");
 
         return new Response(JSON.stringify(result), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -450,14 +510,38 @@ serve(async (req) => {
 
     throw lastError || new Error("All retry attempts failed");
   } catch (error) {
-    console.error("[analyze-narrative] Error:", error);
+    const errMessage = error instanceof Error ? error.message : String(error);
+    const errType = error instanceof Error ? error.constructor.name : "UnknownError";
+
+    console.error("[analyze-narrative] Fatal error:", errMessage, "| session:", sessionId ?? "unknown");
+
+    // FIX: log failure to DB so sessions are never silently broken
+    await logErrorToDB(sessionId, resolvedFlowType, errMessage, errType);
+
+    const isAfterFlow = detectedTiming === "after";
+
     return new Response(
-      JSON.stringify({
-        signalLabel: "Something went wrong",
-        why: ["The system is temporarily unavailable."],
-        suggestion: "Slow down and check in verbally.",
-        detectedTiming: "before",
-      }),
+      JSON.stringify(
+        isAfterFlow
+          ? {
+              clarityCheck: "We couldn't check this right now. Try again in a moment.",
+              otherPersonPerspective: "Only she can speak to how she actually experienced it.",
+              perspectiveDisclaimer: "Don't rely on a tool to tell you what she felt.",
+              accountabilitySteps: "Talk to someone you trust. If you need it now: RAINN 800-656-4673, Crisis Text Line text HOME to 741741, or 988.",
+              avoidingRepetition: "Slow down before the next interaction and pay attention to what she actually says and does.",
+              followUpQuestion: "Is there someone in your life you could talk to about this?",
+              detectedTiming: "after",
+              _error: true,
+            }
+          : {
+              signalLabel: "We couldn't check this right now",
+              why: ["Something went wrong on our end. Try again in a moment."],
+              suggestion: "If something feels off, slow down and check in with her directly before anything else.",
+              followUpQuestion: "Want to try again?",
+              detectedTiming: "before",
+              _error: true,
+            }
+      ),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
