@@ -3,7 +3,7 @@ import {
   Search, Camera, MessageCircle, User, MapPin,
   Send, ChevronLeft, Plus, Image as ImageIcon,
   Smile, Mic, Phone, Video, Shield,
-  ArrowRight, X, Pause, Hand, Sticker,
+  ArrowRight, X, Pause, Hand, Sticker, SquarePen,
 } from "lucide-react";
 
 /**
