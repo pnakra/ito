@@ -20,8 +20,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-eval-passcode, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SUPABASE_URL = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
-const SERVICE_ROLE_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!;
+// Internal (Lovable Cloud) — where eval_runs / eval_results live.
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// External — where the production analyze-* edge functions live.
+const EXTERNAL_SUPABASE_URL = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
+const EXTERNAL_SERVICE_ROLE_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const PASSCODE = Deno.env.get("EVAL_ADMIN_PASSCODE")!;
 
@@ -79,9 +83,9 @@ function flattenStrings(obj: unknown): string {
 }
 
 async function callAnalyzeLanguage(text: string): Promise<{ riskLevel: "green" | "yellow" | "red"; raw: unknown }> {
-  const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-language`, {
+  const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-language`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${EXTERNAL_SERVICE_ROLE_KEY}` },
     body: JSON.stringify({ text }),
   });
   const data = await resp.json().catch(() => ({}));
@@ -107,9 +111,9 @@ async function callAnalyzeNarrative(
   actualRiskLevel: "green" | "yellow" | "red",
   flow: "before" | "after",
 ): Promise<{ ok: boolean; data: unknown; status: number }> {
-  const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-narrative`, {
+  const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-narrative`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${EXTERNAL_SERVICE_ROLE_KEY}` },
     body: JSON.stringify({
       narrativeText,
       precomputedRiskLevel: actualRiskLevel, // FIX: use actual, not expected
