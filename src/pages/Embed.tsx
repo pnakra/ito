@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 /**
- * Loop — fictional consumer messaging app with embedded ITO.
+ * Loop — fictional consumer messaging app with embedded ito.
  * Standalone mobile-first clickable prototype at /embed.
- * Camera-first youth-social vibe; ITO is the calmer help layer inside it.
+ * Camera-first youth-social vibe; ito is the calmer help layer inside it.
  */
 
 type Screen =
@@ -38,7 +38,7 @@ const C = {
   bubbleIn: "#F1F2F4",
   bubbleOut: "#00C7B7",
   online: "#22D07A",
-  // ITO sub-brand — softer, grounded, calmer
+  // ito sub-brand — softer, grounded, calmer
   itoInk: "#0E1A2B",
   itoSoft: "#F5F1EA",       // warm sand, distinct from Loop's cool greys
   itoSoftDeep: "#EBE4D6",
@@ -140,7 +140,7 @@ export default function Embed() {
           {screen === "ask-ito-direct" && <AskItoDirect onBack={() => setScreen("inbox")} />}
         </div>
 
-        {/* ITO bottom sheets */}
+        {/* ito bottom sheets */}
         {screen === "ito-quickread" && (
           <ItoQuickRead
             onClose={() => setScreen("conversation")}
@@ -177,7 +177,7 @@ export default function Embed() {
         textAlign: "center", color: "#888", fontSize: 12,
         fontFamily: "system-ui",
       }}>
-        Loop — concept prototype · ITO embedded · isthisok.app/embed
+        Loop — concept prototype · ito embedded · isthisok.app/embed
       </div>
     </div>
   );
@@ -221,7 +221,7 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
         ))}
       </div>
 
-      {/* Ask ITO — pinned, distinctly different surface */}
+      {/* Ask ito — pinned, distinctly different surface */}
       <div style={{ padding: "0 14px 6px" }}>
         <button
           onClick={() => onOpen("ask-ito")}
@@ -247,7 +247,7 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
               <span style={{
                 fontWeight: 700, fontSize: 15, color: C.itoInk,
                 fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-              }}>Ask ITO</span>
+              }}>Ask ito</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#6F6657", marginTop: 2 }}>
               Private help before you reply
@@ -351,7 +351,7 @@ function AddStory() {
   );
 }
 
-/* ITO mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
+/* ito mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
    Original mark, not derivative of any existing brand. */
 function ItoMark() {
   return (
@@ -510,7 +510,7 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
         `}</style>
       </div>
 
-      {/* ITO inline suggestion — sits right above composer */}
+      {/* ito inline suggestion — sits right above composer */}
       <div style={{ padding: "4px 12px 8px" }}>
         <button
           onClick={onAskIto}
@@ -527,7 +527,7 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
               fontSize: 13.5, fontWeight: 600, color: C.itoInk,
               fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
             }}>
-              Ask ITO before sending
+              Ask ito before sending
             </div>
             <div style={{ fontSize: 11.5, color: "#6F6657", marginTop: 1 }}>
               Private. Jalen won't see this.
@@ -583,7 +583,7 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
   );
 }
 
-/* Tiny ITO mark for inline contexts */
+/* Tiny ito mark for inline contexts */
 function ItoMarkSmall() {
   return (
     <div style={{
@@ -606,7 +606,7 @@ function ItoMarkSmall() {
 
 
 
-/* ---------------- ITO Quick Read sheet ---------------- */
+/* ---------------- ito Quick Read sheet ---------------- */
 
 function ItoQuickRead({
   onClose, onHelpReply, onEscalate,
@@ -621,10 +621,10 @@ function ItoQuickRead({
             fontWeight: 700, fontSize: 17, color: C.itoInk,
             fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
           }}>
-            Ask ITO
+            Ask ito
           </div>
           <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
-            Here's what I'm noticing
+            What stands out
           </div>
         </div>
         <button onClick={onClose} style={iconBtn()}>
@@ -636,7 +636,7 @@ function ItoQuickRead({
       <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 12 }}>
         {[
           "They're still pushing after you sounded unsure.",
-          "You don't seem fully comfortable yet.",
+          "You already said you weren't sure.",
           "You don't have to answer right away.",
         ].map((line, i) => (
           <div key={i} style={{
@@ -682,14 +682,14 @@ function ItoQuickRead({
           width: 6, height: 6, borderRadius: 3, background: "#9B8E73", flexShrink: 0,
         }} />
         <span style={{ fontSize: 11.5, color: "#6F6657", lineHeight: 1.4 }}>
-          ITO can only respond to what you choose to share here.
+          ito only knows what you share here.
         </span>
       </div>
     </Sheet>
   );
 }
 
-/* Medium ITO mark for sheet headers */
+/* Medium ito mark for sheet headers */
 function ItoMarkMedium() {
   return (
     <div style={{
@@ -710,7 +710,7 @@ function ItoMarkMedium() {
   );
 }
 
-/* ---------------- ITO Reply suggestions ---------------- */
+/* ---------------- ito Reply suggestions ---------------- */
 
 function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose: () => void; onEscalate: () => void }) {
   const [copied, setCopied] = useState<number | null>(null);
@@ -725,7 +725,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
     },
     {
       label: "Slow it down",
-      text: "I need a minute to think.",
+      text: "I need a minute.",
       explain: "Best when you want space without escalating.",
       tone: "Gentle",
     },
@@ -763,7 +763,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
             Help me reply
           </div>
           <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
-            Tap a reply to use it as your draft
+            Tap one to use as your draft
           </div>
         </div>
         <button onClick={onClose} style={iconBtn()}>
@@ -777,7 +777,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
         padding: "8px 10px", background: "#fff", borderRadius: 10,
         border: `1px solid ${C.itoSoftDeep}`,
       }}>
-        Nothing sends until you press send in your own chat. You can edit any of these first.
+        Nothing sends until you hit send. Edit it first if you want.
       </div>
 
       {/* Options */}
@@ -898,7 +898,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
   );
 }
 
-/* ---------------- ITO Higher-risk Escalation ---------------- */
+/* ---------------- ito Higher-risk Escalation ---------------- */
 
 function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
@@ -932,7 +932,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
             This may be crossing a line
           </div>
           <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
-            ITO is taking this seriously
+            ito takes this seriously
           </div>
         </div>
         <button onClick={onClose} style={iconBtn()}>
@@ -944,7 +944,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
       <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
         {[
           "Repeated pressure after hesitation is not okay.",
-          "If someone is threatening, coercing, or ignoring your boundaries, this is serious.",
+          "If someone is threatening, pushing, or ignoring your 'no,' this is serious.",
         ].map((line, i) => (
           <div key={i} style={{
             display: "flex", gap: 12, alignItems: "flex-start",
@@ -998,7 +998,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
               border: `1px solid ${C.itoSoftDeep}`, color: C.itoInk,
               fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
             }}>
-              “I need help with a situation with someone. Can you just listen?”
+              "I need help with a situation. Can you listen?"
             </div>
             <div style={{ marginTop: 8 }}>
               If the first person doesn't get it, try another adult.
@@ -1039,7 +1039,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
         background: "#fff", border: `1px solid ${C.itoSoftDeep}`,
         fontSize: 12, color: "#6F6657", lineHeight: 1.45,
       }}>
-        This stays on your device. ITO doesn't notify anyone, and Loop can't see that you opened this.
+        This stays on your device. ito doesn't notify anyone, and Loop can't see that you opened this.
       </div>
 
       <button onClick={onBack} style={{ ...textBtn(), marginTop: 4 }}>
@@ -1093,7 +1093,7 @@ function ActionRow({
   );
 }
 
-/* ---------------- Ask ITO direct (from inbox) ---------------- */
+/* ---------------- Ask ito direct (from inbox) ---------------- */
 
 function AskItoDirect({ onBack }: { onBack: () => void }) {
   const [input, setInput] = useState("");
@@ -1116,7 +1116,7 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
           <div style={{
             fontWeight: 700, fontSize: 16, color: C.itoInk,
             fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-          }}>Ask ITO</div>
+          }}>Ask ito</div>
           <div style={{ fontSize: 11.5, color: "#6F6657" }}>Private. Not stored. Not shared.</div>
         </div>
       </div>
@@ -1128,7 +1128,7 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
           fontSize: 14.5, color: C.itoInk, lineHeight: 1.5,
           fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
         }}>
-          Hey. Tell me what's going on. You can paste a message someone sent, describe a situation, or just type what's bugging you.
+          Tell me what's going on. Paste a message, describe a situation, or just say what's on your mind.
         </div>
 
         <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -1136,7 +1136,7 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
             "Someone is pressuring me to send a pic",
             "I'm not sure if what I said was okay",
             "Did I mess up at a party",
-            "How do I tell someone no",
+            "How do I say no",
           ].map((s, i) => (
             <button key={i} onClick={() => setInput(s)} style={{
               textAlign: "left", padding: "10px 14px", borderRadius: 999,
@@ -1178,7 +1178,7 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ---------------- ITO header (shared) ---------------- */
+/* ---------------- ito header (shared) ---------------- */
 
 function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: string }) {
   return (
@@ -1189,11 +1189,11 @@ function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: strin
       }}>
         <Shield size={18} color="#fff" />
       </div>
-      <div style={{ flex: 1 }}>
+        <div style={{ flex: 1 }}>
         <div style={{
           fontWeight: 700, fontSize: 16, color: C.itoInk,
           fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-        }}>ITO</div>
+        }}>ito</div>
         <div style={{ fontSize: 11.5, color: "#6F6657" }}>{subtitle}</div>
       </div>
       <button onClick={onClose} style={iconBtn()}>
