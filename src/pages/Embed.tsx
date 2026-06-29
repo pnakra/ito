@@ -67,17 +67,22 @@ const storyFriends = [
   { id: "leo",    initial: "L", grad: ["#C8B6FF", "#8A7BFF"], label: "Leo" },
 ];
 
-// Conversation with Jordan — ambiguous → pressuring
-const jordanThread = [
-  { from: "them", text: "you home rn?", time: "11:42 PM" },
-  { from: "me",   text: "yeah just got back", time: "11:43 PM" },
-  { from: "them", text: "parents asleep?", time: "11:43 PM" },
-  { from: "me",   text: "ya why", time: "11:44 PM" },
-  { from: "them", text: "send me something", time: "11:45 PM" },
-  { from: "them", text: "you know what i mean 😉", time: "11:45 PM" },
-  { from: "them", text: "cmon don't be weird about it. i've sent you stuff before", time: "11:46 PM" },
-  { from: "them", text: "no one's gonna see it it's literally just me", time: "11:46 PM" },
+// Conversation with Jalen — hangout pressure, ambiguous → mild guilt-trip
+const jalenThread = [
+  { from: "them", text: "yo what u doing later", time: "10:48 PM" },
+  { from: "me",   text: "idk prob just chilling, kinda tired tbh", time: "10:51 PM" },
+  { from: "them", text: "come thruuu", time: "10:52 PM" },
+  { from: "them", text: "my roommate's gone for the weekend", time: "10:52 PM" },
+  { from: "me",   text: "hmm maybe. how late we talking", time: "10:55 PM" },
+  { from: "them", text: "doesn't matter, whenever. i'll be up 🙂", time: "10:56 PM" },
+  { from: "me",   text: "i kinda have stuff in the morning", time: "11:14 PM" },
+  { from: "them", text: "u always do this lol", time: "11:21 PM" },
+  { from: "them", text: "like i feel like every time i ask u find a reason", time: "11:22 PM" },
+  { from: "them", text: "just come for an hour. it's not that deep", time: "11:23 PM" },
 ];
+
+// Jalen's avatar gradient (kept consistent with inbox style)
+const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
 
 export default function Embed() {
   const [screen, setScreen] = useState<Screen>("inbox");
