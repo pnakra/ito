@@ -602,9 +602,7 @@ function ItoMarkSmall() {
   );
 }
 
-    </div>
-  );
-}
+
 
 /* ---------------- ITO Quick Read sheet ---------------- */
 
