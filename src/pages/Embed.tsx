@@ -3,7 +3,7 @@ import {
   Search, Camera, MessageCircle, User, MapPin,
   Send, ChevronLeft, Plus, Image as ImageIcon,
   Smile, Mic, Phone, Video, Shield,
-  ArrowRight, X, Pause, Hand, Sticker,
+  ArrowRight, X, Pause, Hand, Sticker, SquarePen,
 } from "lucide-react";
 
 /**
@@ -47,12 +47,24 @@ const C = {
 };
 
 const friends = [
-  { id: "jordan", name: "Jordan M.", initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true, story: true },
-  { id: "maya",   name: "Maya",      initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true, story: true },
-  { id: "devon",  name: "Devon",     initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false },
-  { id: "riley",  name: "Riley + 4", initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false },
-  { id: "sam",    name: "Sam",       initial: "S", grad: ["#FFD6E0", "#FF8FB1"], last: "you: lol fr", time: "1h", unread: 0, online: false, story: true },
-  { id: "alex",   name: "Alex K.",   initial: "A", grad: ["#B5E48C", "#76C893"], last: "📸 sent a snap", time: "3h", unread: 0, online: false, story: false },
+  { id: "jordan",  name: "Jordan M.",      initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true,  story: true,  delivered: false },
+  { id: "maya",    name: "Maya",           initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true,  story: true,  delivered: true },
+  { id: "devon",   name: "Devon",          initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false, delivered: false },
+  { id: "riley",   name: "Riley + 4",      initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false, delivered: true },
+  { id: "sam",     name: "Sam",            initial: "S", grad: ["#FFD6E0", "#FF8FB1"], last: "you: lol fr", time: "1h", unread: 0, online: false, story: true,  delivered: true },
+  { id: "alex",    name: "Alex K.",        initial: "A", grad: ["#B5E48C", "#76C893"], last: "📸 sent a snap", time: "3h", unread: 0, online: false, story: false, delivered: true },
+  { id: "noor",    name: "Noor",           initial: "N", grad: ["#FFD580", "#FF9F45"], last: "wait you saw that too??", time: "5h", unread: 3, online: false, story: true,  delivered: false },
+  { id: "studio",  name: "art ppl 🎨",     initial: "✿", grad: ["#F2A6FF", "#B16CFF"], last: "Tasha: bring the polaroids", time: "yday", unread: 0, online: false, story: false, delivered: true },
+  { id: "kai",     name: "Kai",            initial: "K", grad: ["#FFB199", "#FF6F61"], last: "ok bet", time: "yday", unread: 0, online: false, story: false, delivered: true },
+];
+
+const storyFriends = [
+  { id: "maya",   initial: "M", grad: ["#7CC4FF", "#5B8DEF"], label: "Maya" },
+  { id: "jordan", initial: "J", grad: ["#FF8A65", "#FF4D8D"], label: "Jordan" },
+  { id: "noor",   initial: "N", grad: ["#FFD580", "#FF9F45"], label: "Noor" },
+  { id: "sam",    initial: "S", grad: ["#FFD6E0", "#FF8FB1"], label: "Sam" },
+  { id: "tasha",  initial: "T", grad: ["#A0E7E5", "#54B8B5"], label: "Tasha" },
+  { id: "leo",    initial: "L", grad: ["#C8B6FF", "#8A7BFF"], label: "Leo" },
 ];
 
 // Conversation with Jordan — ambiguous → pressuring
@@ -167,50 +179,43 @@ export default function Embed() {
 /* ---------------- Inbox ---------------- */
 
 function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
-  const stories = friends.filter((f) => f.story);
-
   return (
     <div style={{ height: "100%", overflowY: "auto", background: C.bg }}>
-      {/* Top bar — lightweight, no big logo */}
+      {/* Top bar — page title + lightweight actions */}
       <div style={{
-        padding: "6px 18px 10px", display: "flex",
+        padding: "4px 18px 8px", display: "flex",
         justifyContent: "space-between", alignItems: "center",
       }}>
-        <button style={iconBtn()}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 16,
-            background: `linear-gradient(135deg, ${C.accent}, ${C.accentDeep})`,
-            color: "#fff", display: "flex", alignItems: "center",
-            justifyContent: "center", fontWeight: 700, fontSize: 12,
-          }}>YO</div>
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.8, color: C.text }}>Loop</span>
-          <span style={{
-            width: 7, height: 7, borderRadius: 4, background: C.accent,
-            display: "inline-block", marginLeft: 2, marginTop: 8,
-          }} />
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <h1 style={{
+            fontSize: 28, fontWeight: 800, letterSpacing: -0.8,
+            color: C.text, margin: 0, lineHeight: 1,
+          }}>Chats</h1>
+          <span style={{ fontSize: 13, color: C.subtext, fontWeight: 500 }}>9</span>
         </div>
-
-        <button style={iconBtn()}>
-          <Search size={22} color={C.text} strokeWidth={2.2} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button style={iconBtn()}>
+            <Search size={22} color={C.text} strokeWidth={2.2} />
+          </button>
+          <button style={iconBtn()}>
+            <SquarePen size={21} color={C.text} strokeWidth={2.2} />
+          </button>
+        </div>
       </div>
 
-      {/* Stories rail — friends with a "today" ring */}
+      {/* Stories rail */}
       <div style={{
-        display: "flex", gap: 14, padding: "2px 18px 14px",
+        display: "flex", gap: 14, padding: "6px 18px 14px",
         overflowX: "auto", scrollbarWidth: "none",
       }}>
         <AddStory />
-        {stories.map((s) => (
-          <StoryAvatar key={s.id} grad={s.grad} initial={s.initial} label={s.name.split(" ")[0]} />
+        {storyFriends.map((s) => (
+          <StoryAvatar key={s.id} grad={s.grad} initial={s.initial} label={s.label} />
         ))}
       </div>
 
-      {/* Ask ITO pinned — clearly different surface */}
-      <div style={{ padding: "0 14px 8px" }}>
+      {/* Ask ITO — pinned, distinctly different surface */}
+      <div style={{ padding: "0 14px 6px" }}>
         <button
           onClick={() => onOpen("ask-ito")}
           style={{
@@ -218,44 +223,53 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             padding: "12px 12px", background: C.itoSoft,
             border: `1px solid ${C.itoSoftDeep}`,
             borderRadius: 18, cursor: "pointer", textAlign: "left",
+            position: "relative",
           }}
         >
-          <div style={{
-            width: 44, height: 44, borderRadius: 22, background: C.itoInk,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", flexShrink: 0,
-          }}>
-            <Shield size={20} strokeWidth={2} />
-          </div>
+          {/* Pinned dot */}
+          <span style={{
+            position: "absolute", top: 8, right: 10, fontSize: 10,
+            color: "#9B8E73", fontWeight: 600, letterSpacing: 0.4,
+            textTransform: "uppercase",
+          }}>Pinned</span>
+
+          <ItoMark />
+
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{
-                fontWeight: 700, fontSize: 14.5, color: C.itoInk,
+                fontWeight: 700, fontSize: 15, color: C.itoInk,
                 fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
               }}>Ask ITO</span>
-              <span style={{
-                fontSize: 9.5, fontWeight: 700, padding: "2px 6px",
-                background: "#fff", color: C.itoInk, borderRadius: 6,
-                border: `1px solid ${C.itoSoftDeep}`, letterSpacing: 0.4,
-              }}>PRIVATE</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#6F6657", marginTop: 2 }}>
-              Quiet help before you reply. Only you see this.
+              Private help before you reply
+            </div>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 5,
+              marginTop: 6, padding: "3px 8px", borderRadius: 999,
+              background: "#fff", border: `1px solid ${C.itoSoftDeep}`,
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: 3, background: C.online,
+                boxShadow: `0 0 0 3px ${C.online}25`,
+              }} />
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: C.itoInk, letterSpacing: 0.1 }}>
+                Available now
+              </span>
             </div>
           </div>
-          <ArrowRight size={18} color={C.itoInk} />
         </button>
       </div>
 
       {/* Section label */}
       <div style={{
-        padding: "10px 20px 4px", fontSize: 11.5, fontWeight: 700,
-        color: C.subtext, letterSpacing: 0.6, textTransform: "uppercase",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "12px 20px 4px", fontSize: 11, fontWeight: 700,
+        color: C.subtext, letterSpacing: 0.8, textTransform: "uppercase",
       }}>
-        <span>Chats</span>
-        <Plus size={16} color={C.subtext} />
+        Recent
       </div>
+
 
       {/* Friends list */}
       {friends.map((f) => (
@@ -329,6 +343,32 @@ function AddStory() {
     </div>
   );
 }
+
+/* ITO mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
+   Original mark, not derivative of any existing brand. */
+function ItoMark() {
+  return (
+    <div style={{
+      width: 46, height: 46, borderRadius: 14,
+      background: `linear-gradient(160deg, ${C.itoInk} 0%, #1B2C44 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      flexShrink: 0, position: "relative",
+      boxShadow: "0 2px 6px rgba(14, 26, 43, 0.18)",
+    }}>
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* enclosing soft bracket pair = "hold / consider" */}
+        <path d="M7 6.5 C 5 6.5, 4 8, 4 10 L 4 16 C 4 18, 5 19.5, 7 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        <path d="M19 6.5 C 21 6.5, 22 8, 22 10 L 22 16 C 22 18, 21 19.5, 19 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        {/* center: small four-point spark (calm, not glitzy) */}
+        <path d="M13 8.5 L 13.9 12.1 L 17.5 13 L 13.9 13.9 L 13 17.5 L 12.1 13.9 L 8.5 13 L 12.1 12.1 Z"
+              fill={C.accent} />
+      </svg>
+    </div>
+  );
+}
+
 
 function StoryAvatar({ grad, initial, label }: { grad: string[]; initial: string; label: string }) {
   return (
