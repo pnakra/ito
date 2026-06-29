@@ -665,9 +665,9 @@ function ItoQuickRead({
 function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
   const [picked, setPicked] = useState<number | null>(null);
   const options = [
-    { label: "Hold the line", text: "not sending anything tonight. if that's a problem that's on you." },
-    { label: "Name what's happening", text: "you're pushing pretty hard rn and it doesn't feel good. i'm gonna stop." },
-    { label: "Exit the conversation", text: "going to sleep. ttyl." },
+    { label: "Hold your no",          text: "i'm gonna stay in tonight. i wasn't being weird, i'm just tired." },
+    { label: "Name the pressure",     text: "saying 'u always do this' is kinda making me not want to come more, not less." },
+    { label: "Offer a different time", text: "not tonight. wanna do something tmrw afternoon instead?" },
   ];
 
   return (
