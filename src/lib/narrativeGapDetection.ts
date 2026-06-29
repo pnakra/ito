@@ -363,16 +363,20 @@ export function narrativeToDecisionState(
 
   // Map context factors
   const contextFactors: string[] = [];
-  // Tense-aware intoxication: retrospective mentions ("we were drunk", "I had been drinking")
-  // in after-flow shouldn't auto-escalate the same way as present-tense
+  // Substance involvement: in a check-in (before) flow, ANY mention of alcohol or
+  // drugs counts as a live factor — narrators routinely use past-tense voice
+  // ("we'd been drinking", "she had a few") to describe the current situation.
+  // Only downgrade to a softer factor when the user has explicitly framed the
+  // whole event as already-happened (after-flow), where the deterministic
+  // alcohol+physical=red lock would otherwise mis-fire on retrospective recall.
   const hasSubstances = hasMatch(text, SUBSTANCE_PATTERNS);
-  const isRetrospective = detectedTiming === "after" || /\b(was|were|had been|got)\s+(drunk|wasted|high|drinking|tipsy|buzzed)\b/i.test(text);
-  if (hasSubstances && !isRetrospective) {
+  const isAfterFlow = detectedTiming === "after";
+  if (hasSubstances && !isAfterFlow) {
     contextFactors.push("alcohol");
-  } else if (hasSubstances && isRetrospective) {
-    // Still flag as a factor but at lower weight — push "alcohol" only if combined with other red signals
-    // Don't push it so classifyRisk doesn't auto-red from alcohol+physical alone
-    contextFactors.push("emotional-pressure"); // maps to a context factor that won't auto-red with physical
+  } else if (hasSubstances && isAfterFlow) {
+    // After-flow: keep substances as context for the AI without auto-escalating
+    // a retrospective account to red on the alcohol+physical rule.
+    contextFactors.push("emotional-pressure");
   }
   if (hasMatch(text, POWER_PATTERNS)) contextFactors.push("age-imbalance");
   // Tightened: only true sexual-experience gap, not generic "first time at her place" or "bad experience"
