@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 /**
- * Loop — fictional consumer messaging app with embedded ITO.
+ * Loop — fictional consumer messaging app with embedded ito.
  * Standalone mobile-first clickable prototype at /embed.
- * Camera-first youth-social vibe; ITO is the calmer help layer inside it.
+ * Camera-first youth-social vibe; ito is the calmer help layer inside it.
  */
 
 type Screen =
@@ -38,7 +38,7 @@ const C = {
   bubbleIn: "#F1F2F4",
   bubbleOut: "#00C7B7",
   online: "#22D07A",
-  // ITO sub-brand — softer, grounded, calmer
+  // ito sub-brand — softer, grounded, calmer
   itoInk: "#0E1A2B",
   itoSoft: "#F5F1EA",       // warm sand, distinct from Loop's cool greys
   itoSoftDeep: "#EBE4D6",
@@ -140,7 +140,7 @@ export default function Embed() {
           {screen === "ask-ito-direct" && <AskItoDirect onBack={() => setScreen("inbox")} />}
         </div>
 
-        {/* ITO bottom sheets */}
+        {/* ito bottom sheets */}
         {screen === "ito-quickread" && (
           <ItoQuickRead
             onClose={() => setScreen("conversation")}
@@ -221,7 +221,7 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
         ))}
       </div>
 
-      {/* Ask ITO — pinned, distinctly different surface */}
+      {/* Ask ito — pinned, distinctly different surface */}
       <div style={{ padding: "0 14px 6px" }}>
         <button
           onClick={() => onOpen("ask-ito")}
@@ -351,7 +351,7 @@ function AddStory() {
   );
 }
 
-/* ITO mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
+/* ito mark — custom badge: a soft rounded square with an inset "pause/bracket" sparkle.
    Original mark, not derivative of any existing brand. */
 function ItoMark() {
   return (
@@ -510,7 +510,7 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
         `}</style>
       </div>
 
-      {/* ITO inline suggestion — sits right above composer */}
+      {/* ito inline suggestion — sits right above composer */}
       <div style={{ padding: "4px 12px 8px" }}>
         <button
           onClick={onAskIto}
@@ -689,7 +689,7 @@ function ItoQuickRead({
   );
 }
 
-/* Medium ITO mark for sheet headers */
+/* Medium ito mark for sheet headers */
 function ItoMarkMedium() {
   return (
     <div style={{
@@ -710,7 +710,7 @@ function ItoMarkMedium() {
   );
 }
 
-/* ---------------- ITO Reply suggestions ---------------- */
+/* ---------------- ito Reply suggestions ---------------- */
 
 function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose: () => void; onEscalate: () => void }) {
   const [copied, setCopied] = useState<number | null>(null);
@@ -898,7 +898,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
   );
 }
 
-/* ---------------- ITO Higher-risk Escalation ---------------- */
+/* ---------------- ito Higher-risk Escalation ---------------- */
 
 function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () => void }) {
   const [open, setOpen] = useState<string | null>(null);
@@ -1093,7 +1093,7 @@ function ActionRow({
   );
 }
 
-/* ---------------- Ask ITO direct (from inbox) ---------------- */
+/* ---------------- Ask ito direct (from inbox) ---------------- */
 
 function AskItoDirect({ onBack }: { onBack: () => void }) {
   const [input, setInput] = useState("");
@@ -1178,7 +1178,7 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ---------------- ITO header (shared) ---------------- */
+/* ---------------- ito header (shared) ---------------- */
 
 function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: string }) {
   return (
