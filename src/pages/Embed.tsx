@@ -772,29 +772,29 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 
       {/* Subtle reassurance */}
       <div style={{
-        marginTop: 10, fontSize: 12.5, color: "#6F6657", lineHeight: 1.45,
-        padding: "10px 12px", background: "#fff", borderRadius: 12,
+        marginTop: 8, fontSize: 12, color: "#6F6657", lineHeight: 1.4,
+        padding: "8px 10px", background: "#fff", borderRadius: 10,
         border: `1px solid ${C.itoSoftDeep}`,
       }}>
         Nothing sends until you press send in your own chat. You can edit any of these first.
       </div>
 
       {/* Options */}
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
         {options.map((o, i) => {
           const isUsed = used === i;
           return (
             <div
               key={i}
               style={{
-                padding: "14px 14px 12px", background: "#fff",
+                padding: "10px 12px 10px", background: "#fff",
                 border: `1.5px solid ${isUsed ? C.itoInk : C.itoSoftDeep}`,
-                borderRadius: 16, boxShadow: isUsed ? "0 4px 14px rgba(14,26,43,0.10)" : "none",
+                borderRadius: 14, boxShadow: isUsed ? "0 4px 14px rgba(14,26,43,0.10)" : "none",
                 transition: "all 220ms ease",
               }}
             >
               {/* Label + tone tag */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                 <span style={{
                   fontSize: 13, fontWeight: 700, color: C.itoInk,
                   fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
@@ -803,7 +803,7 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
                 </span>
                 <span style={{
                   fontSize: 10, fontWeight: 600, color: "#6F6657",
-                  padding: "2px 7px", background: C.itoSoft, borderRadius: 999,
+                  padding: "2px 6px", background: C.itoSoft, borderRadius: 999,
                 }}>
                   {o.tone}
                 </span>
@@ -811,9 +811,9 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 
               {/* Reply text — focal point */}
               <div style={{
-                padding: "11px 13px", background: C.itoSoft,
-                borderRadius: 12, border: `1px solid ${C.itoSoftDeep}`,
-                fontSize: 15, color: C.itoInk, lineHeight: 1.45,
+                padding: "9px 11px", background: C.itoSoft,
+                borderRadius: 10, border: `1px solid ${C.itoSoftDeep}`,
+                fontSize: 14.5, color: C.itoInk, lineHeight: 1.4,
                 fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
               }}>
                 “{o.text}”
@@ -821,28 +821,28 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
 
               {/* Explanation */}
               <div style={{
-                marginTop: 8, fontSize: 12.5, color: "#6F6657", lineHeight: 1.4,
+                marginTop: 5, fontSize: 12, color: "#6F6657", lineHeight: 1.35,
               }}>
                 {o.explain}
               </div>
 
               {/* Actions */}
               <div style={{
-                marginTop: 12, display: "flex", alignItems: "center", gap: 8,
+                marginTop: 8, display: "flex", alignItems: "center", gap: 6,
               }}>
                 <button
                   onClick={() => handleUse(i)}
                   style={{
-                    flex: 1, padding: "10px 12px", borderRadius: 12,
+                    flex: 1, padding: "8px 10px", borderRadius: 10,
                     background: isUsed ? "#0B1A2D" : C.itoInk,
                     color: "#fff", border: "none", fontWeight: 700,
-                    fontSize: 13, cursor: "pointer", display: "flex",
-                    alignItems: "center", justifyContent: "center", gap: 6,
+                    fontSize: 12.5, cursor: "pointer", display: "flex",
+                    alignItems: "center", justifyContent: "center", gap: 5,
                   }}
                 >
                   {isUsed ? (
                     <>
-                      <Check size={14} strokeWidth={2.5} /> Draft ready
+                      <Check size={13} strokeWidth={2.5} /> Draft ready
                     </>
                   ) : (
                     "Use this"
@@ -851,29 +851,29 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
                 <button
                   onClick={() => handleCopy(i, o.text)}
                   style={{
-                    padding: "10px 12px", borderRadius: 12,
+                    padding: "8px 10px", borderRadius: 10,
                     background: "transparent", border: `1.5px solid ${C.itoSoftDeep}`,
-                    color: C.itoInk, fontWeight: 600, fontSize: 13,
+                    color: C.itoInk, fontWeight: 600, fontSize: 12.5,
                     cursor: "pointer", display: "flex", alignItems: "center",
-                    gap: 5, minWidth: 84, justifyContent: "center",
+                    gap: 4, minWidth: 76, justifyContent: "center",
                   }}
                 >
                   {copied === i ? (
                     <>
-                      <Check size={14} strokeWidth={2.5} /> Copied
+                      <Check size={13} strokeWidth={2.5} /> Copied
                     </>
                   ) : (
                     <>
-                      <Copy size={14} strokeWidth={2.2} /> Copy
+                      <Copy size={13} strokeWidth={2.2} /> Copy
                     </>
                   )}
                 </button>
                 <button
                   style={{
-                    padding: "10px 10px", background: "none", border: "none",
-                    color: "#6F6657", fontSize: 12.5, fontWeight: 500,
+                    padding: "8px 8px", background: "none", border: "none",
+                    color: "#6F6657", fontSize: 12, fontWeight: 500,
                     cursor: "pointer", textDecoration: "underline",
-                    textUnderlineOffset: 3,
+                    textUnderlineOffset: 2,
                   }}
                 >
                   Edit first
@@ -885,7 +885,7 @@ function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void
       </div>
 
       {/* Bottom close */}
-      <button onClick={onClose} style={textBtn()}>
+      <button onClick={onClose} style={{ ...textBtn(), marginTop: 4 }}>
         Not now — I'll write my own
       </button>
     </Sheet>
