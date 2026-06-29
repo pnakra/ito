@@ -16,6 +16,7 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
+import Embed from "./pages/Embed";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogArticle />} />
               <Route path="/admin/evals" element={<AdminEvals />} />
+              <Route path="/embed" element={<Embed />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
