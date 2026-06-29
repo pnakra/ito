@@ -152,6 +152,7 @@ export default function Embed() {
           <ItoReply
             onBack={() => setScreen("ito-quickread")}
             onClose={() => setScreen("conversation")}
+            onEscalate={() => setScreen("ito-escalation")}
           />
         )}
         {screen === "ito-escalation" && (
