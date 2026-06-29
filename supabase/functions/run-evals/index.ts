@@ -111,9 +111,9 @@ async function callAnalyzeNarrative(
   actualRiskLevel: "green" | "yellow" | "red",
   flow: "before" | "after",
 ): Promise<{ ok: boolean; data: unknown; status: number }> {
-  const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-narrative`, {
+  const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-narrative`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${EXTERNAL_SERVICE_ROLE_KEY}` },
     body: JSON.stringify({
       narrativeText,
       precomputedRiskLevel: actualRiskLevel, // FIX: use actual, not expected
