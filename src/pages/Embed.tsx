@@ -4,6 +4,7 @@ import {
   Send, ChevronLeft, Plus, Image as ImageIcon,
   Smile, Mic, Phone, Video, Shield,
   ArrowRight, X, Pause, Hand, Sticker, SquarePen,
+  Copy, Check,
 } from "lucide-react";
 
 /**
@@ -711,66 +712,182 @@ function ItoMarkMedium() {
 /* ---------------- ITO Reply suggestions ---------------- */
 
 function ItoReply({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
-  const [picked, setPicked] = useState<number | null>(null);
+  const [copied, setCopied] = useState<number | null>(null);
+  const [used, setUsed] = useState<number | null>(null);
+
   const options = [
-    { label: "Hold your no",          text: "i'm gonna stay in tonight. i wasn't being weird, i'm just tired." },
-    { label: "Name the pressure",     text: "saying 'u always do this' is kinda making me not want to come more, not less." },
-    { label: "Offer a different time", text: "not tonight. wanna do something tmrw afternoon instead?" },
+    {
+      label: "Set a boundary",
+      text: "I'm not comfortable with that tonight.",
+      explain: "Best when you want to be direct.",
+      tone: "Direct",
+    },
+    {
+      label: "Slow it down",
+      text: "I need a minute to think.",
+      explain: "Best when you want space without escalating.",
+      tone: "Gentle",
+    },
+    {
+      label: "Exit for now",
+      text: "I'm getting off my phone for a bit.",
+      explain: "Best when you want to pause the conversation.",
+      tone: "Pause",
+    },
   ];
 
+  const handleCopy = (i: number, text: string) => {
+    void navigator.clipboard.writeText(text);
+    setCopied(i);
+    setTimeout(() => setCopied((c) => (c === i ? null : c)), 1500);
+  };
+
+  const handleUse = (i: number) => {
+    setUsed(i);
+    setTimeout(() => onClose(), 220);
+  };
+
   return (
-    <Sheet onClose={onClose}>
+    <Sheet onClose={onClose} tall>
+      {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <button onClick={onBack} style={iconBtn()}>
-          <ChevronLeft size={22} color={C.itoInk} />
+          <ChevronLeft size={24} color={C.itoInk} />
         </button>
-        <div style={{
-          flex: 1, fontWeight: 700, fontSize: 16, color: C.itoInk,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
-        }}>Three ways to reply</div>
+        <div style={{ flex: 1 }}>
+          <div style={{
+            fontWeight: 700, fontSize: 17, color: C.itoInk,
+            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+          }}>
+            Help me reply
+          </div>
+          <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
+            Tap a reply to use it as your draft
+          </div>
+        </div>
         <button onClick={onClose} style={iconBtn()}>
           <X size={20} color={C.subtext} />
         </button>
       </div>
 
-      <div style={{ fontSize: 13, color: "#6F6657", marginTop: 6, lineHeight: 1.4 }}>
-        Pick one or use it as a starting point. Nothing sends until you tap send in your own chat.
+      {/* Subtle reassurance */}
+      <div style={{
+        marginTop: 8, fontSize: 12, color: "#6F6657", lineHeight: 1.4,
+        padding: "8px 10px", background: "#fff", borderRadius: 10,
+        border: `1px solid ${C.itoSoftDeep}`,
+      }}>
+        Nothing sends until you press send in your own chat. You can edit any of these first.
       </div>
 
-      <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-        {options.map((o, i) => (
-          <button
-            key={i}
-            onClick={() => setPicked(i)}
-            style={{
-              textAlign: "left", padding: 14, borderRadius: 14,
-              border: `1.5px solid ${picked === i ? C.itoInk : C.itoSoftDeep}`,
-              background: picked === i ? C.itoSoft : "#fff",
-              cursor: "pointer",
-            }}
-          >
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.itoAccent, letterSpacing: 0.5 }}>
-              {o.label.toUpperCase()}
+      {/* Options */}
+      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+        {options.map((o, i) => {
+          const isUsed = used === i;
+          return (
+            <div
+              key={i}
+              style={{
+                padding: "10px 12px 10px", background: "#fff",
+                border: `1.5px solid ${isUsed ? C.itoInk : C.itoSoftDeep}`,
+                borderRadius: 14, boxShadow: isUsed ? "0 4px 14px rgba(14,26,43,0.10)" : "none",
+                transition: "all 220ms ease",
+              }}
+            >
+              {/* Label + tone tag */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <span style={{
+                  fontSize: 13, fontWeight: 700, color: C.itoInk,
+                  fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+                }}>
+                  {o.label}
+                </span>
+                <span style={{
+                  fontSize: 10, fontWeight: 600, color: "#6F6657",
+                  padding: "2px 6px", background: C.itoSoft, borderRadius: 999,
+                }}>
+                  {o.tone}
+                </span>
+              </div>
+
+              {/* Reply text — focal point */}
+              <div style={{
+                padding: "9px 11px", background: C.itoSoft,
+                borderRadius: 10, border: `1px solid ${C.itoSoftDeep}`,
+                fontSize: 14.5, color: C.itoInk, lineHeight: 1.4,
+                fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              }}>
+                “{o.text}”
+              </div>
+
+              {/* Explanation */}
+              <div style={{
+                marginTop: 5, fontSize: 12, color: "#6F6657", lineHeight: 1.35,
+              }}>
+                {o.explain}
+              </div>
+
+              {/* Actions */}
+              <div style={{
+                marginTop: 8, display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <button
+                  onClick={() => handleUse(i)}
+                  style={{
+                    flex: 1, padding: "8px 10px", borderRadius: 10,
+                    background: isUsed ? "#0B1A2D" : C.itoInk,
+                    color: "#fff", border: "none", fontWeight: 700,
+                    fontSize: 12.5, cursor: "pointer", display: "flex",
+                    alignItems: "center", justifyContent: "center", gap: 5,
+                  }}
+                >
+                  {isUsed ? (
+                    <>
+                      <Check size={13} strokeWidth={2.5} /> Draft ready
+                    </>
+                  ) : (
+                    "Use this"
+                  )}
+                </button>
+                <button
+                  onClick={() => handleCopy(i, o.text)}
+                  style={{
+                    padding: "8px 10px", borderRadius: 10,
+                    background: "transparent", border: `1.5px solid ${C.itoSoftDeep}`,
+                    color: C.itoInk, fontWeight: 600, fontSize: 12.5,
+                    cursor: "pointer", display: "flex", alignItems: "center",
+                    gap: 4, minWidth: 76, justifyContent: "center",
+                  }}
+                >
+                  {copied === i ? (
+                    <>
+                      <Check size={13} strokeWidth={2.5} /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={13} strokeWidth={2.2} /> Copy
+                    </>
+                  )}
+                </button>
+                <button
+                  style={{
+                    padding: "8px 8px", background: "none", border: "none",
+                    color: "#6F6657", fontSize: 12, fontWeight: 500,
+                    cursor: "pointer", textDecoration: "underline",
+                    textUnderlineOffset: 2,
+                  }}
+                >
+                  Edit first
+                </button>
+              </div>
             </div>
-            <div style={{ fontSize: 14.5, color: C.itoInk, marginTop: 4, lineHeight: 1.4 }}>
-              "{o.text}"
-            </div>
-          </button>
-        ))}
+          );
+        })}
       </div>
 
-      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-        <button
-          style={primaryBtn(C.itoInk)}
-          disabled={picked === null}
-          onClick={onClose}
-        >
-          Use this draft
-        </button>
-        <button onClick={onClose} style={textBtn()}>
-          Not now
-        </button>
-      </div>
+      {/* Bottom close */}
+      <button onClick={onClose} style={{ ...textBtn(), marginTop: 4 }}>
+        Not now — I'll write my own
+      </button>
     </Sheet>
   );
 }
@@ -941,8 +1058,8 @@ function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: strin
 /* ---------------- Bottom sheet wrapper ---------------- */
 
 function Sheet({
-  children, onClose, accent,
-}: { children: React.ReactNode; onClose: () => void; accent?: string }) {
+  children, onClose, accent, tall,
+}: { children: React.ReactNode; onClose: () => void; accent?: string; tall?: boolean }) {
   return (
     <div style={{
       position: "absolute", inset: 0, zIndex: 40,
@@ -957,7 +1074,7 @@ function Sheet({
           width: "100%", background: "#FAF7F0",
           borderTopLeftRadius: 28, borderTopRightRadius: 28,
           padding: "12px 20px 28px",
-          maxHeight: "85%", overflowY: "auto",
+          maxHeight: tall ? "92%" : "85%", overflowY: "auto",
           borderTop: accent ? `3px solid ${accent}` : "none",
           animation: "slideUp 280ms cubic-bezier(.2,.9,.3,1)",
         }}
