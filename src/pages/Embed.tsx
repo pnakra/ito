@@ -666,7 +666,7 @@ function ItoQuickRead({
           Help me reply
         </button>
         <button onClick={onEscalate} style={ghostBtn()}>
-          Help me think
+          This feels more serious
         </button>
       </div>
 
