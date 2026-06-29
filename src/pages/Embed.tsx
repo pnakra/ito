@@ -179,50 +179,43 @@ export default function Embed() {
 /* ---------------- Inbox ---------------- */
 
 function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
-  const stories = friends.filter((f) => f.story);
-
   return (
     <div style={{ height: "100%", overflowY: "auto", background: C.bg }}>
-      {/* Top bar — lightweight, no big logo */}
+      {/* Top bar — page title + lightweight actions */}
       <div style={{
-        padding: "6px 18px 10px", display: "flex",
+        padding: "4px 18px 8px", display: "flex",
         justifyContent: "space-between", alignItems: "center",
       }}>
-        <button style={iconBtn()}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 16,
-            background: `linear-gradient(135deg, ${C.accent}, ${C.accentDeep})`,
-            color: "#fff", display: "flex", alignItems: "center",
-            justifyContent: "center", fontWeight: 700, fontSize: 12,
-          }}>YO</div>
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.8, color: C.text }}>Loop</span>
-          <span style={{
-            width: 7, height: 7, borderRadius: 4, background: C.accent,
-            display: "inline-block", marginLeft: 2, marginTop: 8,
-          }} />
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <h1 style={{
+            fontSize: 28, fontWeight: 800, letterSpacing: -0.8,
+            color: C.text, margin: 0, lineHeight: 1,
+          }}>Chats</h1>
+          <span style={{ fontSize: 13, color: C.subtext, fontWeight: 500 }}>9</span>
         </div>
-
-        <button style={iconBtn()}>
-          <Search size={22} color={C.text} strokeWidth={2.2} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button style={iconBtn()}>
+            <Search size={22} color={C.text} strokeWidth={2.2} />
+          </button>
+          <button style={iconBtn()}>
+            <SquarePen size={21} color={C.text} strokeWidth={2.2} />
+          </button>
+        </div>
       </div>
 
-      {/* Stories rail — friends with a "today" ring */}
+      {/* Stories rail */}
       <div style={{
-        display: "flex", gap: 14, padding: "2px 18px 14px",
+        display: "flex", gap: 14, padding: "6px 18px 14px",
         overflowX: "auto", scrollbarWidth: "none",
       }}>
         <AddStory />
-        {stories.map((s) => (
-          <StoryAvatar key={s.id} grad={s.grad} initial={s.initial} label={s.name.split(" ")[0]} />
+        {storyFriends.map((s) => (
+          <StoryAvatar key={s.id} grad={s.grad} initial={s.initial} label={s.label} />
         ))}
       </div>
 
-      {/* Ask ITO pinned — clearly different surface */}
-      <div style={{ padding: "0 14px 8px" }}>
+      {/* Ask ITO — pinned, distinctly different surface */}
+      <div style={{ padding: "0 14px 6px" }}>
         <button
           onClick={() => onOpen("ask-ito")}
           style={{
@@ -230,44 +223,53 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             padding: "12px 12px", background: C.itoSoft,
             border: `1px solid ${C.itoSoftDeep}`,
             borderRadius: 18, cursor: "pointer", textAlign: "left",
+            position: "relative",
           }}
         >
-          <div style={{
-            width: 44, height: 44, borderRadius: 22, background: C.itoInk,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", flexShrink: 0,
-          }}>
-            <Shield size={20} strokeWidth={2} />
-          </div>
+          {/* Pinned dot */}
+          <span style={{
+            position: "absolute", top: 8, right: 10, fontSize: 10,
+            color: "#9B8E73", fontWeight: 600, letterSpacing: 0.4,
+            textTransform: "uppercase",
+          }}>Pinned</span>
+
+          <ItoMark />
+
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{
-                fontWeight: 700, fontSize: 14.5, color: C.itoInk,
+                fontWeight: 700, fontSize: 15, color: C.itoInk,
                 fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
               }}>Ask ITO</span>
-              <span style={{
-                fontSize: 9.5, fontWeight: 700, padding: "2px 6px",
-                background: "#fff", color: C.itoInk, borderRadius: 6,
-                border: `1px solid ${C.itoSoftDeep}`, letterSpacing: 0.4,
-              }}>PRIVATE</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#6F6657", marginTop: 2 }}>
-              Quiet help before you reply. Only you see this.
+              Private help before you reply
+            </div>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 5,
+              marginTop: 6, padding: "3px 8px", borderRadius: 999,
+              background: "#fff", border: `1px solid ${C.itoSoftDeep}`,
+            }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: 3, background: C.online,
+                boxShadow: `0 0 0 3px ${C.online}25`,
+              }} />
+              <span style={{ fontSize: 10.5, fontWeight: 600, color: C.itoInk, letterSpacing: 0.1 }}>
+                Available now
+              </span>
             </div>
           </div>
-          <ArrowRight size={18} color={C.itoInk} />
         </button>
       </div>
 
       {/* Section label */}
       <div style={{
-        padding: "10px 20px 4px", fontSize: 11.5, fontWeight: 700,
-        color: C.subtext, letterSpacing: 0.6, textTransform: "uppercase",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "12px 20px 4px", fontSize: 11, fontWeight: 700,
+        color: C.subtext, letterSpacing: 0.8, textTransform: "uppercase",
       }}>
-        <span>Chats</span>
-        <Plus size={16} color={C.subtext} />
+        Recent
       </div>
+
 
       {/* Friends list */}
       {friends.map((f) => (
