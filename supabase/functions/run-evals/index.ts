@@ -95,9 +95,14 @@ async function callAnalyzeLanguage(text: string): Promise<{ riskLevel: "green" |
   return { riskLevel, raw: data };
 }
 
+// FIX: now accepts actualRiskLevel separately from expectedRiskLevel so the
+// severity reminder reflects what the production classifier actually decided,
+// not what the eval expects. Also sends structuredSignals so Claude has the
+// same context as the real app (empty object = signal-floor skip, same as
+// organic sessions that skip the floor).
 async function callAnalyzeNarrative(
   narrativeText: string,
-  precomputedRiskLevel: "green" | "yellow" | "red",
+  actualRiskLevel: "green" | "yellow" | "red",
   flow: "before" | "after",
 ): Promise<{ ok: boolean; data: unknown; status: number }> {
   const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-narrative`, {
@@ -105,9 +110,10 @@ async function callAnalyzeNarrative(
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
     body: JSON.stringify({
       narrativeText,
-      precomputedRiskLevel,
+      precomputedRiskLevel: actualRiskLevel,   // FIX: use actual, not expected
       detectedTiming: flow === "after" ? "after" : undefined,
       isFollowUp: false,
+      structuredSignals: {},                    // FIX: send empty object so edge fn logs hasSignals correctly
     }),
   });
   const data = await resp.json().catch(() => ({}));
@@ -321,7 +327,11 @@ async function processScenario(
       const cls = await callAnalyzeLanguage(scenario.input);
       actualRiskLevel = cls.riskLevel;
     }
-    const narr = await callAnalyzeNarrative(scenario.input, scenario.expects.risk_level, scenario.flow);
+
+    // FIX: pass actualRiskLevel (what the classifier decided) not
+    // scenario.expects.risk_level (what the eval hopes for). This ensures
+    // the severity reminder Claude receives matches what a real user would get.
+    const narr = await callAnalyzeNarrative(scenario.input, actualRiskLevel, scenario.flow);
     const responseText = flattenStrings(narr.data);
     const lower = responseText.toLowerCase();
     // For forbidden-phrase scanning, strip quoted segments — when the model
