@@ -885,6 +885,11 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
         })}
       </div>
 
+      {/* Escalation path */}
+      <button onClick={onEscalate} style={{ ...textBtn(), marginTop: 2, color: C.itoInk, fontWeight: 600 }}>
+        This feels more serious than a reply
+      </button>
+
       {/* Bottom close */}
       <button onClick={onClose} style={{ ...textBtn(), marginTop: 4 }}>
         Not now — I'll write my own
