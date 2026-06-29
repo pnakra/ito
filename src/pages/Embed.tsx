@@ -611,52 +611,100 @@ function ItoQuickRead({
 }: { onClose: () => void; onHelpReply: () => void; onEscalate: () => void }) {
   return (
     <Sheet onClose={onClose}>
-      <ItoHeader onClose={onClose} subtitle="Only you can see this" />
-
-      <div style={{ marginTop: 16 }}>
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          padding: "5px 10px", borderRadius: 999,
-          background: "#F6E8D4", color: "#8A5A12",
-          fontSize: 11.5, fontWeight: 700, marginBottom: 12,
-          letterSpacing: 0.2,
-        }}>
-          <Pause size={12} /> Something's off
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <ItoMarkMedium />
+        <div style={{ flex: 1 }}>
+          <div style={{
+            fontWeight: 700, fontSize: 17, color: C.itoInk,
+            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+          }}>
+            Ask ITO
+          </div>
+          <div style={{ fontSize: 12, color: "#6F6657", marginTop: 1 }}>
+            Here's what I'm noticing
+          </div>
         </div>
-
-        <div style={{
-          fontSize: 18, fontWeight: 500, lineHeight: 1.4, color: C.itoInk,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
-        }}>
-          Jalen's pushing you to come over late, and now turning your hesitation into a thing about you.
-        </div>
-
-        <div style={{
-          marginTop: 14, padding: 14, background: C.itoSoft,
-          border: `1px solid ${C.itoSoftDeep}`,
-          borderRadius: 14, fontSize: 13.5, lineHeight: 1.55, color: "#3D3528",
-        }}>
-          A few things to notice:
-          <ul style={{ margin: "8px 0 0 18px", padding: 0 }}>
-            <li>"u always do this" reframes a normal no as a pattern problem.</li>
-            <li>"it's not that deep" makes your hesitation the issue, not the ask.</li>
-            <li>You said you're tired and have stuff in the morning. Both still true.</li>
-          </ul>
-        </div>
+        <button onClick={onClose} style={iconBtn()}>
+          <X size={20} color={C.subtext} />
+        </button>
       </div>
 
+      {/* Bullets — plain language reflection */}
+      <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 12 }}>
+        {[
+          "They're still pushing after you sounded unsure.",
+          "You don't seem fully comfortable yet.",
+          "You don't have to answer right away.",
+        ].map((line, i) => (
+          <div key={i} style={{
+            display: "flex", gap: 12, alignItems: "flex-start",
+            padding: "12px 14px", background: "#fff",
+            border: `1px solid ${C.itoSoftDeep}`, borderRadius: 12,
+          }}>
+            <span style={{
+              width: 22, height: 22, borderRadius: 11, flexShrink: 0,
+              background: C.itoSoft, color: C.itoInk,
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              fontSize: 11.5, fontWeight: 700, marginTop: 1,
+              fontFamily: '"Newsreader", Georgia, serif',
+            }}>{i + 1}</span>
+            <span style={{
+              fontSize: 14.5, color: C.itoInk, lineHeight: 1.45,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>
+              {line}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Buttons */}
       <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
         <button onClick={onHelpReply} style={primaryBtn(C.itoInk)}>
           Help me reply
         </button>
         <button onClick={onEscalate} style={ghostBtn()}>
-          This feels worse than it looks
-        </button>
-        <button onClick={onClose} style={textBtn()}>
-          Just close — I'll sit with it
+          Help me think
         </button>
       </div>
+
+      {/* System boundary line */}
+      <div style={{
+        marginTop: 16, padding: "10px 12px",
+        display: "flex", alignItems: "center", gap: 8,
+        borderTop: `1px dashed ${C.itoSoftDeep}`,
+        paddingTop: 14,
+      }}>
+        <span style={{
+          width: 6, height: 6, borderRadius: 3, background: "#9B8E73", flexShrink: 0,
+        }} />
+        <span style={{ fontSize: 11.5, color: "#6F6657", lineHeight: 1.4 }}>
+          ITO can only respond to what you choose to share here.
+        </span>
+      </div>
     </Sheet>
+  );
+}
+
+/* Medium ITO mark for sheet headers */
+function ItoMarkMedium() {
+  return (
+    <div style={{
+      width: 40, height: 40, borderRadius: 12,
+      background: `linear-gradient(160deg, ${C.itoInk} 0%, #1B2C44 100%)`,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      flexShrink: 0, boxShadow: "0 2px 6px rgba(14, 26, 43, 0.18)",
+    }}>
+      <svg width="22" height="22" viewBox="0 0 26 26" fill="none">
+        <path d="M7 6.5 C 5 6.5, 4 8, 4 10 L 4 16 C 4 18, 5 19.5, 7 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        <path d="M19 6.5 C 21 6.5, 22 8, 22 10 L 22 16 C 22 18, 21 19.5, 19 19.5"
+              stroke="#FAF7F0" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+        <path d="M13 8.5 L 13.9 12.1 L 17.5 13 L 13.9 13.9 L 13 17.5 L 12.1 13.9 L 8.5 13 L 12.1 12.1 Z"
+              fill={C.accent} />
+      </svg>
+    </div>
   );
 }
 
