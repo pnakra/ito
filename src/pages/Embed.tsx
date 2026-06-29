@@ -1058,8 +1058,8 @@ function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: strin
 /* ---------------- Bottom sheet wrapper ---------------- */
 
 function Sheet({
-  children, onClose, accent,
-}: { children: React.ReactNode; onClose: () => void; accent?: string }) {
+  children, onClose, accent, tall,
+}: { children: React.ReactNode; onClose: () => void; accent?: string; tall?: boolean }) {
   return (
     <div style={{
       position: "absolute", inset: 0, zIndex: 40,
@@ -1074,7 +1074,7 @@ function Sheet({
           width: "100%", background: "#FAF7F0",
           borderTopLeftRadius: 28, borderTopRightRadius: 28,
           padding: "12px 20px 28px",
-          maxHeight: "85%", overflowY: "auto",
+          maxHeight: tall ? "92%" : "85%", overflowY: "auto",
           borderTop: accent ? `3px solid ${accent}` : "none",
           animation: "slideUp 280ms cubic-bezier(.2,.9,.3,1)",
         }}
