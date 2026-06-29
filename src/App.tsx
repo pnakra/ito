@@ -16,6 +16,7 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
+import Embed from "./pages/Embed";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
