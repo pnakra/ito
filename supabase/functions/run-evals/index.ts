@@ -20,8 +20,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-eval-passcode, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SUPABASE_URL = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
-const SERVICE_ROLE_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!;
+// Internal (Lovable Cloud) — where eval_runs / eval_results live.
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// External — where the production analyze-* edge functions live.
+const EXTERNAL_SUPABASE_URL = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
+const EXTERNAL_SERVICE_ROLE_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const PASSCODE = Deno.env.get("EVAL_ADMIN_PASSCODE")!;
 
