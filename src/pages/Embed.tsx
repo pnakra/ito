@@ -491,7 +491,7 @@ function Conversation({ onBack, onAskIto, onEscalate }: { onBack: () => void; on
                   borderBottomRightRadius: m.from === "me" && isLastOfGroup ? 6 : 22,
                   borderBottomLeftRadius: m.from === "them" && isLastOfGroup ? 6 : 22,
                   background: m.from === "me" ? C.bubbleOut : C.bubbleIn,
-                  color: m.from === "me" ? "#fff" : C.text,
+                  color: m.from === "me" ? C.bubbleOutText : C.text,
                   fontSize: 14.5,
                   lineHeight: 1.35,
                   fontWeight: m.from === "me" ? 500 : 400,
