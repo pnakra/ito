@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { logVisit } from "@/lib/logVisit";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import { ArrowRight } from "lucide-react";
 
 const MESSAGES = [
@@ -28,6 +29,11 @@ const Index = () => {
 
   return (
     <div className="flex flex-col bg-background" style={{ height: "100dvh" }}>
+      <SEO
+        title="ito — Is this ok? Anonymous read on hookups & consent"
+        description="Get an honest, non-judgmental perspective on sex, dating, and consent. 100% anonymous — nothing is saved, nothing is tied to you."
+        path="/"
+      />
       <Header />
 
       <main className="flex-1 flex flex-col justify-between px-5 pb-6 pt-4 container mx-auto max-w-md">
