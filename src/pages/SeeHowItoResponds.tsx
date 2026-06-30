@@ -147,9 +147,9 @@ const SeeHowItoResponds = () => {
             <div>
               <p className="text-[14px] text-foreground font-medium mb-1">What would you lead with?</p>
               <p className="text-[12px] text-muted-foreground mb-3">
-                Pick a starting point, or just start typing your own.
+                Pick one, or just start typing your own.
               </p>
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-3 gap-2 mb-3">
                 {RESPONSE_STYLES.map((style) => {
                   const active = selectedStyle === style.id;
                   return (
@@ -230,7 +230,7 @@ const SeeHowItoResponds = () => {
                 <p className="text-[14px] text-foreground/90 leading-relaxed whitespace-pre-wrap">
                   {userResponse.trim() || (
                     <span className="italic text-muted-foreground">
-                      {RESPONSE_STYLES.find((s) => s.id === selectedStyle)?.hint}
+                      {RESPONSE_STYLES.find((s) => s.id === selectedStyle)?.label}
                     </span>
                   )}
                 </p>
