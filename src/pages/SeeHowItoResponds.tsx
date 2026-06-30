@@ -227,13 +227,11 @@ const SeeHowItoResponds = () => {
                   value={userResponse}
                   onChange={(e) => setUserResponse(e.target.value.slice(0, 600))}
                   placeholder="How would you respond?"
-                  className="w-full min-h-[144px] resize-none rounded-[32px] p-6 pt-5 text-sm shadow-inner transition-all focus:ring-4 focus-visible:ring-4"
+                  className="w-full min-h-[144px] resize-none rounded-[32px] p-6 pt-5 text-sm shadow-inner transition-all focus:ring-4 focus-visible:ring-4 focus:ring-indigo-500/5"
                   style={{
                     background: TILE_BG,
                     border: `1px solid ${TILE_BORDER}`,
                     color: "#f1f5f9",
-                    // @ts-expect-error custom ring color via style
-                    "--tw-ring-color": "rgba(99, 102, 241, 0.05)",
                   }}
                 />
                 <button
