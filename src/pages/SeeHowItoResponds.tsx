@@ -273,8 +273,6 @@ const SeeHowItoResponds = () => {
             </div>
           </div>
         )}
-
-        </div>
       </main>
     </div>
   );
