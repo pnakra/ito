@@ -84,7 +84,7 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
 export type ResponseStyle = "plain" | "kind" | "light";
 
 export const RESPONSE_STYLES: { id: ResponseStyle; label: string; starter: string }[] = [
-  { id: "plain", label: "Say it plainly",      starter: "Honestly? I think you already know the answer. " },
-  { id: "kind",  label: "Be kind and careful", starter: "I get why you're sitting with this. Maybe give it some space and " },
-  { id: "light", label: "Keep it light",       starter: "Dude, don't overthink it. Just " },
+  { id: "plain", label: "Say it plainly",      starter: "Honestly, I think the best thing is to just say it." },
+  { id: "kind",  label: "Be kind and careful", starter: "I get why you're sitting with this. Maybe give it a little more space before you decide." },
+  { id: "light", label: "Keep it light",       starter: "Don't overthink it. Just say it in your own words." },
 ];
