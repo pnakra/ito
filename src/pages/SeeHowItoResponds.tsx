@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
 import Header from "@/components/Header";
@@ -34,11 +34,6 @@ const SeeHowItoResponds = () => {
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
   const [itoResponse, setItoResponse] = useState<ItoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const remainingCount = useMemo(
-    () => PREVIEW_SCENARIOS.length,
-    []
-  );
 
   const handleNewScenario = () => {
     setScenario(pickRandom(scenario.id));
@@ -116,9 +111,6 @@ const SeeHowItoResponds = () => {
           >
             what would you tell them?
           </h1>
-          <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed">
-            Composite scenarios, not real submissions. Read it, write what you'd say back, then see how ito reads it.
-          </p>
         </div>
 
         {/* Scenario card */}
@@ -145,10 +137,7 @@ const SeeHowItoResponds = () => {
         {stage === "respond" && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <p className="text-[14px] text-foreground font-medium mb-1">What would you lead with?</p>
-              <p className="text-[12px] text-muted-foreground mb-3">
-                Pick one, or just start typing your own.
-              </p>
+              <p className="text-[14px] text-foreground font-medium mb-3">What would you lead with?</p>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {RESPONSE_STYLES.map((style) => {
                   const active = selectedStyle === style.id;
@@ -196,9 +185,6 @@ const SeeHowItoResponds = () => {
             >
               See how ito responds <ArrowRight className="ml-1.5 w-4 h-4" />
             </Button>
-            <p className="text-[12px] text-muted-foreground text-center">
-              Nothing you write here is saved or linked to you.
-            </p>
           </div>
         )}
 
@@ -282,10 +268,6 @@ const SeeHowItoResponds = () => {
             </div>
           </div>
         )}
-
-        <p className="text-[11px] text-muted-foreground text-center mt-8">
-          {remainingCount} composite scenarios · written for preview only · not real users
-        </p>
       </main>
     </div>
   );
