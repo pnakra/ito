@@ -81,6 +81,7 @@ function POVSelector({ onPick }: { onPick: (p: POV) => void }) {
         </p>
       </div>
     </div>
+    </>
   );
 }
 
