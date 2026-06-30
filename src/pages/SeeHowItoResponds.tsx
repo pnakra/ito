@@ -161,10 +161,10 @@ const SeeHowItoResponds = () => {
                           return;
                         }
                         setSelectedStyle(style.id);
-                        // Only prefill if the textarea is empty or still holds another style's starter
-                        const otherStarters = RESPONSE_STYLES.map((s) => s.starter);
+                        // Only prefill if the textarea is empty or still holds another starter for this scenario
+                        const otherStarters = Object.values(scenario.starters);
                         if (!userResponse.trim() || otherStarters.includes(userResponse)) {
-                          setUserResponse(style.starter);
+                          setUserResponse(scenario.starters[style.id]);
                         }
                       }}
                       className={`text-left px-3 py-2.5 rounded-xl border transition-all ${
