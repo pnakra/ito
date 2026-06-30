@@ -183,7 +183,7 @@ export default function Embed() {
       <div style={{
         position: "fixed", bottom: 16, left: 0, right: 0,
         textAlign: "center", color: "#888", fontSize: 12,
-        fontFamily: "system-ui",
+        fontFamily: '"Geist", "Inter", system-ui, sans-serif',
       }}>
         Clickchat — concept prototype · ito embedded · isthisok.app/embed
       </div>
