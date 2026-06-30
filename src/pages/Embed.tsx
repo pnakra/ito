@@ -1102,7 +1102,7 @@ function ActionRow({
 
 /* ---------------- Ask ito direct (from inbox) ---------------- */
 
-function AskItoDirect({ onBack }: { onBack: () => void }) {
+function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: () => void }) {
   const [input, setInput] = useState("");
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.itoSoft }}>
