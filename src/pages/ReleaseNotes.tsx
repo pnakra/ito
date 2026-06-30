@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { CalendarDays } from "lucide-react";
 
@@ -165,6 +166,11 @@ const categoryColor = (category: string) => {
 const ReleaseNotes = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Release notes — ito"
+        description="What's changed in ito week by week — new flows, safety improvements, copy updates, and product changes."
+        path="/release-notes"
+      />
       <Header />
 
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import { ArrowRight, Play, RotateCcw } from "lucide-react";
 import type { StructuredSignals } from "@/types/signals";
 import { logVisit } from "@/lib/logVisit";
@@ -269,6 +270,11 @@ const Demo = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Interactive demo — See how ito works | ito"
+        description="Walk through three real scenarios and see how ito responds. No signup, no input required — just press play."
+        path="/demo"
+      />
       <Header />
       <main className="flex-1 flex flex-col justify-start pt-[8vh]">
         <section className="container mx-auto px-5 max-w-lg">

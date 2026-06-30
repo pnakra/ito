@@ -7,6 +7,7 @@ import {
   Copy, Check, FileText, Users, Download, HeartPulse,
 } from "lucide-react";
 import EmbedSender from "./EmbedSender";
+import SEO from "@/components/SEO";
 
 type POV = "select" | "receiver" | "sender";
 
@@ -19,6 +20,12 @@ export default function Embed() {
 
 function POVSelector({ onPick }: { onPick: (p: POV) => void }) {
   return (
+    <>
+    <SEO
+      title="ito embed prototype — Clickable concept demo"
+      description="Two sides of the same moment. A clickable concept showing how ito can sit inside any messaging app."
+      path="/embed"
+    />
     <div
       style={{
         background: "#0E0F12", minHeight: "100vh",
@@ -74,6 +81,7 @@ function POVSelector({ onPick }: { onPick: (p: POV) => void }) {
         </p>
       </div>
     </div>
+    </>
   );
 }
 

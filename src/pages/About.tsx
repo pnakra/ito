@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import {
   Accordion,
@@ -10,6 +11,11 @@ import {
 const About = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="About ito — Why this exists & how it works"
+        description="ito is a private place to think through hookups, consent, and confusing moments. No login, no account, nothing tied to you. Here's how it works and why."
+        path="/about"
+      />
       <Header />
       
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">

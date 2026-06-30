@@ -1,18 +1,17 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { blogArticles } from "@/data/blogArticles";
 
 const Blog = () => {
-  useEffect(() => {
-    document.title = "Blog — is this ok?";
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Articles about hookups, consent, and how to think through what happened.");
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Resources — Honest articles on hookups & consent | ito"
+        description="Honest articles about hookups, consent, and how to think through what happened. Plain-language reads, no lecture, no judgment."
+        path="/blog"
+      />
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">
         <div className="max-w-2xl mx-auto space-y-8">

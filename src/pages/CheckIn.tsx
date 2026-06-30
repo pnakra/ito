@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
 import GuidedMode from "@/components/narrative/GuidedMode";
@@ -783,6 +784,11 @@ const CheckIn = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Check in — Get an honest read | ito"
+        description="Write what's happening, or answer a few questions. ito gives you a thoughtful, non-judgmental read. Anonymous, nothing saved."
+        path="/check-in"
+      />
       <Header />
       {showConsentModal && (
         <ConsentModal onConfirm={handleConsentConfirm} onCancel={handleConsentCancel} />

@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate } from "react-router-dom";
-import { useEffect } from "react";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { blogArticles } from "@/data/blogArticles";
@@ -9,23 +9,27 @@ const BlogArticle = () => {
   const { slug } = useParams<{ slug: string }>();
   const article = blogArticles.find((a) => a.slug === slug);
 
-  useEffect(() => {
-    if (article) {
-      document.title = `${article.title} — is this ok?`;
-      let meta = document.querySelector('meta[name="description"]');
-      if (!meta) {
-        meta = document.createElement("meta");
-        meta.setAttribute("name", "description");
-        document.head.appendChild(meta);
-      }
-      meta.setAttribute("content", article.metaDescription);
-    }
-  }, [article]);
-
   if (!article) return <Navigate to="/blog" replace />;
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.metaDescription,
+    author: { "@type": "Organization", name: "ito" },
+    publisher: { "@type": "Organization", name: "ito" },
+    mainEntityOfPage: `https://ito.lovable.app/blog/${article.slug}`,
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title={`${article.title} — ito`}
+        description={article.metaDescription}
+        path={`/blog/${article.slug}`}
+        type="article"
+        jsonLd={articleJsonLd}
+      />
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">
         <article className="max-w-2xl mx-auto space-y-6">

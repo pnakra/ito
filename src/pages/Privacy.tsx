@@ -1,8 +1,14 @@
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Privacy Policy — ito"
+        description="How ito handles your data. No accounts, no PII, nothing tied to you. Read the full privacy policy."
+        path="/privacy"
+      />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-12 max-w-2xl">
         <h1 className="text-2xl font-semibold mb-2">Privacy Policy</h1>
