@@ -223,7 +223,7 @@ const jalenThread = [
 
 
 
-export default function Embed() {
+function ReceiverProto({ onBackToSelect }: { onBackToSelect: () => void }) {
   const [screen, setScreen] = useState<Screen>("inbox");
   const [tab, setTab] = useState<"map" | "chats" | "camera" | "stories" | "you">("chats");
 
@@ -232,6 +232,20 @@ export default function Embed() {
       style={{ background: "#0E0F12", minHeight: "100vh" }}
       className="flex items-center justify-center p-6"
     >
+      <button
+        onClick={onBackToSelect}
+        style={{
+          position: "fixed", top: 18, left: 18, zIndex: 100,
+          padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.08)",
+          color: "#fff", border: "1px solid rgba(255,255,255,0.15)",
+          fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+          display: "inline-flex", alignItems: "center", gap: 6,
+          fontFamily: '"Geist", "Inter", system-ui, sans-serif',
+        }}
+      >
+        <ChevronLeft size={14} /> Switch POV
+      </button>
+
       {/* iPhone 15 Pro frame */}
       <div
         style={{
