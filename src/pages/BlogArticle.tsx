@@ -1,6 +1,6 @@
 import { useParams, Link, Navigate } from "react-router-dom";
-import { useEffect } from "react";
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { blogArticles } from "@/data/blogArticles";
