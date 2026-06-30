@@ -84,8 +84,8 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
 export type ResponseStyle = "bold" | "direct" | "soft" | "chill";
 
 export const RESPONSE_STYLES: { id: ResponseStyle; label: string; hint: string; starter: string }[] = [
-  { id: "bold",   label: "BOLD",   hint: "Say the thing nobody's saying.", starter: "Honestly? I think you already know the answer. " },
-  { id: "direct", label: "DIRECT", hint: "Cut to it. No softening.",       starter: "Just ask her. If you have to guess this hard, that's your answer. " },
-  { id: "soft",   label: "SOFT",   hint: "Kind, careful, leave room.",     starter: "I get why you're sitting with this. Maybe give it some space and " },
-  { id: "chill",  label: "CHILL",  hint: "Low-key, no big deal energy.",   starter: "Dude, don't overthink it. Just " },
+  { id: "bold",   label: "Say it plainly", hint: "Start with the honest thing nobody's saying.",  starter: "Honestly? I think you already know the answer. " },
+  { id: "direct", label: "Cut to the point", hint: "Get straight to it, no softening.",            starter: "Just ask her. If you have to guess this hard, that's your answer. " },
+  { id: "soft",   label: "Leave room",     hint: "Kind, careful, and open.",                       starter: "I get why you're sitting with this. Maybe give it some space and " },
+  { id: "chill",  label: "Keep it light",  hint: "Low-key, no big deal.",                           starter: "Dude, don't overthink it. Just " },
 ];
