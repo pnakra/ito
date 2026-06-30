@@ -21,26 +21,27 @@ type Screen =
   | "ito-escalation"
   | "ask-ito-direct";
 
-// Clickchat host app — vivid aqua, youthful and fast. Not Snap yellow, not generic startup blue.
+// Clickchat host app — Snap-yellow forward, youthful and fast.
 const C = {
   bg: "#FFFFFF",
-  surface: "#F4F6F8",
-  surface2: "#EEF1F4",
+  surface: "#FFFDF0",
+  surface2: "#FFF9D6",
   text: "#0B1220",
   subtext: "#6A7280",
-  border: "#E7EAEE",
-  // Clickchat host accent
-  accent: "#00C7B7",        // vivid aqua
-  accentDeep: "#019A8E",
-  accentSoft: "#DEFBF7",
-  pop: "#FF4D8D",           // secondary pop pink for unread + accents
+  border: "#EFE9C6",
+  // Clickchat host accent — Snapchat-style yellow
+  accent: "#FFFC00",
+  accentDeep: "#E6D900",
+  accentSoft: "#FFFDB8",
+  pop: "#FF4D8D",
   // Bubbles
   bubbleIn: "#F1F2F4",
-  bubbleOut: "#00C7B7",
+  bubbleOut: "#FFFC00",
+  bubbleOutText: "#0B1220",
   online: "#22D07A",
   // ito sub-brand — softer, grounded, calmer
   itoInk: "#0E1A2B",
-  itoSoft: "#F5F1EA",       // warm sand, distinct from Clickchat's cool greys
+  itoSoft: "#F5F1EA",
   itoSoftDeep: "#EBE4D6",
   itoAccent: "#3D5E8C",
   warn: "#C97A1A",
