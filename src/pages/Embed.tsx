@@ -48,7 +48,7 @@ const C = {
 };
 
 const friends = [
-  { id: "jordan",  name: "Jordan M.",      initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true,  story: true,  delivered: false },
+  { id: "jalen",   name: "Jalen",          initial: "J", grad: JALEN_GRAD,             last: "just come for an hour. it's not that deep", time: "now", unread: 3, online: true,  story: false, delivered: false, live: true },
   { id: "maya",    name: "Maya",           initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true,  story: true,  delivered: true },
   { id: "devon",   name: "Devon",          initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false, delivered: false },
   { id: "riley",   name: "Riley + 4",      initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false, delivered: true },
