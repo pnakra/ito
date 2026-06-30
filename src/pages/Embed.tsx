@@ -47,6 +47,9 @@ const C = {
   alert: "#C73838",
 };
 
+// Jalen's avatar gradient (referenced in inbox + conversation header)
+const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
+
 const friends = [
   { id: "jalen",   name: "Jalen",          initial: "J", grad: JALEN_GRAD,             last: "just come for an hour. it's not that deep", time: "now", unread: 3, online: true,  story: false, delivered: false, live: true },
   { id: "maya",    name: "Maya",           initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true,  story: true,  delivered: true },
