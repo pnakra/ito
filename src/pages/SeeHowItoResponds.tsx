@@ -152,7 +152,18 @@ const SeeHowItoResponds = () => {
                   return (
                     <button
                       key={style.id}
-                      onClick={() => setSelectedStyle(active ? null : style.id)}
+                      onClick={() => {
+                        if (active) {
+                          setSelectedStyle(null);
+                          return;
+                        }
+                        setSelectedStyle(style.id);
+                        // Only prefill if the textarea is empty or still holds another style's starter
+                        const otherStarters = RESPONSE_STYLES.map((s) => s.starter);
+                        if (!userResponse.trim() || otherStarters.includes(userResponse)) {
+                          setUserResponse(style.starter);
+                        }
+                      }}
                       className={`text-left px-3 py-2.5 rounded-xl border transition-all ${
                         active
                           ? "border-primary bg-primary/10"
