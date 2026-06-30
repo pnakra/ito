@@ -194,13 +194,19 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
       )}
 
       {/* Privacy + guided mode */}
-      <div className="mt-3 flex flex-col items-center gap-3">
+      <div className="mt-3 flex flex-col items-center gap-2">
         <button
           onClick={onGuidedMode}
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
         >
           Not sure what to say? <span className="text-primary font-medium">Try guided questions</span>
         </button>
+        <a
+          href="/preview"
+          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Want to see how ito reads a situation first? <span className="text-primary font-medium">See an example</span>
+        </a>
       </div>
     </div>
   );
