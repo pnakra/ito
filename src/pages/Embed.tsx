@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 /**
- * Loop — fictional consumer messaging app with embedded ito.
+ * Clickchat — fictional consumer messaging app with embedded ito.
  * Standalone mobile-first clickable prototype at /embed.
  * Camera-first youth-social vibe; ito is the calmer help layer inside it.
  */
@@ -21,7 +21,7 @@ type Screen =
   | "ito-escalation"
   | "ask-ito-direct";
 
-// Loop host app — vivid aqua, youthful and fast. Not Snap yellow, not generic startup blue.
+// Clickchat host app — vivid aqua, youthful and fast. Not Snap yellow, not generic startup blue.
 const C = {
   bg: "#FFFFFF",
   surface: "#F4F6F8",
@@ -29,7 +29,7 @@ const C = {
   text: "#0B1220",
   subtext: "#6A7280",
   border: "#E7EAEE",
-  // Loop host accent
+  // Clickchat host accent
   accent: "#00C7B7",        // vivid aqua
   accentDeep: "#019A8E",
   accentSoft: "#DEFBF7",
@@ -40,7 +40,7 @@ const C = {
   online: "#22D07A",
   // ito sub-brand — softer, grounded, calmer
   itoInk: "#0E1A2B",
-  itoSoft: "#F5F1EA",       // warm sand, distinct from Loop's cool greys
+  itoSoft: "#F5F1EA",       // warm sand, distinct from Clickchat's cool greys
   itoSoftDeep: "#EBE4D6",
   itoAccent: "#3D5E8C",
   warn: "#C97A1A",
@@ -184,7 +184,7 @@ export default function Embed() {
         textAlign: "center", color: "#888", fontSize: 12,
         fontFamily: "system-ui",
       }}>
-        Loop — concept prototype · ito embedded · isthisok.app/embed
+        Clickchat — concept prototype · ito embedded · isthisok.app/embed
       </div>
     </div>
   );
@@ -253,7 +253,7 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{
                 fontWeight: 700, fontSize: 15, color: C.itoInk,
-                fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+                fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.2,
               }}>Ask ito</span>
             </div>
             <div style={{ fontSize: 12.5, color: "#6F6657", marginTop: 2 }}>
@@ -549,7 +549,7 @@ function Conversation({ onBack, onAskIto, onEscalate }: { onBack: () => void; on
           <div style={{ flex: 1 }}>
             <div style={{
               fontSize: 13.5, fontWeight: 600, color: C.itoInk,
-              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
             }}>
               Ask ito before sending
             </div>
@@ -643,7 +643,7 @@ function ItoQuickRead({
         <div style={{ flex: 1 }}>
           <div style={{
             fontWeight: 700, fontSize: 17, color: C.itoInk,
-            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+            fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.3,
           }}>
             Ask ito
           </div>
@@ -673,11 +673,11 @@ function ItoQuickRead({
               background: C.itoSoft, color: C.itoInk,
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               fontSize: 11.5, fontWeight: 700, marginTop: 1,
-              fontFamily: '"Newsreader", Georgia, serif',
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif',
             }}>{i + 1}</span>
             <span style={{
               fontSize: 14.5, color: C.itoInk, lineHeight: 1.45,
-              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
             }}>
               {line}
             </span>
@@ -782,7 +782,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
         <div style={{ flex: 1 }}>
           <div style={{
             fontWeight: 700, fontSize: 17, color: C.itoInk,
-            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+            fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.3,
           }}>
             Help me reply
           </div>
@@ -822,7 +822,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                 <span style={{
                   fontSize: 13, fontWeight: 700, color: C.itoInk,
-                  fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+                  fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
                 }}>
                   {o.label}
                 </span>
@@ -839,7 +839,7 @@ function ItoReply({ onBack, onClose, onEscalate }: { onBack: () => void; onClose
                 padding: "9px 11px", background: C.itoSoft,
                 borderRadius: 10, border: `1px solid ${C.itoSoftDeep}`,
                 fontSize: 14.5, color: C.itoInk, lineHeight: 1.4,
-                fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+                fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
               }}>
                 “{o.text}”
               </div>
@@ -951,7 +951,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
         <div style={{ flex: 1 }}>
           <div style={{
             fontWeight: 700, fontSize: 17, color: C.itoInk,
-            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.3,
+            fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.3,
           }}>
             This may be crossing a line
           </div>
@@ -980,11 +980,11 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
               background: C.itoInk, color: "#fff",
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               fontSize: 11.5, fontWeight: 700, marginTop: 1,
-              fontFamily: '"Newsreader", Georgia, serif',
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif',
             }}>{i + 1}</span>
             <span style={{
               fontSize: 14.5, color: C.itoInk, lineHeight: 1.45,
-              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
             }}>
               {line}
             </span>
@@ -1020,7 +1020,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
             <div style={{
               marginTop: 8, padding: 10, background: C.itoSoft, borderRadius: 10,
               border: `1px solid ${C.itoSoftDeep}`, color: C.itoInk,
-              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
             }}>
               "I need help with a situation. Can you listen?"
             </div>
@@ -1063,7 +1063,7 @@ function ItoEscalation({ onClose, onBack }: { onClose: () => void; onBack: () =>
         background: "#fff", border: `1px solid ${C.itoSoftDeep}`,
         fontSize: 12, color: "#6F6657", lineHeight: 1.45,
       }}>
-        This stays on your device. ito doesn't notify anyone, and Loop can't see that you opened this.
+        This stays on your device. ito doesn't notify anyone, and Clickchat can't see that you opened this.
       </div>
 
       <button onClick={onBack} style={{ ...textBtn(), marginTop: 4 }}>
@@ -1098,7 +1098,7 @@ function ActionRow({
         {icon}
         <span style={{
           flex: 1, fontSize: 14, fontWeight: 700, color: C.itoInk,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+          fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
         }}>
           {label}
         </span>
@@ -1139,7 +1139,7 @@ function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: 
         <div style={{ flex: 1 }}>
           <div style={{
             fontWeight: 700, fontSize: 16, color: C.itoInk,
-            fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+            fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.2,
           }}>Ask ito</div>
           <div style={{ fontSize: 11.5, color: "#6F6657" }}>Private. Not stored. Not shared.</div>
         </div>
@@ -1150,7 +1150,7 @@ function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: 
           padding: 14, background: "#fff", borderRadius: 14,
           border: `1px solid ${C.itoSoftDeep}`,
           fontSize: 14.5, color: C.itoInk, lineHeight: 1.5,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+          fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
         }}>
           Tell me what's going on. Paste a message, describe a situation, or just say what's on your mind.
         </div>
@@ -1183,7 +1183,7 @@ function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: 
           <span style={{ display: "flex", flexDirection: "column" }}>
             <span style={{
               fontSize: 13.5, fontWeight: 700,
-              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+              fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.1,
             }}>See it in a live chat</span>
             <span style={{ fontSize: 11.5, opacity: 0.8, marginTop: 1 }}>
               Open the Jalen conversation
@@ -1238,7 +1238,7 @@ function ItoHeader({ onClose, subtitle }: { onClose: () => void; subtitle: strin
         <div style={{ flex: 1 }}>
         <div style={{
           fontWeight: 700, fontSize: 16, color: C.itoInk,
-          fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.2,
+          fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.2,
         }}>ito</div>
         <div style={{ fontSize: 11.5, color: "#6F6657" }}>{subtitle}</div>
       </div>
