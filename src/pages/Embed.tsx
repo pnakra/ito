@@ -108,7 +108,7 @@ export default function Embed() {
           overflow: "hidden",
           position: "relative",
           color: C.text,
-          fontFamily: '"Inter", system-ui, -apple-system, sans-serif',
+          fontFamily: '"Geist", "Inter", system-ui, -apple-system, sans-serif',
         }}
       >
         {/* Dynamic Island */}
