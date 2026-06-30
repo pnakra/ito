@@ -47,8 +47,11 @@ const C = {
   alert: "#C73838",
 };
 
+// Jalen's avatar gradient (referenced in inbox + conversation header)
+const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
+
 const friends = [
-  { id: "jordan",  name: "Jordan M.",      initial: "J", grad: ["#FF8A65", "#FF4D8D"], last: "haha you up?", time: "now", unread: 2, online: true,  story: true,  delivered: false },
+  { id: "jalen",   name: "Jalen",          initial: "J", grad: JALEN_GRAD,             last: "just come for an hour. it's not that deep", time: "now", unread: 3, online: true,  story: false, delivered: false, live: true },
   { id: "maya",    name: "Maya",           initial: "M", grad: ["#7CC4FF", "#5B8DEF"], last: "ok see u there 🩷", time: "2m", unread: 0, online: true,  story: true,  delivered: true },
   { id: "devon",   name: "Devon",          initial: "D", grad: ["#C8B6FF", "#8A7BFF"], last: "send the pic lol", time: "12m", unread: 1, online: false, story: false, delivered: false },
   { id: "riley",   name: "Riley + 4",      initial: "R", grad: ["#A8E6CF", "#3DD68C"], last: "Maya: pulling up in 10", time: "28m", unread: 0, online: false, story: false, delivered: true },
@@ -82,8 +85,7 @@ const jalenThread = [
   { from: "them", text: "just come for an hour. it's not that deep", time: "11:23 PM" },
 ];
 
-// Jalen's avatar gradient (kept consistent with inbox style)
-const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
+
 
 export default function Embed() {
   const [screen, setScreen] = useState<Screen>("inbox");
@@ -131,13 +133,18 @@ export default function Embed() {
         }}>
           {screen === "inbox" && <Inbox onOpen={(id) => {
             if (id === "ask-ito") setScreen("ask-ito-direct");
-            else setScreen("conversation");
+            else if (id === "jalen") setScreen("conversation");
+            // other friend rows are non-interactive in this demo
           }} />}
           {screen === "conversation" && <Conversation
             onBack={() => setScreen("inbox")}
             onAskIto={() => setScreen("ito-quickread")}
+            onEscalate={() => setScreen("ito-escalation")}
           />}
-          {screen === "ask-ito-direct" && <AskItoDirect onBack={() => setScreen("inbox")} />}
+          {screen === "ask-ito-direct" && <AskItoDirect
+            onBack={() => setScreen("inbox")}
+            onOpenLive={() => setScreen("conversation")}
+          />}
         </div>
 
         {/* ito bottom sheets */}
@@ -279,14 +286,18 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
 
 
       {/* Friends list */}
-      {friends.map((f) => (
+      {friends.map((f) => {
+        const live = (f as any).live;
+        return (
         <button
           key={f.id}
           onClick={() => onOpen(f.id)}
+          disabled={!live}
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 12,
             padding: "9px 18px", background: "transparent", border: "none",
-            cursor: "pointer", textAlign: "left",
+            cursor: live ? "pointer" : "default", textAlign: "left",
+            opacity: live ? 1 : 0.55,
           }}
         >
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -305,8 +316,17 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: 15, color: C.text, letterSpacing: -0.2 }}>{f.name}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, fontSize: 15, color: C.text, letterSpacing: -0.2 }}>{f.name}</span>
+                {live && (
+                  <span style={{
+                    fontSize: 9.5, fontWeight: 700, color: "#fff",
+                    background: C.pop, padding: "2px 6px", borderRadius: 999,
+                    letterSpacing: 0.4, textTransform: "uppercase",
+                  }}>Tap to demo</span>
+                )}
+              </div>
               <span style={{ fontSize: 11.5, color: C.subtext, fontWeight: 500 }}>{f.time}</span>
             </div>
             <div style={{
@@ -330,7 +350,8 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             </div>
           </div>
         </button>
-      ))}
+        );
+      })}
       <div style={{ height: 20 }} />
     </div>
   );
@@ -403,7 +424,7 @@ function StoryAvatar({ grad, initial, label }: { grad: string[]; initial: string
 
 /* ---------------- Conversation ---------------- */
 
-function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () => void }) {
+function Conversation({ onBack, onAskIto, onEscalate }: { onBack: () => void; onAskIto: () => void; onEscalate: () => void }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -430,6 +451,9 @@ function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () =
           <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: -0.2 }}>Jalen</div>
           <div style={{ fontSize: 11, color: C.online, fontWeight: 600 }}>● active now</div>
         </div>
+        <button onClick={onEscalate} title="This feels more serious" style={iconBtn()}>
+          <Shield size={20} color={C.itoInk} />
+        </button>
         <button style={iconBtn()}><Phone size={20} color={C.text} /></button>
         <button style={iconBtn()}><Video size={22} color={C.text} /></button>
       </div>
@@ -1095,7 +1119,7 @@ function ActionRow({
 
 /* ---------------- Ask ito direct (from inbox) ---------------- */
 
-function AskItoDirect({ onBack }: { onBack: () => void }) {
+function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: () => void }) {
   const [input, setInput] = useState("");
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: C.itoSoft }}>
@@ -1145,6 +1169,28 @@ function AskItoDirect({ onBack }: { onBack: () => void }) {
             }}>{s}</button>
           ))}
         </div>
+
+        {/* Bridge into the live conversation demo */}
+        <button
+          onClick={onOpenLive}
+          style={{
+            marginTop: 18, width: "100%", padding: "12px 14px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 10, background: C.itoInk, color: "#fff", border: "none",
+            borderRadius: 14, cursor: "pointer", textAlign: "left",
+          }}
+        >
+          <span style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{
+              fontSize: 13.5, fontWeight: 700,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>See it in a live chat</span>
+            <span style={{ fontSize: 11.5, opacity: 0.8, marginTop: 1 }}>
+              Open the Jalen conversation
+            </span>
+          </span>
+          <ArrowRight size={18} />
+        </button>
       </div>
 
       <div style={{
