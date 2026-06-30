@@ -133,11 +133,11 @@ const SeeHowItoResponds = () => {
             <button
               onClick={handleNewScenario}
               className="text-[12px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors"
+              aria-label="new scenario"
             >
-              <Shuffle className="w-3 h-3" /> new one
+              <Shuffle className="w-3 h-3" />
             </button>
           </div>
-          <h2 className="text-[15px] font-semibold text-foreground mb-2">{scenario.title}</h2>
           <p className="text-[15px] text-foreground/90 leading-relaxed">{scenario.scenario_text}</p>
         </div>
 
@@ -174,7 +174,6 @@ const SeeHowItoResponds = () => {
                       }`}
                     >
                       <div className="text-[13px] font-semibold text-foreground">{style.label}</div>
-                      <div className="text-[11px] text-muted-foreground leading-tight mt-0.5">{style.hint}</div>
                     </button>
                   );
                 })}
