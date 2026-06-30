@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
 import Header from "@/components/Header";
@@ -34,11 +34,6 @@ const SeeHowItoResponds = () => {
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
   const [itoResponse, setItoResponse] = useState<ItoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const remainingCount = useMemo(
-    () => PREVIEW_SCENARIOS.length,
-    []
-  );
 
   const handleNewScenario = () => {
     setScenario(pickRandom(scenario.id));
