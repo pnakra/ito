@@ -85,8 +85,7 @@ const jalenThread = [
   { from: "them", text: "just come for an hour. it's not that deep", time: "11:23 PM" },
 ];
 
-// Jalen's avatar gradient (kept consistent with inbox style)
-const JALEN_GRAD = ["#7CC4FF", "#5B8DEF"];
+
 
 export default function Embed() {
   const [screen, setScreen] = useState<Screen>("inbox");
