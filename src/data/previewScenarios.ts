@@ -20,11 +20,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "We were messing around and at one point she got quiet and pulled back a little, but didn't say anything or tell me to stop. I kept going, but I've been replaying whether that pause meant something I should've paid more attention to.",
     starters: {
       plain:
-        "Hey — when you went quiet the other night, I'm not sure if I should've stopped. Did I miss something?",
+        "Just ask her directly if she was okay with what happened. Don't dance around it.",
       kind:
-        "I've been thinking about that moment you pulled back. I want to check in — was that actually okay with you?",
+        "Check in with her. Let her know you noticed the pause and want to make sure she was actually good.",
       light:
-        "Random one — that pause the other night, you were good, right? Just want to make sure.",
+        "Just text her and ask if she was good. Not a big deal to bring up.",
     },
   },
   {
@@ -35,11 +35,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "After we made out, I've been thinking about how into it she actually seemed versus how into it I wanted her to be. In the moment it felt mutual, but I keep questioning whether I was reading what I hoped for instead of what was actually there.",
     starters: {
       plain:
-        "I want to ask straight up — were you actually into it the other night, or was I reading what I wanted to see?",
+        "Be honest and ask her if she was actually into it. Stop guessing on your own.",
       kind:
-        "I keep wondering if I read the other night right. Was it actually mutual for you?",
+        "Talk to her. Tell her you've been thinking about it and want to make sure it felt mutual to her too.",
       light:
-        "Quick one — the other night felt mutual to me, but you'd say if it wasn't, right?",
+        "Just ask her. She'll tell you.",
     },
   },
   {
@@ -50,11 +50,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "I've brought up wanting to take things further a few times with someone I've been seeing, and she keeps saying she's not ready. I think I've backed off, but now I'm second-guessing whether I asked too many times, or if she felt like she had to keep saying no for it to register.",
     starters: {
       plain:
-        "I've asked about this a few times and I shouldn't have kept bringing it up. I'm done asking — it's your call.",
+        "Stop asking. She's said no more than once — drop it and don't bring it up again.",
       kind:
-        "I realize I've brought this up more than once. I don't want you to feel like you have to keep saying no. I'll leave it alone.",
+        "Let it go. She's told you where she's at. Don't make her keep repeating herself.",
       light:
-        "Forget I kept bringing it up — my bad. Not asking again.",
+        "Quit bringing it up. If anything changes, she'll say so.",
     },
   },
   {
@@ -65,11 +65,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "Looking back at what happened between us, she said yes at the time, but she'd had a few drinks, and I keep wondering if she would've said the same thing sober. She hasn't brought it up since and acts like everything's normal, but I can't stop replaying it.",
     starters: {
       plain:
-        "I want to ask about the other night. You'd been drinking, and I'm not sure I should've gone ahead. How are you actually feeling about it?",
+        "You knew she'd been drinking. Own that and ask her how she actually feels about it now.",
       kind:
-        "I've been sitting with the other night. You'd had a few drinks, and I want to check in honestly — how are you feeling about how it went?",
+        "Check in with her honestly. Don't act like it didn't happen just because she hasn't brought it up.",
       light:
-        "Hey — about the other night, just wanted to check you're actually good with how it went.",
+        "Just ask her if she's good. Better than sitting on it.",
     },
   },
   {
@@ -80,11 +80,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "Earlier she told me she wasn't really feeling up for anything, but later that night when we were together, she didn't say no and seemed to go along with things. I don't know if she changed her mind or just felt like it was easier not to say anything.",
     starters: {
       plain:
-        "Earlier you said you weren't up for anything, and I shouldn't have let it keep going just because you didn't stop me. I'm sorry.",
+        "Not saying no isn't a yes. She told you earlier she wasn't into it — that should've been the answer.",
       kind:
-        "You'd told me earlier you weren't feeling it. I want to check in honestly — was the rest of the night actually okay with you?",
+        "Talk to her. She'd already told you she wasn't feeling it, so check in honestly about how she's doing now.",
       light:
-        "Hey — you told me earlier you weren't up for it. Just want to make sure you were actually good with what happened.",
+        "Just check in with her and make sure she was actually good with how it went.",
     },
   },
   {
@@ -95,11 +95,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "After what happened between us, I've thought about bringing up doing it again, but I keep stalling because I'm not sure if she actually wants that or if she'd just go along with it to avoid an awkward conversation. I don't know how to ask without it feeling like pressure.",
     starters: {
       plain:
-        "I'm not going to keep bringing up doing it again. If it's something you want, you can tell me — otherwise I'll leave it.",
+        "Don't bring it up. If she wants it, she'll tell you.",
       kind:
-        "I don't want to keep raising the idea of doing it again. If it's something you want, let me know on your own time.",
+        "Leave space for her. If she's into it again, she'll let you know on her own.",
       light:
-        "Not angling for a round two — if you're into it sometime, you tell me.",
+        "Just chill — don't push for a round two.",
     },
   },
   {
@@ -110,11 +110,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "My friends told me I was overthinking it, but in the moment I had this nagging feeling that she wasn't as into it as she was acting. I went along with what was happening anyway, and now I keep wondering if I should've stopped and asked instead of assuming.",
     starters: {
       plain:
-        "I had a feeling you weren't fully into it the other night and I didn't stop to ask. I should have. Are you okay?",
+        "You knew something was off and ignored it. Check in with her now and actually listen.",
       kind:
-        "Something felt off to me in the moment and I didn't check in then. I'm checking now — was that actually okay with you?",
+        "Your gut was telling you something. Reach out and ask her how she's really feeling about it.",
       light:
-        "Quick check — the other night, you were actually good, right? I should've asked then.",
+        "Just ask her. Better late than never.",
     },
   },
   {
@@ -125,11 +125,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "I told a friend I wasn't interested in anything physical right now. He keeps bringing it up anyway over text, not pushy exactly, but like he's testing if I'll change my mind. I don't know if I'm allowed to be annoyed about this or if it's normal.",
     starters: {
       plain:
-        "I've already told you I'm not interested in anything physical. Please stop bringing it up.",
+        "Tell him plainly to stop. You don't owe him repeated nos.",
       kind:
-        "I said I'm not into anything physical right now. I'd rather you didn't keep checking — my answer isn't going to change.",
+        "Let him know you've already answered and you'd like him to drop it.",
       light:
-        "Same answer as before — not interested. Can we drop it?",
+        "Just tell him to chill — same answer as before.",
     },
   },
   {
@@ -140,11 +140,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "We made out once, and afterward I kept replaying whether he was actually into it or just going along with it. He seemed enthusiastic in the moment, but I don't know how much of that I can trust versus what I wanted to see. I don't know how to tell the difference.",
     starters: {
       plain:
-        "Quick thing — when we made out, were you actually into it or just going along?",
+        "Just ask him directly if he was into it. Don't sit with the guessing.",
       kind:
-        "I've been wondering if I read the other night right. Were you actually into it?",
+        "Check in with him. Tell him you want to make sure it actually felt mutual.",
       light:
-        "Random — the other night, you were good with it, right?",
+        "Just ask. He'll say.",
     },
   },
   {
@@ -155,11 +155,11 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
       "I told a guy I wasn't interested in anything happening between us. He didn't push back exactly, but he started talking about wanting to 'finally do it this year,' like he was hoping I'd reconsider. It's subtle enough that I don't know if I'm allowed to call it pressure.",
     starters: {
       plain:
-        "When you talk about 'finally doing it this year,' it feels like pressure. I told you I'm not interested — that's still where I'm at.",
+        "That's pressure. Tell him to stop bringing it up — your answer stands.",
       kind:
-        "The way you keep mentioning it is starting to feel like pressure. I meant what I said before — I'm not interested.",
+        "Name it. Let him know the way he keeps mentioning it feels like pressure.",
       light:
-        "The 'finally this year' stuff — not happening. I already told you where I'm at.",
+        "Tell him to drop the 'finally this year' thing. Not happening.",
     },
   },
 ];
