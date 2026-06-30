@@ -1169,6 +1169,28 @@ function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: 
             }}>{s}</button>
           ))}
         </div>
+
+        {/* Bridge into the live conversation demo */}
+        <button
+          onClick={onOpenLive}
+          style={{
+            marginTop: 18, width: "100%", padding: "12px 14px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            gap: 10, background: C.itoInk, color: "#fff", border: "none",
+            borderRadius: 14, cursor: "pointer", textAlign: "left",
+          }}
+        >
+          <span style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{
+              fontSize: 13.5, fontWeight: 700,
+              fontFamily: '"Newsreader", Georgia, serif', letterSpacing: -0.1,
+            }}>See it in a live chat</span>
+            <span style={{ fontSize: 11.5, opacity: 0.8, marginTop: 1 }}>
+              Open the Jalen conversation
+            </span>
+          </span>
+          <ArrowRight size={18} />
+        </button>
       </div>
 
       <div style={{
