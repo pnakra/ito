@@ -133,13 +133,18 @@ export default function Embed() {
         }}>
           {screen === "inbox" && <Inbox onOpen={(id) => {
             if (id === "ask-ito") setScreen("ask-ito-direct");
-            else setScreen("conversation");
+            else if (id === "jalen") setScreen("conversation");
+            // other friend rows are non-interactive in this demo
           }} />}
           {screen === "conversation" && <Conversation
             onBack={() => setScreen("inbox")}
             onAskIto={() => setScreen("ito-quickread")}
+            onEscalate={() => setScreen("ito-escalation")}
           />}
-          {screen === "ask-ito-direct" && <AskItoDirect onBack={() => setScreen("inbox")} />}
+          {screen === "ask-ito-direct" && <AskItoDirect
+            onBack={() => setScreen("inbox")}
+            onOpenLive={() => setScreen("conversation")}
+          />}
         </div>
 
         {/* ito bottom sheets */}
