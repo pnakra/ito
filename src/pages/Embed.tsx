@@ -6,6 +6,141 @@ import {
   ArrowRight, X, Pause, Hand, Sticker, SquarePen,
   Copy, Check, FileText, Users, Download, HeartPulse,
 } from "lucide-react";
+import EmbedSender from "./EmbedSender";
+
+type POV = "select" | "receiver" | "sender";
+
+export default function Embed() {
+  const [pov, setPov] = useState<POV>("select");
+  if (pov === "select") return <POVSelector onPick={setPov} />;
+  if (pov === "sender") return <EmbedSender onBackToSelect={() => setPov("select")} />;
+  return <ReceiverProto onBackToSelect={() => setPov("select")} />;
+}
+
+function POVSelector({ onPick }: { onPick: (p: POV) => void }) {
+  return (
+    <div
+      style={{
+        background: "#0E0F12", minHeight: "100vh",
+        color: "#fff",
+        fontFamily: '"Geist", "Inter", system-ui, -apple-system, sans-serif',
+      }}
+      className="flex items-center justify-center px-6 py-12"
+    >
+      <div style={{ maxWidth: 720, width: "100%" }}>
+        <div style={{
+          fontSize: 11.5, fontWeight: 700, letterSpacing: 1.2,
+          textTransform: "uppercase", color: "#FFFC00", marginBottom: 10,
+        }}>
+          isthisok.app / embed — clickable concept
+        </div>
+        <h1 style={{
+          fontSize: 32, fontWeight: 800, letterSpacing: -0.8,
+          lineHeight: 1.15, marginBottom: 12,
+        }}>
+          Two sides of the same moment.
+        </h1>
+        <p style={{
+          fontSize: 15.5, lineHeight: 1.55, color: "#B6BDC8", marginBottom: 28,
+          maxWidth: 540,
+        }}>
+          ito sits inside the chat app where it's actually happening. Pick the side
+          you want to see — both flows end with the same pause-and-think moment,
+          just from a different vantage.
+        </p>
+
+        <div style={{ display: "grid", gap: 14 }}>
+          <POVCard
+            onClick={() => onPick("receiver")}
+            tag="Receiver POV"
+            title="Maya may be being pressured"
+            blurb="She's gotten messages all night from Jalen pushing her to come over. She's not sure how to respond. ito helps her see the pattern and write something honest."
+            accent="#FFFC00"
+          />
+          <POVCard
+            onClick={() => onPick("sender")}
+            tag="Sender POV"
+            title="Jalen may be pressuring Maya for a pic"
+            blurb="They've been physical before. Tonight she's quiet. He's about to send a third nudge. ito asks him what he actually wants — before he adds more pressure."
+            accent="#7CC4FF"
+            ambiguous
+          />
+        </div>
+
+        <p style={{
+          marginTop: 22, fontSize: 12, color: "#6F7785", lineHeight: 1.5,
+        }}>
+          Mobile-first prototype. Best viewed at full size. You can switch POV at any time.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function POVCard({
+  onClick, tag, title, blurb, accent, ambiguous,
+}: {
+  onClick: () => void; tag: string; title: string; blurb: string;
+  accent: string; ambiguous?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        textAlign: "left", padding: "18px 20px",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: 18, cursor: "pointer", color: "#fff",
+        fontFamily: '"Geist", "Inter", system-ui, sans-serif',
+        transition: "all 180ms ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+        e.currentTarget.style.borderColor = accent + "60";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+        e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+        <span style={{
+          width: 8, height: 8, borderRadius: 4, background: accent,
+        }} />
+        <span style={{
+          fontSize: 10.5, fontWeight: 700, letterSpacing: 0.8,
+          textTransform: "uppercase", color: "#B6BDC8",
+        }}>
+          {tag}
+        </span>
+        {ambiguous && (
+          <span style={{
+            fontSize: 9.5, fontWeight: 700, letterSpacing: 0.6,
+            textTransform: "uppercase", color: "#0E0F12",
+            background: "#FFFC00", padding: "2px 7px", borderRadius: 999,
+          }}>
+            Mixed signals
+          </span>
+        )}
+      </div>
+      <div style={{
+        fontSize: 19, fontWeight: 700, letterSpacing: -0.3, marginBottom: 6,
+      }}>
+        {title}
+      </div>
+      <div style={{ fontSize: 13.5, color: "#B6BDC8", lineHeight: 1.5 }}>
+        {blurb}
+      </div>
+      <div style={{
+        marginTop: 12, display: "inline-flex", alignItems: "center", gap: 6,
+        fontSize: 12.5, fontWeight: 600, color: accent,
+      }}>
+        Open prototype <ArrowRight size={14} />
+      </div>
+    </button>
+  );
+}
+
 
 /**
  * Clickchat — fictional consumer messaging app with embedded ito.
