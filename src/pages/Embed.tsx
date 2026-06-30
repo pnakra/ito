@@ -451,6 +451,9 @@ function Conversation({ onBack, onAskIto, onEscalate }: { onBack: () => void; on
           <div style={{ fontWeight: 700, fontSize: 15, letterSpacing: -0.2 }}>Jalen</div>
           <div style={{ fontSize: 11, color: C.online, fontWeight: 600 }}>● active now</div>
         </div>
+        <button onClick={onEscalate} title="This feels more serious" style={iconBtn()}>
+          <Shield size={20} color={C.itoInk} />
+        </button>
         <button style={iconBtn()}><Phone size={20} color={C.text} /></button>
         <button style={iconBtn()}><Video size={22} color={C.text} /></button>
       </div>
