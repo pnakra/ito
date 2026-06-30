@@ -12,16 +12,16 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
   {
     id: "ito-scenario-01",
     narrator_gender: "male",
-    title: "Reading the signals",
+    title: "The pause I might have missed",
     scenario_text:
-      "There's a girl in my friend group who's been texting more and finding reasons to hang out alone. She hasn't said anything outright, but I keep wondering if she's actually interested or if I'm reading into normal friend stuff. I don't want to misjudge this and push for something she didn't actually offer.",
+      "We were messing around and at one point she got quiet and pulled back a little, but didn't say anything or tell me to stop. I kept going, but I've been replaying whether that pause meant something I should've paid more attention to.",
   },
   {
     id: "ito-scenario-02",
     narrator_gender: "male",
-    title: "After the makeout",
+    title: "What I wanted to see",
     scenario_text:
-      "We made out once a couple weeks ago and haven't talked about it since. She still texts me like normal, but I can't tell if she thinks something's going to happen again or if she's also just pretending it didn't happen. I don't want to assume more than what's actually there.",
+      "After we made out, I've been thinking about how into it she actually seemed versus how into it I wanted her to be. In the moment it felt mutual, but I keep questioning whether I was reading what I hoped for instead of what was actually there.",
   },
   {
     id: "ito-scenario-03",
@@ -40,9 +40,9 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
   {
     id: "ito-scenario-05",
     narrator_gender: "male",
-    title: "Her words vs. what I'm seeing",
+    title: "Not saying no isn't the same as saying yes",
     scenario_text:
-      "She's told me before she's not looking for anything serious, but the way she acts when we're together feels like more than that. I keep going back and forth on whether I should take her at her word or trust what I'm seeing, and I don't want to push for something she didn't actually offer.",
+      "Earlier she told me she wasn't really feeling up for anything, but later that night when we were together, she didn't say no and seemed to go along with things. I don't know if she changed her mind or just felt like it was easier not to say anything.",
   },
   {
     id: "ito-scenario-06",
@@ -54,9 +54,9 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
   {
     id: "ito-scenario-07",
     narrator_gender: "male",
-    title: "Trusting my own read",
+    title: "The nagging feeling I ignored",
     scenario_text:
-      "My friends keep telling me a girl I've been talking to is 'definitely into it' and that I'm overthinking things, but something about how she acts makes me uneasy in a way I can't fully explain. I don't know if I should trust their read or my own hesitation.",
+      "My friends told me I was overthinking it, but in the moment I had this nagging feeling that she wasn't as into it as she was acting. I went along with what was happening anyway, and now I keep wondering if I should've stopped and asked instead of assuming.",
   },
   {
     id: "ito-scenario-08",
@@ -68,9 +68,9 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
   {
     id: "ito-scenario-09",
     narrator_gender: "female",
-    title: "What it felt like vs. what he said",
+    title: "Reading it as it happened",
     scenario_text:
-      "We made out once, and the way he acted that night felt like more than just a one-time thing. A few days later he told me he just sees me as a friend. I don't know what to do with how different things felt in the moment versus what he said after.",
+      "We made out once, and afterward I kept replaying whether he was actually into it or just going along with it. He seemed enthusiastic in the moment, but I don't know how much of that I can trust versus what I wanted to see. I don't know how to tell the difference.",
   },
   {
     id: "ito-scenario-10",
