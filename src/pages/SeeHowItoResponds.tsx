@@ -145,7 +145,10 @@ const SeeHowItoResponds = () => {
         {stage === "respond" && (
           <div className="space-y-5 animate-fade-in">
             <div>
-              <p className="text-[14px] text-foreground font-medium mb-3">What would you tell them?</p>
+              <p className="text-[14px] text-foreground font-medium mb-1">What would you lead with?</p>
+              <p className="text-[12px] text-muted-foreground mb-3">
+                Pick a starting point, or just start typing your own.
+              </p>
               <div className="grid grid-cols-2 gap-2 mb-3">
                 {RESPONSE_STYLES.map((style) => {
                   const active = selectedStyle === style.id;
@@ -170,7 +173,7 @@ const SeeHowItoResponds = () => {
                           : "border-border bg-card hover:border-primary/40"
                       }`}
                     >
-                      <div className="text-[12px] font-bold tracking-wider text-foreground">{style.label}</div>
+                      <div className="text-[13px] font-semibold text-foreground">{style.label}</div>
                       <div className="text-[11px] text-muted-foreground leading-tight mt-0.5">{style.hint}</div>
                     </button>
                   );
