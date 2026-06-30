@@ -97,8 +97,6 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   // === IMAGE-BASED ABUSE — escalating (non-consensual sharing of intimate imagery) ===
   { pattern: /\b(send|sending|sent|post(ing)?|share|sharing|leak(ing)?|drop|spread|forward(ing)?|upload(ing)?)\s+(her|his|their|the|those|these)\s+(nudes?|naked\s+(pics?|photos?|images?)|intimate\s+(pics?|photos?|images?)|sex\s+(tape|video))\b/i, category: "image-based abuse", severity: "red", escalates: true },
   { pattern: /\bhave\s+(her|his|their)\s+nudes?\b[\s\S]{0,80}\b(send|sending|post|sharing|share|leak|drop|use|threaten)\b/i, category: "image-based abuse", severity: "red", escalates: true },
-  // Catches "have nudes... sending them to her sister/family/anyone" where the
-  // object is a pronoun referring back to the earlier-mentioned intimate images.
   { pattern: /\b(nudes?|naked\s+(pics?|photos?|images?)|intimate\s+(pics?|photos?|images?)|sex\s+(tape|video))\b[\s\S]{0,120}\b(send(ing)?|post(ing)?|shar(e|ing)|leak(ing)?|drop(ping)?|forward(ing)?|upload(ing)?)\s+(them|those|these|it)\b/i, category: "image-based abuse", severity: "red", escalates: true },
   { pattern: /\b(revenge\s+porn|leak\s+(her|his|their)\s+(nudes?|pics?|photos?))\b/i, category: "image-based abuse", severity: "red", escalates: true },
 
@@ -111,8 +109,6 @@ const FLAG_WORDS: { pattern: RegExp; category: string; severity: "red" | "yellow
   { pattern: /\bi\s+(kept\s+going|didn'?t\s+stop|continued|kept\s+pushing)\s+(after|when|even\s+though|even\s+after)\s+(she|he|they)\s+(said|told\s+me|asked\s+me\s+to)\s+(stop|maybe|wait|no|slow\s+down)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
   { pattern: /\bshe\s+said\s+(maybe\s+we\s+should\s+stop|we\s+should\s+stop|stop|wait)\b[\s\S]{0,60}\bi\s+(kept|didn'?t|finished|continued)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
   { pattern: /\bshe\s+said\s+(she\s+)?(wasn'?t\s+sure|wasn'?t\s+into\s+it)\b[\s\S]{0,80}\bi\s+(pushed|kept|continued|didn'?t\s+stop)\b/i, category: "regretful perpetrator", severity: "red", escalates: true },
-
-
 
   // === CONTEXTUAL ONLY — detected and passed silently to AI, do NOT escalate risk ===
   // Derogatory/objectifying language — emotional context, not a consent violation signal on its own
@@ -297,12 +293,25 @@ export function classifyRisk(decisions: DecisionState): RiskClassification {
     };
   }
 
-  // Multiple risk factors = red
-  if (riskFactorCount >= 2) {
+  // FIX: Multiple risk factors only escalate to red when there is physical momentum.
+  // Without physical momentum, no physical action is imminent — red is the wrong
+  // call and produces stop moments for benign situations (e.g. a 16-year-old
+  // noticing someone likes their Instagram pictures). Yellow is correct here:
+  // it surfaces the complexity without treating a non-physical situation as a crisis.
+  if (riskFactorCount >= 2 && isPhysicalMomentum) {
     return {
       level: "red",
       stopMessage: "Too many factors that complicate consent. Pause and reassess.",
       reasoning: "Multiple complicating factors significantly increase the risk of harm.",
+      flaggedWords
+    };
+  }
+
+  if (riskFactorCount >= 2 && !isPhysicalMomentum) {
+    return {
+      level: "yellow",
+      stopMessage: "A few things here worth slowing down on. Check in verbally before anything physical.",
+      reasoning: "Multiple complicating factors require extra care and explicit communication.",
       flaggedWords
     };
   }
