@@ -153,7 +153,7 @@ function POVCard({
 /**
  * Clickchat — fictional consumer messaging app with embedded ito.
  * Standalone mobile-first clickable prototype at /embed.
- * Camera-first youth-social vibe; ito is the calmer help layer inside it.
+ * Camera-first youth-social style; ito is the calmer help layer inside it.
  */
 
 type Screen =
