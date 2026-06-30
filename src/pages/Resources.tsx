@@ -1,10 +1,16 @@
 import Header from "@/components/Header";
+import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { ExternalLink, Phone, MessageCircle } from "lucide-react";
 
 const Resources = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SEO
+        title="Get help — 988, RAINN & crisis resources | ito"
+        description="Real people to talk to: 988 Lifeline, RAINN, and Crisis Text Line. When you need more than a thinking space."
+        path="/resources"
+      />
       <Header />
       
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">
