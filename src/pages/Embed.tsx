@@ -410,7 +410,7 @@ function StoryAvatar({ grad, initial, label }: { grad: string[]; initial: string
 
 /* ---------------- Conversation ---------------- */
 
-function Conversation({ onBack, onAskIto }: { onBack: () => void; onAskIto: () => void }) {
+function Conversation({ onBack, onAskIto, onEscalate }: { onBack: () => void; onAskIto: () => void; onEscalate: () => void }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
