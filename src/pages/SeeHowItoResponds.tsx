@@ -67,7 +67,7 @@ const SeeHowItoResponds = () => {
         {
           narrativeText: text,
           precomputedRiskLevel: risk.level,
-          detectedTiming: gapResult.detectedTiming,
+          detectedTiming: "before",
           isFollowUp: false,
           structuredSignals: {},
           entryMethod: "typed",
