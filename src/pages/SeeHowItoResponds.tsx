@@ -163,19 +163,24 @@ const SeeHowItoResponds = () => {
               const bg = { background: active ? "rgba(99, 102, 241, 0.08)" : TILE_BG };
 
               if (isWide) {
+                const wideBg = active ? "rgba(99, 102, 241, 0.08)" : TILE_BG;
+                const wideBorder = active ? "rgba(99, 102, 241, 0.5)" : TILE_BORDER;
+                const wideIconBg = active ? "rgba(99, 102, 241, 0.15)" : "rgba(99, 102, 241, 0.05)";
+                const wideIconBorder = active ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.1)";
+                const wideIconLine = active ? ACCENT : "rgba(99, 102, 241, 0.4)";
                 return (
                   <button
                     key={style.id}
                     onClick={() => handleStyleClick(style.id)}
                     className={`col-span-6 ${baseClass} ${activeClass} flex items-center justify-between gap-4 active:scale-[0.98]`}
-                    style={{ ...bg, ...border }}
+                    style={{ background: wideBg, border: `1px solid ${wideBorder}` }}
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                        style={{ background: active ? "rgba(99, 102, 241, 0.15)" : "rgba(99, 102, 241, 0.05)", border: `1px solid ${active ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.1)"}` }
+                        style={{ background: wideIconBg, border: `1px solid ${wideIconBorder}` }}
                       >
-                        <div className="w-4 h-1 rounded-full" style={{ background: active ? ACCENT : "rgba(99, 102, 241, 0.4)" }} />
+                        <div className="w-4 h-1 rounded-full" style={{ background: wideIconLine }} />
                       </div>
                       <div className="text-left">
                         <p className="text-[10px] uppercase tracking-wider font-bold mb-0.5" style={{ color: "#64748b" }}>
