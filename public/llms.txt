@@ -1,0 +1,17 @@
+# ito — Is this ok?
+
+> Anonymous, non-judgmental space to think through hookups, consent, and confusing moments. No login, no history saved.
+
+ito gives you an honest read on situations involving sex, dating, and consent. You write what's going on in your own words and get a thoughtful perspective back. Nothing is stored and nothing is tied to you.
+
+## Pages
+
+- [Home / Check-in](/check-in): The main intake — describe a situation and get a perspective.
+- [About](/about): What ito is, why it exists, how privacy works, and FAQ.
+- [Resources](/blog): Articles on hookups, consent, and how to think through what happened.
+- [Privacy](/privacy): How (little) data is handled.
+- [Release notes](/release-notes): Product changes over time.
+
+## Optional
+
+- [Embed prototype](/embed): Clickable demo of how ito can be embedded into messaging apps.
