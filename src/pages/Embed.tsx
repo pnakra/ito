@@ -286,14 +286,18 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
 
 
       {/* Friends list */}
-      {friends.map((f) => (
+      {friends.map((f) => {
+        const live = (f as any).live;
+        return (
         <button
           key={f.id}
           onClick={() => onOpen(f.id)}
+          disabled={!live}
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 12,
             padding: "9px 18px", background: "transparent", border: "none",
-            cursor: "pointer", textAlign: "left",
+            cursor: live ? "pointer" : "default", textAlign: "left",
+            opacity: live ? 1 : 0.55,
           }}
         >
           <div style={{ position: "relative", flexShrink: 0 }}>
@@ -312,8 +316,17 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             )}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <span style={{ fontWeight: 600, fontSize: 15, color: C.text, letterSpacing: -0.2 }}>{f.name}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+                <span style={{ fontWeight: 600, fontSize: 15, color: C.text, letterSpacing: -0.2 }}>{f.name}</span>
+                {live && (
+                  <span style={{
+                    fontSize: 9.5, fontWeight: 700, color: "#fff",
+                    background: C.pop, padding: "2px 6px", borderRadius: 999,
+                    letterSpacing: 0.4, textTransform: "uppercase",
+                  }}>Tap to demo</span>
+                )}
+              </div>
               <span style={{ fontSize: 11.5, color: C.subtext, fontWeight: 500 }}>{f.time}</span>
             </div>
             <div style={{
@@ -337,7 +350,8 @@ function Inbox({ onOpen }: { onOpen: (id: string) => void }) {
             </div>
           </div>
         </button>
-      ))}
+        );
+      })}
       <div style={{ height: 20 }} />
     </div>
   );
