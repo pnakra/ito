@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, RefreshCw, Shuffle, Share2, Check } from "lucide-react";
+import { ArrowRight, RefreshCw, Shuffle, Share2, Check, Lock } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
-import { Textarea } from "@/components/ui/textarea";
 import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
 import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { classifyRisk } from "@/lib/riskClassification";
@@ -51,7 +50,6 @@ const SeeHowItoResponds = () => {
   const [scenario, setScenario] = useState<PreviewScenario>(initial.scenario);
   const [wasShared, setWasShared] = useState<boolean>(initial.wasShared);
   const [stage, setStage] = useState<Stage>("respond");
-  const [userResponse, setUserResponse] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
   const [itoResponse, setItoResponse] = useState<ItoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +66,6 @@ const SeeHowItoResponds = () => {
     setScenario(pickNextScenario(scenario));
     setWasShared(false);
     setStage("respond");
-    setUserResponse("");
     setSelectedStyle(null);
     setItoResponse(null);
     setError(null);
@@ -122,9 +119,9 @@ const SeeHowItoResponds = () => {
     }
   };
 
-
-  const handleSubmit = async () => {
-    if (!userResponse.trim() && !selectedStyle) return;
+  const handleStyleSelect = async (id: ResponseStyle) => {
+    if (stage !== "respond") return;
+    setSelectedStyle(id);
     setStage("loading");
     setError(null);
 
@@ -157,26 +154,17 @@ const SeeHowItoResponds = () => {
       console.error("[preview] ito response failed", e);
       setError("ito couldn't respond right now. Try again in a moment.");
       setStage("respond");
+      setSelectedStyle(null);
     }
   };
 
-  const handleStyleClick = (id: ResponseStyle) => {
-    if (selectedStyle === id) {
-      setSelectedStyle(null);
-      return;
-    }
-    setSelectedStyle(id);
-    const otherStarters = Object.values(scenario.starters);
-    if (!userResponse.trim() || otherStarters.includes(userResponse)) {
-      setUserResponse(scenario.starters[id]);
-    }
-  };
+  const chosenStyle = selectedStyle ? RESPONSE_STYLES.find((s) => s.id === selectedStyle) : null;
 
   return (
     <div className="min-h-[100dvh] flex flex-col" style={{ background: PAGE_BG }}>
       <SEO
         title="See how ito responds — preview real scenarios"
-        description="Read a real-feeling situation, write what you'd say, then see how ito responds. A short preview of how the tool reads a moment."
+        description="Read a real-feeling situation, pick how you'd handle it, then see how ito reads the moment."
         path="/preview"
       />
       <Header />
@@ -188,8 +176,8 @@ const SeeHowItoResponds = () => {
             ito / preview
           </span>
           <div className="flex gap-1">
-            <div className="w-4 h-1 rounded-full" style={{ background: ACCENT }} />
-            <div className="w-1.5 h-1 rounded-full" style={{ background: TILE_BORDER }} />
+            <div className={`h-1 rounded-full transition-all ${stage === "respond" ? "w-4" : "w-1.5"}`} style={{ background: stage === "respond" ? ACCENT : TILE_BORDER }} />
+            <div className={`h-1 rounded-full transition-all ${stage === "reveal" ? "w-4" : "w-1.5"}`} style={{ background: stage === "reveal" ? ACCENT : TILE_BORDER }} />
             <div className="w-1.5 h-1 rounded-full" style={{ background: TILE_BORDER }} />
           </div>
         </div>
@@ -205,12 +193,11 @@ const SeeHowItoResponds = () => {
           </div>
         )}
 
-
         {/* Respond stage */}
         {stage === "respond" && (
-          <div className="grid grid-cols-6 gap-3 animate-fade-in">
+          <div className="flex flex-col gap-3 animate-fade-in">
             {/* Scenario tile */}
-            <div className="col-span-6 p-6 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+            <div className="p-6 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
                   Scenario · {scenario.narrator_gender === "male" ? "he" : "she"}/them
@@ -224,109 +211,63 @@ const SeeHowItoResponds = () => {
                   <Shuffle className="w-4 h-4" />
                 </button>
               </div>
-              <p
-                className="text-[22px] leading-[1.3] text-slate-100 italic"
-                style={{ fontFamily: '"Newsreader", "Georgia", serif' }}
-              >
+              <p className="text-[17px] leading-[1.5] font-normal text-slate-100">
                 {scenario.scenario_text}
               </p>
             </div>
 
-            {/* Style tiles */}
-            {RESPONSE_STYLES.map((style, i) => {
-              const active = selectedStyle === style.id;
-              const isWide = i === 2;
-              const baseClass = "rounded-[28px] p-5 transition-all cursor-pointer";
-              const activeClass = active ? "ring-1" : "hover:border-indigo-500/30";
-              const border = { border: `1px solid ${active ? "rgba(99, 102, 241, 0.5)" : TILE_BORDER}` };
-              const bg = { background: active ? "rgba(99, 102, 241, 0.08)" : TILE_BG };
+            {/* Prompt */}
+            <div className="px-1 pt-2 pb-1">
+              <p className="text-[13px] font-medium text-slate-300">
+                How would you handle this?
+              </p>
+              <p className="text-[12px] mt-0.5" style={{ color: "#64748b" }}>
+                Pick a vibe. ito will show its read next.
+              </p>
+            </div>
 
-              if (isWide) {
-                const wideBg = active ? "rgba(99, 102, 241, 0.08)" : TILE_BG;
-                const wideBorder = active ? "rgba(99, 102, 241, 0.5)" : TILE_BORDER;
-                const wideIconBg = active ? "rgba(99, 102, 241, 0.15)" : "rgba(99, 102, 241, 0.05)";
-                const wideIconBorder = active ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.1)";
-                const wideIconLine = active ? ACCENT : "rgba(99, 102, 241, 0.4)";
+            {/* Style cards — three uniform emoji cards in clear sequence */}
+            <div className="grid grid-cols-3 gap-2">
+              {RESPONSE_STYLES.map((style, i) => {
+                const active = selectedStyle === style.id;
                 return (
                   <button
                     key={style.id}
-                    onClick={() => handleStyleClick(style.id)}
-                    className={`col-span-6 ${baseClass} ${activeClass} flex items-center justify-between gap-4 active:scale-[0.98]`}
-                    style={{ background: wideBg, border: `1px solid ${wideBorder}` }}
+                    onClick={() => handleStyleSelect(style.id)}
+                    className="rounded-[24px] p-4 pt-5 flex flex-col items-center gap-2 transition-all active:scale-95 hover:border-indigo-500/40 relative"
+                    style={{
+                      background: active ? "rgba(99, 102, 241, 0.1)" : TILE_BG,
+                      border: `1px solid ${active ? "rgba(99, 102, 241, 0.5)" : TILE_BORDER}`,
+                      minHeight: 140,
+                    }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                        style={{ background: wideIconBg, border: `1px solid ${wideIconBorder}` }}
-                      >
-                        <div className="w-4 h-1 rounded-full" style={{ background: wideIconLine }} />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-[10px] uppercase tracking-wider font-bold mb-0.5" style={{ color: "#64748b" }}>
-                          Style {String.fromCharCode(65 + i)}
-                        </p>
-                        <p className="text-sm font-medium text-slate-200">{style.label}</p>
-                      </div>
-                    </div>
-                    <div className="pr-2" style={{ opacity: active ? 1 : 0.3 }}>
-                      <ArrowRight className="w-4 h-4" style={{ color: ACCENT }} />
+                    <span
+                      className="absolute top-2.5 left-3 text-[9px] font-bold tracking-widest tabular-nums"
+                      style={{ color: "#475569" }}
+                    >
+                      0{i + 1}
+                    </span>
+                    <span className="text-[36px] leading-none mt-1" aria-hidden>
+                      {style.emoji}
+                    </span>
+                    <div className="flex flex-col items-center gap-0.5 mt-auto">
+                      <span className="text-[13px] font-semibold text-slate-100 leading-tight">
+                        {style.vibe}
+                      </span>
+                      <span className="text-[10.5px] leading-tight text-center" style={{ color: "#94a3b8" }}>
+                        {style.label}
+                      </span>
                     </div>
                   </button>
                 );
-              }
+              })}
+            </div>
 
-              return (
-                <button
-                  key={style.id}
-                  onClick={() => handleStyleClick(style.id)}
-                  className={`col-span-3 aspect-square ${baseClass} ${activeClass} flex flex-col justify-between active:scale-95`}
-                  style={{ ...bg, ...border }}
-                >
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{
-                      background: active ? "rgba(99, 102, 241, 0.15)" : i === 0 ? "rgba(99, 102, 241, 0.1)" : "rgba(99, 102, 241, 0.05)",
-                      border: `1px solid ${active ? "rgba(99, 102, 241, 0.3)" : "rgba(99, 102, 241, 0.15)"}`,
-                    }}
-                  >
-                    <div
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: active ? ACCENT : i === 0 ? "rgba(99, 102, 241, 0.7)" : "rgba(99, 102, 241, 0.4)" }}
-                    />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[10px] uppercase tracking-wider font-bold mb-0.5" style={{ color: "#64748b" }}>
-                      Style {String.fromCharCode(65 + i)}
-                    </p>
-                    <p className="text-sm font-medium text-slate-200">{style.label}</p>
-                  </div>
-                </button>
-              );
-            })}
-
-            {/* Input area */}
-            <div className="col-span-6 mt-1">
-              <div className="relative group">
-                <Textarea
-                  value={userResponse}
-                  onChange={(e) => setUserResponse(e.target.value.slice(0, 600))}
-                  placeholder="How would you respond?"
-                  className="w-full min-h-[144px] resize-none rounded-[32px] p-6 pt-5 text-sm shadow-inner transition-all focus:ring-4 focus-visible:ring-4 focus:ring-indigo-500/5"
-                  style={{
-                    background: TILE_BG,
-                    border: `1px solid ${TILE_BORDER}`,
-                    color: "#f1f5f9",
-                  }}
-                />
-                <button
-                  onClick={handleSubmit}
-                  disabled={!userResponse.trim() && !selectedStyle}
-                  className="absolute bottom-4 right-4 h-10 px-6 rounded-full text-[13px] font-bold tracking-tight transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                  style={{ background: ACCENT, color: "#fff", boxShadow: "0 0 20px rgba(99, 102, 241, 0.25)" }}
-                >
-                  Reveal
-                </button>
-              </div>
+            {/* Intensity spectrum hint */}
+            <div className="flex items-center gap-2 px-1 mt-1 text-[10px]" style={{ color: "#475569" }}>
+              <span>More direct</span>
+              <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.4), rgba(99,102,241,0.05))" }} />
+              <span>Softer</span>
             </div>
           </div>
         )}
@@ -350,51 +291,56 @@ const SeeHowItoResponds = () => {
         )}
 
         {/* Reveal */}
-        {stage === "reveal" && itoResponse && (
-          <div className="grid grid-cols-6 gap-3 animate-fade-in">
-            {/* User's take */}
-            <div className="col-span-6 md:col-span-3 p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
-              <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>Your instinct</p>
-              {selectedStyle && (
-                <div
-                  className="inline-block text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full mb-3"
-                  style={{ background: "rgba(99, 102, 241, 0.15)", color: ACCENT }}
-                >
-                  {RESPONSE_STYLES.find((s) => s.id === selectedStyle)?.label}
-                </div>
-              )}
-              <p className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: "#e2e8f0" }}>
-                {userResponse.trim() || (
-                  <span className="italic" style={{ color: "#64748b" }}>
-                    {RESPONSE_STYLES.find((s) => s.id === selectedStyle)?.label}
-                  </span>
-                )}
+        {stage === "reveal" && itoResponse && chosenStyle && (
+          <div className="flex flex-col gap-3 animate-fade-in">
+            {/* Your pick */}
+            <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+              <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>
+                Your pick
               </p>
+              <div className="flex items-center gap-3">
+                <span className="text-[28px] leading-none" aria-hidden>{chosenStyle.emoji}</span>
+                <div>
+                  <p className="text-[15px] font-semibold text-slate-100">{chosenStyle.vibe}</p>
+                  <p className="text-[12px]" style={{ color: "#94a3b8" }}>{chosenStyle.label}</p>
+                </div>
+              </div>
             </div>
 
-            {/* ito's take */}
-            <div className="col-span-6 md:col-span-3 p-5 rounded-[28px]" style={{ background: "rgba(99, 102, 241, 0.08)", border: "1px solid rgba(99, 102, 241, 0.35)" }}>
-              <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: ACCENT }}>ito's read</p>
-              <p className="text-[15px] font-semibold text-white mb-2">{itoResponse.signalLabel}</p>
-              {itoResponse.why.length > 0 && (
-                <ul className="space-y-1.5 mb-3">
-                  {itoResponse.why.map((point, i) => (
-                    <li key={i} className="text-[13.5px] leading-relaxed flex gap-2" style={{ color: "#cbd5e1" }}>
-                      <span style={{ color: ACCENT }}>·</span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {itoResponse.suggestion && (
-                <p className="text-[13.5px] leading-relaxed italic border-t pt-3" style={{ color: "#e2e8f0", borderColor: "rgba(255,255,255,0.1)" }}>
-                  {itoResponse.suggestion}
+            {/* ito's read — short */}
+            <div className="p-5 rounded-[28px]" style={{ background: "rgba(99, 102, 241, 0.08)", border: "1px solid rgba(99, 102, 241, 0.35)" }}>
+              <p className="text-[10px] uppercase tracking-wider font-bold mb-2" style={{ color: ACCENT }}>ito's read</p>
+              <p className="text-[15px] font-semibold text-white mb-1.5">{itoResponse.signalLabel}</p>
+              {itoResponse.why[0] && (
+                <p className="text-[13.5px] leading-relaxed" style={{ color: "#cbd5e1" }}>
+                  {itoResponse.why[0]}
                 </p>
               )}
             </div>
 
+            {/* Locked / teaser */}
+            <div
+              className="p-4 rounded-[24px] flex items-center gap-3"
+              style={{ background: TILE_BG, border: `1px dashed ${TILE_BORDER}` }}
+            >
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.2)" }}
+              >
+                <Lock className="w-4 h-4" style={{ color: ACCENT }} />
+              </div>
+              <div className="flex-1">
+                <p className="text-[12.5px] font-medium text-slate-200 leading-snug">
+                  ito goes deeper with your own situation.
+                </p>
+                <p className="text-[11px] leading-snug" style={{ color: "#64748b" }}>
+                  Previews stay short on purpose.
+                </p>
+              </div>
+            </div>
+
             {/* Alignment check */}
-            <div className="col-span-6 p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+            <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>
                 How close was your read?
               </p>
@@ -419,35 +365,29 @@ const SeeHowItoResponds = () => {
                   );
                 })}
               </div>
-              {alignment && (
-                <p className="text-[11px] mt-3 text-center" style={{ color: "#64748b" }}>
-                  Thanks — that helps calibrate how ito is landing.
-                </p>
-              )}
             </div>
 
             {/* Share */}
-            <div className="col-span-6">
-              <button
-                onClick={handleShare}
-                className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
-                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
-              >
-                {copiedShare ? (
-                  <>
-                    <Check className="w-4 h-4" style={{ color: ACCENT }} />
-                    Link copied
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="w-4 h-4" />
-                    Send this scenario to someone
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={handleShare}
+              className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
+              style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+            >
+              {copiedShare ? (
+                <>
+                  <Check className="w-4 h-4" style={{ color: ACCENT }} />
+                  Link copied
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4" />
+                  Send this scenario to someone
+                </>
+              )}
+            </button>
 
-            <div className="col-span-6 p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+            {/* CTAs */}
+            <div className="p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[15px] text-white mb-1 font-medium">Have your own situation?</p>
               <p className="text-[13px] mb-4" style={{ color: "#64748b" }}>
                 These scenarios are made up. Yours doesn't have to be.
@@ -474,7 +414,7 @@ const SeeHowItoResponds = () => {
         )}
 
         {/* Try another */}
-        {stage !== "reveal" && (
+        {stage === "respond" && (
           <div className="text-center mt-6">
             <button
               onClick={handleNewScenario}
