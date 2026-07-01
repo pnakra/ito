@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
+import PreviewIntroModal from "@/components/narrative/PreviewIntroModal";
+
 import SignalFloor from "@/components/narrative/SignalFloor";
 import AdaptiveFollowUp from "@/components/narrative/AdaptiveFollowUp";
 import StopMoment from "@/components/prevention/StopMoment";
@@ -796,14 +798,18 @@ const CheckIn = () => {
 
           {/* Phase 1: Narrative Input */}
           {phase === "narrative-input" && (
-            <NarrativeInput
-              onSubmit={handleNarrativeSubmit}
-              isLoading={isLoading}
-              compact={shouldShowPatternWarning}
-              initialValue={prefillSituation}
-              hideSuggestions={!!prefillSituation}
-            />
+            <>
+              <NarrativeInput
+                onSubmit={handleNarrativeSubmit}
+                isLoading={isLoading}
+                compact={shouldShowPatternWarning}
+                initialValue={prefillSituation}
+                hideSuggestions={!!prefillSituation}
+              />
+              {!prefillSituation && <PreviewIntroModal />}
+            </>
           )}
+
 
           {/* Phase 2: Signal Floor */}
           {phase === "signal-floor" && (

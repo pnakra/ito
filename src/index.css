@@ -275,3 +275,34 @@ input:focus {
   animation: ito-preview-slide 3.2s linear infinite;
 }
 
+/* Preview chip — soft pulsing glow + shimmer to signal it's interactive */
+@keyframes ito-chip-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35), 0 0 0 1px hsl(var(--primary) / 0.55) inset;
+  }
+  50% {
+    box-shadow: 0 0 0 6px hsl(var(--primary) / 0), 0 0 0 1px hsl(var(--primary) / 0.95) inset;
+  }
+}
+@keyframes ito-chip-shimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+.ito-preview-chip {
+  position: relative;
+  overflow: hidden;
+  animation: ito-chip-glow 2.4s ease-in-out infinite;
+}
+.ito-preview-chip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.18), transparent);
+  animation: ito-chip-shimmer 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+
