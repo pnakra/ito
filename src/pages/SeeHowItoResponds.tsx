@@ -225,9 +225,6 @@ const SeeHowItoResponds = () => {
               <p className="text-[13px] font-medium text-slate-300">
                 How would you handle this?
               </p>
-              <p className="text-[12px] mt-0.5" style={{ color: "#64748b" }}>
-                Pick a vibe. ito will show its read next.
-              </p>
             </div>
 
             {/* Style cards — three uniform emoji cards in clear sequence */}
