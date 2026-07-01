@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
-import GuidedMode from "@/components/narrative/GuidedMode";
 import SignalFloor from "@/components/narrative/SignalFloor";
 import AdaptiveFollowUp from "@/components/narrative/AdaptiveFollowUp";
 import StopMoment from "@/components/prevention/StopMoment";
@@ -31,7 +30,6 @@ import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/i
 
 type FlowPhase =
   | "narrative-input"
-  | "guided-mode"
   | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
@@ -85,9 +83,7 @@ const CheckIn = () => {
   // Held in a ref so it survives consent-modal interception and reaches the edge function.
   const entryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
   const pendingEntryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
-  const [phase, setPhase] = useState<FlowPhase>(
-    searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
-  );
+  const [phase, setPhase] = useState<FlowPhase>("narrative-input");
 
   // External handoff: prefill the narrative textarea via ?situation= query param.
   // Read once on mount, then strip from URL so refresh doesn't overwrite edits.
@@ -447,24 +443,6 @@ const CheckIn = () => {
     fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
   };
 
-  // Handle guided mode submission
-  const handleGuidedSubmit = (text: string, signals: StructuredSignals) => {
-    logFreetext("before", "guided-mode", text);
-    setStructuredSignals(signals);
-    structuredSignalsRef.current = signals;
-    
-    const newHistory = [...narrativeHistory, text];
-    setNarrativeHistory(newHistory);
-    
-    const cumulativeText = newHistory.join("\n\n");
-    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
-    
-    if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
-    else if (signals.timing === "deciding") setDetectedTiming("before");
-    
-    proceedWithSignals(cumulativeText, signals, result, gapResult);
-  };
-
   // Handle follow-up question answers
   const handleFollowUpAnswers = (answers: Record<string, string>) => {
     const answerLines = Object.entries(answers)
@@ -796,7 +774,7 @@ const CheckIn = () => {
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {phase !== "narrative-input" && phase !== "guided-mode" ? (
+          {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
               if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
@@ -808,7 +786,7 @@ const CheckIn = () => {
               else if (phase === "outcome-feedback") setPhase("outcome");
               else resetFlow();
             }} />
-          ) : phase === "guided-mode" ? null : (
+          ) : (
             <BackButton to="/" />
           )}
 
@@ -820,20 +798,10 @@ const CheckIn = () => {
           {phase === "narrative-input" && (
             <NarrativeInput
               onSubmit={handleNarrativeSubmit}
-              onGuidedMode={() => setPhase("guided-mode")}
               isLoading={isLoading}
               compact={shouldShowPatternWarning}
               initialValue={prefillSituation}
               hideSuggestions={!!prefillSituation}
-            />
-          )}
-
-          {/* Phase 1b: Guided Mode */}
-          {phase === "guided-mode" && (
-            <GuidedMode
-              onSubmit={handleGuidedSubmit}
-              onBack={() => setPhase("narrative-input")}
-              isLoading={isLoading}
             />
           )}
 

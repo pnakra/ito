@@ -14,14 +14,13 @@ export type EntryMethod = "typed" | "chip_unedited" | "chip_edited";
 
 interface NarrativeInputProps {
   onSubmit: (text: string, entryMethod: EntryMethod) => void;
-  onGuidedMode: () => void;
   isLoading: boolean;
   compact?: boolean;
   initialValue?: string;
   hideSuggestions?: boolean;
 }
 
-const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
+const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -168,10 +167,8 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
         <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
             "They said yes but something felt off",
-            "I'm not sure if I went too far",
-            "They haven't texted back and I'm overthinking it",
-            "I don't know if what happened was okay",
-            "Things got further than I expected and I feel weird about it",
+            "Should I try to hook up with her when I see her next",
+            "Did we only kiss because we were drunk?",
           ].map((prompt) => (
             <button
               key={prompt}
@@ -193,14 +190,8 @@ const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialVal
         </div>
       )}
 
-      {/* Privacy + guided mode */}
+      {/* Privacy + preview link */}
       <div className="mt-3 flex flex-col items-center gap-2">
-        <button
-          onClick={onGuidedMode}
-          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Not sure what to say? <span className="text-primary font-medium">Try guided questions</span>
-        </button>
         <a
           href="/preview"
           className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
