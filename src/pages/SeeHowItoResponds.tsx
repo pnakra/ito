@@ -273,6 +273,38 @@ const SeeHowItoResponds = () => {
               <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, rgba(99,102,241,0.4), rgba(99,102,241,0.05))" }} />
               <span>Softer</span>
             </div>
+
+            {/* Preview of the chosen response + reveal CTA */}
+            {selectedStyle && (() => {
+              const s = RESPONSE_STYLES.find((x) => x.id === selectedStyle)!;
+              const starter = scenario.starters[selectedStyle];
+              return (
+                <div className="mt-2 flex flex-col gap-3 animate-fade-in">
+                  <div
+                    className="p-5 rounded-[24px]"
+                    style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
+                        Your take · {s.vibe}
+                      </span>
+                      <span className="text-[20px] leading-none" aria-hidden>{s.emoji}</span>
+                    </div>
+                    <p className="text-[14px] leading-relaxed" style={{ color: "#e2e8f0" }}>
+                      {starter}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleReveal}
+                    className="w-full h-12 rounded-full text-[14px] font-bold tracking-tight transition-all active:scale-95 shadow-lg inline-flex items-center justify-center gap-2"
+                    style={{ background: ACCENT, color: "#fff", boxShadow: "0 0 24px rgba(99, 102, 241, 0.3)" }}
+                  >
+                    Reveal ito's read
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         )}
 
