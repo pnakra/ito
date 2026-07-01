@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
+import { ArrowRight, RefreshCw, Shuffle, Share2, Check } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,8 +8,10 @@ import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScena
 import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { classifyRisk } from "@/lib/riskClassification";
 import { detectGaps, narrativeToDecisionState } from "@/lib/narrativeGapDetection";
+import { supabase } from "@/integrations/supabase/client";
 
 type Stage = "respond" | "loading" | "reveal";
+type Alignment = "aligned" | "somewhat" | "not_really";
 
 interface ItoResponse {
   signalLabel: string;
@@ -27,22 +29,99 @@ const ACCENT = "#6366f1";
 const ACCENT_SOFT = "rgba(99, 102, 241, 0.15)";
 const PAGE_BG = "#08090D";
 
+const ALIGNMENT_OPTIONS: { id: Alignment; label: string }[] = [
+  { id: "aligned", label: "Pretty aligned" },
+  { id: "somewhat", label: "Somewhat" },
+  { id: "not_really", label: "Not really" },
+];
+
+const pickScenarioFromParam = (): { scenario: PreviewScenario; wasShared: boolean } => {
+  if (typeof window === "undefined") return { scenario: pickNextScenario(), wasShared: false };
+  const params = new URLSearchParams(window.location.search);
+  const sharedId = params.get("s");
+  if (sharedId) {
+    const match = PREVIEW_SCENARIOS.find((s) => s.id === sharedId);
+    if (match) return { scenario: match, wasShared: true };
+  }
+  return { scenario: pickNextScenario(), wasShared: false };
+};
+
 const SeeHowItoResponds = () => {
-  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
+  const initial = pickScenarioFromParam();
+  const [scenario, setScenario] = useState<PreviewScenario>(initial.scenario);
+  const [wasShared, setWasShared] = useState<boolean>(initial.wasShared);
   const [stage, setStage] = useState<Stage>("respond");
   const [userResponse, setUserResponse] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
   const [itoResponse, setItoResponse] = useState<ItoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [alignment, setAlignment] = useState<Alignment | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
+
+  useEffect(() => {
+    if (!copiedShare) return;
+    const t = setTimeout(() => setCopiedShare(false), 2000);
+    return () => clearTimeout(t);
+  }, [copiedShare]);
 
   const handleNewScenario = () => {
     setScenario(pickNextScenario(scenario));
+    setWasShared(false);
     setStage("respond");
     setUserResponse("");
     setSelectedStyle(null);
     setItoResponse(null);
     setError(null);
+    setAlignment(null);
+    if (typeof window !== "undefined" && window.location.search) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
   };
+
+  const handleAlignment = async (id: Alignment) => {
+    if (alignment) return;
+    setAlignment(id);
+    try {
+      await supabase.from("submissions").insert({
+        flow_type: "preview",
+        step_name: "alignment_check",
+        step_type: "choice",
+        choice_value: id,
+        metadata: {
+          scenario_id: scenario.id,
+          scenario_theme: scenario.theme,
+          selected_style: selectedStyle,
+          signal_label: itoResponse?.signalLabel ?? null,
+        },
+      });
+    } catch (e) {
+      console.error("[preview] alignment log failed", e);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/preview?s=${scenario.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "See how ito responds",
+          text: "Try this one — what would you say?",
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopiedShare(true);
+      }
+    } catch (e) {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopiedShare(true);
+      } catch {
+        // no-op
+      }
+    }
+  };
+
 
   const handleSubmit = async () => {
     if (!userResponse.trim() && !selectedStyle) return;
@@ -115,6 +194,17 @@ const SeeHowItoResponds = () => {
           </div>
         </div>
         <h1 className="sr-only">See how ito responds</h1>
+
+        {wasShared && stage === "respond" && (
+          <div
+            className="mb-3 px-3 py-2 rounded-full text-[11px] inline-flex items-center gap-1.5"
+            style={{ background: ACCENT_SOFT, color: ACCENT, border: `1px solid rgba(99, 102, 241, 0.25)` }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />
+            Someone sent you this one
+          </div>
+        )}
+
 
         {/* Respond stage */}
         {stage === "respond" && (
@@ -303,7 +393,63 @@ const SeeHowItoResponds = () => {
               )}
             </div>
 
-            {/* CTAs */}
+            {/* Alignment check */}
+            <div className="col-span-6 p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+              <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: "#64748b" }}>
+                How close was your read?
+              </p>
+              <p className="text-[12px] mb-3" style={{ color: "#64748b" }}>
+                No right answer — the gap is the point.
+              </p>
+              <div className="flex gap-2">
+                {ALIGNMENT_OPTIONS.map((opt) => {
+                  const active = alignment === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleAlignment(opt.id)}
+                      disabled={!!alignment}
+                      className="flex-1 h-10 rounded-full text-[12px] font-semibold transition-all active:scale-95 disabled:cursor-default"
+                      style={{
+                        background: active ? ACCENT : "transparent",
+                        color: active ? "#fff" : "#cbd5e1",
+                        border: `1px solid ${active ? ACCENT : TILE_BORDER}`,
+                        opacity: alignment && !active ? 0.4 : 1,
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {alignment && (
+                <p className="text-[11px] mt-3 text-center" style={{ color: "#64748b" }}>
+                  Thanks — that helps calibrate how ito is landing.
+                </p>
+              )}
+            </div>
+
+            {/* Share */}
+            <div className="col-span-6">
+              <button
+                onClick={handleShare}
+                className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4" style={{ color: ACCENT }} />
+                    Link copied
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    Send this scenario to someone
+                  </>
+                )}
+              </button>
+            </div>
+
             <div className="col-span-6 p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[15px] text-white mb-1 font-medium">Have your own situation?</p>
               <p className="text-[13px] mb-4" style={{ color: "#64748b" }}>
