@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, RefreshCw, Shuffle, Share2, Check, Lock } from "lucide-react";
+import { ArrowRight, RefreshCw, Shuffle, Share2, Check, Lock, Target, Heart, Feather } from "lucide-react";
+
+const STYLE_ICONS: Record<string, typeof Target> = {
+  plain: Target,
+  kind: Heart,
+  light: Feather,
+};
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
@@ -347,9 +353,10 @@ const SeeHowItoResponds = () => {
                     >
                       0{i + 1}
                     </span>
-                    <span className="text-[36px] leading-none mt-1" aria-hidden>
-                      {style.emoji}
-                    </span>
+                    {(() => {
+                      const Icon = STYLE_ICONS[style.id] ?? Target;
+                      return <Icon size={32} strokeWidth={1.75} className="mt-1 text-indigo-300" aria-hidden />;
+                    })()}
                     <div className="flex flex-col items-center gap-0.5 mt-auto">
                       <span className="text-[13px] font-semibold text-slate-100 leading-tight">
                         {style.vibe}
@@ -384,7 +391,7 @@ const SeeHowItoResponds = () => {
                       <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
                         Your take · {s.vibe}
                       </span>
-                      <span className="text-[20px] leading-none" aria-hidden>{s.emoji}</span>
+                      {(() => { const Icon = STYLE_ICONS[s.id] ?? Target; return <Icon size={18} strokeWidth={2} className="text-indigo-300" aria-hidden />; })()}
                     </div>
                     <p className="text-[14px] leading-relaxed" style={{ color: "#e2e8f0" }}>
                       {starter}
@@ -431,7 +438,7 @@ const SeeHowItoResponds = () => {
                 <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
                   Your take · {chosenStyle.vibe}
                 </p>
-                <span className="text-[20px] leading-none" aria-hidden>{chosenStyle.emoji}</span>
+                {(() => { const Icon = STYLE_ICONS[chosenStyle.id] ?? Target; return <Icon size={18} strokeWidth={2} className="text-indigo-300" aria-hidden />; })()}
               </div>
               <p className="text-[14px] leading-relaxed" style={{ color: "#e2e8f0" }}>
                 {scenario.starters[chosenStyle.id]}
