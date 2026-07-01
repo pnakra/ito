@@ -156,7 +156,16 @@ const SeeHowItoResponds = () => {
 
   const handleStyleSelect = (id: ResponseStyle) => {
     if (stage !== "respond") return;
-    setSelectedStyle((prev) => (prev === id ? null : id));
+    setSelectedStyle((prev) => {
+      const next = prev === id ? null : id;
+      if (next) {
+        logPreviewEvent("style_select", {
+          choice_value: next,
+          metadata: { scenario_id: scenario.id, scenario_theme: scenario.theme },
+        });
+      }
+      return next;
+    });
     setError(null);
   };
 
@@ -164,6 +173,10 @@ const SeeHowItoResponds = () => {
     if (!selectedStyle || stage !== "respond") return;
     setStage("loading");
     setError(null);
+    logPreviewEvent("reveal_click", {
+      choice_value: selectedStyle,
+      metadata: { scenario_id: scenario.id, scenario_theme: scenario.theme },
+    });
 
     try {
       const text = scenario.scenario_text;
@@ -184,17 +197,36 @@ const SeeHowItoResponds = () => {
         { maxRetries: 2, baseDelayMs: 500, label: "preview-analyze" }
       );
 
-      setItoResponse({
+      const resp = {
         signalLabel: cleanText(data?.signalLabel) || "Worth a pause",
         why: cleanList(data?.why),
         suggestion: cleanText(data?.suggestion),
-      });
+      };
+      setItoResponse(resp);
       setStage("reveal");
+      logPreviewEvent("reveal_shown", {
+        metadata: {
+          scenario_id: scenario.id,
+          selected_style: selectedStyle,
+          signal_label: resp.signalLabel,
+        },
+      });
     } catch (e) {
       console.error("[preview] ito response failed", e);
       setError("ito couldn't respond right now. Try again in a moment.");
       setStage("respond");
     }
+  };
+
+  const handleCtaTryOwn = (position: string) => {
+    logPreviewEvent("cta_try_own_click", {
+      metadata: {
+        scenario_id: scenario.id,
+        selected_style: selectedStyle,
+        signal_label: itoResponse?.signalLabel ?? null,
+        position,
+      },
+    });
   };
 
   const chosenStyle = selectedStyle ? RESPONSE_STYLES.find((s) => s.id === selectedStyle) : null;
