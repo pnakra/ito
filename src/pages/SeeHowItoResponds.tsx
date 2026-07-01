@@ -45,6 +45,35 @@ const pickScenarioFromParam = (): { scenario: PreviewScenario; wasShared: boolea
   return { scenario: pickNextScenario(), wasShared: false };
 };
 
+const readCampaignParams = () => {
+  if (typeof window === "undefined") return {};
+  const p = new URLSearchParams(window.location.search);
+  const out: Record<string, string> = {};
+  ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "ref"].forEach((k) => {
+    const v = p.get(k);
+    if (v) out[k] = v;
+  });
+  if (typeof document !== "undefined" && document.referrer) out.referrer = document.referrer;
+  return out;
+};
+
+const logPreviewEvent = async (
+  step_name: string,
+  extra: { choice_value?: string; metadata?: Record<string, unknown> } = {}
+) => {
+  try {
+    await supabase.from("submissions").insert({
+      flow_type: "preview",
+      step_name,
+      step_type: "event",
+      choice_value: extra.choice_value ?? null,
+      metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) },
+    });
+  } catch (e) {
+    console.error("[preview] log failed", step_name, e);
+  }
+};
+
 const SeeHowItoResponds = () => {
   const initial = pickScenarioFromParam();
   const [scenario, setScenario] = useState<PreviewScenario>(initial.scenario);
@@ -62,8 +91,20 @@ const SeeHowItoResponds = () => {
     return () => clearTimeout(t);
   }, [copiedShare]);
 
+  // Track landing (fires once per mount)
+  useEffect(() => {
+    logPreviewEvent("preview_view", {
+      metadata: { scenario_id: initial.scenario.id, was_shared: initial.wasShared },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleNewScenario = () => {
-    setScenario(pickNextScenario(scenario));
+    const next = pickNextScenario(scenario);
+    logPreviewEvent("another_scenario", {
+      metadata: { from: scenario.id, to: next.id, at_stage: stage },
+    });
+    setScenario(next);
     setWasShared(false);
     setStage("respond");
     setSelectedStyle(null);
