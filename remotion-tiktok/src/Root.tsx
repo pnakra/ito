@@ -17,7 +17,7 @@ const MISREAD_V2: MisreadProps = {
 };
 
 const SCENARIOS: Record<string, VideoProps> = {
-  misread: {
+  "misread-v1": {
     hook: "he sent this. what do you say?",
     timestamp: "2:14 AM",
     message: "you were into it right? like i didn't misread it?",
