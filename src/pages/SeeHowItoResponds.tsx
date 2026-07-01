@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
+import { ArrowRight, RefreshCw, Shuffle, Share2, Check } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,8 +8,10 @@ import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScena
 import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { classifyRisk } from "@/lib/riskClassification";
 import { detectGaps, narrativeToDecisionState } from "@/lib/narrativeGapDetection";
+import { supabase } from "@/integrations/supabase/client";
 
 type Stage = "respond" | "loading" | "reveal";
+type Alignment = "aligned" | "somewhat" | "not_really";
 
 interface ItoResponse {
   signalLabel: string;
@@ -27,22 +29,99 @@ const ACCENT = "#6366f1";
 const ACCENT_SOFT = "rgba(99, 102, 241, 0.15)";
 const PAGE_BG = "#08090D";
 
+const ALIGNMENT_OPTIONS: { id: Alignment; label: string }[] = [
+  { id: "aligned", label: "Pretty aligned" },
+  { id: "somewhat", label: "Somewhat" },
+  { id: "not_really", label: "Not really" },
+];
+
+const pickScenarioFromParam = (): { scenario: PreviewScenario; wasShared: boolean } => {
+  if (typeof window === "undefined") return { scenario: pickNextScenario(), wasShared: false };
+  const params = new URLSearchParams(window.location.search);
+  const sharedId = params.get("s");
+  if (sharedId) {
+    const match = PREVIEW_SCENARIOS.find((s) => s.id === sharedId);
+    if (match) return { scenario: match, wasShared: true };
+  }
+  return { scenario: pickNextScenario(), wasShared: false };
+};
+
 const SeeHowItoResponds = () => {
-  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
+  const initial = pickScenarioFromParam();
+  const [scenario, setScenario] = useState<PreviewScenario>(initial.scenario);
+  const [wasShared, setWasShared] = useState<boolean>(initial.wasShared);
   const [stage, setStage] = useState<Stage>("respond");
   const [userResponse, setUserResponse] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
   const [itoResponse, setItoResponse] = useState<ItoResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [alignment, setAlignment] = useState<Alignment | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
+
+  useEffect(() => {
+    if (!copiedShare) return;
+    const t = setTimeout(() => setCopiedShare(false), 2000);
+    return () => clearTimeout(t);
+  }, [copiedShare]);
 
   const handleNewScenario = () => {
     setScenario(pickNextScenario(scenario));
+    setWasShared(false);
     setStage("respond");
     setUserResponse("");
     setSelectedStyle(null);
     setItoResponse(null);
     setError(null);
+    setAlignment(null);
+    if (typeof window !== "undefined" && window.location.search) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
   };
+
+  const handleAlignment = async (id: Alignment) => {
+    if (alignment) return;
+    setAlignment(id);
+    try {
+      await supabase.from("submissions").insert({
+        flow_type: "preview",
+        step_name: "alignment_check",
+        step_type: "choice",
+        choice_value: id,
+        metadata: {
+          scenario_id: scenario.id,
+          scenario_theme: scenario.theme,
+          selected_style: selectedStyle,
+          signal_label: itoResponse?.signalLabel ?? null,
+        },
+      });
+    } catch (e) {
+      console.error("[preview] alignment log failed", e);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/preview?s=${scenario.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "See how ito responds",
+          text: "Try this one — what would you say?",
+          url,
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopiedShare(true);
+      }
+    } catch (e) {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopiedShare(true);
+      } catch {
+        // no-op
+      }
+    }
+  };
+
 
   const handleSubmit = async () => {
     if (!userResponse.trim() && !selectedStyle) return;
