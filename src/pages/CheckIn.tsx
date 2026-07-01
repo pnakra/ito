@@ -792,7 +792,7 @@ const CheckIn = () => {
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {phase !== "narrative-input" && phase !== "guided-mode" ? (
+          {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
               if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
@@ -804,7 +804,7 @@ const CheckIn = () => {
               else if (phase === "outcome-feedback") setPhase("outcome");
               else resetFlow();
             }} />
-          ) : phase === "guided-mode" ? null : (
+          ) : (
             <BackButton to="/" />
           )}
 
