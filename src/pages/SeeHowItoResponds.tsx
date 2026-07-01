@@ -195,6 +195,17 @@ const SeeHowItoResponds = () => {
         </div>
         <h1 className="sr-only">See how ito responds</h1>
 
+        {wasShared && stage === "respond" && (
+          <div
+            className="mb-3 px-3 py-2 rounded-full text-[11px] inline-flex items-center gap-1.5"
+            style={{ background: ACCENT_SOFT, color: ACCENT, border: `1px solid rgba(99, 102, 241, 0.25)` }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: ACCENT }} />
+            Someone sent you this one
+          </div>
+        )}
+
+
         {/* Respond stage */}
         {stage === "respond" && (
           <div className="grid grid-cols-6 gap-3 animate-fade-in">
