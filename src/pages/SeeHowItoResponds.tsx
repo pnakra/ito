@@ -353,9 +353,10 @@ const SeeHowItoResponds = () => {
                     >
                       0{i + 1}
                     </span>
-                    <span className="text-[36px] leading-none mt-1" aria-hidden>
-                      {style.emoji}
-                    </span>
+                    {(() => {
+                      const Icon = STYLE_ICONS[style.id] ?? Target;
+                      return <Icon size={32} strokeWidth={1.75} className="mt-1 text-indigo-300" aria-hidden />;
+                    })()}
                     <div className="flex flex-col items-center gap-0.5 mt-auto">
                       <span className="text-[13px] font-semibold text-slate-100 leading-tight">
                         {style.vibe}
