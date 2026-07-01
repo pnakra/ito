@@ -4,7 +4,7 @@ import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Textarea } from "@/components/ui/textarea";
-import { PREVIEW_SCENARIOS, RESPONSE_STYLES, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
+import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
 import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { classifyRisk } from "@/lib/riskClassification";
 import { detectGaps, narrativeToDecisionState } from "@/lib/narrativeGapDetection";
@@ -21,13 +21,6 @@ const cleanText = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const cleanList = (v: unknown): string[] =>
   Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean) : [];
 
-const pickRandom = (exceptId?: string) => {
-  const pool = exceptId ? PREVIEW_SCENARIOS.filter((s) => s.id !== exceptId) : PREVIEW_SCENARIOS;
-  return pool[Math.floor(Math.random() * pool.length)];
-};
-
-const scenarioIndex = (id: string) => PREVIEW_SCENARIOS.findIndex((s) => s.id === id) + 1;
-
 const TILE_BG = "#12141C";
 const TILE_BORDER = "#212631";
 const ACCENT = "#6366f1";
@@ -35,7 +28,7 @@ const ACCENT_SOFT = "rgba(99, 102, 241, 0.15)";
 const PAGE_BG = "#08090D";
 
 const SeeHowItoResponds = () => {
-  const [scenario, setScenario] = useState<PreviewScenario>(() => pickRandom());
+  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
   const [stage, setStage] = useState<Stage>("respond");
   const [userResponse, setUserResponse] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
@@ -43,7 +36,7 @@ const SeeHowItoResponds = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleNewScenario = () => {
-    setScenario(pickRandom(scenario.id));
+    setScenario(pickNextScenario(scenario));
     setStage("respond");
     setUserResponse("");
     setSelectedStyle(null);
