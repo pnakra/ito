@@ -189,10 +189,19 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
               {prompt}
             </button>
           ))}
-          {/* Highlighted interactive preview chip — visually distinct */}
+          {/* Highlighted interactive preview chip — visually distinct.
+              Pulse is suppressed for users who already took the preview CTA. */}
           <a
             href="/preview"
-            className="ito-preview-chip inline-flex items-center gap-1.5 text-[14px] text-primary bg-primary/5 hover:bg-primary/10 px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug font-medium"
+            onClick={() => {
+              logSubmission({
+                flowType: "before",
+                stepName: "preview_chip_clicked",
+                stepType: "choice",
+                metadata: { surface: "check-in", pulsing: !suppressChipPulse },
+              });
+            }}
+            className={`${suppressChipPulse ? "" : "ito-preview-chip "}inline-flex items-center gap-1.5 text-[14px] text-primary bg-primary/5 hover:bg-primary/10 px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug font-medium`}
             aria-label="See how ito responds — interactive preview"
           >
             <span aria-hidden className="text-[10px]">▶</span>
