@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
 import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
+import Go from "./pages/Go";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/embed" element={<Embed />} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
+              <Route path="/go" element={<Go />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
