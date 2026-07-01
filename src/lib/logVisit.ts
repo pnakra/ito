@@ -22,7 +22,7 @@ export async function logVisit() {
           apikey: ANON_KEY,
         },
         body: JSON.stringify({
-          path: window.location.pathname,
+          path: window.location.pathname + window.location.search,
           referrer: document.referrer || null,
           user_agent: navigator.userAgent || null,
           session_id: getSessionId(),
