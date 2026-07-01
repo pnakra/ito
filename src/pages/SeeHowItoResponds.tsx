@@ -359,7 +359,7 @@ const SeeHowItoResponds = () => {
                     })()}
                     <div className="flex flex-col items-center gap-0.5 mt-auto">
                       <span className="text-[13px] font-semibold text-slate-100 leading-tight">
-                        {style.vibe}
+                        {style.tone}
                       </span>
                       <span className="text-[10.5px] leading-tight text-center" style={{ color: "#94a3b8" }}>
                         {style.label}
@@ -389,7 +389,7 @@ const SeeHowItoResponds = () => {
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
-                        Your take · {s.vibe}
+                        Your take · {s.tone}
                       </span>
                       {(() => { const Icon = STYLE_ICONS[s.id] ?? Target; return <Icon size={18} strokeWidth={2} className="text-indigo-300" aria-hidden />; })()}
                     </div>
@@ -436,7 +436,7 @@ const SeeHowItoResponds = () => {
             <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
-                  Your take · {chosenStyle.vibe}
+                  Your take · {chosenStyle.tone}
                 </p>
                 {(() => { const Icon = STYLE_ICONS[chosenStyle.id] ?? Target; return <Icon size={18} strokeWidth={2} className="text-indigo-300" aria-hidden />; })()}
               </div>
