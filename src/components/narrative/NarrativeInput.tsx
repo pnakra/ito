@@ -167,10 +167,8 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
         <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
           {[
             "They said yes but something felt off",
-            "I'm not sure if I went too far",
-            "They haven't texted back and I'm overthinking it",
-            "I don't know if what happened was okay",
-            "Things got further than I expected and I feel weird about it",
+            "Should I try to hook up with her when I see her next",
+            "Did we only kiss because we were drunk?",
           ].map((prompt) => (
             <button
               key={prompt}
