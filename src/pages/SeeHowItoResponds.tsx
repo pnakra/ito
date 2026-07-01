@@ -67,7 +67,7 @@ const logPreviewEvent = async (
       step_name,
       step_type: "event",
       choice_value: extra.choice_value ?? null,
-      metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) },
+      metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) } as any,
     }]);
   } catch (e) {
     console.error("[preview] log failed", step_name, e);
