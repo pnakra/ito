@@ -16,6 +16,32 @@ const MISREAD_V2: MisreadProps = {
   twist: "most friends pick #3. here's why ito flags it.",
 };
 
+const DRAMATIC_V2: MisreadProps = {
+  timestamp: "11:47 pm",
+  message: "she said i was being too much last night. i wasn't right?",
+  replies: [
+    { text: "what does 'too much' mean to her?" },
+    { text: "if she said it, she meant it. ask her" },
+    { text: "nah you're fine, she's just being dramatic" },
+  ],
+  flaggedIndex: 2,
+  signalLabel: "flipping it back on her",
+  twist: "most friends pick #3. here's why ito flags it.",
+};
+
+const SAMEPAGE_V2: MisreadProps = {
+  timestamp: "9:02 am",
+  message: "thought we were on the same page last night. she's being weird now.",
+  replies: [
+    { text: "have you asked her what felt off?" },
+    { text: "sounds like she's telling you something" },
+    { text: "girls do that. don't stress it" },
+  ],
+  flaggedIndex: 2,
+  signalLabel: "writing off her signal",
+  twist: "most friends pick #3. here's why ito flags it.",
+};
+
 const SCENARIOS: Record<string, VideoProps> = {
   "misread-v1": {
     hook: "he sent this. what do you say?",
@@ -80,6 +106,24 @@ export const RemotionRoot: React.FC = () => (
       width={1080}
       height={1920}
       defaultProps={MISREAD_V2}
+    />
+    <Composition
+      id="dramatic-v2"
+      component={MainVideoMisread}
+      durationInFrames={415}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={DRAMATIC_V2}
+    />
+    <Composition
+      id="samepage-v2"
+      component={MainVideoMisread}
+      durationInFrames={415}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={SAMEPAGE_V2}
     />
   </>
 );
