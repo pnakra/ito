@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, RefreshCw, Shuffle, Share2, Check, Lock } from "lucide-react";
+import { ArrowRight, RefreshCw, Shuffle, Share2, Check, Lock, Target, Heart, Feather } from "lucide-react";
+
+const STYLE_ICONS: Record<string, typeof Target> = {
+  plain: Target,
+  kind: Heart,
+  light: Feather,
+};
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
