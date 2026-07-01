@@ -21,12 +21,8 @@ const cleanText = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const cleanList = (v: unknown): string[] =>
   Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean) : [];
 
-const pickRandom = (exceptId?: string) => {
-  const pool = exceptId ? PREVIEW_SCENARIOS.filter((s) => s.id !== exceptId) : PREVIEW_SCENARIOS;
-  return pool[Math.floor(Math.random() * pool.length)];
-};
-
-const scenarioIndex = (id: string) => PREVIEW_SCENARIOS.findIndex((s) => s.id === id) + 1;
+const SeeHowItoResponds = () => {
+  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
 
 const TILE_BG = "#12141C";
 const TILE_BORDER = "#212631";
