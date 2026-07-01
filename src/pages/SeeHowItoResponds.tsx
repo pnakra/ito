@@ -119,8 +119,20 @@ const SeeHowItoResponds = () => {
   const handleAlignment = async (id: Alignment) => {
     if (alignment) return;
     setAlignment(id);
-    try {
-      await supabase.from("submissions").insert({
+    logPreviewEvent("alignment_check", {
+      choice_value: id,
+      metadata: {
+        scenario_id: scenario.id,
+        scenario_theme: scenario.theme,
+        selected_style: selectedStyle,
+        signal_label: itoResponse?.signalLabel ?? null,
+      },
+    });
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/preview?s=${scenario.id}`;
+    logPreviewEvent("share_click", { metadata: { scenario_id: scenario.id } });
         flow_type: "preview",
         step_name: "alignment_check",
         step_type: "choice",
