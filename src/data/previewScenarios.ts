@@ -387,10 +387,15 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
   },
 ];
 
-export const RESPONSE_STYLES: { id: ResponseStyle; label: string }[] = [
-  { id: "plain", label: "Say it plainly" },
-  { id: "kind", label: "Be kind and careful" },
-  { id: "light", label: "Keep it light" },
+export const RESPONSE_STYLES: {
+  id: ResponseStyle;
+  label: string;
+  emoji: string;
+  vibe: string;
+}[] = [
+  { id: "plain", label: "Say it plainly", emoji: "🎯", vibe: "Direct" },
+  { id: "kind", label: "Be kind and careful", emoji: "🫶", vibe: "Warm" },
+  { id: "light", label: "Keep it light", emoji: "🪶", vibe: "Breezy" },
 ];
 
 // Themes in the order we want to cycle through — spreads picks across
