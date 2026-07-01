@@ -4,7 +4,7 @@ import { ArrowRight, RefreshCw, Shuffle } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Textarea } from "@/components/ui/textarea";
-import { PREVIEW_SCENARIOS, RESPONSE_STYLES, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
+import { PREVIEW_SCENARIOS, RESPONSE_STYLES, pickNextScenario, type PreviewScenario, type ResponseStyle } from "@/data/previewScenarios";
 import { invokeEdgeFunctionWithRetry } from "@/lib/invokeEdgeFunctionWithRetry";
 import { classifyRisk } from "@/lib/riskClassification";
 import { detectGaps, narrativeToDecisionState } from "@/lib/narrativeGapDetection";
