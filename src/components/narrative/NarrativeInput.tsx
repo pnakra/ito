@@ -14,14 +14,13 @@ export type EntryMethod = "typed" | "chip_unedited" | "chip_edited";
 
 interface NarrativeInputProps {
   onSubmit: (text: string, entryMethod: EntryMethod) => void;
-  onGuidedMode: () => void;
   isLoading: boolean;
   compact?: boolean;
   initialValue?: string;
   hideSuggestions?: boolean;
 }
 
-const NarrativeInput = ({ onSubmit, onGuidedMode, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
+const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
