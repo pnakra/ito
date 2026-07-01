@@ -393,7 +393,63 @@ const SeeHowItoResponds = () => {
               )}
             </div>
 
-            {/* CTAs */}
+            {/* Alignment check */}
+            <div className="col-span-6 p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+              <p className="text-[10px] uppercase tracking-wider font-bold mb-1" style={{ color: "#64748b" }}>
+                How close was your read?
+              </p>
+              <p className="text-[12px] mb-3" style={{ color: "#64748b" }}>
+                No right answer — the gap is the point.
+              </p>
+              <div className="flex gap-2">
+                {ALIGNMENT_OPTIONS.map((opt) => {
+                  const active = alignment === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleAlignment(opt.id)}
+                      disabled={!!alignment}
+                      className="flex-1 h-10 rounded-full text-[12px] font-semibold transition-all active:scale-95 disabled:cursor-default"
+                      style={{
+                        background: active ? ACCENT : "transparent",
+                        color: active ? "#fff" : "#cbd5e1",
+                        border: `1px solid ${active ? ACCENT : TILE_BORDER}`,
+                        opacity: alignment && !active ? 0.4 : 1,
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {alignment && (
+                <p className="text-[11px] mt-3 text-center" style={{ color: "#64748b" }}>
+                  Thanks — that helps calibrate how ito is landing.
+                </p>
+              )}
+            </div>
+
+            {/* Share */}
+            <div className="col-span-6">
+              <button
+                onClick={handleShare}
+                className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4" style={{ color: ACCENT }} />
+                    Link copied
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    Send this scenario to someone
+                  </>
+                )}
+              </button>
+            </div>
+
             <div className="col-span-6 p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[15px] text-white mb-1 font-medium">Have your own situation?</p>
               <p className="text-[13px] mb-4" style={{ color: "#64748b" }}>
