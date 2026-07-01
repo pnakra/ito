@@ -210,11 +210,11 @@ const Misread = () => {
                 className="text-[11px] px-2 py-0.5 rounded-full"
                 style={{ background: FLAG_TINT, color: ACCENT, border: `1px solid ${FLAG_BORDER}` }}
               >
-                {SCENARIO.signalLabel}
+                {SCENARIO.signalLabelByChoice[tappedIndex ?? SCENARIO.flaggedIndex]}
               </span>
             </div>
             <ul className="space-y-2.5 mb-4">
-              {SCENARIO.itoRead.map((line, i) => (
+              {SCENARIO.itoReadByChoice[tappedIndex ?? SCENARIO.flaggedIndex].map((line, i) => (
                 <li key={i} className="text-[15px] leading-[1.5]" style={{ color: "#D5D1C8" }}>
                   {line}
                 </li>
