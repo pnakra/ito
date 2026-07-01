@@ -225,9 +225,6 @@ const SeeHowItoResponds = () => {
               <p className="text-[13px] font-medium text-slate-300">
                 How would you handle this?
               </p>
-              <p className="text-[12px] mt-0.5" style={{ color: "#64748b" }}>
-                Pick a vibe. ito will show its read next.
-              </p>
             </div>
 
             {/* Style cards — three uniform emoji cards in clear sequence */}
@@ -331,16 +328,15 @@ const SeeHowItoResponds = () => {
           <div className="flex flex-col gap-3 animate-fade-in">
             {/* Your pick */}
             <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
-              <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>
-                Your pick
-              </p>
-              <div className="flex items-center gap-3">
-                <span className="text-[28px] leading-none" aria-hidden>{chosenStyle.emoji}</span>
-                <div>
-                  <p className="text-[15px] font-semibold text-slate-100">{chosenStyle.vibe}</p>
-                  <p className="text-[12px]" style={{ color: "#94a3b8" }}>{chosenStyle.label}</p>
-                </div>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
+                  Your take · {chosenStyle.vibe}
+                </p>
+                <span className="text-[20px] leading-none" aria-hidden>{chosenStyle.emoji}</span>
               </div>
+              <p className="text-[14px] leading-relaxed" style={{ color: "#e2e8f0" }}>
+                {scenario.starters[chosenStyle.id]}
+              </p>
             </div>
 
             {/* ito's read — short */}
