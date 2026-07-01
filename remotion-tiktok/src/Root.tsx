@@ -72,5 +72,14 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={props}
       />
     ))}
+    <Composition
+      id="misread"
+      component={MainVideoMisread}
+      durationInFrames={415}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={MISREAD_V2}
+    />
   </>
 );
