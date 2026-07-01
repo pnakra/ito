@@ -70,7 +70,7 @@ const logEvent = async (step_name: string, extra: Record<string, unknown> = {}) 
           scenario_id: "misread",
           scenario_theme: "misread",
           selected_style: (extra as any).reply_index ?? null,
-          signal_label: SCENARIO.signalLabel,
+          signal_label: SCENARIO.signalLabelByChoice[(extra as any).reply_index ?? SCENARIO.flaggedIndex] ?? null,
           utm: readCampaignParams(),
           referrer: (readCampaignParams() as any).referrer,
         },
