@@ -5,7 +5,6 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
-import GuidedMode from "@/components/narrative/GuidedMode";
 import SignalFloor from "@/components/narrative/SignalFloor";
 import AdaptiveFollowUp from "@/components/narrative/AdaptiveFollowUp";
 import StopMoment from "@/components/prevention/StopMoment";
