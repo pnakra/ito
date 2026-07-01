@@ -57,17 +57,50 @@ const readCampaignParams = () => {
   return out;
 };
 
+const SLACK_NOTIFY_EVENTS = new Set([
+  "preview_view",
+  "reveal_shown",
+  "alignment_check",
+  "cta_try_own_click",
+  "share_click",
+]);
+
+const notifySlack = (event: string, metadata: Record<string, unknown>) => {
+  if (!SLACK_NOTIFY_EVENTS.has(event)) return;
+  const utm = readCampaignParams();
+  // fire-and-forget; never block UI
+  supabase.functions
+    .invoke("notify-preview-slack", {
+      body: {
+        event,
+        scenario_id: metadata.scenario_id,
+        scenario_theme: metadata.scenario_theme,
+        selected_style: metadata.selected_style ?? metadata.choice ?? null,
+        signal_label: metadata.signal_label,
+        alignment: metadata.alignment,
+        utm,
+        referrer: utm.referrer,
+      },
+    })
+    .catch((e) => console.error("[preview] slack notify failed", event, e));
+};
+
 const logPreviewEvent = async (
   step_name: string,
   extra: { choice_value?: string; metadata?: Record<string, unknown> } = {}
 ) => {
+  const metadata = { ...readCampaignParams(), ...(extra.metadata ?? {}) };
+  if (extra.choice_value && step_name === "alignment_check") {
+    (metadata as any).alignment = extra.choice_value;
+  }
+  notifySlack(step_name, metadata);
   try {
     await supabase.from("submissions").insert([{
       flow_type: "preview",
       step_name,
       step_type: "event",
       choice_value: extra.choice_value ?? null,
-      metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) } as any,
+      metadata: metadata as any,
     }]);
   } catch (e) {
     console.error("[preview] log failed", step_name, e);

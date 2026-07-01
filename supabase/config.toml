@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.fetch-evals]
 verify_jwt = false
+
+[functions.notify-preview-slack]
+verify_jwt = false
