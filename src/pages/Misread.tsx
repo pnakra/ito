@@ -22,11 +22,27 @@ const SCENARIO = {
     { text: "haha bro you're fine, don't overthink it" },
   ],
   flaggedIndex: 2,
-  signalLabel: "letting him off the hook",
-  itoRead: [
-    "\"haha you're fine\" ends the question before he has to sit with it.",
-    "the fact that he's asking at 2am means part of him already knows something felt off.",
-    "a friend who cares says: what does she say when you ask her?",
+  signalLabelByChoice: [
+    "pointing him back to her",
+    "naming what he's avoiding",
+    "letting him off the hook",
+  ],
+  itoReadByChoice: [
+    [
+      "good instinct — you're pointing him back to her instead of answering for her.",
+      "the fact that he's asking at 2am means part of him already knows something felt off.",
+      "the only person who can answer 'was she into it' is her. anything else is a guess he wants to believe.",
+    ],
+    [
+      "you named the thing most friends dodge — if he has to ask, he already has a read.",
+      "the 2am timing tells you his gut is louder than his story right now.",
+      "next step for him isn't reassurance from you. it's a real conversation with her.",
+    ],
+    [
+      "\"haha you're fine\" ends the question before he has to sit with it.",
+      "the fact that he's asking at 2am means part of him already knows something felt off.",
+      "a friend who cares says: what does she say when you ask her?",
+    ],
   ],
 };
 
