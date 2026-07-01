@@ -45,6 +45,12 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
   }, []);
 
   useEffect(() => {
+    try {
+      if (localStorage.getItem(PREVIEW_CTA_TAKEN_KEY) === "1") setSuppressChipPulse(true);
+    } catch { /* noop */ }
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       textareaRef.current?.focus();
     }, 200);
