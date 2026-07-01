@@ -68,17 +68,44 @@ Deno.serve(async (req) => {
       });
     }
 
-    const path = safePath(body.path);
+    const path = safePath(body.path) ?? "/";
     const referrer = safeReferrer(body.referrer);
     const user_agent = truncate(body.user_agent, MAX_FIELD_LEN);
+    const session_id = typeof body.session_id === "string" ? body.session_id : null;
+
+    // Parse UTM params from referrer or path query string
+    let utm: Record<string, string | null> = {
+      utm_source: null,
+      utm_medium: null,
+      utm_campaign: null,
+      utm_content: null,
+      utm_term: null,
+    };
+    let variant: string | null = null;
+    try {
+      const qIndex = (typeof body.path === "string" ? body.path : "").indexOf("?");
+      if (qIndex >= 0) {
+        const params = new URLSearchParams((body.path as string).slice(qIndex + 1));
+        for (const k of Object.keys(utm)) utm[k] = params.get(k);
+        variant = params.get("variant");
+      }
+    } catch {
+      // ignore
+    }
 
     const supabase = createClient(
-      Deno.env.get("EXTERNAL_SUPABASE_URL")!,
-      Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
     const { error } = await supabase.from("visits").insert({
-      metadata: { path, referrer, userAgent: user_agent },
+      path,
+      referrer,
+      user_agent,
+      session_id,
+      variant,
+      ...utm,
+      metadata: {},
     });
 
     if (error) {
