@@ -62,13 +62,13 @@ const logPreviewEvent = async (
   extra: { choice_value?: string; metadata?: Record<string, unknown> } = {}
 ) => {
   try {
-    await supabase.from("submissions").insert({
+    await supabase.from("submissions").insert([{
       flow_type: "preview",
       step_name,
       step_type: "event",
       choice_value: extra.choice_value ?? null,
       metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) },
-    });
+    }]);
   } catch (e) {
     console.error("[preview] log failed", step_name, e);
   }
