@@ -68,16 +68,16 @@ export const SceneCTA: React.FC = () => {
         <span
           style={{
             color: "#E8A87C",
-            fontSize: 44,
+            fontSize: 56,
             fontWeight: 600,
             letterSpacing: 0.5,
           }}
         >
-          isthisok.app
+          isthisok.app/go
         </span>
       </div>
       <div style={{ opacity: l3, marginTop: 20 }}>
-        <span style={{ color: "#555", fontSize: 24, letterSpacing: 1 }}>link in bio</span>
+        <span style={{ color: "#555", fontSize: 24, letterSpacing: 1 }}>type it in</span>
       </div>
     </AbsoluteFill>
   );
