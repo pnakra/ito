@@ -119,9 +119,14 @@ const SeeHowItoResponds = () => {
     }
   };
 
-  const handleStyleSelect = async (id: ResponseStyle) => {
+  const handleStyleSelect = (id: ResponseStyle) => {
     if (stage !== "respond") return;
-    setSelectedStyle(id);
+    setSelectedStyle((prev) => (prev === id ? null : id));
+    setError(null);
+  };
+
+  const handleReveal = async () => {
+    if (!selectedStyle || stage !== "respond") return;
     setStage("loading");
     setError(null);
 
@@ -154,7 +159,6 @@ const SeeHowItoResponds = () => {
       console.error("[preview] ito response failed", e);
       setError("ito couldn't respond right now. Try again in a moment.");
       setStage("respond");
-      setSelectedStyle(null);
     }
   };
 
