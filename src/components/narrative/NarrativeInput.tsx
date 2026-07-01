@@ -190,15 +190,69 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
         </div>
       )}
 
-      {/* Privacy + preview link */}
-      <div className="mt-3 flex flex-col items-center gap-2">
-        <a
-          href="/preview"
-          className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Want to see how ito reads a situation first? <span className="text-primary font-medium">See an example</span>
-        </a>
-      </div>
+      {/* Interactive preview CTA — "terminal analysis stream" */}
+      <a
+        href="/preview"
+        className="group relative mt-4 block w-full max-w-[340px] mx-auto overflow-hidden rounded-xl border border-border/60 bg-card/40 shadow-lg transition-all hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        aria-label="See how ito reads a situation — interactive preview"
+      >
+        {/* Terminal header */}
+        <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-3 py-1.5">
+          <div className="flex space-x-1.5">
+            <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+            <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+            <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground/70">
+            ito / preview
+          </span>
+        </div>
+
+        {/* Terminal body */}
+        <div className="space-y-3 p-4">
+          {/* Command line with looping typing */}
+          <div className="flex items-start gap-2">
+            <span className="font-mono text-sm text-primary leading-none mt-1">$</span>
+            <span className="font-mono text-[13px] text-muted-foreground leading-tight">
+              <span className="ito-preview-typing">read_situation --parse</span>
+            </span>
+          </div>
+
+          {/* Scenario */}
+          <div className="border-l border-border/60 pl-4">
+            <p className="font-serif italic text-[15px] leading-snug text-foreground/90">
+              "we made out last night but she was pretty drunk. was that okay?"
+            </p>
+          </div>
+
+          {/* Analysis result */}
+          <div className="relative overflow-hidden rounded-md border border-primary/20 bg-primary/[0.06] p-3">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-primary/80">
+                analysis ready
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            </div>
+            <p className="font-sans text-[13px] text-foreground/80">
+              try a vibe:{" "}
+              <span className="font-serif italic text-[15px] text-primary">
+                direct, warm, or breezy
+              </span>
+            </p>
+            <div className="mt-3 h-0.5 w-full overflow-hidden bg-border/60">
+              <div className="ito-preview-slide h-full w-1/3 bg-primary/50" />
+            </div>
+          </div>
+
+          {/* CTA footer */}
+          <div className="flex items-center justify-center pt-1">
+            <span className="font-sans text-[11px] font-medium uppercase tracking-wider text-primary transition-transform group-hover:translate-x-1">
+              try a scenario →
+            </span>
+          </div>
+        </div>
+      </a>
+
     </div>
   );
 };
