@@ -30,7 +30,6 @@ import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/i
 
 type FlowPhase =
   | "narrative-input"
-  | "guided-mode"
   | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
