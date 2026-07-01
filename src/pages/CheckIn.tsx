@@ -443,24 +443,6 @@ const CheckIn = () => {
     fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
   };
 
-  // Handle guided mode submission
-  const handleGuidedSubmit = (text: string, signals: StructuredSignals) => {
-    logFreetext("before", "guided-mode", text);
-    setStructuredSignals(signals);
-    structuredSignalsRef.current = signals;
-    
-    const newHistory = [...narrativeHistory, text];
-    setNarrativeHistory(newHistory);
-    
-    const cumulativeText = newHistory.join("\n\n");
-    const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
-    
-    if (signals.timing === "already-happened" || signals.timing === "both") setDetectedTiming("after");
-    else if (signals.timing === "deciding") setDetectedTiming("before");
-    
-    proceedWithSignals(cumulativeText, signals, result, gapResult);
-  };
-
   // Handle follow-up question answers
   const handleFollowUpAnswers = (answers: Record<string, string>) => {
     const answerLines = Object.entries(answers)
