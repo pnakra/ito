@@ -58,7 +58,6 @@ const readCampaignParams = () => {
 };
 
 const SLACK_NOTIFY_EVENTS = new Set([
-  "preview_view",
   "reveal_shown",
   "alignment_check",
   "cta_try_own_click",
