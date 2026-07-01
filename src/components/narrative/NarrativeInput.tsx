@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight } from "lucide-react";
+import { logSubmission } from "@/lib/submissionLogger";
+import { PREVIEW_CTA_TAKEN_KEY } from "@/components/narrative/PreviewIntroModal";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
