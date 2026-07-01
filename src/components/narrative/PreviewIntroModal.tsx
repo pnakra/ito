@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { logSubmission } from "@/lib/submissionLogger";
 
 const STORAGE_KEY = "ito_preview_intro_seen_v1";
+// Set when the user clicked "Try it" (vs dismissed via X / backdrop).
+// Read by NarrativeInput to suppress the pulsing preview chip for users
+// who already saw the preview — the pulse would be noise for them.
+export const PREVIEW_CTA_TAKEN_KEY = "ito_preview_cta_taken_v1";
 
 /**
  * First-visit modal that offers the interactive preview before the user
@@ -12,12 +17,23 @@ const STORAGE_KEY = "ito_preview_intro_seen_v1";
  */
 const PreviewIntroModal = () => {
   const [open, setOpen] = useState(false);
+  // Track outcome so onOpenChange(false) after a CTA click doesn't
+  // double-log a "dismissed" event.
+  const outcomeRef = useRef<"pending" | "cta" | "dismissed">("pending");
 
   useEffect(() => {
     // Defer so it doesn't race the page mount / consent modal
     const t = setTimeout(() => {
       try {
-        if (!localStorage.getItem(STORAGE_KEY)) setOpen(true);
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          setOpen(true);
+          logSubmission({
+            flowType: "before",
+            stepName: "preview_modal_shown",
+            stepType: "choice",
+            metadata: { surface: "check-in" },
+          });
+        }
       } catch {
         /* noop */
       }
@@ -27,11 +43,30 @@ const PreviewIntroModal = () => {
 
   const dismiss = () => {
     try { localStorage.setItem(STORAGE_KEY, "1"); } catch { /* noop */ }
+    if (outcomeRef.current === "pending") {
+      outcomeRef.current = "dismissed";
+      logSubmission({
+        flowType: "before",
+        stepName: "preview_modal_dismissed",
+        stepType: "choice",
+        metadata: { surface: "check-in" },
+      });
+    }
     setOpen(false);
   };
 
   const goToPreview = () => {
-    try { localStorage.setItem(STORAGE_KEY, "1"); } catch { /* noop */ }
+    try {
+      localStorage.setItem(STORAGE_KEY, "1");
+      localStorage.setItem(PREVIEW_CTA_TAKEN_KEY, "1");
+    } catch { /* noop */ }
+    outcomeRef.current = "cta";
+    logSubmission({
+      flowType: "before",
+      stepName: "preview_modal_cta_clicked",
+      stepType: "choice",
+      metadata: { surface: "check-in" },
+    });
     window.location.href = "/preview";
   };
 

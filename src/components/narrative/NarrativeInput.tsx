@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight } from "lucide-react";
+import { logSubmission } from "@/lib/submissionLogger";
+import { PREVIEW_CTA_TAKEN_KEY } from "@/components/narrative/PreviewIntroModal";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
@@ -23,6 +25,10 @@ interface NarrativeInputProps {
 const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  // If the user already took the preview CTA (from the first-visit modal),
+  // suppress the pulse/shimmer on the preview chip — it becomes noise.
+  // They still get the chip as a second entry point, just without the animation.
+  const [suppressChipPulse, setSuppressChipPulse] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Tracks which chip (if any) seeded the textarea. Used to distinguish
   // chip_unedited vs chip_edited submissions for entry-method analytics
@@ -36,6 +42,12 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
       setPlaceholderIndex(prev => (prev + 1) % PLACEHOLDER_ROTATIONS.length);
     }, 4000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(PREVIEW_CTA_TAKEN_KEY) === "1") setSuppressChipPulse(true);
+    } catch { /* noop */ }
   }, []);
 
   useEffect(() => {
@@ -177,10 +189,19 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
               {prompt}
             </button>
           ))}
-          {/* Highlighted interactive preview chip — visually distinct */}
+          {/* Highlighted interactive preview chip — visually distinct.
+              Pulse is suppressed for users who already took the preview CTA. */}
           <a
             href="/preview"
-            className="ito-preview-chip inline-flex items-center gap-1.5 text-[14px] text-primary bg-primary/5 hover:bg-primary/10 px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug font-medium"
+            onClick={() => {
+              logSubmission({
+                flowType: "before",
+                stepName: "preview_chip_clicked",
+                stepType: "choice",
+                metadata: { surface: "check-in", pulsing: !suppressChipPulse },
+              });
+            }}
+            className={`${suppressChipPulse ? "" : "ito-preview-chip "}inline-flex items-center gap-1.5 text-[14px] text-primary bg-primary/5 hover:bg-primary/10 px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug font-medium`}
             aria-label="See how ito responds — interactive preview"
           >
             <span aria-hidden className="text-[10px]">▶</span>
