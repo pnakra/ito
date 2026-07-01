@@ -83,9 +83,7 @@ const CheckIn = () => {
   // Held in a ref so it survives consent-modal interception and reaches the edge function.
   const entryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
   const pendingEntryMethodRef = useRef<"typed" | "chip_unedited" | "chip_edited">("typed");
-  const [phase, setPhase] = useState<FlowPhase>(
-    searchParams.get("mode") === "guided" ? "guided-mode" : "narrative-input"
-  );
+  const [phase, setPhase] = useState<FlowPhase>("narrative-input");
 
   // External handoff: prefill the narrative textarea via ?situation= query param.
   // Read once on mount, then strip from URL so refresh doesn't overwrite edits.
