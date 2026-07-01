@@ -73,7 +73,7 @@ export const SceneCTA: React.FC = () => {
             letterSpacing: 0.5,
           }}
         >
-          isthisok.app/go
+          isthisok.app/misread
         </span>
       </div>
       <div style={{ opacity: l3, marginTop: 20 }}>
