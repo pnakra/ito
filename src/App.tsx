@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
 import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
+import Go from "./pages/Go";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
