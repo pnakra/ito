@@ -417,29 +417,22 @@ const SeeHowItoResponds = () => {
               )}
             </div>
 
-            {/* Locked / teaser */}
-            <div
-              className="p-4 rounded-[24px] flex items-center gap-3"
-              style={{ background: TILE_BG, border: `1px dashed ${TILE_BORDER}` }}
-            >
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.2)" }}
+            {/* Primary CTA — try with your own situation */}
+            <Link to="/check-in" onClick={() => handleCtaTryOwn("primary_after_read")}>
+              <button
+                className="w-full h-12 rounded-full text-[14px] font-bold tracking-tight transition-all active:scale-95 shadow-lg inline-flex items-center justify-center gap-2"
+                style={{ background: ACCENT, color: "#fff", boxShadow: "0 0 24px rgba(99, 102, 241, 0.3)" }}
               >
-                <Lock className="w-4 h-4" style={{ color: ACCENT }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-[12.5px] font-medium text-slate-200 leading-snug">
-                  ito goes deeper with your own situation.
-                </p>
-                <p className="text-[11px] leading-snug" style={{ color: "#64748b" }}>
-                  Previews stay short on purpose.
-                </p>
-              </div>
-            </div>
+                Try ito with your own situation
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+            <p className="text-center text-[11px] -mt-1" style={{ color: "#64748b" }}>
+              Previews stay short. ito goes deeper with real situations.
+            </p>
 
             {/* Alignment check */}
-            <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+            <div className="p-5 rounded-[28px] mt-1" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>
                 How close was your read?
               </p>
@@ -466,48 +459,33 @@ const SeeHowItoResponds = () => {
               </div>
             </div>
 
-            {/* Share */}
-            <button
-              onClick={handleShare}
-              className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
-              style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
-            >
-              {copiedShare ? (
-                <>
-                  <Check className="w-4 h-4" style={{ color: ACCENT }} />
-                  Link copied
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4" />
-                  Send this scenario to someone
-                </>
-              )}
-            </button>
-
-            {/* CTAs */}
-            <div className="p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
-              <p className="text-[15px] text-white mb-1 font-medium">Have your own situation?</p>
-              <p className="text-[13px] mb-4" style={{ color: "#64748b" }}>
-                These scenarios are made up. Yours doesn't have to be.
-              </p>
-              <div className="flex flex-col gap-3">
-                <Link to="/check-in">
-                  <button
-                    className="w-full h-11 rounded-full text-[14px] font-semibold transition-all active:scale-95"
-                    style={{ background: ACCENT, color: "#fff" }}
-                  >
-                    Try ito with your own <ArrowRight className="inline-block ml-1.5 w-4 h-4 align-text-bottom" />
-                  </button>
-                </Link>
-                <button
-                  onClick={handleNewScenario}
-                  className="w-full h-11 rounded-full text-[14px] font-semibold border transition-all active:scale-95"
-                  style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
-                >
-                  <RefreshCw className="inline-block mr-1.5 w-4 h-4 align-text-bottom" /> Try another scenario
-                </button>
-              </div>
+            {/* Secondary actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleShare}
+                className="h-11 rounded-full text-[12.5px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-1.5"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4" style={{ color: ACCENT }} />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleNewScenario}
+                className="h-11 rounded-full text-[12.5px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-1.5"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                <RefreshCw className="w-4 h-4" />
+                New scenario
+              </button>
             </div>
           </div>
         )}
