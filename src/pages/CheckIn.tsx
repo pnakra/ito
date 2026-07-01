@@ -796,14 +796,18 @@ const CheckIn = () => {
 
           {/* Phase 1: Narrative Input */}
           {phase === "narrative-input" && (
-            <NarrativeInput
-              onSubmit={handleNarrativeSubmit}
-              isLoading={isLoading}
-              compact={shouldShowPatternWarning}
-              initialValue={prefillSituation}
-              hideSuggestions={!!prefillSituation}
-            />
+            <>
+              <NarrativeInput
+                onSubmit={handleNarrativeSubmit}
+                isLoading={isLoading}
+                compact={shouldShowPatternWarning}
+                initialValue={prefillSituation}
+                hideSuggestions={!!prefillSituation}
+              />
+              {!prefillSituation && <PreviewIntroModal />}
+            </>
           )}
+
 
           {/* Phase 2: Signal Floor */}
           {phase === "signal-floor" && (
