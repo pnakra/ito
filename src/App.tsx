@@ -19,6 +19,7 @@ import AdminEvals from "./pages/AdminEvals";
 import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
 import Go from "./pages/Go";
+import Misread from "./pages/Misread";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
               <Route path="/go" element={<Go />} />
+              <Route path="/misread" element={<Misread />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
