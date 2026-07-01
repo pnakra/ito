@@ -21,9 +21,6 @@ const cleanText = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const cleanList = (v: unknown): string[] =>
   Array.isArray(v) ? v.map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean) : [];
 
-const SeeHowItoResponds = () => {
-  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
-
 const TILE_BG = "#12141C";
 const TILE_BORDER = "#212631";
 const ACCENT = "#6366f1";
@@ -31,7 +28,7 @@ const ACCENT_SOFT = "rgba(99, 102, 241, 0.15)";
 const PAGE_BG = "#08090D";
 
 const SeeHowItoResponds = () => {
-  const [scenario, setScenario] = useState<PreviewScenario>(() => pickRandom());
+  const [scenario, setScenario] = useState<PreviewScenario>(() => pickNextScenario());
   const [stage, setStage] = useState<Stage>("respond");
   const [userResponse, setUserResponse] = useState("");
   const [selectedStyle, setSelectedStyle] = useState<ResponseStyle | null>(null);
@@ -39,7 +36,7 @@ const SeeHowItoResponds = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleNewScenario = () => {
-    setScenario(pickRandom(scenario.id));
+    setScenario(pickNextScenario(scenario));
     setStage("respond");
     setUserResponse("");
     setSelectedStyle(null);
