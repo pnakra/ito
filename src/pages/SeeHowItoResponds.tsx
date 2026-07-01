@@ -111,21 +111,17 @@ const SeeHowItoResponds = () => {
 
       <main className="flex-1 container mx-auto max-w-[420px] px-5 pt-6 pb-12">
         {/* Header */}
-        <div className="flex justify-between items-end mb-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: "rgba(99, 102, 241, 0.8)" }}>
-              ito / preview
-            </span>
-            <h1 className="text-lg font-semibold text-white tracking-tight">
-              Scenario {String(scenarioIndex(scenario.id)).padStart(2, "0")}
-            </h1>
-          </div>
-          <div className="flex gap-1 mb-1.5">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: "rgba(99, 102, 241, 0.8)" }}>
+            ito / preview
+          </span>
+          <div className="flex gap-1">
             <div className="w-4 h-1 rounded-full" style={{ background: ACCENT }} />
             <div className="w-1.5 h-1 rounded-full" style={{ background: TILE_BORDER }} />
             <div className="w-1.5 h-1 rounded-full" style={{ background: TILE_BORDER }} />
           </div>
         </div>
+        <h1 className="sr-only">See how ito responds</h1>
 
         {/* Respond stage */}
         {stage === "respond" && (
