@@ -37,33 +37,27 @@ const PreviewIntroModal = () => {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) dismiss(); }}>
-      <DialogContent className="max-w-[380px] rounded-2xl">
-        <DialogHeader className="space-y-2 text-left">
+      <DialogContent className="max-w-[380px] rounded-2xl text-center">
+        <DialogHeader className="space-y-2 items-center text-center">
           <div className="inline-flex w-fit items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-primary">
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
             new here?
           </div>
           <DialogTitle
-            className="text-[22px] leading-tight"
+            className="text-[22px] leading-tight text-center"
             style={{ fontFamily: '"Newsreader", "Georgia", serif', fontStyle: "italic", fontWeight: 400 }}
           >
-            see how ito responds first
+            see how ito works
           </DialogTitle>
-          <DialogDescription className="text-[14px] leading-relaxed text-muted-foreground">
-            pick a vibe, see the read, compare it to yours. takes 30 seconds — no writing required.
+          <DialogDescription className="text-[14px] leading-relaxed text-muted-foreground text-center">
+            preview common scenarios people ask, respond on your own, and compare it to how ito responds
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 flex flex-col gap-2">
+        <div className="mt-2 flex flex-col items-center gap-2">
           <Button onClick={goToPreview} className="w-full h-11">
-            Try a scenario <ArrowRight className="ml-1.5 w-4 h-4" />
+            Try it <ArrowRight className="ml-1.5 w-4 h-4" />
           </Button>
-          <button
-            onClick={dismiss}
-            className="text-[13px] text-muted-foreground hover:text-foreground transition-colors py-1"
-          >
-            skip — I'll write my own
-          </button>
         </div>
       </DialogContent>
     </Dialog>
@@ -71,3 +65,4 @@ const PreviewIntroModal = () => {
 };
 
 export default PreviewIntroModal;
+

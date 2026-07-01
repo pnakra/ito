@@ -281,7 +281,7 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
     theme: "subtle-pressure",
     title: "He gets quiet when I say no",
     scenario_text:
-      "Every time I say I'm not up for anything physical, he goes quiet or acts a little cold for the rest of the night. He never actually argues with me, but the vibe shift is enough that I've started dreading saying no.",
+      "Every time I say I'm not up for anything physical, he goes quiet or acts a little cold for the rest of the night. He never actually argues with me, but the energy shift is enough that I've started dreading saying no.",
     starters: {
       plain: "That's a real form of pressure. Dreading saying no is a sign, not overthinking.",
       kind: "The way he reacts is doing something to you. That's worth naming — to him or to yourself first.",
@@ -341,7 +341,7 @@ export const PREVIEW_SCENARIOS: PreviewScenario[] = [
     starters: {
       plain: "You're not making it up. The 'so mature' line is a pattern worth paying attention to.",
       kind: "That feeling is worth trusting. You don't need proof for it to matter.",
-      light: "That vibe is a real thing. You're allowed to step back.",
+      light: "That feeling is a real thing. You're allowed to step back.",
     },
   },
 
@@ -391,11 +391,11 @@ export const RESPONSE_STYLES: {
   id: ResponseStyle;
   label: string;
   emoji: string;
-  vibe: string;
+  tone: string;
 }[] = [
-  { id: "plain", label: "Say it plainly", emoji: "🎯", vibe: "Direct" },
-  { id: "kind", label: "Be kind and careful", emoji: "🫶", vibe: "Warm" },
-  { id: "light", label: "Keep it light", emoji: "🪶", vibe: "Breezy" },
+  { id: "plain", label: "Say it plainly", emoji: "🎯", tone: "Direct" },
+  { id: "kind", label: "Be kind and careful", emoji: "🫶", tone: "Warm" },
+  { id: "light", label: "Keep it light", emoji: "🪶", tone: "Breezy" },
 ];
 
 // Themes in the order we want to cycle through — spreads picks across
