@@ -45,6 +45,35 @@ const pickScenarioFromParam = (): { scenario: PreviewScenario; wasShared: boolea
   return { scenario: pickNextScenario(), wasShared: false };
 };
 
+const readCampaignParams = () => {
+  if (typeof window === "undefined") return {};
+  const p = new URLSearchParams(window.location.search);
+  const out: Record<string, string> = {};
+  ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "ref"].forEach((k) => {
+    const v = p.get(k);
+    if (v) out[k] = v;
+  });
+  if (typeof document !== "undefined" && document.referrer) out.referrer = document.referrer;
+  return out;
+};
+
+const logPreviewEvent = async (
+  step_name: string,
+  extra: { choice_value?: string; metadata?: Record<string, unknown> } = {}
+) => {
+  try {
+    await supabase.from("submissions").insert([{
+      flow_type: "preview",
+      step_name,
+      step_type: "event",
+      choice_value: extra.choice_value ?? null,
+      metadata: { ...readCampaignParams(), ...(extra.metadata ?? {}) } as any,
+    }]);
+  } catch (e) {
+    console.error("[preview] log failed", step_name, e);
+  }
+};
+
 const SeeHowItoResponds = () => {
   const initial = pickScenarioFromParam();
   const [scenario, setScenario] = useState<PreviewScenario>(initial.scenario);
@@ -62,8 +91,20 @@ const SeeHowItoResponds = () => {
     return () => clearTimeout(t);
   }, [copiedShare]);
 
+  // Track landing (fires once per mount)
+  useEffect(() => {
+    logPreviewEvent("preview_view", {
+      metadata: { scenario_id: initial.scenario.id, was_shared: initial.wasShared },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleNewScenario = () => {
-    setScenario(pickNextScenario(scenario));
+    const next = pickNextScenario(scenario);
+    logPreviewEvent("another_scenario", {
+      metadata: { from: scenario.id, to: next.id, at_stage: stage },
+    });
+    setScenario(next);
     setWasShared(false);
     setStage("respond");
     setSelectedStyle(null);
@@ -78,26 +119,20 @@ const SeeHowItoResponds = () => {
   const handleAlignment = async (id: Alignment) => {
     if (alignment) return;
     setAlignment(id);
-    try {
-      await supabase.from("submissions").insert({
-        flow_type: "preview",
-        step_name: "alignment_check",
-        step_type: "choice",
-        choice_value: id,
-        metadata: {
-          scenario_id: scenario.id,
-          scenario_theme: scenario.theme,
-          selected_style: selectedStyle,
-          signal_label: itoResponse?.signalLabel ?? null,
-        },
-      });
-    } catch (e) {
-      console.error("[preview] alignment log failed", e);
-    }
+    logPreviewEvent("alignment_check", {
+      choice_value: id,
+      metadata: {
+        scenario_id: scenario.id,
+        scenario_theme: scenario.theme,
+        selected_style: selectedStyle,
+        signal_label: itoResponse?.signalLabel ?? null,
+      },
+    });
   };
 
   const handleShare = async () => {
     const url = `${window.location.origin}/preview?s=${scenario.id}`;
+    logPreviewEvent("share_click", { metadata: { scenario_id: scenario.id } });
     try {
       if (navigator.share) {
         await navigator.share({
@@ -121,7 +156,16 @@ const SeeHowItoResponds = () => {
 
   const handleStyleSelect = (id: ResponseStyle) => {
     if (stage !== "respond") return;
-    setSelectedStyle((prev) => (prev === id ? null : id));
+    setSelectedStyle((prev) => {
+      const next = prev === id ? null : id;
+      if (next) {
+        logPreviewEvent("style_select", {
+          choice_value: next,
+          metadata: { scenario_id: scenario.id, scenario_theme: scenario.theme },
+        });
+      }
+      return next;
+    });
     setError(null);
   };
 
@@ -129,6 +173,10 @@ const SeeHowItoResponds = () => {
     if (!selectedStyle || stage !== "respond") return;
     setStage("loading");
     setError(null);
+    logPreviewEvent("reveal_click", {
+      choice_value: selectedStyle,
+      metadata: { scenario_id: scenario.id, scenario_theme: scenario.theme },
+    });
 
     try {
       const text = scenario.scenario_text;
@@ -149,17 +197,36 @@ const SeeHowItoResponds = () => {
         { maxRetries: 2, baseDelayMs: 500, label: "preview-analyze" }
       );
 
-      setItoResponse({
+      const resp = {
         signalLabel: cleanText(data?.signalLabel) || "Worth a pause",
         why: cleanList(data?.why),
         suggestion: cleanText(data?.suggestion),
-      });
+      };
+      setItoResponse(resp);
       setStage("reveal");
+      logPreviewEvent("reveal_shown", {
+        metadata: {
+          scenario_id: scenario.id,
+          selected_style: selectedStyle,
+          signal_label: resp.signalLabel,
+        },
+      });
     } catch (e) {
       console.error("[preview] ito response failed", e);
       setError("ito couldn't respond right now. Try again in a moment.");
       setStage("respond");
     }
+  };
+
+  const handleCtaTryOwn = (position: string) => {
+    logPreviewEvent("cta_try_own_click", {
+      metadata: {
+        scenario_id: scenario.id,
+        selected_style: selectedStyle,
+        signal_label: itoResponse?.signalLabel ?? null,
+        position,
+      },
+    });
   };
 
   const chosenStyle = selectedStyle ? RESPONSE_STYLES.find((s) => s.id === selectedStyle) : null;
@@ -350,29 +417,22 @@ const SeeHowItoResponds = () => {
               )}
             </div>
 
-            {/* Locked / teaser */}
-            <div
-              className="p-4 rounded-[24px] flex items-center gap-3"
-              style={{ background: TILE_BG, border: `1px dashed ${TILE_BORDER}` }}
-            >
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.2)" }}
+            {/* Primary CTA — try with your own situation */}
+            <Link to="/check-in" onClick={() => handleCtaTryOwn("primary_after_read")}>
+              <button
+                className="w-full h-12 rounded-full text-[14px] font-bold tracking-tight transition-all active:scale-95 shadow-lg inline-flex items-center justify-center gap-2"
+                style={{ background: ACCENT, color: "#fff", boxShadow: "0 0 24px rgba(99, 102, 241, 0.3)" }}
               >
-                <Lock className="w-4 h-4" style={{ color: ACCENT }} />
-              </div>
-              <div className="flex-1">
-                <p className="text-[12.5px] font-medium text-slate-200 leading-snug">
-                  ito goes deeper with your own situation.
-                </p>
-                <p className="text-[11px] leading-snug" style={{ color: "#64748b" }}>
-                  Previews stay short on purpose.
-                </p>
-              </div>
-            </div>
+                Try ito with your own situation
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+            <p className="text-center text-[11px] -mt-1" style={{ color: "#64748b" }}>
+              Previews stay short. ito goes deeper with real situations.
+            </p>
 
             {/* Alignment check */}
-            <div className="p-5 rounded-[28px]" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
+            <div className="p-5 rounded-[28px] mt-1" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
               <p className="text-[10px] uppercase tracking-wider font-bold mb-3" style={{ color: "#64748b" }}>
                 How close was your read?
               </p>
@@ -399,48 +459,33 @@ const SeeHowItoResponds = () => {
               </div>
             </div>
 
-            {/* Share */}
-            <button
-              onClick={handleShare}
-              className="w-full h-11 rounded-full text-[13px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-2"
-              style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
-            >
-              {copiedShare ? (
-                <>
-                  <Check className="w-4 h-4" style={{ color: ACCENT }} />
-                  Link copied
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4" />
-                  Send this scenario to someone
-                </>
-              )}
-            </button>
-
-            {/* CTAs */}
-            <div className="p-5 rounded-[28px] text-center" style={{ background: TILE_BG, border: `1px solid ${TILE_BORDER}` }}>
-              <p className="text-[15px] text-white mb-1 font-medium">Have your own situation?</p>
-              <p className="text-[13px] mb-4" style={{ color: "#64748b" }}>
-                These scenarios are made up. Yours doesn't have to be.
-              </p>
-              <div className="flex flex-col gap-3">
-                <Link to="/check-in">
-                  <button
-                    className="w-full h-11 rounded-full text-[14px] font-semibold transition-all active:scale-95"
-                    style={{ background: ACCENT, color: "#fff" }}
-                  >
-                    Try ito with your own <ArrowRight className="inline-block ml-1.5 w-4 h-4 align-text-bottom" />
-                  </button>
-                </Link>
-                <button
-                  onClick={handleNewScenario}
-                  className="w-full h-11 rounded-full text-[14px] font-semibold border transition-all active:scale-95"
-                  style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
-                >
-                  <RefreshCw className="inline-block mr-1.5 w-4 h-4 align-text-bottom" /> Try another scenario
-                </button>
-              </div>
+            {/* Secondary actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleShare}
+                className="h-11 rounded-full text-[12.5px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-1.5"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                {copiedShare ? (
+                  <>
+                    <Check className="w-4 h-4" style={{ color: ACCENT }} />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleNewScenario}
+                className="h-11 rounded-full text-[12.5px] font-semibold border transition-all active:scale-95 inline-flex items-center justify-center gap-1.5"
+                style={{ background: "transparent", borderColor: TILE_BORDER, color: "#e2e8f0" }}
+              >
+                <RefreshCw className="w-4 h-4" />
+                New scenario
+              </button>
             </div>
           </div>
         )}
