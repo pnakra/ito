@@ -22,11 +22,27 @@ const SCENARIO = {
     { text: "haha bro you're fine, don't overthink it" },
   ],
   flaggedIndex: 2,
-  signalLabel: "letting him off the hook",
-  itoRead: [
-    "\"haha you're fine\" ends the question before he has to sit with it.",
-    "the fact that he's asking at 2am means part of him already knows something felt off.",
-    "a friend who cares says: what does she say when you ask her?",
+  signalLabelByChoice: [
+    "pointing him back to her",
+    "naming what he's avoiding",
+    "letting him off the hook",
+  ],
+  itoReadByChoice: [
+    [
+      "good instinct — you're pointing him back to her instead of answering for her.",
+      "the fact that he's asking at 2am means part of him already knows something felt off.",
+      "the only person who can answer 'was she into it' is her. anything else is a guess he wants to believe.",
+    ],
+    [
+      "you named the thing most friends dodge — if he has to ask, he already has a read.",
+      "the 2am timing tells you his gut is louder than his story right now.",
+      "next step for him isn't reassurance from you. it's a real conversation with her.",
+    ],
+    [
+      "\"haha you're fine\" ends the question before he has to sit with it.",
+      "the fact that he's asking at 2am means part of him already knows something felt off.",
+      "a friend who cares says: what does she say when you ask her?",
+    ],
   ],
 };
 
@@ -54,7 +70,7 @@ const logEvent = async (step_name: string, extra: Record<string, unknown> = {}) 
           scenario_id: "misread",
           scenario_theme: "misread",
           selected_style: (extra as any).reply_index ?? null,
-          signal_label: SCENARIO.signalLabel,
+          signal_label: SCENARIO.signalLabelByChoice[(extra as any).reply_index ?? SCENARIO.flaggedIndex] ?? null,
           utm: readCampaignParams(),
           referrer: (readCampaignParams() as any).referrer,
         },
@@ -194,11 +210,11 @@ const Misread = () => {
                 className="text-[11px] px-2 py-0.5 rounded-full"
                 style={{ background: FLAG_TINT, color: ACCENT, border: `1px solid ${FLAG_BORDER}` }}
               >
-                {SCENARIO.signalLabel}
+                {SCENARIO.signalLabelByChoice[tappedIndex ?? SCENARIO.flaggedIndex]}
               </span>
             </div>
             <ul className="space-y-2.5 mb-4">
-              {SCENARIO.itoRead.map((line, i) => (
+              {SCENARIO.itoReadByChoice[tappedIndex ?? SCENARIO.flaggedIndex].map((line, i) => (
                 <li key={i} className="text-[15px] leading-[1.5]" style={{ color: "#D5D1C8" }}>
                   {line}
                 </li>
