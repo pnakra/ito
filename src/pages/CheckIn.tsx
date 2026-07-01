@@ -816,20 +816,10 @@ const CheckIn = () => {
           {phase === "narrative-input" && (
             <NarrativeInput
               onSubmit={handleNarrativeSubmit}
-              onGuidedMode={() => setPhase("guided-mode")}
               isLoading={isLoading}
               compact={shouldShowPatternWarning}
               initialValue={prefillSituation}
               hideSuggestions={!!prefillSituation}
-            />
-          )}
-
-          {/* Phase 1b: Guided Mode */}
-          {phase === "guided-mode" && (
-            <GuidedMode
-              onSubmit={handleGuidedSubmit}
-              onBack={() => setPhase("narrative-input")}
-              isLoading={isLoading}
             />
           )}
 
