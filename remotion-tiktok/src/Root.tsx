@@ -107,5 +107,23 @@ export const RemotionRoot: React.FC = () => (
       height={1920}
       defaultProps={MISREAD_V2}
     />
+    <Composition
+      id="dramatic-v2"
+      component={MainVideoMisread}
+      durationInFrames={415}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={DRAMATIC_V2}
+    />
+    <Composition
+      id="samepage-v2"
+      component={MainVideoMisread}
+      durationInFrames={415}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={SAMEPAGE_V2}
+    />
   </>
 );
