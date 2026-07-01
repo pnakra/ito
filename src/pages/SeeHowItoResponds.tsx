@@ -438,7 +438,7 @@ const SeeHowItoResponds = () => {
                 <p className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "#64748b" }}>
                   Your take · {chosenStyle.vibe}
                 </p>
-                <span className="text-[20px] leading-none" aria-hidden>{chosenStyle.emoji}</span>
+                {(() => { const Icon = STYLE_ICONS[chosenStyle.id] ?? Target; return <Icon size={18} strokeWidth={2} className="text-indigo-300" aria-hidden />; })()}
               </div>
               <p className="text-[14px] leading-relaxed" style={{ color: "#e2e8f0" }}>
                 {scenario.starters[chosenStyle.id]}
