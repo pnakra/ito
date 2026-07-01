@@ -25,6 +25,10 @@ interface NarrativeInputProps {
 const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  // If the user already took the preview CTA (from the first-visit modal),
+  // suppress the pulse/shimmer on the preview chip — it becomes noise.
+  // They still get the chip as a second entry point, just without the animation.
+  const [suppressChipPulse, setSuppressChipPulse] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Tracks which chip (if any) seeded the textarea. Used to distinguish
   // chip_unedited vs chip_edited submissions for entry-method analytics
