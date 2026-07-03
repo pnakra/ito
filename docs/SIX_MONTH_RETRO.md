@@ -146,4 +146,64 @@ Dark-mode default. Geist Sans + Newsreader serif italic for headlines. **No gree
 
 ---
 
-*Last updated: June 25, 2026*
+## 8. Addendum — since June 25, 2026
+
+Two weeks of surface-area expansion, a formal safety eval suite, and the first paid distribution test. The core intervention loop is unchanged; everything below is scaffolding around it (evals, previews, ads, attribution).
+
+### 8.1 Formal safety eval suite
+
+- Grew the adversarial scenario set from 30 → **84 scenarios** in `src/eval/scenarios.ts`, then added **8 illegal-tier scenarios** (CSAM, planned assault, trafficking, minors, incapacitated victims) to explicitly verify RED-tier refusals rather than assume them.
+- Latest full run: **100% pass** on the 6-dimension rubric. The 13 failures caught in the prior run were fixed in `src/lib/riskClassification.ts`, `supabase/functions/analyze-narrative/index.ts`, and the scenarios file itself (no schema or edge-function shape changes required).
+- Built `/admin/evals` (gated by `EVAL_ADMIN_PASSCODE`) with an export-scenarios action and a backend secret-rotation action for the passcode. Access-verify goes through the `verify-eval-access` edge function; run + fetch through `run-evals` / `fetch-evals`.
+- Split the eval runner's Supabase connection off the shared client — it now reads `EXTERNAL_SUPABASE_URL` / `EXTERNAL_SUPABASE_SERVICE_ROLE_KEY` so production classification traffic and eval writes can't collide.
+
+Companion artifacts: **Safety Reviewer Pack** (deep-dive scoring matrix) and **Safety Board One-Pager** (84 scenarios, rubric summary, risk mitigation architecture).
+
+### 8.2 Preview surfaces — `/preview`, `/misread`, `/embed`
+
+New top-of-funnel surfaces designed to *demonstrate* the intervention without requiring users to type their own situation first:
+
+| Route | Purpose | State |
+|---|---|---|
+| `/preview` (`SeeHowItoResponds`) | Gamified scenario picker — tone selection, alignment check, live-generated ito response. Slack-notified via `notify-preview-slack`. | Shipped |
+| `/misread` | Scenario-continuous landing page mirroring the TikTok video exactly (same message, tap-to-reveal, no modal). Suppresses the preview intro modal. | Shipped |
+| `/embed` + `/embed/sender` | Clickable "Clickchat" messenger prototype for slide decks — both recipient and sender POVs. Snap-yellow palette, Geist. | Shipped |
+| `/go` | Sticky A/B redirector between `/preview` and `/check-in`. Used for the first TikTok test before we pivoted to `/misread`. | Shipped |
+
+Instrumented events on `/check-in`: `preview_modal_cta_clicked`, `preview_chip_clicked`. Removed `preview_modal_shown` and `preview_modal_dismissed` after deciding the shown-rate is uninformative for a first-time-visitor-dominant audience.
+
+### 8.3 Check-in surface changes
+
+- **Removed Guided Mode entirely.** Check-in is now narrative-only.
+- Prompt chips reduced to three, matching the intake grammar the eval suite hardened around: *something felt off*, *should i try to hook up*, *drunk kissing*. Fourth animated chip added as a pulsing entry point to `/preview`.
+- Preview intro modal added for first-time visitors (localStorage-gated, suppressed on `/misread`).
+
+### 8.4 First paid distribution test — TikTok
+
+Three 1080×1920 Remotion-rendered ads (`misread`, `dramatic-v2`, `samepage-v2`). Ran the misread creative first.
+
+- **Results:** 6,995 views, 5 likes, 2 saves, **1.34% CTR**, ~112 TikTok-referred `/misread` sessions (Vercel Analytics, server-side), **92% bounce**.
+- **Diagnosis:** the hook works, the landing page doesn't convert. The `/go` split was the wrong destination — scenario discontinuity between the video and the tool. Rebuilt `/misread` as a mirror of the ad and re-rendered the video with the `/misread` URL overlay.
+- **Instrumentation gap surfaced:** Vercel saw the 112 visits, Supabase saw **zero**. The `visits` table was missing entirely; created it and updated the `log-visit` edge function + `src/lib/logVisit.ts` to capture full paths and UTM. Still investigating whether TikTok's in-app browser is blocking the client-side call.
+
+### 8.5 Attribution and governance
+
+- **Gameboi bleed rate query (May 10 → today): 0.** Zero `submissions` and zero `visits` attributed to `source=gameboi`. Not a distribution failure — a plumbing failure downstream of the same `visits`-table gap above. Patching `submissionLogger.ts` to merge `getReferralMeta()` into `metadata` on every insert is the next fix.
+- All analytics queries this period read only `id`, `created_at`, `metadata` keys, and UTM columns. `freetext_value`, `choice_value`, and `ai_response_summary` were never queried — the anonymity model held under real analytics pressure, not just in principle.
+
+### 8.6 Ops and hygiene
+
+- Removed "Override Labs" branding from the footer; retained only in the Privacy Policy.
+- SEO pass: added `react-helmet-async`, `src/components/SEO.tsx`, `robots.txt`, `llms.txt`, `sitemap.xml`.
+- Renamed all edge-function references from `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` to `EXTERNAL_SUPABASE_*` to make the split-project architecture explicit in code.
+- Fixed the `/admin/evals` password-page CORS/env issue by hard-pinning the API key and adding `AUTH_HEADERS`.
+
+### 8.7 Revised open questions
+
+- **Landing-page conversion, not ad creative, is the current bottleneck.** 1.34% CTR is healthy; 92% bounce on a scenario-continuous page is the number to move.
+- **Client-side event logging is unreliable on in-app browsers.** Need `sendBeacon` (or server-side attribution) before the next paid run, or all future distribution tests will look like zero-conversion in Supabase regardless of reality.
+- **Preview surfaces haven't produced measurable downstream conversion to `/check-in` yet.** Open question whether they're a warmup that pays off later or a detour from intent.
+
+---
+
+*Last updated: July 3, 2026*
