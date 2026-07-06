@@ -378,6 +378,7 @@ async function processScenario(
   scenario: ScenarioIn,
   forbiddenPhrases: string[],
   forbiddenPatterns: RegExp[],
+  yellowCrimeOvernamePatterns: string[],
 ): Promise<{ pass: boolean; toneScore: number | null }> {
   const started = Date.now();
   try {
