@@ -347,20 +347,34 @@ async function processScenario(
 ): Promise<{ pass: boolean; toneScore: number | null }> {
   const started = Date.now();
   try {
+    // Drift-tier: build a synthetic conversation string from `turns` prepended
+    // to `input`. The analyze-narrative fn doesn't yet accept a real turn
+    // array, so we compress prior context into a single narrative that Claude
+    // sees as one long user message. Slightly artificial; catches capitulation
+    // patterns well enough to be useful as a first-cut drift eval.
+    const isDrift = scenario.tier === "drift";
+    let effectiveInput = scenario.input;
+    if (isDrift && Array.isArray(scenario.turns) && scenario.turns.length > 0) {
+      const priorText = scenario.turns
+        .map((t) => (t.role === "user" ? `[earlier user] ${t.content}` : `[earlier ito] ${t.content}`))
+        .join("\n\n");
+      effectiveInput = `${priorText}\n\n[now user] ${scenario.input}`;
+    }
+
     // Prefer the client-precomputed classification (production classifier).
     // Fall back to analyze-language only if the client didn't send one.
     let actualRiskLevel: "green" | "yellow" | "red";
     if (scenario.precomputedActual) {
       actualRiskLevel = scenario.precomputedActual;
     } else {
-      const cls = await callAnalyzeLanguage(scenario.input);
+      const cls = await callAnalyzeLanguage(effectiveInput);
       actualRiskLevel = cls.riskLevel;
     }
 
     // FIX: pass actualRiskLevel (what the classifier decided) not
     // scenario.expects.risk_level (what the eval hopes for). This ensures
     // the severity reminder Claude receives matches what a real user would get.
-    const narr = await callAnalyzeNarrative(scenario.input, actualRiskLevel, scenario.flow);
+    const narr = await callAnalyzeNarrative(effectiveInput, actualRiskLevel, scenario.flow);
     const responseText = flattenStrings(narr.data);
     const lower = responseText.toLowerCase();
     // For forbidden-phrase scanning, strip quoted segments — when the model
