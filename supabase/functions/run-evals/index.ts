@@ -962,6 +962,7 @@ serve(async (req) => {
     scenarios: body.scenarios,
     forbiddenPhrases: body.forbiddenPhrases ?? [],
     forbiddenPatterns: body.forbiddenPatterns ?? [],
+    yellowCrimeOvernamePatterns: body.yellowCrimeOvernamePatterns ?? [],
   };
 
   const { data: runRow, error: runErr } = await supabase
