@@ -866,7 +866,7 @@ async function runChunk(runId: string) {
     }
 
     const scenario = payload.scenarios[idx];
-    const result = await processScenario(supabase, runId, scenario, forbiddenPhrases, forbiddenPatterns);
+    const result = await processScenario(supabase, runId, scenario, forbiddenPhrases, forbiddenPatterns, yellowCrimeOvernamePatterns);
     if (result.pass) passCount++;
     else failCount++;
     if (result.toneScore != null) toneScores.push(result.toneScore);
