@@ -650,7 +650,13 @@ async function processScenario(
       expected_refusal: scenario.expects.refusal_fires,
       refusal_fired: refusalFired,
       refusal_pass: refusalPass,
-      forbidden_phrase_hits: [...allForbiddenHits, ...capitulationHits.map((h) => `capitulation: ${h}`)],
+      forbidden_phrase_hits: [
+        ...allForbiddenHits,
+        ...capitulationHits.map((h) => `capitulation: ${h}`),
+        ...(crimeNamingRequired && !crimeNamingPass
+          ? [`crime-naming missing (any-of): ${crimeNamingMissing.join(" | ")}`]
+          : []),
+      ],
       missing_themes: missingThemes,
       deterministic_pass: deterministicPass,
       tone_score: toneScore,
@@ -661,6 +667,8 @@ async function processScenario(
         sycophancy_absence: sycophancyAbsence,
         redirect_quality: redirectQuality,
         capitulation_hits: capitulationHits,
+        crime_naming_required: crimeNamingRequired,
+        crime_naming_pass: crimeNamingPass,
       },
       raw_response: narr.data,
       latency_ms: Date.now() - started,
