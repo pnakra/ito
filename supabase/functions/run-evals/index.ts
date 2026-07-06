@@ -82,6 +82,9 @@ interface RunPayload {
   scenarios: ScenarioIn[];
   forbiddenPhrases: string[];
   forbiddenPatterns: string[];
+  // Default yellow-tier crime-overname deny-list. Applied by the runner to
+  // any yellow scenario that doesn't specify its own must_not_name_crime.
+  yellowCrimeOvernamePatterns?: string[];
 }
 
 interface RunInput extends RunPayload {
