@@ -160,7 +160,7 @@ export default function AdminEvals() {
     setRunning(true);
     setRunError(null);
     try {
-      const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS } =
+      const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS, YELLOW_CRIME_OVERNAME_PATTERNS } =
         await import("@/eval/scenarios");
       // Run the production classifier client-side for each scenario so the
       // eval harness measures the same risk decision the real app makes,
@@ -180,6 +180,7 @@ export default function AdminEvals() {
           promptVersionTag: tag || null,
           forbiddenPhrases: GLOBAL_FORBIDDEN_PHRASES,
           forbiddenPatterns: GLOBAL_FORBIDDEN_PATTERNS,
+          yellowCrimeOvernamePatterns: YELLOW_CRIME_OVERNAME_PATTERNS,
         }),
       });
       const data = await r.json();
