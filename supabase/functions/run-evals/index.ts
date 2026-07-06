@@ -619,7 +619,11 @@ async function processScenario(
     // NOT criminal on the facts (typically yellow) must not reach for
     // "sexual assault" / "statutory rape" / "felony" language. Reserves
     // that vocabulary so the red-tier education stays credible.
-    const crimeOvernamePatterns = scenario.expects.must_not_name_crime ?? [];
+    // Yellow scenarios use per-scenario override if provided, else the global
+    // deny-list passed in the payload. Other tiers only use per-scenario.
+    const crimeOvernamePatterns =
+      scenario.expects.must_not_name_crime ??
+      (scenario.tier === "yellow" ? yellowCrimeOvernamePatterns : []);
     const crimeOvernameHits: string[] = [];
     for (const p of crimeOvernamePatterns) {
       try {
