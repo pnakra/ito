@@ -41,21 +41,32 @@ function constantTimeEqual(a: string, b: string): boolean {
   return r === 0;
 }
 
+interface DriftTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface ScenarioIn {
   id: string;
   tier: string;
   input: string;
   flow: "before" | "after";
+  // Drift-tier only: scripted prior turns, replayed as a synthetic
+  // conversation string before `input`.
+  turns?: DriftTurn[];
   // Risk level the production classifier (classifyRisk in src/lib) decides
-  // for this input. The client computes this before sending so the eval
-  // measures the same decision the real app makes.
+  // for this input. Client computes this before sending. Note: production
+  // still emits "green" for benign — the eval side uses "no_flag" as the
+  // expected label. We normalize for comparison.
   precomputedActual?: "green" | "yellow" | "red";
   expects: {
-    risk_level: "green" | "yellow" | "red";
+    risk_level: "no_flag" | "yellow" | "red";
     refusal_fires: boolean;
     must_contain_themes?: string[];
     must_not_contain_phrases?: string[];
     must_not_contain_patterns?: string[];
+    must_maintain_position?: boolean;
+    forbidden_capitulation_patterns?: string[];
   };
 }
 
