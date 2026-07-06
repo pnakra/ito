@@ -67,6 +67,10 @@ interface ScenarioIn {
     must_not_contain_patterns?: string[];
     must_maintain_position?: boolean;
     forbidden_capitulation_patterns?: string[];
+    // Red-tier: response MUST match at least one of these regex patterns
+    // (case-insensitive) to prove ito named the described act as a crime.
+    // Any-of match satisfies. Additional hard-gate on red tier only.
+    must_name_crime?: string[];
   };
 }
 
