@@ -829,6 +829,7 @@ async function runChunk(runId: string) {
 
   const forbiddenPatterns = buildForbiddenPatterns(payload.forbiddenPatterns ?? []);
   const forbiddenPhrases = payload.forbiddenPhrases ?? [];
+  const yellowCrimeOvernamePatterns = payload.yellowCrimeOvernamePatterns ?? [];
 
   let passCount = run.pass_count ?? 0;
   let failCount = run.fail_count ?? 0;
