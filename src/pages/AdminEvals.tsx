@@ -384,13 +384,14 @@ export default function AdminEvals() {
               )}
               <button
                 onClick={async () => {
-                  const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS } =
+                  const { ALL_SCENARIOS, GLOBAL_FORBIDDEN_PHRASES, GLOBAL_FORBIDDEN_PATTERNS, YELLOW_CRIME_OVERNAME_PATTERNS } =
                     await import("@/eval/scenarios");
                   const payload = {
                     exported_at: new Date().toISOString(),
                     total: ALL_SCENARIOS.length,
                     global_forbidden_phrases: GLOBAL_FORBIDDEN_PHRASES,
                     global_forbidden_patterns: GLOBAL_FORBIDDEN_PATTERNS,
+                    yellow_crime_overname_patterns: YELLOW_CRIME_OVERNAME_PATTERNS,
                     scenarios: ALL_SCENARIOS,
                   };
                   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
