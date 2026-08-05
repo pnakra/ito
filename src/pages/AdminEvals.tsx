@@ -306,6 +306,8 @@ export default function AdminEvals() {
           <header className="flex items-baseline justify-between border-b border-border pb-4">
             <h1 className="font-serif text-3xl">safety evals</h1>
             <div className="flex items-center gap-4">
+              <EvalsTabs />
+
               {selectedRun && (
                 <>
                   <button
