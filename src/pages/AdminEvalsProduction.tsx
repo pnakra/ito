@@ -350,9 +350,18 @@ function ProductionDashboard({ email }: { email: string }) {
     return map;
   }, [actions]);
 
-  const visibleActions = actions.filter(
-    (a) => statusFilter === "all" || a.status === statusFilter,
-  );
+  const visibleActions = actions
+    .filter((a) => statusFilter === "all" || a.status === statusFilter)
+    .filter(
+      (a) => triageFilter === "all" || (a.triage ?? "").toLowerCase() === triageFilter,
+    )
+    .sort((a, b) => {
+      if (a.status === "proposed" && b.status === "proposed") {
+        const rank = (t: string | null) => ((t ?? "").toLowerCase() === "mechanical" ? 0 : 1);
+        return rank(a.triage) - rank(b.triage);
+      }
+      return 0;
+    });
 
   return (
     <main className="min-h-[100dvh] bg-background text-foreground px-6 py-10 pb-12">
