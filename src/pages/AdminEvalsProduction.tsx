@@ -30,6 +30,7 @@ type ActionItem = {
   notes: string | null;
   week_of: string | null;
   created_at: string;
+  applied_at: string | null;
 };
 
 const STATUSES = ["proposed", "approved", "backlog", "ignored", "applied"] as const;
@@ -176,6 +177,28 @@ function ActionRow({
             {item.target_location ? ` · ${item.target_location}` : ""} ·{" "}
             {item.grade_session_id.slice(0, 8)}
           </div>
+          {item.status === "applied" && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-emerald-500/50 text-emerald-400">
+                Implemented
+              </span>
+              <span className="text-[11px] font-mono text-muted-foreground">
+                {item.applied_at
+                  ? new Date(item.applied_at).toLocaleDateString()
+                  : "date unknown"}
+              </span>
+              {item.notes && (
+                <span className="text-xs text-muted-foreground italic">{item.notes}</span>
+              )}
+            </div>
+          )}
+          {item.status === "approved" && (
+            <div className="mt-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-amber-500/50 text-amber-400">
+                Awaiting deploy
+              </span>
+            </div>
+          )}
         </div>
         <select
           value={item.status}
