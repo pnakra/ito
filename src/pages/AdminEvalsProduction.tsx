@@ -562,32 +562,72 @@ function ProductionDashboard({ email }: { email: string }) {
               grouped by week here.
             </p>
           )}
-          {weeks.map(([monday, rows]) => {
-            const scored = rows.filter((r) => r.overall != null) as Array<Grade & { overall: number }>;
-            const avg =
-              scored.length > 0
-                ? (scored.reduce((a, b) => a + b.overall, 0) / scored.length).toFixed(2)
-                : "–";
-            return (
-              <div key={monday} className="space-y-3">
-                <div className="flex items-baseline justify-between border-b border-border/60 pb-2">
+          {weekStats.map(({ monday, rows, avg, delta, gates }) => (
+            <div key={monday} className="space-y-3">
+              <div className="border-b border-border/60 pb-3 space-y-2">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h3 className="font-serif text-xl">week of {weekLabel(monday)}</h3>
-                  <div className="text-xs font-mono text-muted-foreground">
-                    {rows.length} session{rows.length === 1 ? "" : "s"} · avg {avg}
+                  <div className="flex items-baseline gap-3 text-xs font-mono text-muted-foreground">
+                    <span>
+                      {rows.length} session{rows.length === 1 ? "" : "s"}
+                    </span>
+                    <span className={scoreTone(avg)}>avg {avg != null ? avg.toFixed(2) : "–"}</span>
+                    {delta != null && (
+                      <span
+                        className={
+                          delta > 0.001
+                            ? "text-emerald-400"
+                            : delta < -0.001
+                              ? "text-destructive"
+                              : "text-muted-foreground"
+                        }
+                      >
+                        {delta > 0 ? "▲" : delta < 0 ? "▼" : "="} {Math.abs(delta).toFixed(2)} vs
+                        prev week
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {rows.map((g) => (
-                    <SessionCard
-                      key={g.id}
-                      grade={g}
-                      actions={actionsBySession.get(g.session_id) ?? []}
-                    />
-                  ))}
-                </div>
+                {gates.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {gates.map(([name, { pass, total }]) => {
+                      const rate = total > 0 ? pass / total : 0;
+                      return (
+                        <div key={name} className="border border-border rounded px-2 py-1.5">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">
+                            {name.replace(/_/g, " ")}
+                          </div>
+                          <div
+                            className={`font-mono text-sm ${
+                              rate === 1
+                                ? "text-foreground"
+                                : rate >= 0.8
+                                  ? "text-amber-400"
+                                  : "text-destructive"
+                            }`}
+                          >
+                            {Math.round(rate * 100)}%{" "}
+                            <span className="text-[10px] text-muted-foreground">
+                              {pass}/{total}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            );
-          })}
+              <div className="space-y-2">
+                {rows.map((g) => (
+                  <SessionCard
+                    key={g.id}
+                    grade={g}
+                    actions={actionsBySession.get(g.session_id) ?? []}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       </div>
     </main>
