@@ -33,7 +33,7 @@ type ActionItem = {
   applied_at: string | null;
 };
 
-const STATUSES = ["proposed", "approved", "backlog", "ignored", "applied"] as const;
+const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
 
 function mondayOf(iso: string): string {
   const d = new Date(iso);
@@ -189,6 +189,18 @@ function ActionRow({
               </span>
               {item.notes && (
                 <span className="text-xs text-muted-foreground italic">{item.notes}</span>
+              )}
+            </div>
+          )}
+          {item.status === "needs_review" && (
+            <div className="mt-2 space-y-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-amber-500/50 text-amber-400">
+                Needs review
+              </span>
+              {item.notes && (
+                <div className="text-xs text-amber-200/80 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1.5">
+                  {item.notes}
+                </div>
               )}
             </div>
           )}
