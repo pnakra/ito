@@ -16,6 +16,7 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
+import AdminEvalsProduction from "./pages/AdminEvalsProduction";
 import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
 import Go from "./pages/Go";
@@ -44,6 +45,8 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogArticle />} />
               <Route path="/admin/evals" element={<AdminEvals />} />
+              <Route path="/admin/evals/production" element={<AdminEvalsProduction />} />
+
               <Route path="/embed" element={<Embed />} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />

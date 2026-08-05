@@ -14,6 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_queue: {
+        Row: {
+          created_at: string
+          decided_at: string | null
+          fix: string
+          grade_session_id: string
+          id: string
+          notes: string | null
+          plan: Json
+          status: string
+          target_function: string | null
+          target_location: string | null
+          updated_at: string
+          week_of: string | null
+        }
+        Insert: {
+          created_at?: string
+          decided_at?: string | null
+          fix: string
+          grade_session_id: string
+          id?: string
+          notes?: string | null
+          plan?: Json
+          status?: string
+          target_function?: string | null
+          target_location?: string | null
+          updated_at?: string
+          week_of?: string | null
+        }
+        Update: {
+          created_at?: string
+          decided_at?: string | null
+          fix?: string
+          grade_session_id?: string
+          id?: string
+          notes?: string | null
+          plan?: Json
+          status?: string
+          target_function?: string | null
+          target_location?: string | null
+          updated_at?: string
+          week_of?: string | null
+        }
+        Relationships: []
+      }
+      eval_grades: {
+        Row: {
+          created_at: string
+          evidence: Json
+          flags: Json
+          flow_type: string
+          gates: Json
+          id: string
+          overall: number | null
+          scores: Json
+          session_id: string
+          session_started_at: string
+          summary: string | null
+          transcript: string | null
+          updated_at: string
+          week_of: string | null
+        }
+        Insert: {
+          created_at?: string
+          evidence?: Json
+          flags?: Json
+          flow_type?: string
+          gates?: Json
+          id?: string
+          overall?: number | null
+          scores?: Json
+          session_id: string
+          session_started_at: string
+          summary?: string | null
+          transcript?: string | null
+          updated_at?: string
+          week_of?: string | null
+        }
+        Update: {
+          created_at?: string
+          evidence?: Json
+          flags?: Json
+          flow_type?: string
+          gates?: Json
+          id?: string
+          overall?: number | null
+          scores?: Json
+          session_id?: string
+          session_started_at?: string
+          summary?: string | null
+          transcript?: string | null
+          updated_at?: string
+          week_of?: string | null
+        }
+        Relationships: []
+      }
       eval_results: {
         Row: {
           actual_risk_level: string | null
@@ -187,6 +283,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       visits: {
         Row: {
           created_at: string
@@ -240,10 +357,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -370,6 +493,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
