@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminSupabase } from "@/lib/adminSupabase";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import EvalsTabs from "@/components/evals/EvalsTabs";
 import SEO from "@/components/SEO";
@@ -228,21 +228,20 @@ function ProductionDashboard({ email }: { email: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    // Only runs behind AdminAuthGate, so this client already carries a session
-    // and the requests go out authenticated.
-    const { data: sessionData } = await supabase.auth.getSession();
+     // AdminAuthGate and these queries share the dedicated external client.
+     const { data: sessionData } = await adminSupabase.auth.getSession();
     if (!sessionData.session) {
       setError("No active session — sign in again.");
       setLoading(false);
       return;
     }
     const [g, a] = await Promise.all([
-      supabase
+       adminSupabase
         .from("eval_grades")
         .select("*")
         .order("session_started_at", { ascending: false })
         .limit(500),
-      supabase.from("action_queue").select("*").order("created_at", { ascending: false }),
+       adminSupabase.from("action_queue").select("*").order("created_at", { ascending: false }),
     ]);
     const errs: string[] = [];
     if (g.error) errs.push(`eval_grades: ${g.error.message}`);
@@ -260,7 +259,7 @@ function ProductionDashboard({ email }: { email: string }) {
 
   async function updateAction(id: string, patch: Partial<ActionItem>) {
     setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
-    const { error } = await supabase
+     const { error } = await adminSupabase
       .from("action_queue")
       .update({ ...(patch as Record<string, never>), decided_at: new Date().toISOString() })
       .eq("id", id);
@@ -303,7 +302,7 @@ function ProductionDashboard({ email }: { email: string }) {
           <div className="flex items-center gap-4">
             <EvalsTabs />
             <button
-              onClick={() => supabase.auth.signOut()}
+               onClick={() => adminSupabase.auth.signOut()}
               className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
             >
               sign out
