@@ -31,9 +31,28 @@ type ActionItem = {
   week_of: string | null;
   created_at: string;
   applied_at: string | null;
+  triage: string | null;
+  triage_reason: string | null;
 };
 
 const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
+const TRIAGES = ["mechanical", "judgment"] as const;
+
+function TriageChip({ triage, reason }: { triage: string | null; reason: string | null }) {
+  if (!triage) return null;
+  const isMech = triage.toLowerCase() === "mechanical";
+  const cls = isMech
+    ? "border-emerald-500/50 text-emerald-400"
+    : "border-amber-500/50 text-amber-400";
+  return (
+    <span
+      title={reason ?? undefined}
+      className={`text-[11px] font-mono px-2 py-0.5 rounded border uppercase ${cls}`}
+    >
+      {triage}
+    </span>
+  );
+}
 
 function mondayOf(iso: string): string {
   const d = new Date(iso);
