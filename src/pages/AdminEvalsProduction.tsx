@@ -458,6 +458,34 @@ function ProductionDashboard({ email }: { email: string }) {
           signed in as {email} · {loading ? "loading…" : `${grades.length} graded sessions, ${actions.length} action items`}
         </div>
 
+        {health && (
+          <p className="text-sm text-amber-200 bg-amber-500/10 border border-amber-500/40 rounded px-3 py-2">
+            Connection warning — {health}
+          </p>
+        )}
+
+        {trend.length > 1 && (
+          <section className="border border-border rounded p-4 space-y-2">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              average score trend
+            </div>
+            <div className="flex items-end gap-2 h-20">
+              {trend.map((w) => (
+                <div key={w.monday} className="flex-1 flex flex-col items-center gap-1">
+                  <div
+                    className="w-full bg-foreground/25 rounded-sm"
+                    style={{ height: `${Math.max(4, (w.avg / 5) * 64)}px` }}
+                    title={`${weekLabel(w.monday)} · ${w.avg.toFixed(2)}`}
+                  />
+                  <div className="text-[9px] font-mono text-muted-foreground truncate">
+                    {w.avg.toFixed(1)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {error && (
           <p className="text-sm text-destructive font-mono border border-destructive/40 rounded px-3 py-2">
             query error — {error}
