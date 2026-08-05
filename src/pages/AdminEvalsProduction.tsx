@@ -418,6 +418,24 @@ function ProductionDashboard({ email }: { email: string }) {
               ))}
             </div>
           </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">
+              triage
+            </span>
+            {["all", ...TRIAGES].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTriageFilter(t)}
+                className={`text-[11px] px-2 py-1 rounded border ${
+                  triageFilter === t
+                    ? "border-foreground/40 text-foreground bg-foreground/5"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
           {visibleActions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Nothing {statusFilter === "all" ? "in the queue" : `marked ${statusFilter}`} yet.
