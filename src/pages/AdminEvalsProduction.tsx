@@ -284,6 +284,7 @@ function ProductionDashboard({ email }: { email: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("proposed");
+  const [triageFilter, setTriageFilter] = useState<string>("all");
 
   const load = useCallback(async () => {
     setLoading(true);
