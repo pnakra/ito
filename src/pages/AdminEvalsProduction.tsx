@@ -17,6 +17,7 @@ type Grade = {
   transcript: string | null;
   evidence: Record<string, unknown>;
   week_of: string | null;
+  rubric_version?: string | null;
 };
 
 type ActionItem = {
@@ -33,6 +34,8 @@ type ActionItem = {
   applied_at: string | null;
   triage: string | null;
   triage_reason: string | null;
+  decided_by?: string | null;
+  decided_at?: string | null;
 };
 
 const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
