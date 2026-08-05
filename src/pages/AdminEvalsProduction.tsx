@@ -228,6 +228,14 @@ function ProductionDashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    // Only runs behind AdminAuthGate, so this client already carries a session
+    // and the requests go out authenticated.
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      setError("No active session — sign in again.");
+      setLoading(false);
+      return;
+    }
     const [g, a] = await Promise.all([
       supabase
         .from("eval_grades")
@@ -236,12 +244,15 @@ function ProductionDashboard() {
         .limit(500),
       supabase.from("action_queue").select("*").order("created_at", { ascending: false }),
     ]);
-    if (g.error) setError(g.error.message);
+    const errs: string[] = [];
+    if (g.error) errs.push(`eval_grades: ${g.error.message}`);
     else setGrades((g.data ?? []) as unknown as Grade[]);
-    if (a.error) setError(a.error.message);
+    if (a.error) errs.push(`action_queue: ${a.error.message}`);
     else setActions((a.data ?? []) as unknown as ActionItem[]);
+    setError(errs.length > 0 ? errs.join(" · ") : null);
     setLoading(false);
   }, []);
+
 
   useEffect(() => {
     load();
