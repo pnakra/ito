@@ -218,7 +218,7 @@ function ActionRow({
   );
 }
 
-function ProductionDashboard() {
+function ProductionDashboard({ email }: { email: string }) {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [actions, setActions] = useState<ActionItem[]>([]);
   const [loading, setLoading] = useState(true);
