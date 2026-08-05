@@ -293,6 +293,30 @@ function ProductionDashboard({ email }: { email: string }) {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("proposed");
   const [triageFilter, setTriageFilter] = useState<string>("all");
+  const [health, setHealth] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const problems: string[] = [];
+      try {
+        const [g, a] = await Promise.all([
+          adminSupabase.from("eval_grades").select("id", { count: "exact", head: true }),
+          adminSupabase.from("action_queue").select("id", { count: "exact", head: true }),
+        ]);
+        if (g.error) problems.push(`eval_grades unreachable (${g.error.message})`);
+        if (a.error) problems.push(`action_queue unreachable (${a.error.message})`);
+      } catch (e) {
+        problems.push(
+          `cannot reach the eval database (${e instanceof Error ? e.message : "network error"})`,
+        );
+      }
+      if (!cancelled) setHealth(problems.length > 0 ? problems.join(" · ") : null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -327,10 +351,11 @@ function ProductionDashboard({ email }: { email: string }) {
   }, [load]);
 
   async function updateAction(id: string, patch: Partial<ActionItem>) {
-    setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    const stamp = { decided_by: email, decided_at: new Date().toISOString() };
+    setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch, ...stamp } : i)));
      const { error } = await adminSupabase
       .from("action_queue")
-      .update({ ...(patch as Record<string, never>), decided_at: new Date().toISOString() })
+      .update({ ...(patch as Record<string, never>), ...stamp })
       .eq("id", id);
     if (error) {
       setError(error.message);
