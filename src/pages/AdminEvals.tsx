@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import EvalsTabs from "@/components/evals/EvalsTabs";
 
 const EVAL_PROJECT_ID = "ochulsnvnqcbzqnlkazu";
 const EVAL_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6Im9jaHVsc252bnFjYnpxbmxrYXp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzOTY1NTUsImV4cCI6MjA3Nzk3MjU1NX0.dBLDOTsv5s0axzzSmeNkLTGK0vJt58yC-2mUAXv889Q";
