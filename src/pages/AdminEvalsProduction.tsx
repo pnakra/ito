@@ -110,9 +110,14 @@ function SessionCard({ grade, actions }: { grade: Grade; actions: ActionItem[] }
             <div className="text-sm text-foreground truncate">
               {grade.summary ?? "(no summary)"}
             </div>
-            <div className="text-[11px] font-mono text-muted-foreground mt-1">
-              {new Date(grade.session_started_at).toLocaleString()} · {grade.flow_type} ·{" "}
-              {grade.session_id.slice(0, 8)}
+            <div className="text-[11px] font-mono text-muted-foreground mt-1 flex flex-wrap items-center gap-1.5">
+              <span>
+                {new Date(grade.session_started_at).toLocaleString()} · {grade.flow_type} ·{" "}
+                {grade.session_id.slice(0, 8)}
+              </span>
+              <span className="px-1.5 py-0.5 rounded border border-border text-[10px] uppercase tracking-wider">
+                rubric {grade.rubric_version ?? "unversioned"}
+              </span>
             </div>
           </div>
           <div className={`text-lg font-mono ${scoreTone(grade.overall)}`}>
