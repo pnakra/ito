@@ -218,7 +218,7 @@ function ActionRow({
   );
 }
 
-function ProductionDashboard() {
+function ProductionDashboard({ email }: { email: string }) {
   const [grades, setGrades] = useState<Grade[]>([]);
   const [actions, setActions] = useState<ActionItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -228,6 +228,14 @@ function ProductionDashboard() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    // Only runs behind AdminAuthGate, so this client already carries a session
+    // and the requests go out authenticated.
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      setError("No active session — sign in again.");
+      setLoading(false);
+      return;
+    }
     const [g, a] = await Promise.all([
       supabase
         .from("eval_grades")
@@ -236,12 +244,15 @@ function ProductionDashboard() {
         .limit(500),
       supabase.from("action_queue").select("*").order("created_at", { ascending: false }),
     ]);
-    if (g.error) setError(g.error.message);
+    const errs: string[] = [];
+    if (g.error) errs.push(`eval_grades: ${g.error.message}`);
     else setGrades((g.data ?? []) as unknown as Grade[]);
-    if (a.error) setError(a.error.message);
+    if (a.error) errs.push(`action_queue: ${a.error.message}`);
     else setActions((a.data ?? []) as unknown as ActionItem[]);
+    setError(errs.length > 0 ? errs.join(" · ") : null);
     setLoading(false);
   }, []);
+
 
   useEffect(() => {
     load();
@@ -300,7 +311,22 @@ function ProductionDashboard() {
           </div>
         </header>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <div className="text-xs font-mono text-muted-foreground">
+          signed in as {email} · {loading ? "loading…" : `${grades.length} graded sessions, ${actions.length} action items`}
+        </div>
+
+        {error && (
+          <p className="text-sm text-destructive font-mono border border-destructive/40 rounded px-3 py-2">
+            query error — {error}
+          </p>
+        )}
+
+        {!loading && !error && grades.length === 0 && actions.length === 0 && (
+          <p className="text-sm text-muted-foreground border border-border rounded px-3 py-2">
+            Signed in and the queries succeeded, but both tables returned zero rows — nothing has
+            been graded yet.
+          </p>
+        )}
 
         <section className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -383,7 +409,9 @@ export default function AdminEvalsProduction() {
   return (
     <>
       <SEO title="Production evals" description="Internal production eval review." path="/admin/evals/production" />
-      <AdminAuthGate>{() => <ProductionDashboard />}</AdminAuthGate>
+      <AdminAuthGate>
+        {(session) => <ProductionDashboard email={session.user.email ?? "unknown"} />}
+      </AdminAuthGate>
     </>
   );
 }
