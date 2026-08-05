@@ -230,18 +230,24 @@ function ActionRow({
               </span>
             </div>
           )}
+          {item.triage && item.triage_reason && (
+            <div className="mt-2 text-xs text-muted-foreground">{item.triage_reason}</div>
+          )}
         </div>
-        <select
-          value={item.status}
-          onChange={(e) => onUpdate(item.id, { status: e.target.value })}
-          className="bg-background border border-border rounded px-2 py-1 text-xs text-foreground"
-        >
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <TriageChip triage={item.triage} reason={item.triage_reason} />
+          <select
+            value={item.status}
+            onChange={(e) => onUpdate(item.id, { status: e.target.value })}
+            className="bg-background border border-border rounded px-2 py-1 text-xs text-foreground"
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {steps.length > 0 && (
