@@ -251,7 +251,7 @@ function ProductionDashboard() {
     setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
     const { error } = await supabase
       .from("action_queue")
-      .update({ ...patch, decided_at: new Date().toISOString() })
+      .update({ ...(patch as Record<string, never>), decided_at: new Date().toISOString() })
       .eq("id", id);
     if (error) {
       setError(error.message);
@@ -382,7 +382,7 @@ function ProductionDashboard() {
 export default function AdminEvalsProduction() {
   return (
     <>
-      <SEO title="Production evals" description="Internal production eval review." noindex />
+      <SEO title="Production evals" description="Internal production eval review." />
       <AdminAuthGate>{() => <ProductionDashboard />}</AdminAuthGate>
     </>
   );
