@@ -374,6 +374,47 @@ function ProductionDashboard({ email }: { email: string }) {
     return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
   }, [grades]);
 
+  // Newest-first weeks with avg, delta vs the previous week, and gate pass rates.
+  const weekStats = useMemo(() => {
+    const avgOf = (rows: Grade[]) => {
+      const scored = rows.filter((r) => typeof r.overall === "number") as Array<
+        Grade & { overall: number }
+      >;
+      return scored.length > 0
+        ? scored.reduce((a, b) => a + b.overall, 0) / scored.length
+        : null;
+    };
+    return weeks.map(([monday, rows], i) => {
+      const avg = avgOf(rows);
+      const prev = weeks[i + 1] ? avgOf(weeks[i + 1][1]) : null;
+      const gateMap = new Map<string, { pass: number; total: number }>();
+      for (const r of rows) {
+        for (const [k, v] of Object.entries(r.gates ?? {})) {
+          if (typeof v !== "boolean") continue;
+          const cur = gateMap.get(k) ?? { pass: 0, total: 0 };
+          cur.total += 1;
+          if (v) cur.pass += 1;
+          gateMap.set(k, cur);
+        }
+      }
+      return {
+        monday,
+        rows,
+        avg,
+        delta: avg != null && prev != null ? avg - prev : null,
+        gates: [...gateMap.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+      };
+    });
+  }, [weeks]);
+
+  // Oldest-first series for the across-weeks trend line.
+  const trend = useMemo(
+    () => [...weekStats].reverse().filter((w) => w.avg != null) as Array<
+      (typeof weekStats)[number] & { avg: number }
+    >,
+    [weekStats],
+  );
+
   const actionsBySession = useMemo(() => {
     const map = new Map<string, ActionItem[]>();
     for (const a of actions) {
