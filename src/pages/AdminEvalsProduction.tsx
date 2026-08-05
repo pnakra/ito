@@ -409,7 +409,9 @@ export default function AdminEvalsProduction() {
   return (
     <>
       <SEO title="Production evals" description="Internal production eval review." path="/admin/evals/production" />
-      <AdminAuthGate>{() => <ProductionDashboard />}</AdminAuthGate>
+      <AdminAuthGate>
+        {(session) => <ProductionDashboard email={session.user.email ?? "unknown"} />}
+      </AdminAuthGate>
     </>
   );
 }
