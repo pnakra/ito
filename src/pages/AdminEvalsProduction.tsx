@@ -33,7 +33,7 @@ type ActionItem = {
   applied_at: string | null;
 };
 
-const STATUSES = ["proposed", "approved", "backlog", "ignored", "applied"] as const;
+const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
 
 function mondayOf(iso: string): string {
   const d = new Date(iso);
