@@ -17,6 +17,7 @@ type Grade = {
   transcript: string | null;
   evidence: Record<string, unknown>;
   week_of: string | null;
+  rubric_version?: string | null;
 };
 
 type ActionItem = {
@@ -33,6 +34,8 @@ type ActionItem = {
   applied_at: string | null;
   triage: string | null;
   triage_reason: string | null;
+  decided_by?: string | null;
+  decided_at?: string | null;
 };
 
 const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
@@ -107,9 +110,14 @@ function SessionCard({ grade, actions }: { grade: Grade; actions: ActionItem[] }
             <div className="text-sm text-foreground truncate">
               {grade.summary ?? "(no summary)"}
             </div>
-            <div className="text-[11px] font-mono text-muted-foreground mt-1">
-              {new Date(grade.session_started_at).toLocaleString()} · {grade.flow_type} ·{" "}
-              {grade.session_id.slice(0, 8)}
+            <div className="text-[11px] font-mono text-muted-foreground mt-1 flex flex-wrap items-center gap-1.5">
+              <span>
+                {new Date(grade.session_started_at).toLocaleString()} · {grade.flow_type} ·{" "}
+                {grade.session_id.slice(0, 8)}
+              </span>
+              <span className="px-1.5 py-0.5 rounded border border-border text-[10px] uppercase tracking-wider">
+                rubric {grade.rubric_version ?? "unversioned"}
+              </span>
             </div>
           </div>
           <div className={`text-lg font-mono ${scoreTone(grade.overall)}`}>
@@ -285,6 +293,30 @@ function ProductionDashboard({ email }: { email: string }) {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("proposed");
   const [triageFilter, setTriageFilter] = useState<string>("all");
+  const [health, setHealth] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const problems: string[] = [];
+      try {
+        const [g, a] = await Promise.all([
+          adminSupabase.from("eval_grades").select("id", { count: "exact", head: true }),
+          adminSupabase.from("action_queue").select("id", { count: "exact", head: true }),
+        ]);
+        if (g.error) problems.push(`eval_grades unreachable (${g.error.message})`);
+        if (a.error) problems.push(`action_queue unreachable (${a.error.message})`);
+      } catch (e) {
+        problems.push(
+          `cannot reach the eval database (${e instanceof Error ? e.message : "network error"})`,
+        );
+      }
+      if (!cancelled) setHealth(problems.length > 0 ? problems.join(" · ") : null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -319,10 +351,11 @@ function ProductionDashboard({ email }: { email: string }) {
   }, [load]);
 
   async function updateAction(id: string, patch: Partial<ActionItem>) {
-    setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+    const stamp = { decided_by: email, decided_at: new Date().toISOString() };
+    setActions((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch, ...stamp } : i)));
      const { error } = await adminSupabase
       .from("action_queue")
-      .update({ ...(patch as Record<string, never>), decided_at: new Date().toISOString() })
+      .update({ ...(patch as Record<string, never>), ...stamp })
       .eq("id", id);
     if (error) {
       setError(error.message);
@@ -340,6 +373,47 @@ function ProductionDashboard({ email }: { email: string }) {
     }
     return [...map.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1));
   }, [grades]);
+
+  // Newest-first weeks with avg, delta vs the previous week, and gate pass rates.
+  const weekStats = useMemo(() => {
+    const avgOf = (rows: Grade[]) => {
+      const scored = rows.filter((r) => typeof r.overall === "number") as Array<
+        Grade & { overall: number }
+      >;
+      return scored.length > 0
+        ? scored.reduce((a, b) => a + b.overall, 0) / scored.length
+        : null;
+    };
+    return weeks.map(([monday, rows], i) => {
+      const avg = avgOf(rows);
+      const prev = weeks[i + 1] ? avgOf(weeks[i + 1][1]) : null;
+      const gateMap = new Map<string, { pass: number; total: number }>();
+      for (const r of rows) {
+        for (const [k, v] of Object.entries(r.gates ?? {})) {
+          if (typeof v !== "boolean") continue;
+          const cur = gateMap.get(k) ?? { pass: 0, total: 0 };
+          cur.total += 1;
+          if (v) cur.pass += 1;
+          gateMap.set(k, cur);
+        }
+      }
+      return {
+        monday,
+        rows,
+        avg,
+        delta: avg != null && prev != null ? avg - prev : null,
+        gates: [...gateMap.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+      };
+    });
+  }, [weeks]);
+
+  // Oldest-first series for the across-weeks trend line.
+  const trend = useMemo(
+    () => [...weekStats].reverse().filter((w) => w.avg != null) as Array<
+      (typeof weekStats)[number] & { avg: number }
+    >,
+    [weekStats],
+  );
 
   const actionsBySession = useMemo(() => {
     const map = new Map<string, ActionItem[]>();
@@ -383,6 +457,34 @@ function ProductionDashboard({ email }: { email: string }) {
         <div className="text-xs font-mono text-muted-foreground">
           signed in as {email} · {loading ? "loading…" : `${grades.length} graded sessions, ${actions.length} action items`}
         </div>
+
+        {health && (
+          <p className="text-sm text-amber-200 bg-amber-500/10 border border-amber-500/40 rounded px-3 py-2">
+            Connection warning — {health}
+          </p>
+        )}
+
+        {trend.length > 1 && (
+          <section className="border border-border rounded p-4 space-y-2">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              average score trend
+            </div>
+            <div className="flex items-end gap-2 h-20">
+              {trend.map((w) => (
+                <div key={w.monday} className="flex-1 flex flex-col items-center gap-1">
+                  <div
+                    className="w-full bg-foreground/25 rounded-sm"
+                    style={{ height: `${Math.max(4, (w.avg / 5) * 64)}px` }}
+                    title={`${weekLabel(w.monday)} · ${w.avg.toFixed(2)}`}
+                  />
+                  <div className="text-[9px] font-mono text-muted-foreground truncate">
+                    {w.avg.toFixed(1)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {error && (
           <p className="text-sm text-destructive font-mono border border-destructive/40 rounded px-3 py-2">
@@ -460,32 +562,72 @@ function ProductionDashboard({ email }: { email: string }) {
               grouped by week here.
             </p>
           )}
-          {weeks.map(([monday, rows]) => {
-            const scored = rows.filter((r) => r.overall != null) as Array<Grade & { overall: number }>;
-            const avg =
-              scored.length > 0
-                ? (scored.reduce((a, b) => a + b.overall, 0) / scored.length).toFixed(2)
-                : "–";
-            return (
-              <div key={monday} className="space-y-3">
-                <div className="flex items-baseline justify-between border-b border-border/60 pb-2">
+          {weekStats.map(({ monday, rows, avg, delta, gates }) => (
+            <div key={monday} className="space-y-3">
+              <div className="border-b border-border/60 pb-3 space-y-2">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h3 className="font-serif text-xl">week of {weekLabel(monday)}</h3>
-                  <div className="text-xs font-mono text-muted-foreground">
-                    {rows.length} session{rows.length === 1 ? "" : "s"} · avg {avg}
+                  <div className="flex items-baseline gap-3 text-xs font-mono text-muted-foreground">
+                    <span>
+                      {rows.length} session{rows.length === 1 ? "" : "s"}
+                    </span>
+                    <span className={scoreTone(avg)}>avg {avg != null ? avg.toFixed(2) : "–"}</span>
+                    {delta != null && (
+                      <span
+                        className={
+                          delta > 0.001
+                            ? "text-emerald-400"
+                            : delta < -0.001
+                              ? "text-destructive"
+                              : "text-muted-foreground"
+                        }
+                      >
+                        {delta > 0 ? "▲" : delta < 0 ? "▼" : "="} {Math.abs(delta).toFixed(2)} vs
+                        prev week
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {rows.map((g) => (
-                    <SessionCard
-                      key={g.id}
-                      grade={g}
-                      actions={actionsBySession.get(g.session_id) ?? []}
-                    />
-                  ))}
-                </div>
+                {gates.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {gates.map(([name, { pass, total }]) => {
+                      const rate = total > 0 ? pass / total : 0;
+                      return (
+                        <div key={name} className="border border-border rounded px-2 py-1.5">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground truncate">
+                            {name.replace(/_/g, " ")}
+                          </div>
+                          <div
+                            className={`font-mono text-sm ${
+                              rate === 1
+                                ? "text-foreground"
+                                : rate >= 0.8
+                                  ? "text-amber-400"
+                                  : "text-destructive"
+                            }`}
+                          >
+                            {Math.round(rate * 100)}%{" "}
+                            <span className="text-[10px] text-muted-foreground">
+                              {pass}/{total}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            );
-          })}
+              <div className="space-y-2">
+                {rows.map((g) => (
+                  <SessionCard
+                    key={g.id}
+                    grade={g}
+                    actions={actionsBySession.get(g.session_id) ?? []}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       </div>
     </main>
