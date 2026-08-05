@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { adminSupabase } from "@/lib/adminSupabase";
 
 const ADMIN_EMAIL = "priya@overridelabsprevention.org";
 
@@ -9,9 +9,8 @@ interface Props {
 }
 
 /**
- * Real Supabase auth gate. There is no local password comparison: the entered
- * password is sent to Supabase, so the resulting session (and its JWT) is what
- * the dashboard queries with. RLS is the actual boundary.
+ * Auth gate for the external eval database. The resulting session and all
+ * production-eval queries use this same dedicated client.
  */
 export default function AdminAuthGate({ children }: Props) {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,11 +22,11 @@ export default function AdminAuthGate({ children }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: sub } = adminSupabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setChecking(false);
     });
-    supabase.auth.getSession().then(({ data }) => {
+    adminSupabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setChecking(false);
     });
@@ -41,7 +40,7 @@ export default function AdminAuthGate({ children }: Props) {
     }
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase
+       const { data, error } = await adminSupabase
         .from("user_roles")
         .select("role")
         .eq("user_id", session.user.id)
@@ -60,7 +59,7 @@ export default function AdminAuthGate({ children }: Props) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await adminSupabase.auth.signInWithPassword({
       email: ADMIN_EMAIL,
       password,
     });
@@ -125,7 +124,7 @@ export default function AdminAuthGate({ children }: Props) {
           </p>
           {error && <p className="text-sm text-destructive font-mono">{error}</p>}
           <button
-            onClick={() => supabase.auth.signOut()}
+             onClick={() => adminSupabase.auth.signOut()}
             className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
           >
             sign out
