@@ -382,7 +382,7 @@ function ProductionDashboard() {
 export default function AdminEvalsProduction() {
   return (
     <>
-      <SEO title="Production evals" description="Internal production eval review." />
+      <SEO title="Production evals" description="Internal production eval review." path="/admin/evals/production" />
       <AdminAuthGate>{() => <ProductionDashboard />}</AdminAuthGate>
     </>
   );
