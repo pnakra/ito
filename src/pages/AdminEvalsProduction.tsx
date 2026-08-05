@@ -192,6 +192,18 @@ function ActionRow({
               )}
             </div>
           )}
+          {item.status === "needs_review" && (
+            <div className="mt-2 space-y-2">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-amber-500/50 text-amber-400">
+                Needs review
+              </span>
+              {item.notes && (
+                <div className="text-xs text-amber-200/80 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1.5">
+                  {item.notes}
+                </div>
+              )}
+            </div>
+          )}
           {item.status === "approved" && (
             <div className="mt-2">
               <span className="text-[11px] font-mono px-2 py-0.5 rounded border border-amber-500/50 text-amber-400">
