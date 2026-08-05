@@ -45,6 +45,8 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogArticle />} />
               <Route path="/admin/evals" element={<AdminEvals />} />
+              <Route path="/admin/evals/production" element={<AdminEvalsProduction />} />
+
               <Route path="/embed" element={<Embed />} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
