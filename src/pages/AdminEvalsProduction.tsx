@@ -311,7 +311,22 @@ function ProductionDashboard({ email }: { email: string }) {
           </div>
         </header>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <div className="text-xs font-mono text-muted-foreground">
+          signed in as {email} · {loading ? "loading…" : `${grades.length} graded sessions, ${actions.length} action items`}
+        </div>
+
+        {error && (
+          <p className="text-sm text-destructive font-mono border border-destructive/40 rounded px-3 py-2">
+            query error — {error}
+          </p>
+        )}
+
+        {!loading && !error && grades.length === 0 && actions.length === 0 && (
+          <p className="text-sm text-muted-foreground border border-border rounded px-3 py-2">
+            Signed in and the queries succeeded, but both tables returned zero rows — nothing has
+            been graded yet.
+          </p>
+        )}
 
         <section className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
