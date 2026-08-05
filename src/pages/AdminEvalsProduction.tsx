@@ -31,9 +31,28 @@ type ActionItem = {
   week_of: string | null;
   created_at: string;
   applied_at: string | null;
+  triage: string | null;
+  triage_reason: string | null;
 };
 
 const STATUSES = ["proposed", "needs_review", "approved", "backlog", "ignored", "applied"] as const;
+const TRIAGES = ["mechanical", "judgment"] as const;
+
+function TriageChip({ triage, reason }: { triage: string | null; reason: string | null }) {
+  if (!triage) return null;
+  const isMech = triage.toLowerCase() === "mechanical";
+  const cls = isMech
+    ? "border-emerald-500/50 text-emerald-400"
+    : "border-amber-500/50 text-amber-400";
+  return (
+    <span
+      title={reason ?? undefined}
+      className={`text-[11px] font-mono px-2 py-0.5 rounded border uppercase ${cls}`}
+    >
+      {triage}
+    </span>
+  );
+}
 
 function mondayOf(iso: string): string {
   const d = new Date(iso);
@@ -211,18 +230,24 @@ function ActionRow({
               </span>
             </div>
           )}
+          {item.triage && item.triage_reason && (
+            <div className="mt-2 text-xs text-muted-foreground">{item.triage_reason}</div>
+          )}
         </div>
-        <select
-          value={item.status}
-          onChange={(e) => onUpdate(item.id, { status: e.target.value })}
-          className="bg-background border border-border rounded px-2 py-1 text-xs text-foreground"
-        >
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <TriageChip triage={item.triage} reason={item.triage_reason} />
+          <select
+            value={item.status}
+            onChange={(e) => onUpdate(item.id, { status: e.target.value })}
+            className="bg-background border border-border rounded px-2 py-1 text-xs text-foreground"
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {steps.length > 0 && (
@@ -259,6 +284,7 @@ function ProductionDashboard({ email }: { email: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("proposed");
+  const [triageFilter, setTriageFilter] = useState<string>("all");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -325,9 +351,18 @@ function ProductionDashboard({ email }: { email: string }) {
     return map;
   }, [actions]);
 
-  const visibleActions = actions.filter(
-    (a) => statusFilter === "all" || a.status === statusFilter,
-  );
+  const visibleActions = actions
+    .filter((a) => statusFilter === "all" || a.status === statusFilter)
+    .filter(
+      (a) => triageFilter === "all" || (a.triage ?? "").toLowerCase() === triageFilter,
+    )
+    .sort((a, b) => {
+      if (a.status === "proposed" && b.status === "proposed") {
+        const rank = (t: string | null) => ((t ?? "").toLowerCase() === "mechanical" ? 0 : 1);
+        return rank(a.triage) - rank(b.triage);
+      }
+      return 0;
+    });
 
   return (
     <main className="min-h-[100dvh] bg-background text-foreground px-6 py-10 pb-12">
@@ -382,6 +417,24 @@ function ProductionDashboard({ email }: { email: string }) {
                 </button>
               ))}
             </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">
+              triage
+            </span>
+            {["all", ...TRIAGES].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTriageFilter(t)}
+                className={`text-[11px] px-2 py-1 rounded border ${
+                  triageFilter === t
+                    ? "border-foreground/40 text-foreground bg-foreground/5"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
           </div>
           {visibleActions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
