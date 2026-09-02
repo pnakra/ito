@@ -526,8 +526,8 @@ function GrowthDashboard({ email }: { email: string }) {
         {/* 6 — data hygiene */}
         <section className="border border-border rounded px-4 py-3">
           <p className="text-xs font-mono text-muted-foreground">
-            data hygiene · {stats.junk} of {stats.total} sessions flagged junk (
-            {pct(stats.junk, stats.total)}) — excluded from analytics elsewhere, shown here for
+            data hygiene · {stats.junk} of {stats.rawTotal} sessions flagged junk (
+            {pct(stats.junk, stats.rawTotal)}) — excluded from analytics elsewhere, shown here for
             visibility only.
           </p>
         </section>
