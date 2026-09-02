@@ -32,7 +32,6 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
     detectedTiming === "before" ? "deciding" : ""
   );
   const [physicalStage, setPhysicalStage] = useState<string[]>([]);
-  const [ageUser, setAgeUser] = useState("");
   const [ageOther, setAgeOther] = useState("");
   const [intent, setIntent] = useState("");
 
@@ -50,7 +49,6 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
       const signals: StructuredSignals = {};
       if (timing) signals.timing = timing as StructuredSignals["timing"];
       if (physicalStage.length > 0) signals.physicalStage = physicalStage;
-      if (ageUser) signals.ageUser = ageUser;
       if (ageOther) signals.ageOther = ageOther;
       if (intent) signals.intent = intent;
       onSubmit(signals);
@@ -69,7 +67,7 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
     switch (step) {
       case 1: return !!timing;
       case 2: return physicalStage.length > 0;
-      case 3: return !!ageUser || !!ageOther;
+      case 3: return !!ageOther;
       case 4: return !!intent;
       default: return false;
     }
