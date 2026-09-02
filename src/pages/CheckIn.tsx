@@ -22,7 +22,7 @@ import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ConfidencePost from "@/components/prevention/ConfidencePost";
 import AgeConfidenceCheck, { type AgeConfidenceResult } from "@/components/narrative/AgeConfidenceCheck";
-import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
+import OutcomeFeedback, { feedbackMap } from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
 import { classifyRisk, detectFlagWords, formatSelectionsForAI } from "@/lib/riskClassification";
@@ -444,7 +444,12 @@ const CheckIn = () => {
   };
 
   // Handle signal floor submission
-  const handleSignalFloorSubmit = (signals: StructuredSignals) => {
+  const handleSignalFloorSubmit = (incoming: StructuredSignals) => {
+    // Preserve ageUser captured in the mandatory age-check micro-step
+    const signals: StructuredSignals = {
+      ...(structuredSignalsRef.current.ageUser ? { ageUser: structuredSignalsRef.current.ageUser } : {}),
+      ...incoming,
+    };
     setStructuredSignals(signals);
     structuredSignalsRef.current = signals;
     
@@ -1029,7 +1034,9 @@ const CheckIn = () => {
               )}
               {selectedOutcome && (
                 <div className="bg-callout rounded-lg p-5">
-                  <p className="text-[15px] text-callout-foreground">Thanks — noted.</p>
+                  <p className="text-[15px] text-callout-foreground">
+                    {feedbackMap[selectedOutcome] ?? feedbackMap["not-sure"]}
+                  </p>
                 </div>
               )}
             </>

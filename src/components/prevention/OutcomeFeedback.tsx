@@ -6,7 +6,7 @@ interface OutcomeFeedbackProps {
   onReset: () => void;
 }
 
-const feedbackMap: Record<string, string> = {
+export const feedbackMap: Record<string, string> = {
   stopped: "Stopping or asking is how you make sure everyone's okay.",
   "checked-in": "Stopping or asking is how you make sure everyone's okay.",
   "didnt-proceed": "Not going through with it is always an okay choice.",
