@@ -147,6 +147,12 @@ Deno.serve(async (req) => {
 
     const anon_id = truncateStr(body.anon_id, 128);
 
+    // Tag obvious internal test / prompt-injection submissions (never dropped)
+    const junk = classifyJunk(freetext_value ?? choice_value);
+    if (junk.flagged) {
+      metadata = { ...metadata, flagged_junk: true, flagged_junk_reason: junk.reason };
+    }
+
     const extUrl = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
     const supabase = createClient(
       extUrl,
