@@ -277,7 +277,35 @@ function GrowthDashboard({ email }: { email: string }) {
     const confPre = avg(bothConf.map((r) => r.confidence_pre as number));
     const confPost = avg(bothConf.map((r) => r.confidence_post as number));
 
+    // 4.5 — statistical readiness: under-18 vs 18+
+    const readiness = {
+      under18: { outcome: 0, bothConf: 0 },
+      over18: { outcome: 0, bothConf: 0 },
+    } as const;
+    for (const r of organic) {
+      const g = comparisonAgeGroup(r);
+      if (!g) continue;
+      if ((r.outcome ?? "").trim() !== "") readiness[g].outcome += 1;
+      if (typeof r.confidence_pre === "number" && typeof r.confidence_post === "number") {
+        readiness[g].bothConf += 1;
+      }
+    }
+    const readinessGaps = [
+      { name: "under-18 outcome responses", count: readiness.under18.outcome, target: OUTCOME_READINESS_TARGET },
+      { name: "18+ outcome responses", count: readiness.over18.outcome, target: OUTCOME_READINESS_TARGET },
+      { name: "under-18 confidence pairs", count: readiness.under18.bothConf, target: CONFIDENCE_READINESS_TARGET },
+      { name: "18+ confidence pairs", count: readiness.over18.bothConf, target: CONFIDENCE_READINESS_TARGET },
+    ];
+    const remaining = (item: (typeof readinessGaps)[number]) => Math.max(0, item.target - item.count);
+    const biggestGap = readinessGaps.reduce((max, item) =>
+      remaining(item) > remaining(max) ? item : max
+    , readinessGaps[0]);
+    const readinessBottleneck = biggestGap
+      ? `furthest from ready: ${biggestGap.name}, ${biggestGap.count}/${biggestGap.target}`
+      : "not enough data yet";
+
     // 5 — referrers
+
     const refMap = new Map<string, { total: number; real: number }>();
     for (const r of clean) {
       const key = (r.referrer ?? "").trim() || "(direct / none)";
