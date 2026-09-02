@@ -358,6 +358,8 @@ function GrowthDashboard({ email }: { email: string }) {
       realOutcome: real.filter((r) => (r.outcome ?? "").trim() !== "").length,
       ageCounts,
       ageTrend,
+      sessionsTrend,
+      maxWeekCount,
       anonTotal: perAnon.size,
       dist,
       repeatAnon,
