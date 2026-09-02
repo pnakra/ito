@@ -17,6 +17,7 @@ import BlogArticle from "./pages/BlogArticle";
 import NotFound from "./pages/NotFound";
 import AdminEvals from "./pages/AdminEvals";
 import AdminEvalsProduction from "./pages/AdminEvalsProduction";
+import AdminEvalsGrowth from "./pages/AdminEvalsGrowth";
 import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
 import Go from "./pages/Go";
