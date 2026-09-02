@@ -1020,30 +1020,9 @@ const CheckIn = () => {
             />
           )}
 
-          {/* Post-explanation confidence + outcome — asked immediately after the
-              explanation renders, before any optional follow-up branches. */}
-          {(phase === "explanation" || phase === "after-explanation") &&
-            !isLoading &&
-            explanationComplete && (
-            <>
-              {confidencePost === null && (
-                <ConfidencePost onSelect={handleConfidencePost} />
-              )}
-              {confidencePost !== null && !selectedOutcome && (
-                <OutcomeCheck onSelect={handleOutcomeSelect} />
-              )}
-              {selectedOutcome && (
-                <div className="bg-callout rounded-lg p-5">
-                  <p className="text-[15px] text-callout-foreground">
-                    {feedbackMap[selectedOutcome] ?? feedbackMap["not-sure"]}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-
           {/* Proactive ito follow-up question + immediate input
-              Renders below the initial analysis, before the Done/Continue choice.
+              Renders right after the explanation so the first interactive prompt
+              is conversational, not a survey question.
               Submitting jumps straight into the chat phase with seeded context. */}
           {/* Gated to neutral ('No flag') risk only. For Red/Yellow, continuing
               the conversation with a proactive prompt risks legitimizing coercive
@@ -1079,6 +1058,29 @@ const CheckIn = () => {
               isActive={true}
             />
           )}
+
+          {/* Post-explanation confidence + outcome — asked after the interactive
+              follow-up prompts so "tell me more" / Done-Continue remain primary. */}
+          {(phase === "explanation" || phase === "after-explanation") &&
+            !isLoading &&
+            explanationComplete && (
+            <>
+              {confidencePost === null && (
+                <ConfidencePost onSelect={handleConfidencePost} />
+              )}
+              {confidencePost !== null && !selectedOutcome && (
+                <OutcomeCheck onSelect={handleOutcomeSelect} />
+              )}
+              {selectedOutcome && (
+                <div className="bg-callout rounded-lg p-5">
+                  <p className="text-[15px] text-callout-foreground">
+                    {feedbackMap[selectedOutcome] ?? feedbackMap["not-sure"]}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
 
           {/* Follow-up Chat */}
           <ConversationalChat
