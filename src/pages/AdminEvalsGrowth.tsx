@@ -45,6 +45,10 @@ const OUTCOMES = [
   "prefer-not-to-say",
 ] as const;
 
+const OUTCOME_READINESS_TARGET = 100; // per group, for a 15-20pt outcome-rate difference to be trustworthy
+const CONFIDENCE_READINESS_TARGET = 30; // per group, for a confidence-delta difference to be trustworthy
+
+
 function ageBucket(row: SessionRow): AgeBucket {
   if (row.age_prefer_not_to_say) return "prefer-not-to-say";
   const raw = row.age_user;
@@ -66,6 +70,14 @@ function numericBucket(n: number): AgeBucket {
   if (n < 25) return "18-24";
   return "25-plus";
 }
+
+function comparisonAgeGroup(row: SessionRow): "under18" | "over18" | null {
+  const b = ageBucket(row);
+  if (b === "under-16" || b === "16-17") return "under18";
+  if (b === "18-24" || b === "25-plus") return "over18";
+  return null;
+}
+
 
 function pct(n: number, d: number): string {
   if (d === 0) return "–";
@@ -118,6 +130,35 @@ function BarRow({
     </div>
   );
 }
+
+function ProgressRow({
+  label,
+  count,
+  target,
+}: {
+  label: string;
+  count: number;
+  target: number;
+}) {
+  const share = target > 0 ? Math.min(1, count / target) : 0;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-baseline justify-between gap-3 text-xs font-mono">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="text-foreground">
+          {count} / {target}
+        </span>
+      </div>
+      <div className="h-2 w-full bg-foreground/5 rounded-sm overflow-hidden">
+        <div
+          className="h-full bg-foreground/25 rounded-sm"
+          style={{ width: `${Math.max(share > 0 ? 2 : 0, share * 100)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 
 function Empty({ note = "not enough data yet" }: { note?: string }) {
   return <p className="text-xs font-mono text-muted-foreground">{note}</p>;
