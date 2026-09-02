@@ -172,12 +172,13 @@ function GrowthDashboard({ email }: { email: string }) {
   }, [load]);
 
   const stats = useMemo(() => {
+    const clean = rows.filter((r) => !r.flagged_junk);
     const isReal = (r: SessionRow) => REAL_SOURCES.has((r.source_type ?? "").toLowerCase());
-    const real = rows.filter(isReal);
+    const real = clean.filter(isReal);
     const organic = real.filter((r) => !r.is_prolific);
-    const prolific = rows.filter((r) => r.is_prolific);
+    const prolific = clean.filter((r) => r.is_prolific);
 
-    const uniqueAnon = new Set(rows.map((r) => r.anon_id).filter(Boolean) as string[]);
+    const uniqueAnon = new Set(clean.map((r) => r.anon_id).filter(Boolean) as string[]);
 
     // 2 — age, organic real sessions only
     const ageCounts = new Map<AgeBucket, number>(AGE_BUCKETS.map((b) => [b, 0]));
@@ -237,7 +238,7 @@ function GrowthDashboard({ email }: { email: string }) {
 
     // 5 — referrers
     const refMap = new Map<string, { total: number; real: number }>();
-    for (const r of rows) {
+    for (const r of clean) {
       const key = (r.referrer ?? "").trim() || "(direct / none)";
       const cur = refMap.get(key) ?? { total: 0, real: 0 };
       cur.total += 1;
@@ -251,7 +252,8 @@ function GrowthDashboard({ email }: { email: string }) {
     const junk = rows.filter((r) => r.flagged_junk).length;
 
     return {
-      total: rows.length,
+      rawTotal: rows.length,
+      cleanTotal: clean.length,
       real,
       organic,
       prolificCount: prolific.length,
@@ -317,7 +319,7 @@ function GrowthDashboard({ email }: { email: string }) {
 
         {/* 1 — header KPIs */}
         <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-          <Stat label="sessions" value={String(stats.total)} />
+          <Stat label="sessions" value={String(stats.cleanTotal)} />
           <Stat label="real narrative" value={String(stats.real.length)} sub="typed / chip_edited" />
           <Stat label="prolific" value={String(stats.prolificCount)} />
           <Stat label="unique anon ids" value={String(stats.uniqueAnon)} />
@@ -524,8 +526,8 @@ function GrowthDashboard({ email }: { email: string }) {
         {/* 6 — data hygiene */}
         <section className="border border-border rounded px-4 py-3">
           <p className="text-xs font-mono text-muted-foreground">
-            data hygiene · {stats.junk} of {stats.total} sessions flagged junk (
-            {pct(stats.junk, stats.total)}) — excluded from analytics elsewhere, shown here for
+            data hygiene · {stats.junk} of {stats.rawTotal} sessions flagged junk (
+            {pct(stats.junk, stats.rawTotal)}) — excluded from analytics elsewhere, shown here for
             visibility only.
           </p>
         </section>
