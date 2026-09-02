@@ -154,21 +154,8 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
 
         {step === 3 && (
           <div className="animate-fade-in space-y-5">
-            <h2 className="text-question">Rough ages</h2>
+            <h2 className="text-question">Roughly how old are they?</h2>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-[13px] text-muted-foreground mb-2 block">You</span>
-                <Select value={ageUser} onValueChange={setAgeUser} disabled={isLoading}>
-                  <SelectTrigger className="h-[56px] bg-card shadow-card border-0 rounded-[12px]">
-                    <SelectValue placeholder="age" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {AGE_BAND_OPTIONS.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
               <div>
                 <span className="text-[13px] text-muted-foreground mb-2 block">Them</span>
                 <Select value={ageOther} onValueChange={setAgeOther} disabled={isLoading}>
@@ -185,6 +172,7 @@ const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloo
             </div>
           </div>
         )}
+
 
         {step === 4 && (
           <div className="animate-fade-in space-y-5">
