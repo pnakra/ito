@@ -11,7 +11,9 @@ const feedbackMap: Record<string, string> = {
   "checked-in": "Stopping or asking is how you make sure everyone's okay.",
   "didnt-proceed": "Not going through with it is always an okay choice.",
   "not-sure": "When things feel confusing, it usually helps to slow down sooner.",
+  "prefer-not-to-say": "That's fine. When things feel unclear, slowing down is usually the move.",
 };
+
 
 const OutcomeFeedback = ({ outcomeId, onReset }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[outcomeId] || feedbackMap["not-sure"];
