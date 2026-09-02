@@ -31,8 +31,9 @@ export const PHYSICAL_STAGE_OPTIONS = [
 ] as const;
 
 export const AGE_BAND_OPTIONS = [
-  { value: "under-16", label: "Under 16" },
-  { value: "16-17", label: "16–17" },
+  { value: "13-14", label: "13–14" },
+  { value: "15-16", label: "15–16" },
+  { value: "17", label: "17" },
   { value: "18-24", label: "18–24" },
   { value: "25-plus", label: "25+" },
 ] as const;

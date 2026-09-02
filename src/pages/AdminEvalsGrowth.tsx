@@ -28,10 +28,13 @@ type SessionRow = {
 const REAL_SOURCES = new Set(["typed", "chip_edited"]);
 
 const AGE_BUCKETS = [
-  "under-16",
-  "16-17",
+  "13-14",
+  "15-16",
+  "17",
   "18-24",
   "25-plus",
+  "under-16",
+  "16-17",
   "prefer-not-to-say",
   "unknown",
 ] as const;
@@ -65,15 +68,16 @@ function ageBucket(row: SessionRow): AgeBucket {
 }
 
 function numericBucket(n: number): AgeBucket {
-  if (n < 16) return "under-16";
-  if (n < 18) return "16-17";
+  if (n < 15) return "13-14";
+  if (n < 17) return "15-16";
+  if (n < 18) return "17";
   if (n < 25) return "18-24";
   return "25-plus";
 }
 
 function comparisonAgeGroup(row: SessionRow): "under18" | "over18" | null {
   const b = ageBucket(row);
-  if (b === "under-16" || b === "16-17") return "under18";
+  if (b === "13-14" || b === "15-16" || b === "17" || b === "under-16" || b === "16-17") return "under18";
   if (b === "18-24" || b === "25-plus") return "over18";
   return null;
 }
@@ -243,6 +247,7 @@ function GrowthDashboard({ email }: { email: string }) {
     }
 
     // monthly % of known-age sessions self-reporting under 18
+    const MINOR_BUCKETS = new Set<AgeBucket>(["13-14", "15-16", "17", "under-16", "16-17"]);
     const monthMap = new Map<string, { known: number; minor: number }>();
     for (const r of organic) {
       const b = ageBucket(r);
@@ -250,7 +255,7 @@ function GrowthDashboard({ email }: { email: string }) {
       const m = monthOf(r.started_at);
       const cur = monthMap.get(m) ?? { known: 0, minor: 0 };
       cur.known += 1;
-      if (b === "under-16" || b === "16-17") cur.minor += 1;
+      if (MINOR_BUCKETS.has(b)) cur.minor += 1;
       monthMap.set(m, cur);
     }
     const ageTrend = [...monthMap.entries()]
