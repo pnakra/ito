@@ -93,6 +93,20 @@ function monthLabel(m: string): string {
   return d.toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });
 }
 
+function isoWeekStart(iso: string): string {
+  const d = new Date(iso);
+  const day = d.getUTCDay(); // 0 = Sun … 6 = Sat
+  const diff = (day === 0 ? -6 : 1) - day; // days to Monday
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + diff);
+  return monday.toISOString().slice(0, 10);
+}
+
+function weekLabel(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="border border-border rounded px-3 py-2">
@@ -243,6 +257,18 @@ function GrowthDashboard({ email }: { email: string }) {
       .sort((a, b) => (a[0] < b[0] ? -1 : 1))
       .map(([m, v]) => ({ month: m, known: v.known, minor: v.minor, rate: v.minor / v.known }));
 
+    // weekly sessions over time (organic real sessions, last ~12 weeks)
+    const weekMap = new Map<string, number>();
+    for (const r of organic) {
+      const w = isoWeekStart(r.started_at);
+      weekMap.set(w, (weekMap.get(w) ?? 0) + 1);
+    }
+    const sessionsTrend = [...weekMap.entries()]
+      .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      .slice(-12)
+      .map(([week, count]) => ({ week, count }));
+    const maxWeekCount = sessionsTrend.length > 0 ? Math.max(...sessionsTrend.map((w) => w.count)) : 0;
+
     // 3 — engagement
     const perAnon = new Map<string, number>();
     for (const r of organic) {
@@ -332,6 +358,8 @@ function GrowthDashboard({ email }: { email: string }) {
       realOutcome: real.filter((r) => (r.outcome ?? "").trim() !== "").length,
       ageCounts,
       ageTrend,
+      sessionsTrend,
+      maxWeekCount,
       anonTotal: perAnon.size,
       dist,
       repeatAnon,
@@ -406,6 +434,52 @@ function GrowthDashboard({ email }: { email: string }) {
             value={pct(stats.realOutcome, stats.real.length)}
             sub={`${stats.realOutcome}/${stats.real.length}`}
           />
+        </section>
+
+        {/* 1.5 — sessions over time */}
+        <section className="border border-border rounded p-4 space-y-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground">
+              sessions over time
+            </h2>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              organic real sessions · weekly
+            </span>
+          </div>
+
+          {stats.sessionsTrend.length === 0 ? (
+            <Empty />
+          ) : stats.sessionsTrend.length === 1 ? (
+            <p className="text-xs font-mono text-muted-foreground">
+              {weekLabel(stats.sessionsTrend[0].week)} · {stats.sessionsTrend[0].count} session
+              {stats.sessionsTrend[0].count === 1 ? "" : "s"} — one week of data so far, chart
+              appears next week.
+            </p>
+          ) : (
+            <div className="flex items-end gap-2 h-24">
+              {stats.sessionsTrend.map((w) => {
+                const height =
+                  stats.maxWeekCount > 0 ? Math.max(4, (w.count / stats.maxWeekCount) * 80) : 4;
+                return (
+                  <div key={w.week} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="text-[9px] font-mono text-foreground">{w.count}</div>
+                    <div
+                      className="w-full bg-foreground/25 rounded-sm"
+                      style={{ height: `${height}px` }}
+                      title={`${weekLabel(w.week)} · ${w.count} sessions`}
+                    />
+                    <div className="text-[9px] font-mono text-muted-foreground truncate">
+                      {weekLabel(w.week)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <p className="text-xs font-mono text-muted-foreground">
+            counts organic real sessions only (typed / chip_edited, not Prolific or demo traffic).
+          </p>
         </section>
 
         {/* 2 — audience / age */}
