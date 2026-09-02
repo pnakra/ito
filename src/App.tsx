@@ -47,6 +47,7 @@ const App = () => (
               <Route path="/blog/:slug" element={<BlogArticle />} />
               <Route path="/admin/evals" element={<AdminEvals />} />
               <Route path="/admin/evals/production" element={<AdminEvalsProduction />} />
+              <Route path="/admin/evals/growth" element={<AdminEvalsGrowth />} />
               <Route path="/evals/production" element={<Navigate to="/admin/evals/production" replace />} />
 
               <Route path="/embed" element={<Embed />} />
