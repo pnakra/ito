@@ -341,9 +341,12 @@ function GrowthDashboard({ email }: { email: string }) {
       bothConfCount: bothConf.length,
       confPre,
       confPost,
+      readiness,
+      readinessBottleneck,
       referrers,
       junk,
     };
+
   }, [rows]);
 
   const organicTotal = stats.organic.length;
