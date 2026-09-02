@@ -319,7 +319,7 @@ function GrowthDashboard({ email }: { email: string }) {
 
         {/* 1 — header KPIs */}
         <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-          <Stat label="sessions" value={String(stats.total)} />
+          <Stat label="sessions" value={String(stats.cleanTotal)} />
           <Stat label="real narrative" value={String(stats.real.length)} sub="typed / chip_edited" />
           <Stat label="prolific" value={String(stats.prolificCount)} />
           <Stat label="unique anon ids" value={String(stats.uniqueAnon)} />
