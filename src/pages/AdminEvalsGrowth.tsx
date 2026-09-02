@@ -436,6 +436,52 @@ function GrowthDashboard({ email }: { email: string }) {
           />
         </section>
 
+        {/* 1.5 — sessions over time */}
+        <section className="border border-border rounded p-4 space-y-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground">
+              sessions over time
+            </h2>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              organic real sessions · weekly
+            </span>
+          </div>
+
+          {stats.sessionsTrend.length === 0 ? (
+            <Empty />
+          ) : stats.sessionsTrend.length === 1 ? (
+            <p className="text-xs font-mono text-muted-foreground">
+              {weekLabel(stats.sessionsTrend[0].week)} · {stats.sessionsTrend[0].count} session
+              {stats.sessionsTrend[0].count === 1 ? "" : "s"} — one week of data so far, chart
+              appears next week.
+            </p>
+          ) : (
+            <div className="flex items-end gap-2 h-24">
+              {stats.sessionsTrend.map((w) => {
+                const height =
+                  stats.maxWeekCount > 0 ? Math.max(4, (w.count / stats.maxWeekCount) * 80) : 4;
+                return (
+                  <div key={w.week} className="flex-1 flex flex-col items-center gap-1">
+                    <div className="text-[9px] font-mono text-foreground">{w.count}</div>
+                    <div
+                      className="w-full bg-foreground/25 rounded-sm"
+                      style={{ height: `${height}px` }}
+                      title={`${weekLabel(w.week)} · ${w.count} sessions`}
+                    />
+                    <div className="text-[9px] font-mono text-muted-foreground truncate">
+                      {weekLabel(w.week)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <p className="text-xs font-mono text-muted-foreground">
+            counts organic real sessions only (typed / chip_edited, not Prolific or demo traffic).
+          </p>
+        </section>
+
         {/* 2 — audience / age */}
         <section className="border border-border rounded p-4 space-y-4">
           <div className="flex items-baseline justify-between gap-2">
