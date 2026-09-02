@@ -172,12 +172,13 @@ function GrowthDashboard({ email }: { email: string }) {
   }, [load]);
 
   const stats = useMemo(() => {
+    const clean = rows.filter((r) => !r.flagged_junk);
     const isReal = (r: SessionRow) => REAL_SOURCES.has((r.source_type ?? "").toLowerCase());
-    const real = rows.filter(isReal);
+    const real = clean.filter(isReal);
     const organic = real.filter((r) => !r.is_prolific);
-    const prolific = rows.filter((r) => r.is_prolific);
+    const prolific = clean.filter((r) => r.is_prolific);
 
-    const uniqueAnon = new Set(rows.map((r) => r.anon_id).filter(Boolean) as string[]);
+    const uniqueAnon = new Set(clean.map((r) => r.anon_id).filter(Boolean) as string[]);
 
     // 2 — age, organic real sessions only
     const ageCounts = new Map<AgeBucket, number>(AGE_BUCKETS.map((b) => [b, 0]));
@@ -237,7 +238,7 @@ function GrowthDashboard({ email }: { email: string }) {
 
     // 5 — referrers
     const refMap = new Map<string, { total: number; real: number }>();
-    for (const r of rows) {
+    for (const r of clean) {
       const key = (r.referrer ?? "").trim() || "(direct / none)";
       const cur = refMap.get(key) ?? { total: 0, real: 0 };
       cur.total += 1;
@@ -251,7 +252,8 @@ function GrowthDashboard({ email }: { email: string }) {
     const junk = rows.filter((r) => r.flagged_junk).length;
 
     return {
-      total: rows.length,
+      rawTotal: rows.length,
+      cleanTotal: clean.length,
       real,
       organic,
       prolificCount: prolific.length,
