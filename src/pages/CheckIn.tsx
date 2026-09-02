@@ -20,6 +20,8 @@ import SessionPatternWarning from "@/components/prevention/SessionPatternWarning
 import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
+import ConfidencePost from "@/components/prevention/ConfidencePost";
+import AgeConfidenceCheck, { type AgeConfidenceResult } from "@/components/narrative/AgeConfidenceCheck";
 import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
@@ -32,6 +34,7 @@ import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/i
 
 type FlowPhase =
   | "narrative-input"
+  | "age-check"
   | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
@@ -136,6 +139,9 @@ const CheckIn = () => {
   // Follow-up chat
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
+  const [confidencePost, setConfidencePost] = useState<number | null>(null);
+  // Pending narrative held while the mandatory age-check micro-step runs
+  const [pendingAgeCheckText, setPendingAgeCheckText] = useState<string | null>(null);
   
   // Session tracking
   const {
@@ -170,6 +176,12 @@ const CheckIn = () => {
       if (text.trim()) {
         // Log demo session the same way a normal session would
         logFreetext("before", "narrative-input", narrative || "");
+        logSubmission({
+          flowType: "before",
+          stepName: "narrative-input-entry",
+          stepType: "choice",
+          metadata: { entry_method: "demo", source_type: "demo" },
+        });
         logChoice("before", "signal-floor", JSON.stringify({ ...signals, _demo: true }));
         setNarrativeHistory([text]);
         setStructuredSignals(signals);
@@ -313,7 +325,38 @@ const CheckIn = () => {
       setShowConsentModal(true);
       return;
     }
-    processNarrativeSubmit(text, entryMethod);
+    startAgeCheck(text, entryMethod);
+  };
+
+  // Mandatory age + pre-confidence micro-step, before any AI work starts
+  const startAgeCheck = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited") => {
+    entryMethodRef.current = entryMethod;
+    setPendingAgeCheckText(text);
+    setPhase("age-check");
+  };
+
+  const handleAgeCheckSubmit = ({ ageUser, confidencePre }: AgeConfidenceResult) => {
+    logChoice("before", "age-check", ageUser);
+    logSubmission({
+      flowType: "before",
+      stepName: "confidence-pre",
+      stepType: "choice",
+      choiceValue: confidencePre != null ? String(confidencePre) : "not-answered",
+      metadata: { scale: "1-5" },
+    });
+
+    if (ageUser && ageUser !== "prefer-not-to-say") {
+      setStructuredSignals(prev => {
+        const next = { ...prev, ageUser };
+        structuredSignalsRef.current = next;
+        return next;
+      });
+    }
+
+    const text = pendingAgeCheckText ?? "";
+    setPendingAgeCheckText(null);
+    if (text) processNarrativeSubmit(text, entryMethodRef.current);
+    else setPhase("narrative-input");
   };
 
   const processNarrativeSubmit = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited" = "typed") => {
@@ -326,7 +369,7 @@ const CheckIn = () => {
       flowType: "before",
       stepName: "narrative-input-entry",
       stepType: "choice",
-      metadata: { entry_method: entryMethod },
+      metadata: { entry_method: entryMethod, source_type: entryMethod },
     });
 
     // Flag victim/perpetrator submissions for monitoring (no behavior change)
@@ -390,7 +433,7 @@ const CheckIn = () => {
   const handleConsentConfirm = () => {
     setShowConsentModal(false);
     if (pendingSubmitText) {
-      processNarrativeSubmit(pendingSubmitText, pendingEntryMethodRef.current);
+      startAgeCheck(pendingSubmitText, pendingEntryMethodRef.current);
       setPendingSubmitText(null);
     }
   };
@@ -603,7 +646,8 @@ const CheckIn = () => {
   };
 
   // Post-explanation choices
-  const handlePostExplanationDone = () => setPhase("outcome");
+  const handlePostExplanationDone = () =>
+    setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
   
   const handlePostExplanationContinue = () => {
     setChatMessages([]);
@@ -730,12 +774,23 @@ const CheckIn = () => {
     }
   };
 
-  const handleFollowUpDone = () => setPhase("outcome");
+  const handleFollowUpDone = () =>
+    setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
 
   const handleOutcomeSelect = (outcome: string) => {
     setSelectedOutcome(outcome);
     logChoice("before", "outcome", outcome);
-    setPhase("outcome-feedback");
+  };
+
+  const handleConfidencePost = (value: number) => {
+    setConfidencePost(value);
+    logSubmission({
+      flowType: "before",
+      stepName: "confidence-post",
+      stepType: "choice",
+      choiceValue: String(value),
+      metadata: { scale: "1-5" },
+    });
   };
 
   const resetFlow = () => {
@@ -754,6 +809,8 @@ const CheckIn = () => {
     setExplanationComplete(false);
     setChatMessages([]);
     setSelectedOutcome(null);
+    setConfidencePost(null);
+    setPendingAgeCheckText(null);
     resetSessionId();
   };
 
@@ -778,7 +835,8 @@ const CheckIn = () => {
         <div className="max-w-2xl mx-auto space-y-6">
           {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
-              if (phase === "signal-floor") setPhase("narrative-input");
+              if (phase === "age-check") setPhase("narrative-input");
+              else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
               else if (phase === "explanation" || phase === "after-explanation") setPhase("signal-floor");
@@ -810,6 +868,11 @@ const CheckIn = () => {
             </>
           )}
 
+
+          {/* Phase 1b: Mandatory age + pre-confidence check */}
+          {phase === "age-check" && (
+            <AgeConfidenceCheck onSubmit={handleAgeCheckSubmit} isLoading={isLoading} />
+          )}
 
           {/* Phase 2: Signal Floor */}
           {phase === "signal-floor" && (
@@ -950,6 +1013,26 @@ const CheckIn = () => {
               showUncertaintyOptions={showUncertaintyOptions}
               isActive={true}
             />
+          )}
+
+          {/* Post-explanation confidence + outcome — asked immediately after the
+              explanation renders, before any optional follow-up branches. */}
+          {(phase === "explanation" || phase === "after-explanation") &&
+            !isLoading &&
+            explanationComplete && (
+            <>
+              {confidencePost === null && (
+                <ConfidencePost onSelect={handleConfidencePost} />
+              )}
+              {confidencePost !== null && !selectedOutcome && (
+                <OutcomeCheck onSelect={handleOutcomeSelect} />
+              )}
+              {selectedOutcome && (
+                <div className="bg-callout rounded-lg p-5">
+                  <p className="text-[15px] text-callout-foreground">Thanks — noted.</p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Proactive ito follow-up question + immediate input
