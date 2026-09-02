@@ -93,6 +93,20 @@ function monthLabel(m: string): string {
   return d.toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });
 }
 
+function isoWeekStart(iso: string): string {
+  const d = new Date(iso);
+  const day = d.getUTCDay(); // 0 = Sun … 6 = Sat
+  const diff = (day === 0 ? -6 : 1) - day; // days to Monday
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + diff);
+  return monday.toISOString().slice(0, 10);
+}
+
+function weekLabel(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="border border-border rounded px-3 py-2">
