@@ -278,10 +278,11 @@ function GrowthDashboard({ email }: { email: string }) {
     const confPost = avg(bothConf.map((r) => r.confidence_post as number));
 
     // 4.5 — statistical readiness: under-18 vs 18+
-    const readiness = {
+    const readiness: Record<"under18" | "over18", { outcome: number; bothConf: number }> = {
       under18: { outcome: 0, bothConf: 0 },
       over18: { outcome: 0, bothConf: 0 },
-    } as const;
+    };
+
     for (const r of organic) {
       const g = comparisonAgeGroup(r);
       if (!g) continue;
