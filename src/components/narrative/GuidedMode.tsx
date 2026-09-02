@@ -18,6 +18,7 @@ import {
   RELATIONSHIP_OPTIONS,
   serializeSignals,
 } from "@/types/signals";
+import { logSubmission } from "@/lib/submissionLogger";
 
 interface GuidedModeProps {
   onSubmit: (text: string, signals: StructuredSignals) => void;
@@ -78,6 +79,14 @@ const GuidedMode = ({ onSubmit, onBack, isLoading }: GuidedModeProps) => {
 
     const narrative = parts.join("\n\n");
     if (narrative.trim()) {
+      // Guided entry is hand-written text; log it on the same
+      // narrative-input-entry channel as the freeform path.
+      logSubmission({
+        flowType: "before",
+        stepName: "narrative-input-entry",
+        stepType: "choice",
+        metadata: { entry_method: "typed", source_type: "typed", mode: "guided" },
+      });
       onSubmit(narrative, signals);
     }
   };
