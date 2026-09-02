@@ -45,6 +45,10 @@ const OUTCOMES = [
   "prefer-not-to-say",
 ] as const;
 
+const OUTCOME_READINESS_TARGET = 100; // per group, for a 15-20pt outcome-rate difference to be trustworthy
+const CONFIDENCE_READINESS_TARGET = 30; // per group, for a confidence-delta difference to be trustworthy
+
+
 function ageBucket(row: SessionRow): AgeBucket {
   if (row.age_prefer_not_to_say) return "prefer-not-to-say";
   const raw = row.age_user;
@@ -66,6 +70,14 @@ function numericBucket(n: number): AgeBucket {
   if (n < 25) return "18-24";
   return "25-plus";
 }
+
+function comparisonAgeGroup(row: SessionRow): "under18" | "over18" | null {
+  const b = ageBucket(row);
+  if (b === "under-16" || b === "16-17") return "under18";
+  if (b === "18-24" || b === "25-plus") return "over18";
+  return null;
+}
+
 
 function pct(n: number, d: number): string {
   if (d === 0) return "–";
@@ -118,6 +130,35 @@ function BarRow({
     </div>
   );
 }
+
+function ProgressRow({
+  label,
+  count,
+  target,
+}: {
+  label: string;
+  count: number;
+  target: number;
+}) {
+  const share = target > 0 ? Math.min(1, count / target) : 0;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-baseline justify-between gap-3 text-xs font-mono">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="text-foreground">
+          {count} / {target}
+        </span>
+      </div>
+      <div className="h-2 w-full bg-foreground/5 rounded-sm overflow-hidden">
+        <div
+          className="h-full bg-foreground/25 rounded-sm"
+          style={{ width: `${Math.max(share > 0 ? 2 : 0, share * 100)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 
 function Empty({ note = "not enough data yet" }: { note?: string }) {
   return <p className="text-xs font-mono text-muted-foreground">{note}</p>;
@@ -236,7 +277,36 @@ function GrowthDashboard({ email }: { email: string }) {
     const confPre = avg(bothConf.map((r) => r.confidence_pre as number));
     const confPost = avg(bothConf.map((r) => r.confidence_post as number));
 
+    // 4.5 — statistical readiness: under-18 vs 18+
+    const readiness: Record<"under18" | "over18", { outcome: number; bothConf: number }> = {
+      under18: { outcome: 0, bothConf: 0 },
+      over18: { outcome: 0, bothConf: 0 },
+    };
+
+    for (const r of organic) {
+      const g = comparisonAgeGroup(r);
+      if (!g) continue;
+      if ((r.outcome ?? "").trim() !== "") readiness[g].outcome += 1;
+      if (typeof r.confidence_pre === "number" && typeof r.confidence_post === "number") {
+        readiness[g].bothConf += 1;
+      }
+    }
+    const readinessGaps = [
+      { name: "under-18 outcome responses", count: readiness.under18.outcome, target: OUTCOME_READINESS_TARGET },
+      { name: "18+ outcome responses", count: readiness.over18.outcome, target: OUTCOME_READINESS_TARGET },
+      { name: "under-18 confidence pairs", count: readiness.under18.bothConf, target: CONFIDENCE_READINESS_TARGET },
+      { name: "18+ confidence pairs", count: readiness.over18.bothConf, target: CONFIDENCE_READINESS_TARGET },
+    ];
+    const remaining = (item: (typeof readinessGaps)[number]) => Math.max(0, item.target - item.count);
+    const biggestGap = readinessGaps.reduce((max, item) =>
+      remaining(item) > remaining(max) ? item : max
+    , readinessGaps[0]);
+    const readinessBottleneck = biggestGap
+      ? `furthest from ready: ${biggestGap.name}, ${biggestGap.count}/${biggestGap.target}`
+      : "not enough data yet";
+
     // 5 — referrers
+
     const refMap = new Map<string, { total: number; real: number }>();
     for (const r of clean) {
       const key = (r.referrer ?? "").trim() || "(direct / none)";
@@ -272,9 +342,12 @@ function GrowthDashboard({ email }: { email: string }) {
       bothConfCount: bothConf.length,
       confPre,
       confPost,
+      readiness,
+      readinessBottleneck,
       referrers,
       junk,
     };
+
   }, [rows]);
 
   const organicTotal = stats.organic.length;
@@ -492,7 +565,72 @@ function GrowthDashboard({ email }: { email: string }) {
           )}
         </section>
 
+        {/* 4.5 — statistical readiness */}
+        <section className="border border-border rounded p-4 space-y-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-xs uppercase tracking-wider text-muted-foreground">
+              statistical readiness — under-18 vs 18+
+            </h2>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              non-prolific real sessions with known age
+            </span>
+          </div>
+
+          {organicTotal === 0 ? (
+            <Empty />
+          ) : (
+            <>
+              <div className="space-y-4">
+                <div className="space-y-2.5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    outcome comparison
+                  </div>
+                  <ProgressRow
+                    label="under-18"
+                    count={stats.readiness.under18.outcome}
+                    target={OUTCOME_READINESS_TARGET}
+                  />
+                  <ProgressRow
+                    label="18+"
+                    count={stats.readiness.over18.outcome}
+                    target={OUTCOME_READINESS_TARGET}
+                  />
+                  <p className="text-xs font-mono text-muted-foreground">
+                    ready once both groups reach ~{OUTCOME_READINESS_TARGET} — below ~50 per
+                    group, treat any difference as a hypothesis, not a finding.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 pt-3 border-t border-border">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    confidence-delta comparison
+                  </div>
+                  <ProgressRow
+                    label="under-18"
+                    count={stats.readiness.under18.bothConf}
+                    target={CONFIDENCE_READINESS_TARGET}
+                  />
+                  <ProgressRow
+                    label="18+"
+                    count={stats.readiness.over18.bothConf}
+                    target={CONFIDENCE_READINESS_TARGET}
+                  />
+                  <p className="text-xs font-mono text-muted-foreground">
+                    ready once both groups reach ~{CONFIDENCE_READINESS_TARGET} — continuous
+                    comparisons need fewer people than outcome rates.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-border">
+                <p className="text-xs font-mono text-foreground">{stats.readinessBottleneck}</p>
+              </div>
+            </>
+          )}
+        </section>
+
         {/* 5 — referrers */}
+
         <section className="border border-border rounded p-4 space-y-3">
           <h2 className="text-xs uppercase tracking-wider text-muted-foreground">referrers</h2>
           {stats.referrers.length === 0 ? (
