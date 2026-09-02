@@ -257,6 +257,18 @@ function GrowthDashboard({ email }: { email: string }) {
       .sort((a, b) => (a[0] < b[0] ? -1 : 1))
       .map(([m, v]) => ({ month: m, known: v.known, minor: v.minor, rate: v.minor / v.known }));
 
+    // weekly sessions over time (organic real sessions, last ~12 weeks)
+    const weekMap = new Map<string, number>();
+    for (const r of organic) {
+      const w = isoWeekStart(r.started_at);
+      weekMap.set(w, (weekMap.get(w) ?? 0) + 1);
+    }
+    const sessionsTrend = [...weekMap.entries()]
+      .sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      .slice(-12)
+      .map(([week, count]) => ({ week, count }));
+    const maxWeekCount = sessionsTrend.length > 0 ? Math.max(...sessionsTrend.map((w) => w.count)) : 0;
+
     // 3 — engagement
     const perAnon = new Map<string, number>();
     for (const r of organic) {
