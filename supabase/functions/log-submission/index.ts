@@ -57,9 +57,16 @@ const INJECTION_PATTERNS = [
   "prompt injection",
 ];
 
+const QA_TEST_MARKER = "qa-test";
+
 function classifyJunk(text: string | null): { flagged: boolean; reason?: string } {
   if (!text) return { flagged: false };
   const lower = text.toLowerCase();
+
+  if (lower.includes(QA_TEST_MARKER)) {
+    return { flagged: true, reason: "qa_test_marker" };
+  }
+
   const wordCount = lower.trim().split(/\s+/).filter(Boolean).length;
 
   if (INJECTION_PATTERNS.some((p) => lower.includes(p))) {
