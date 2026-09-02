@@ -31,6 +31,18 @@ export default function EvalsTabs() {
       >
         Production
       </NavLink>
+      <NavLink
+        to="/admin/evals/growth"
+        className={({ isActive }) =>
+          `${base} ${
+            isActive
+              ? "border-foreground/40 text-foreground bg-foreground/5"
+              : "border-border text-muted-foreground hover:text-foreground"
+          }`
+        }
+      >
+        Growth
+      </NavLink>
     </nav>
   );
 }
