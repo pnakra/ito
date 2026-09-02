@@ -222,6 +222,15 @@ const SeeHowItoResponds = () => {
       const decisionState = narrativeToDecisionState(text, gapResult.detectedTiming);
       const risk = classifyRisk(decisionState);
 
+      logPreviewEvent("narrative-input-entry", {
+        choice_value: "demo",
+        metadata: {
+          entry_method: "demo",
+          source_type: "demo",
+          scenario_id: scenario.id,
+        },
+      });
+
       const data = await invokeEdgeFunctionWithRetry<Record<string, unknown>>(
         "analyze-narrative",
         {

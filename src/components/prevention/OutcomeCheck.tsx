@@ -11,7 +11,9 @@ const outcomes = [
   { id: "checked-in", label: "I asked if they were okay" },
   { id: "didnt-proceed", label: "I decided not to do it" },
   { id: "not-sure", label: "I'm not sure / I didn't follow this" },
+  { id: "prefer-not-to-say", label: "Prefer not to say" },
 ];
+
 
 const OutcomeCheck = ({ onSelect }: OutcomeCheckProps) => {
   const [selected, setSelected] = useState<string | null>(null);

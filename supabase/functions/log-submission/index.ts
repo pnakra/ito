@@ -33,12 +33,51 @@ function truncateStr(value: unknown, max: number): string | null {
   return value.slice(0, max);
 }
 
+// --- Junk / injection tagging -------------------------------------------
+// Never drops anything. Rows are written as-is and tagged in metadata so
+// analytics can exclude them by default while keeping them for review.
+const TEST_PATTERNS = [
+  "test",
+  "supabase",
+  "jfc",
+  "verification",
+  "asdf",
+  "hello world",
+  "ignore me",
+  "sanity check",
+];
+const INJECTION_PATTERNS = [
+  "system prompt",
+  "ignore previous instructions",
+  "ignore all previous",
+  "context realignment",
+  "disregard previous",
+  "you are chatgpt",
+  "reveal your instructions",
+  "prompt injection",
+];
+
+function classifyJunk(text: string | null): { flagged: boolean; reason?: string } {
+  if (!text) return { flagged: false };
+  const lower = text.toLowerCase();
+  const wordCount = lower.trim().split(/\s+/).filter(Boolean).length;
+
+  if (INJECTION_PATTERNS.some((p) => lower.includes(p))) {
+    return { flagged: true, reason: "injection_pattern" };
+  }
+  if (wordCount > 0 && wordCount <= 5 && TEST_PATTERNS.some((p) => lower.includes(p))) {
+    return { flagged: true, reason: "short_test_pattern" };
+  }
+  return { flagged: false };
+}
+
 function badRequest(message: string): Response {
   return new Response(JSON.stringify({ error: message }), {
     status: 400,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -107,6 +146,12 @@ Deno.serve(async (req) => {
         : 0;
 
     const anon_id = truncateStr(body.anon_id, 128);
+
+    // Tag obvious internal test / prompt-injection submissions (never dropped)
+    const junk = classifyJunk(freetext_value ?? choice_value);
+    if (junk.flagged) {
+      metadata = { ...metadata, flagged_junk: true, flagged_junk_reason: junk.reason };
+    }
 
     const extUrl = Deno.env.get("EXTERNAL_SUPABASE_URL")!;
     const supabase = createClient(
