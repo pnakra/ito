@@ -51,8 +51,10 @@ const App = () => (
               <Route path="/admin/evals/growth" element={<AdminEvalsGrowth />} />
               <Route path="/evals/production" element={<Navigate to="/admin/evals/production" replace />} />
 
-              <Route path="/sessions" element={<AdminSessions />} />
-              <Route path="/sessions/:sessionId" element={<AdminSessions />} />
+              <Route path="/admin/evals/sessions" element={<AdminSessions />} />
+              <Route path="/admin/evals/sessions/:sessionId" element={<AdminSessions />} />
+              <Route path="/sessions" element={<Navigate to="/admin/evals/sessions" replace />} />
+              <Route path="/sessions/:sessionId" element={<Navigate to="/admin/evals/sessions" replace />} />
               <Route path="/embed" element={<Embed />} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />

@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { adminSupabase } from "@/lib/adminSupabase";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import SEO from "@/components/SEO";
+import EvalsTabs from "@/components/evals/EvalsTabs";
 
 type SubmissionRow = {
   id: string;
@@ -94,7 +95,10 @@ function Shell({
     <main className="min-h-[100dvh] bg-background px-6 py-10">
       <div className="mx-auto w-full max-w-5xl space-y-8 pb-12">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl text-foreground">{title}</h1>
+          <div className="flex flex-wrap items-center gap-4">
+            <h1 className="font-serif text-2xl text-foreground">{title}</h1>
+            <EvalsTabs />
+          </div>
           <div className="flex items-center gap-3">
             {right}
             <button
@@ -170,7 +174,7 @@ function SessionList() {
         </span>
       }
     >
-      <SEO title="Sessions" description="Admin session viewer" path="/sessions" />
+      <SEO title="Sessions" description="Admin session viewer" path="/admin/evals/sessions" noindex />
 
       <input
         value={q}
@@ -193,7 +197,7 @@ function SessionList() {
         {slice.map((s) => (
           <Link
             key={s.session_id}
-            to={`/sessions/${s.session_id}`}
+            to={`/admin/evals/sessions/${s.session_id}`}
             className="block border border-border rounded px-4 py-3 hover:bg-foreground/5 transition-colors"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-2 text-[11px] font-mono text-muted-foreground">
@@ -285,8 +289,8 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (e.key === "ArrowRight" && nextId) navigate(`/sessions/${nextId}`);
-      if (e.key === "ArrowLeft" && prevId) navigate(`/sessions/${prevId}`);
+      if (e.key === "ArrowRight" && nextId) navigate(`/admin/evals/sessions/${nextId}`);
+      if (e.key === "ArrowLeft" && prevId) navigate(`/admin/evals/sessions/${prevId}`);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -337,7 +341,7 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
           )}
           <button
             disabled={!prevId}
-            onClick={() => prevId && navigate(`/sessions/${prevId}`)}
+            onClick={() => prevId && navigate(`/admin/evals/sessions/${prevId}`)}
             className="border border-border rounded px-3 py-1.5 text-xs font-mono disabled:opacity-40"
             title="previous conversation (←)"
           >
@@ -345,14 +349,14 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
           </button>
           <button
             disabled={!nextId}
-            onClick={() => nextId && navigate(`/sessions/${nextId}`)}
+            onClick={() => nextId && navigate(`/admin/evals/sessions/${nextId}`)}
             className="border border-border rounded px-3 py-1.5 text-xs font-mono disabled:opacity-40"
             title="next conversation (→)"
           >
             next →
           </button>
           <Link
-            to="/sessions"
+            to="/admin/evals/sessions"
             className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
           >
             back to sessions
@@ -360,7 +364,7 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
         </div>
       }
     >
-      <SEO title="Session detail" description="Admin session viewer" path="/sessions" />
+      <SEO title="Session detail" description="Admin session viewer" path="/admin/evals/sessions" noindex />
 
       {loading && <p className="text-sm text-muted-foreground">loading...</p>}
       {error && <p className="text-sm text-destructive font-mono">{error}</p>}

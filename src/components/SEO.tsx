@@ -8,15 +8,17 @@ interface SEOProps {
   path: string;
   type?: "website" | "article";
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
 }
 
-export default function SEO({ title, description, path, type = "website", jsonLd }: SEOProps) {
+export default function SEO({ title, description, path, type = "website", jsonLd, noindex = false }: SEOProps) {
   const url = `${SITE_URL}${path}`;
   const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   return (
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
       <link rel="canonical" href={url} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
