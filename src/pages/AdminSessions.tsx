@@ -149,9 +149,11 @@ function SessionList() {
         if (!prev.preview && r.freetext_value) prev.preview = r.freetext_value.trim();
       }
     }
-    const list = [...map.values()].sort((a, b) =>
-      (b.created_at ?? "").localeCompare(a.created_at ?? ""),
-    );
+    // drop sessions with no narrative input (e.g. preview clicks only)
+    const list = [...map.values()]
+      .filter((s) => s.preview.length > 0)
+      .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""));
+
     const term = q.trim().toLowerCase();
     if (!term) return list;
     return list.filter(
@@ -251,20 +253,28 @@ function useSessionOrder() {
     (async () => {
       const { data, error } = await adminSupabase
         .from("submissions")
-        .select("session_id, created_at")
+        .select("session_id, created_at, freetext_value")
         .order("created_at", { ascending: false })
         .limit(5000);
       if (cancelled || error || !data) return;
       const starts = new Map<string, string>();
+      const hasText = new Set<string>();
       for (let i = data.length - 1; i >= 0; i--) {
-        const r = data[i] as { session_id: string; created_at: string | null };
+        const r = data[i] as {
+          session_id: string;
+          created_at: string | null;
+          freetext_value: string | null;
+        };
         if (!starts.has(r.session_id)) starts.set(r.session_id, r.created_at ?? "");
+        if (r.freetext_value?.trim()) hasText.add(r.session_id);
       }
       setOrder(
         [...starts.entries()]
+          .filter(([id]) => hasText.has(id))
           .sort((a, b) => b[1].localeCompare(a[1]))
           .map(([id]) => id),
       );
+
     })();
     return () => {
       cancelled = true;
