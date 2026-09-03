@@ -170,6 +170,7 @@ const ReleaseNotes = () => {
         title="Release notes — ito"
         description="What's changed in ito week by week — new flows, safety improvements, copy updates, and product changes."
         path="/release-notes"
+        noindex
       />
       <Header />
 
