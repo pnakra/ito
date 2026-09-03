@@ -135,7 +135,7 @@ function SessionList() {
         map.set(r.session_id, {
           session_id: r.session_id,
           anon_id: anonOf(r),
-          created_at: r.created_at,
+          created_at: r.created_at ?? "",
           count: 1,
           preview: r.freetext_value?.trim() ?? "",
         });
@@ -145,7 +145,9 @@ function SessionList() {
         if (!prev.preview && r.freetext_value) prev.preview = r.freetext_value.trim();
       }
     }
-    const list = [...map.values()].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    const list = [...map.values()].sort((a, b) =>
+      (b.created_at ?? "").localeCompare(a.created_at ?? ""),
+    );
     const term = q.trim().toLowerCase();
     if (!term) return list;
     return list.filter(
