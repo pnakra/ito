@@ -127,15 +127,19 @@ const ConversationalChat = ({
         value={input}
         onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
         onKeyDown={handleKeyDown}
-        placeholder="Type here..."
+        placeholder={isClosed ? "This conversation is closed." : "Type here..."}
         className="min-h-[80px] resize-none text-body"
-        disabled={isLoading}
+        disabled={isLoading || isClosed}
       />
 
       <div className="flex items-center justify-between">
-        <span className="text-caption text-muted-foreground">
-          {input.length} / {maxLength}
-        </span>
+        {isClosed ? (
+          <span />
+        ) : (
+          <span className="text-caption text-muted-foreground">
+            {input.length} / {maxLength}
+          </span>
+        )}
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
@@ -147,7 +151,7 @@ const ConversationalChat = ({
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || isClosed}
             size="sm"
           >
             {isLoading ? (
