@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { adminSupabase } from "@/lib/adminSupabase";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import SEO from "@/components/SEO";
@@ -275,16 +275,29 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const order = useSessionOrder();
+  const navigate = useNavigate();
 
   const idx = order.indexOf(sessionId);
   const prevId = idx > 0 ? order[idx - 1] : null;
   const nextId = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.key === "ArrowRight" && nextId) navigate(`/sessions/${nextId}`);
+      if (e.key === "ArrowLeft" && prevId) navigate(`/sessions/${prevId}`);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [nextId, prevId, navigate]);
 
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
+      window.scrollTo({ top: 0 });
       const { data, error } = await adminSupabase
         .from("submissions")
         .select("*")
@@ -316,12 +329,35 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
     <Shell
       title="session"
       right={
-        <Link
-          to="/sessions"
-          className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
-        >
-          back to sessions
-        </Link>
+        <div className="flex items-center gap-3">
+          {idx >= 0 && (
+            <span className="text-[11px] font-mono text-muted-foreground">
+              {idx + 1} / {order.length}
+            </span>
+          )}
+          <button
+            disabled={!prevId}
+            onClick={() => prevId && navigate(`/sessions/${prevId}`)}
+            className="border border-border rounded px-3 py-1.5 text-xs font-mono disabled:opacity-40"
+            title="previous conversation (←)"
+          >
+            ← prev
+          </button>
+          <button
+            disabled={!nextId}
+            onClick={() => nextId && navigate(`/sessions/${nextId}`)}
+            className="border border-border rounded px-3 py-1.5 text-xs font-mono disabled:opacity-40"
+            title="next conversation (→)"
+          >
+            next →
+          </button>
+          <Link
+            to="/sessions"
+            className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+          >
+            back to sessions
+          </Link>
+        </div>
       }
     >
       <SEO title="Session detail" description="Admin session viewer" path="/sessions" />
