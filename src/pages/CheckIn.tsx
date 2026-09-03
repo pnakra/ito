@@ -861,7 +861,7 @@ const CheckIn = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
         title="Check in — Get an honest read | ito"
-        description="Write what's happening, or answer a few questions. ito gives you a thoughtful, non-judgmental read. Anonymous, nothing saved."
+        description="Write what's happening, or answer a few questions. ito gives you a thoughtful, non-judgmental read. Anonymous, nothing saved that identifies you."
         path="/check-in"
       />
       <Header />

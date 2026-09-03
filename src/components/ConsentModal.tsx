@@ -55,7 +55,7 @@ const ConsentModal = ({ onConfirm, onCancel }: ConsentModalProps) => {
             <a href="tel:988" className="text-primary underline underline-offset-2 hover:no-underline font-medium">988</a>.
           </li>
           <li>
-            Anonymous and private. Nothing you share is linked to you or sold.
+            Anonymous. Nothing saved that identifies you.
           </li>
         </ul>
 

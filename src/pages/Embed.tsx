@@ -1291,7 +1291,7 @@ function AskItoDirect({ onBack, onOpenLive }: { onBack: () => void; onOpenLive: 
             fontWeight: 700, fontSize: 16, color: C.itoInk,
             fontFamily: '"Geist", "Inter", system-ui, sans-serif', letterSpacing: -0.2,
           }}>Ask ito</div>
-          <div style={{ fontSize: 11.5, color: "#6F6657" }}>Private. Not stored. Not shared.</div>
+          <div style={{ fontSize: 11.5, color: "#6F6657" }}>Anonymous, nothing saved that identifies you.</div>
         </div>
       </div>
 

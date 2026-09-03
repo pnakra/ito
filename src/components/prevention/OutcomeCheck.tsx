@@ -28,7 +28,7 @@ const OutcomeCheck = ({ onSelect }: OutcomeCheckProps) => {
       <div className="bg-card shadow-card rounded-lg p-5">
         <h2 className="text-h2 mb-1">What did you do?</h2>
         <p className="text-muted-foreground text-body">
-          Just for you to think about. Nothing is saved.
+          Just for you to think about. Anonymous. Nothing saved that identifies you.
         </p>
       </div>
       
