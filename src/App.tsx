@@ -22,6 +22,7 @@ import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
 import Go from "./pages/Go";
 import Misread from "./pages/Misread";
+import AdminSessions from "./pages/AdminSessions";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,8 @@ const App = () => (
               <Route path="/admin/evals/growth" element={<AdminEvalsGrowth />} />
               <Route path="/evals/production" element={<Navigate to="/admin/evals/production" replace />} />
 
+              <Route path="/sessions" element={<AdminSessions />} />
+              <Route path="/sessions/:sessionId" element={<AdminSessions />} />
               <Route path="/embed" element={<Embed />} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
