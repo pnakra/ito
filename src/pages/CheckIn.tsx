@@ -844,6 +844,8 @@ const CheckIn = () => {
     setIsLoading(false);
     setExplanationComplete(false);
     setChatMessages([]);
+    setChatClosed(false);
+    preChatNarrativeRef.current = "";
     setSelectedOutcome(null);
     setConfidencePost(null);
     setPendingAgeCheckText(null);
