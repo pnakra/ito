@@ -697,7 +697,7 @@ const CheckIn = () => {
         riskLevel: riskHighWaterMark,
       };
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string }>(
         "ito-followup",
         followUpBody,
         {
@@ -714,7 +714,7 @@ const CheckIn = () => {
           stepName: "chat-closed",
           stepType: "choice",
           choiceValue: "closed-adversarial",
-          metadata: { strikes: followUpData?.strikes ?? null },
+          metadata: { strikes: followUpData?.strikes ?? null, close_reason: followUpData?.closeReason ?? null },
         });
       }
 
@@ -760,7 +760,7 @@ const CheckIn = () => {
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string }>(
         "ito-followup",
         followUpBody,
         {
@@ -779,7 +779,7 @@ const CheckIn = () => {
           stepName: "chat-closed",
           stepType: "choice",
           choiceValue: "closed-adversarial",
-          metadata: { strikes: followUpData?.strikes ?? null },
+          metadata: { strikes: followUpData?.strikes ?? null, close_reason: followUpData?.closeReason ?? null },
         });
       }
 
