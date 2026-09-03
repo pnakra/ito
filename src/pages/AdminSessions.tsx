@@ -238,10 +238,48 @@ function SessionList() {
   );
 }
 
+/** Ordered list of session ids, matching the list view's ordering (newest first). */
+function useSessionOrder() {
+  const [order, setOrder] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await adminSupabase
+        .from("submissions")
+        .select("session_id, created_at")
+        .order("created_at", { ascending: false })
+        .limit(5000);
+      if (cancelled || error || !data) return;
+      const starts = new Map<string, string>();
+      for (let i = data.length - 1; i >= 0; i--) {
+        const r = data[i] as { session_id: string; created_at: string | null };
+        if (!starts.has(r.session_id)) starts.set(r.session_id, r.created_at ?? "");
+      }
+      setOrder(
+        [...starts.entries()]
+          .sort((a, b) => b[1].localeCompare(a[1]))
+          .map(([id]) => id),
+      );
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return order;
+}
+
 function SessionDetail({ sessionId }: { sessionId: string }) {
   const [rows, setRows] = useState<SubmissionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const order = useSessionOrder();
+
+  const idx = order.indexOf(sessionId);
+  const prevId = idx > 0 ? order[idx - 1] : null;
+  const nextId = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
+
 
   useEffect(() => {
     let cancelled = false;
