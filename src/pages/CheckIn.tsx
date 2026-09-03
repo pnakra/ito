@@ -659,6 +659,7 @@ const CheckIn = () => {
   
   const handlePostExplanationContinue = () => {
     setChatMessages([]);
+    preChatNarrativeRef.current = narrativeHistory.join("\n\n");
     setPhase("follow-up-chat");
   };
 
