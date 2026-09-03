@@ -1123,6 +1123,7 @@ const CheckIn = () => {
             isLoading={isLoading}
             isActive={phase === "follow-up-chat"}
             riskLevel={riskHighWaterMark}
+            isClosed={chatClosed}
           />
 
           {/* Outcome */}
