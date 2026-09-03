@@ -168,7 +168,7 @@ function SessionList() {
         </span>
       }
     >
-      <SEO title="Sessions" description="Admin session viewer" noindex />
+      <SEO title="Sessions" description="Admin session viewer" path="/sessions" />
 
       <input
         value={q}
@@ -284,7 +284,7 @@ function SessionDetail({ sessionId }: { sessionId: string }) {
         </Link>
       }
     >
-      <SEO title="Session detail" description="Admin session viewer" noindex />
+      <SEO title="Session detail" description="Admin session viewer" path="/sessions" />
 
       {loading && <p className="text-sm text-muted-foreground">loading...</p>}
       {error && <p className="text-sm text-destructive font-mono">{error}</p>}
