@@ -1,8 +1,12 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /sessions
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /sessions
 
 User-agent: Twitterbot
 Allow: /
@@ -13,5 +17,6 @@ Allow: /
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /sessions
 
 Sitemap: https://ito.lovable.app/sitemap.xml

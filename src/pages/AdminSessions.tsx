@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { adminSupabase } from "@/lib/adminSupabase";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import SEO from "@/components/SEO";
+import EvalsTabs from "@/components/evals/EvalsTabs";
 
 type SubmissionRow = {
   id: string;
@@ -94,7 +95,10 @@ function Shell({
     <main className="min-h-[100dvh] bg-background px-6 py-10">
       <div className="mx-auto w-full max-w-5xl space-y-8 pb-12">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl text-foreground">{title}</h1>
+          <div className="flex flex-wrap items-center gap-4">
+            <h1 className="font-serif text-2xl text-foreground">{title}</h1>
+            <EvalsTabs />
+          </div>
           <div className="flex items-center gap-3">
             {right}
             <button
