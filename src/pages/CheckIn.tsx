@@ -752,14 +752,15 @@ const CheckIn = () => {
     try {
       const followUpBody = {
         message,
-        conversationHistory: chatMessages.slice(-12),
-        initialContext: cumulativeText,
+        conversationHistory: chatMessages,
+        initialContext: preChatNarrativeRef.current,
+        structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
       };
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
         "ito-followup",
         followUpBody,
         {
@@ -770,6 +771,17 @@ const CheckIn = () => {
       );
 
       console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
+
+      if (followUpData?.closed === true) {
+        setChatClosed(true);
+        logSubmission({
+          flowType: "before",
+          stepName: "chat-closed",
+          stepType: "choice",
+          choiceValue: "closed-adversarial",
+          metadata: { strikes: followUpData?.strikes ?? null },
+        });
+      }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
