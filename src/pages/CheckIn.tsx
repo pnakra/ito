@@ -672,6 +672,8 @@ const CheckIn = () => {
       : analysis?.followUpQuestion) || "";
     if (!question) return;
 
+    preChatNarrativeRef.current = narrativeHistory.join("\n\n");
+
     const seededHistory = [
       { role: "assistant" as const, content: question },
       { role: "user" as const, content: userText },
@@ -690,11 +692,12 @@ const CheckIn = () => {
       const followUpBody = {
         message: userText,
         conversationHistory: [{ role: "assistant" as const, content: question }],
-        initialContext: cumulativeText,
+        initialContext: preChatNarrativeRef.current,
+        structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
       };
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
         "ito-followup",
         followUpBody,
         {
@@ -703,6 +706,17 @@ const CheckIn = () => {
           label: "ito-followup",
         },
       );
+
+      if (followUpData?.closed === true) {
+        setChatClosed(true);
+        logSubmission({
+          flowType: "before",
+          stepName: "chat-closed",
+          stepType: "choice",
+          choiceValue: "closed-adversarial",
+          metadata: { strikes: followUpData?.strikes ?? null },
+        });
+      }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
       if (!responseText) throw new Error("Empty response. Try again.");
