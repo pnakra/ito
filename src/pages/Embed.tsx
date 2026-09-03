@@ -25,6 +25,7 @@ function POVSelector({ onPick }: { onPick: (p: POV) => void }) {
       title="ito embed prototype — Clickable concept demo"
       description="Two sides of the same moment. A clickable concept showing how ito can sit inside any messaging app."
       path="/embed"
+      noindex
     />
     <div
       style={{

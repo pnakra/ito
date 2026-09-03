@@ -22,6 +22,7 @@ import Embed from "./pages/Embed";
 import SeeHowItoResponds from "./pages/SeeHowItoResponds";
 import Go from "./pages/Go";
 import Misread from "./pages/Misread";
+import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import AdminSessions from "./pages/AdminSessions";
 import Footer from "./components/Footer";
 
@@ -41,7 +42,7 @@ const App = () => (
               <Route path="/chat" element={<CheckIn />} />
               <Route path="/about" element={<About />} />
               <Route path="/resources" element={<Resources />} />
-              <Route path="/demo" element={<Demo />} />
+              <Route path="/demo" element={<AdminAuthGate>{() => <Demo />}</AdminAuthGate>} />
               <Route path="/release-notes" element={<ReleaseNotes />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/blog" element={<Blog />} />
@@ -55,7 +56,7 @@ const App = () => (
               <Route path="/admin/evals/sessions/:sessionId" element={<AdminSessions />} />
               <Route path="/sessions" element={<Navigate to="/admin/evals/sessions" replace />} />
               <Route path="/sessions/:sessionId" element={<Navigate to="/admin/evals/sessions" replace />} />
-              <Route path="/embed" element={<Embed />} />
+              <Route path="/embed" element={<AdminAuthGate>{() => <Embed />}</AdminAuthGate>} />
               <Route path="/preview" element={<SeeHowItoResponds />} />
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
               <Route path="/go" element={<Go />} />

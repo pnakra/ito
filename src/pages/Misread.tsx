@@ -127,6 +127,7 @@ const Misread = () => {
         title="you think she was into it right? — ito"
         description="if you're asking, part of you already knows. see how ito reads it."
         path="/misread"
+        noindex
       />
 
       <main className="flex-1 container mx-auto max-w-[420px] px-5 pt-8 pb-16" style={{ fontFamily: "Geist, system-ui, sans-serif" }}>

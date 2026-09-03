@@ -274,6 +274,7 @@ const Demo = () => {
         title="Interactive demo — See how ito works | ito"
         description="Walk through three real scenarios and see how ito responds. No signup, no input required — just press play."
         path="/demo"
+        noindex
       />
       <Header />
       <main className="flex-1 flex flex-col justify-start pt-[8vh]">
