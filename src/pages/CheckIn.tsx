@@ -138,6 +138,9 @@ const CheckIn = () => {
   
   // Follow-up chat
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [chatClosed, setChatClosed] = useState(false);
+  // Snapshot of the narrative as it stood when the chat began
+  const preChatNarrativeRef = useRef<string>("");
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
   // Pending narrative held while the mandatory age-check micro-step runs
