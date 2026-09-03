@@ -1,4 +1,4 @@
-// AI eval scenarios for ito — v8 suite (140 scenarios).
+// AI eval scenarios for ito — v8 suite (136 scenarios).
 // Corpus-grounded rebuild: categories and mode distribution derived bottom-up
 // from ~1,500 r/teenagers + r/datingadvice posts (~552 High/Medium prevention-
 // relevance). Full sourcing rationale lives in the v6 workbook README.
