@@ -813,6 +813,7 @@ const CheckIn = () => {
     setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
 
   const handleOutcomeSelect = (outcome: string) => {
+    if (selectedOutcome) return;
     setSelectedOutcome(outcome);
     logChoice("before", "outcome", outcome);
   };
