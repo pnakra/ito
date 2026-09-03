@@ -113,7 +113,7 @@ const About = () => {
                   Can I download my conversation?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. Nothing is stored, so there's nothing to download. When you close the tab, the conversation is gone for good.
+                  No. Anonymous. Nothing saved that identifies you, so there's nothing to download. When you close the tab, the conversation is gone for good.
                 </AccordionContent>
               </AccordionItem>
 
@@ -122,7 +122,7 @@ const About = () => {
                   How do I delete my history?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  There's no history to delete. What you type is used to give you a response, and then it's gone. No account, no log, nothing saved on our end.
+                  There's no history to delete. What you type is used to give you a response, and then it's gone. No account, no log. Anonymous. Nothing saved that identifies you.
                 </AccordionContent>
               </AccordionItem>
 

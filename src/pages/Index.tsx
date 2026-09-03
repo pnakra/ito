@@ -31,7 +31,7 @@ const Index = () => {
     <div className="flex flex-col bg-background" style={{ height: "100dvh" }}>
       <SEO
         title="ito — Is this ok? Anonymous read on hookups & consent"
-        description="Get an honest, non-judgmental perspective on sex, dating, and consent. 100% anonymous — nothing is saved, nothing is tied to you."
+        description="Get an honest, non-judgmental perspective on sex, dating, and consent. Anonymous, nothing saved that identifies you."
         path="/"
       />
       <Header />
@@ -61,7 +61,7 @@ const Index = () => {
           </p>
 
           <p className="text-muted-foreground mt-2 text-[15px]">
-            <span className="font-bold text-foreground">100% anonymous.</span> Works like incognito — nothing is saved, nothing is tied to you.
+            <span className="font-bold text-foreground">Anonymous.</span> Works like incognito — nothing saved that identifies you.
           </p>
         </div>
 
