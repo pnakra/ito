@@ -44,6 +44,7 @@ const ConversationalChat = ({
   isLoading, 
   isActive,
   riskLevel,
+  isClosed = false,
 }: ConversationalChatProps) => {
   const [input, setInput] = useState("");
   const maxLength = 500;
