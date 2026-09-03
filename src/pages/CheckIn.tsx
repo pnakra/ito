@@ -138,6 +138,9 @@ const CheckIn = () => {
   
   // Follow-up chat
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [chatClosed, setChatClosed] = useState(false);
+  // Snapshot of the narrative as it stood when the chat began
+  const preChatNarrativeRef = useRef<string>("");
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
   // Pending narrative held while the mandatory age-check micro-step runs
@@ -656,6 +659,7 @@ const CheckIn = () => {
   
   const handlePostExplanationContinue = () => {
     setChatMessages([]);
+    preChatNarrativeRef.current = narrativeHistory.join("\n\n");
     setPhase("follow-up-chat");
   };
 
@@ -667,6 +671,8 @@ const CheckIn = () => {
       ? afterAnalysis?.followUpQuestion
       : analysis?.followUpQuestion) || "";
     if (!question) return;
+
+    preChatNarrativeRef.current = narrativeHistory.join("\n\n");
 
     const seededHistory = [
       { role: "assistant" as const, content: question },
@@ -686,11 +692,12 @@ const CheckIn = () => {
       const followUpBody = {
         message: userText,
         conversationHistory: [{ role: "assistant" as const, content: question }],
-        initialContext: cumulativeText,
+        initialContext: preChatNarrativeRef.current,
+        structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
       };
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
         "ito-followup",
         followUpBody,
         {
@@ -699,6 +706,17 @@ const CheckIn = () => {
           label: "ito-followup",
         },
       );
+
+      if (followUpData?.closed === true) {
+        setChatClosed(true);
+        logSubmission({
+          flowType: "before",
+          stepName: "chat-closed",
+          stepType: "choice",
+          choiceValue: "closed-adversarial",
+          metadata: { strikes: followUpData?.strikes ?? null },
+        });
+      }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
       if (!responseText) throw new Error("Empty response. Try again.");
@@ -734,14 +752,15 @@ const CheckIn = () => {
     try {
       const followUpBody = {
         message,
-        conversationHistory: chatMessages.slice(-12),
-        initialContext: cumulativeText,
+        conversationHistory: chatMessages,
+        initialContext: preChatNarrativeRef.current,
+        structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
       };
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number }>(
         "ito-followup",
         followUpBody,
         {
@@ -752,6 +771,17 @@ const CheckIn = () => {
       );
 
       console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
+
+      if (followUpData?.closed === true) {
+        setChatClosed(true);
+        logSubmission({
+          flowType: "before",
+          stepName: "chat-closed",
+          stepType: "choice",
+          choiceValue: "closed-adversarial",
+          metadata: { strikes: followUpData?.strikes ?? null },
+        });
+      }
 
       const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
 
@@ -783,6 +813,7 @@ const CheckIn = () => {
     setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
 
   const handleOutcomeSelect = (outcome: string) => {
+    if (selectedOutcome) return;
     setSelectedOutcome(outcome);
     logChoice("before", "outcome", outcome);
   };
@@ -813,6 +844,8 @@ const CheckIn = () => {
     setIsLoading(false);
     setExplanationComplete(false);
     setChatMessages([]);
+    setChatClosed(false);
+    preChatNarrativeRef.current = "";
     setSelectedOutcome(null);
     setConfidencePost(null);
     setPendingAgeCheckText(null);
@@ -1090,6 +1123,7 @@ const CheckIn = () => {
             isLoading={isLoading}
             isActive={phase === "follow-up-chat"}
             riskLevel={riskHighWaterMark}
+            isClosed={chatClosed}
           />
 
           {/* Outcome */}

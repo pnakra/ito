@@ -16,6 +16,7 @@ interface ConversationalChatProps {
   isLoading: boolean;
   isActive: boolean;
   riskLevel?: RiskLevel;
+  isClosed?: boolean;
 }
 
 const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; className: string }> = {
@@ -43,6 +44,7 @@ const ConversationalChat = ({
   isLoading, 
   isActive,
   riskLevel,
+  isClosed = false,
 }: ConversationalChatProps) => {
   const [input, setInput] = useState("");
   const maxLength = 500;
@@ -125,15 +127,19 @@ const ConversationalChat = ({
         value={input}
         onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
         onKeyDown={handleKeyDown}
-        placeholder="Type here..."
+        placeholder={isClosed ? "This conversation is closed." : "Type here..."}
         className="min-h-[80px] resize-none text-body"
-        disabled={isLoading}
+        disabled={isLoading || isClosed}
       />
 
       <div className="flex items-center justify-between">
-        <span className="text-caption text-muted-foreground">
-          {input.length} / {maxLength}
-        </span>
+        {isClosed ? (
+          <span />
+        ) : (
+          <span className="text-caption text-muted-foreground">
+            {input.length} / {maxLength}
+          </span>
+        )}
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
@@ -145,7 +151,7 @@ const ConversationalChat = ({
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || isClosed}
             size="sm"
           >
             {isLoading ? (
