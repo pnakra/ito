@@ -18,7 +18,7 @@ const BlogArticle = () => {
     description: article.metaDescription,
     author: { "@type": "Organization", name: "ito" },
     publisher: { "@type": "Organization", name: "ito" },
-    mainEntityOfPage: `https://ito.lovable.app/blog/${article.slug}`,
+    mainEntityOfPage: `https://isthisok.app/blog/${article.slug}`,
   };
 
   return (
