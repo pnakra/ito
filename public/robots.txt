@@ -31,4 +31,4 @@ Disallow: /demo
 Disallow: /go
 Disallow: /misread
 
-Sitemap: https://ito.lovable.app/sitemap.xml
+Sitemap: https://isthisok.app/sitemap.xml
