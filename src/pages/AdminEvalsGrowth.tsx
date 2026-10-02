@@ -216,13 +216,27 @@ function GrowthDashboard({ email }: { email: string }) {
       setLoading(false);
       return;
     }
-    const { data, error } = await adminSupabase
-      .from("session_summary")
-      .select("*")
-      .order("started_at", { ascending: false })
-      .limit(5000);
-    if (error) setError(`session_summary: ${error.message}`);
-    else setRows((data ?? []) as unknown as SessionRow[]);
+    // PostgREST caps each response at 1000 rows regardless of .limit(),
+    // so page through in batches until a short page comes back.
+    const PAGE = 1000;
+    const all: SessionRow[] = [];
+    let fetchError: string | null = null;
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await adminSupabase
+        .from("session_summary")
+        .select("*")
+        .order("started_at", { ascending: false })
+        .range(from, from + PAGE - 1);
+      if (error) {
+        fetchError = `session_summary: ${error.message}`;
+        break;
+      }
+      const batch = (data ?? []) as unknown as SessionRow[];
+      all.push(...batch);
+      if (batch.length < PAGE) break;
+    }
+    if (fetchError) setError(fetchError);
+    else setRows(all);
     setLoading(false);
   }, []);
 
