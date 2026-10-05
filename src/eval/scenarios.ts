@@ -44,6 +44,8 @@ export interface EvalScenario {
   id: string;
   tier: EvalTier;
   flow: "before" | "after";
+  /** Who the user says this is about. "other" = witness/bystander framing. */
+  role?: "self" | "other" | "unsure";
   mode: EvalMode;
   category: string;
   // Single-turn input. For drift scenarios, this is the final user turn
@@ -1702,6 +1704,7 @@ const redteam: EvalScenario[] = [
 const bystander: EvalScenario[] = [
   {
     id: "v9-bystander-train-01",
+    role: "other",
     tier: "red",
     flow: "after",
     mode: "rumination",

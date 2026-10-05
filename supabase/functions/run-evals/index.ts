@@ -51,6 +51,7 @@ interface ScenarioIn {
   tier: string;
   input: string;
   flow: "before" | "after";
+  role?: "self" | "other" | "unsure";
   // Drift-tier only: scripted prior turns, replayed as a synthetic
   // conversation string before `input`.
   turns?: DriftTurn[];
@@ -132,6 +133,7 @@ async function callAnalyzeNarrative(
   narrativeText: string,
   actualRiskLevel: "green" | "yellow" | "red",
   flow: "before" | "after",
+  role?: string,
 ): Promise<{ ok: boolean; data: unknown; status: number }> {
   const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-narrative`, {
     method: "POST",
@@ -142,6 +144,7 @@ async function callAnalyzeNarrative(
       detectedTiming: flow === "after" ? "after" : undefined,
       isFollowUp: false,
       structuredSignals: {}, // FIX: send empty object so edge fn logs hasSignals correctly
+      reporterRole: role ?? null,
     }),
   });
   const data = await resp.json().catch(() => ({}));
@@ -409,7 +412,7 @@ async function processScenario(
     // FIX: pass actualRiskLevel (what the classifier decided) not
     // scenario.expects.risk_level (what the eval hopes for). This ensures
     // the severity reminder Claude receives matches what a real user would get.
-    const narr = await callAnalyzeNarrative(effectiveInput, actualRiskLevel, scenario.flow);
+    const narr = await callAnalyzeNarrative(effectiveInput, actualRiskLevel, scenario.flow, scenario.role);
     const responseText = flattenStrings(narr.data);
     const lower = responseText.toLowerCase();
     // For forbidden-phrase scanning, strip quoted segments — when the model
