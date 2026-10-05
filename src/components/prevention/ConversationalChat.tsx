@@ -73,6 +73,10 @@ const ConversationalChat = ({
   };
 
   const pill = riskLevel ? riskPillConfig[riskLevel] : null;
+  const pillLabel =
+    pill && riskLevel === "red" && reporterRole === "other"
+      ? "What you can do"
+      : pill?.label;
 
   return (
     <div className="animate-fade-in space-y-6">
