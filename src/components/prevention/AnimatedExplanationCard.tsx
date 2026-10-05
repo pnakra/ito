@@ -14,9 +14,10 @@ interface AnimatedExplanationCardProps {
   analysis: AnalysisData | null;
   isLoading: boolean;
   onComplete?: () => void;
+  reporterRole?: "self" | "other" | "unsure" | null;
 }
 
-const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedExplanationCardProps) => {
+const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole }: AnimatedExplanationCardProps) => {
   const [showBadge, setShowBadge] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);
@@ -62,7 +63,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete }: AnimatedEx
       {/* Badge hero */}
       {showBadge && (
         <div className="flex justify-center animate-scale-in" style={{ animationDuration: "350ms", animationDelay: "0ms" }}>
-          <RiskBadge level={analysis.riskLevel} size="lg" />
+          <RiskBadge level={analysis.riskLevel} size="lg" reporterRole={reporterRole} />
         </div>
       )}
 

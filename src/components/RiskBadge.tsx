@@ -4,12 +4,13 @@ import { Hand, Pause, HelpCircle } from "lucide-react";
 interface RiskBadgeProps {
   level: RiskLevel;
   size?: "sm" | "lg";
+  reporterRole?: "self" | "other" | "unsure" | null;
 }
 
-const RiskBadge = ({ level, size = "lg" }: RiskBadgeProps) => {
+const RiskBadge = ({ level, size = "lg", reporterRole }: RiskBadgeProps) => {
   const config = {
     red: {
-      label: "Stop and think",
+      label: reporterRole === "other" ? "What you can do" : "Stop and think",
       icon: Hand,
       className: "bg-accent text-primary border-[1.5px] border-primary",
       disclaimer: null

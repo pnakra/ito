@@ -17,6 +17,7 @@ interface ConversationalChatProps {
   isActive: boolean;
   riskLevel?: RiskLevel;
   isClosed?: boolean;
+  reporterRole?: "self" | "other" | "unsure" | null;
 }
 
 const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; className: string }> = {
@@ -37,14 +38,15 @@ const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; clas
   },
 };
 
-const ConversationalChat = ({ 
-  messages, 
-  onSendMessage, 
-  onDone, 
-  isLoading, 
+const ConversationalChat = ({
+  messages,
+  onSendMessage,
+  onDone,
+  isLoading,
   isActive,
   riskLevel,
   isClosed = false,
+  reporterRole,
 }: ConversationalChatProps) => {
   const [input, setInput] = useState("");
   const maxLength = 500;
@@ -71,6 +73,10 @@ const ConversationalChat = ({
   };
 
   const pill = riskLevel ? riskPillConfig[riskLevel] : null;
+  const pillLabel =
+    pill && riskLevel === "red" && reporterRole === "other"
+      ? "What you can do"
+      : pill?.label;
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -79,7 +85,7 @@ const ConversationalChat = ({
           <div className="mb-4">
             <span className={`${pill.className} text-[13px] py-1.5 px-3 rounded-full font-semibold inline-flex items-center gap-1.5 leading-none`}>
               <pill.icon className="w-3.5 h-3.5 shrink-0" />
-              {pill.label}
+              {pillLabel}
             </span>
           </div>
         )}
