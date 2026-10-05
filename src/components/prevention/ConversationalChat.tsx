@@ -17,6 +17,7 @@ interface ConversationalChatProps {
   isActive: boolean;
   riskLevel?: RiskLevel;
   isClosed?: boolean;
+  reporterRole?: "self" | "other" | "unsure" | null;
 }
 
 const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; className: string }> = {

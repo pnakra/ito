@@ -63,7 +63,7 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole
       {/* Badge hero */}
       {showBadge && (
         <div className="flex justify-center animate-scale-in" style={{ animationDuration: "350ms", animationDelay: "0ms" }}>
-          <RiskBadge level={analysis.riskLevel} size="lg" />
+          <RiskBadge level={analysis.riskLevel} size="lg" reporterRole={reporterRole} />
         </div>
       )}
 
