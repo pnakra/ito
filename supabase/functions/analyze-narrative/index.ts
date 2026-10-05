@@ -41,6 +41,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+
+const WITNESS_FRAME = `
+WITNESS MODE (the user said this is about someone else, not themselves).
+Keep the exact same JSON output format and the same locked severity. Change only the frame:
+- Speak to him as a witness or friend, not as the person acting. Never use "do not proceed", "hold on" or pre-action stop language aimed at him.
+- Secondhand signals are not consent: what other guys say she wants is not her saying it. Each person needs his own yes from her.
+- Intoxication: state conditionally on what he described ("if she was that drunk, she very likely couldn't consent"), not as settled fact.
+- Name the crime plainly when what he described is sexual assault or rape.
+- Give one concrete move: if it is happening now, interrupt (distract, get her friends, get her out, call 911). If it already happened: check on her if he knows her, save or screenshot messages before they disappear, and point to campus resources, the Title IX office, or RAINN (1-800-656-4673).
+- Acknowledge that freezing or not understanding at first is common, without letting that excuse staying silent now.
+- Do not assume college: say "someone you trust" rather than "trusted adult" unless he said he is in high school.
+- If the story shows HE took part, pressured, or plans to, drop witness mode and address his own conduct directly.
+`;
+
 const SYSTEM_PROMPT_BEFORE = `You are a wise, older male mentor — think a trusted older cousin or a coach who's seen a lot and isn't easily rattled. You're not a therapist, a teacher, or a moral authority. You're someone a teenage boy would actually open up to because you don't flinch, you don't lecture, and you don't make him feel like a bad person for having desires or making mistakes.
 
 Your tone: warm, direct, unhurried. You've been in complicated situations with women. You understand the pressure boys are under. You also have real values — and you hold them without preaching.
@@ -352,6 +366,7 @@ serve(async (req) => {
     structuredSignals,
     entryMethod,
     sessionId,  // FIX: captured for DB error logging
+    reporterRole,
   } = body as {
     narrativeText?: string;
     precomputedRiskLevel?: string;
@@ -361,6 +376,7 @@ serve(async (req) => {
     structuredSignals?: Record<string, unknown>;
     entryMethod?: string;
     sessionId?: string;
+    reporterRole?: string;
   };
 
   const resolvedFlowType = detectedTiming === "after" ? "after" : "before";
@@ -381,7 +397,8 @@ serve(async (req) => {
 
     const isAfterFlow = detectedTiming === "after";
     const isBothTiming = structuredSignals?.timing === "both";
-    const systemPrompt = isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE;
+    const isWitness = reporterRole === "other";
+    const systemPrompt = (isAfterFlow ? SYSTEM_PROMPT_AFTER : SYSTEM_PROMPT_BEFORE) + (isWitness ? WITNESS_FRAME : "");
 
     const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
 
@@ -412,7 +429,7 @@ serve(async (req) => {
       content: `Narrative:\n${narrativeText}${signalContext}\n\n${severityReminder}\n\nRemember: Respond with ONLY the JSON, no other text.`,
     });
 
-    console.log("[analyze-narrative] Calling Claude, isAfter:", isAfterFlow, "messages:", messages.length, "hasSignals:", !!signalContext, "session:", sessionId ?? "unknown");
+    console.log("[analyze-narrative] Calling Claude, isAfter:", isAfterFlow, "witness:", isWitness, "messages:", messages.length, "hasSignals:", !!signalContext, "session:", sessionId ?? "unknown");
 
     let lastError: Error | null = null;
 

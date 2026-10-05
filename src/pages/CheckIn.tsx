@@ -141,6 +141,9 @@ const CheckIn = () => {
   const [chatClosed, setChatClosed] = useState(false);
   // Snapshot of the narrative as it stood when the chat began
   const preChatNarrativeRef = useRef<string>("");
+  // Reporter role: preset via ?role=other (bystander entry point) or asked at the stop screen.
+  const presetRole = (["self", "other", "unsure"] as const).find((r) => r === searchParams.get("role")) ?? null;
+  const reporterRoleRef = useRef<"self" | "other" | "unsure" | null>(presetRole);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
   // Pending narrative held while the mandatory age-check micro-step runs
@@ -563,6 +566,7 @@ const CheckIn = () => {
           isFollowUp: narrativeHistory.length > 1,
           structuredSignals: structuredSignalsRef.current,
           entryMethod: entryMethodRef.current,
+          reporterRole: reporterRoleRef.current,
         },
         {
           maxRetries: 3,
@@ -695,6 +699,7 @@ const CheckIn = () => {
         initialContext: preChatNarrativeRef.current,
         structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
+        reporterRole: reporterRoleRef.current,
       };
 
       const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string }>(
@@ -756,6 +761,7 @@ const CheckIn = () => {
         initialContext: preChatNarrativeRef.current,
         structuredSignals: structuredSignalsRef.current,
         riskLevel: riskHighWaterMark,
+        reporterRole: reporterRoleRef.current,
       };
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
@@ -939,9 +945,11 @@ const CheckIn = () => {
               stopMessage={riskResult.stopMessage}
               onAcknowledge={handleStopMomentAcknowledge}
               isCrisis={riskResult.isCrisis}
-              onRoleSelect={(role) =>
-                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: role, metadata: { role } })
-              }
+              role={reporterRoleRef.current}
+              onRoleSelect={(role) => {
+                reporterRoleRef.current = role;
+                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: role, metadata: { role } });
+              }}
             />
           )}
 

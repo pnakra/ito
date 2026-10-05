@@ -103,6 +103,20 @@ const corsHeaders = {
 // 6. No judgment labels: "manipulation," "toxic," "red flag"
 // =============================================================================
 
+
+const WITNESS_FRAME = `
+WITNESS MODE (the user said this is about someone else, not themselves).
+Keep the exact same JSON output format and the same locked severity. Change only the frame:
+- Speak to him as a witness or friend, not as the person acting. Never use "do not proceed", "hold on" or pre-action stop language aimed at him.
+- Secondhand signals are not consent: what other guys say she wants is not her saying it. Each person needs his own yes from her.
+- Intoxication: state conditionally on what he described ("if she was that drunk, she very likely couldn't consent"), not as settled fact.
+- Name the crime plainly when what he described is sexual assault or rape.
+- Give one concrete move: if it is happening now, interrupt (distract, get her friends, get her out, call 911). If it already happened: check on her if he knows her, save or screenshot messages before they disappear, and point to campus resources, the Title IX office, or RAINN (1-800-656-4673).
+- Acknowledge that freezing or not understanding at first is common, without letting that excuse staying silent now.
+- Do not assume college: say "someone you trust" rather than "trusted adult" unless he said he is in high school.
+- If the story shows HE took part, pressured, or plans to, drop witness mode and address his own conduct directly.
+`;
+
 const SYSTEM_PROMPT = `You sound like a thoughtful older sibling — someone a teenager would actually trust in a private moment. Calm, real, non-judgmental. You are good at reading social situations.
 
 CONTEXT: The user already got an initial assessment. Now they want to keep talking — maybe to clarify something, correct a misunderstanding, or share more.
@@ -234,7 +248,7 @@ serve(async (req) => {
           body: JSON.stringify({
             model: "claude-sonnet-4-5",
             max_tokens: 400,
-            system: SYSTEM_PROMPT,
+            system: SYSTEM_PROMPT + (payload?.reporterRole === "other" ? WITNESS_FRAME.replace("Keep the exact same JSON output format and", "Keep") : ""),
             messages,
           }),
         });
