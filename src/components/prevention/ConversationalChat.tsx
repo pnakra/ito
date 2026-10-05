@@ -38,14 +38,15 @@ const riskPillConfig: Record<RiskLevel, { label: string; icon: typeof Hand; clas
   },
 };
 
-const ConversationalChat = ({ 
-  messages, 
-  onSendMessage, 
-  onDone, 
-  isLoading, 
+const ConversationalChat = ({
+  messages,
+  onSendMessage,
+  onDone,
+  isLoading,
   isActive,
   riskLevel,
   isClosed = false,
+  reporterRole,
 }: ConversationalChatProps) => {
   const [input, setInput] = useState("");
   const maxLength = 500;
