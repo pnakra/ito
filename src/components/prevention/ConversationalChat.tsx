@@ -85,7 +85,7 @@ const ConversationalChat = ({
           <div className="mb-4">
             <span className={`${pill.className} text-[13px] py-1.5 px-3 rounded-full font-semibold inline-flex items-center gap-1.5 leading-none`}>
               <pill.icon className="w-3.5 h-3.5 shrink-0" />
-              {pill.label}
+              {pillLabel}
             </span>
           </div>
         )}

@@ -1041,6 +1041,7 @@ const CheckIn = () => {
                 analysis={analysis}
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
+                reporterRole={reporterRoleRef.current}
               />
             )
           )}
@@ -1135,6 +1136,7 @@ const CheckIn = () => {
             isActive={phase === "follow-up-chat"}
             riskLevel={riskHighWaterMark}
             isClosed={chatClosed}
+            reporterRole={reporterRoleRef.current}
           />
 
           {/* Outcome */}
