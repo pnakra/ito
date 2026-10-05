@@ -939,6 +939,9 @@ const CheckIn = () => {
               stopMessage={riskResult.stopMessage}
               onAcknowledge={handleStopMomentAcknowledge}
               isCrisis={riskResult.isCrisis}
+              onRoleSelect={(role) =>
+                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: role, metadata: { role } })
+              }
             />
           )}
 
