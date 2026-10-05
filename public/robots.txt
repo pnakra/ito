@@ -3,6 +3,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /sessions
 Disallow: /embed
+Disallow: /witness
 Disallow: /demo
 Disallow: /go
 Disallow: /misread
