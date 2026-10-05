@@ -135,9 +135,14 @@ async function callAnalyzeNarrative(
   flow: "before" | "after",
   role?: string,
 ): Promise<{ ok: boolean; data: unknown; status: number }> {
-  const resp = await fetch(`${EXTERNAL_SUPABASE_URL}/functions/v1/analyze-narrative`, {
+  // Role-tagged (witness) scenarios run against this project's analyze-narrative,
+  // which is the copy the live app calls and the one that carries WITNESS_FRAME.
+  const useLocal = !!role;
+  const base = useLocal ? Deno.env.get("SUPABASE_URL") : EXTERNAL_SUPABASE_URL;
+  const key = useLocal ? Deno.env.get("SUPABASE_ANON_KEY") : EXTERNAL_SERVICE_ROLE_KEY;
+  const resp = await fetch(`${base}/functions/v1/analyze-narrative`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${EXTERNAL_SERVICE_ROLE_KEY}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}`, apikey: key ?? "" },
     body: JSON.stringify({
       narrativeText,
       precomputedRiskLevel: actualRiskLevel, // FIX: use actual, not expected
