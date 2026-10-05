@@ -103,7 +103,7 @@ const WitnessReport = () => {
 
           {brief && r && (
             <section className="space-y-4">
-              <h2 className="font-semibold text-foreground">3. What {r.label.toLowerCase()} would see</h2>
+              <h2 className="font-semibold text-foreground">3. What {r.id === "rainn" ? "RAINN" : `the ${r.label}`} would see</h2>
               <div className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-mono text-xs text-muted-foreground">ANONYMOUS WITNESS REPORT · PRACTICE</div>
