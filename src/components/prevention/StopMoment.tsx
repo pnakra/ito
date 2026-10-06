@@ -148,7 +148,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                 {isWitness && witnessTiming !== "now" && <a href="tel:911" className={linkClass}>Call 911</a>}
                 <a href="tel:988" className={linkClass}>Call or text 988 — Crisis Lifeline</a>
                 <a href="tel:18006564673" className={linkClass}>Call RAINN — 1-800-656-4673</a>
-                <a href="sms:741741?body=HELLO" className={linkClass}>Text HOME to 741741 — Crisis Text Line</a>
+                <a href="sms:741741?body=HOME" className={linkClass}>Text HOME to 741741 — Crisis Text Line</a>
               </div>
             )}
           </div>
