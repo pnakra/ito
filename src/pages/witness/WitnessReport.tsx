@@ -72,7 +72,7 @@ const WitnessReport = () => {
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12 pb-12">
         <div className="max-w-2xl mx-auto space-y-8">
-          <BackButton to="/witness" />
+          <BackButton to="/bystanderbeta" />
           <div className="rounded-lg border border-signal-pause/40 bg-signal-pause/10 px-4 py-3 text-sm text-foreground">
             Practice mode. This does not send anything, and nothing is saved.
           </div>

@@ -134,3 +134,16 @@ export function refreshReferralMeta(): ReferralMeta {
   referralMeta = init();
   return referralMeta;
 }
+
+/** Set or clear the session's `src` tag (used by bystander mode, which tags every row). */
+export function setReferralSrc(src: string | undefined): ReferralMeta {
+  const current = { ...getReferralMeta() };
+  if (src) current.src = src;
+  else delete current.src;
+  referralMeta = current;
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+    sessionStorage.setItem(GAMEBOI_STORAGE_KEY, JSON.stringify(current));
+  } catch { /* ignore */ }
+  return current;
+}
