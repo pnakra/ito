@@ -122,7 +122,7 @@ const About = () => {
                   How do I delete my history?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  There's no history to delete. What you type is used to give you a response, and then it's gone. No account, no log, nothing saved that identifies you.
+                  There's no account and no login. Conversations are anonymous, and they may be reviewed to make ito better. Nothing is saved that identifies you.
                 </AccordionContent>
               </AccordionItem>
 
