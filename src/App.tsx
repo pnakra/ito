@@ -25,7 +25,6 @@ import Misread from "./pages/Misread";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import AdminSessions from "./pages/AdminSessions";
 import Footer from "./components/Footer";
-import WitnessHome from "./pages/witness/WitnessHome";
 import WitnessGuide from "./pages/witness/WitnessGuide";
 import WitnessPractice from "./pages/witness/WitnessPractice";
 import WitnessReport from "./pages/witness/WitnessReport";
@@ -67,7 +66,7 @@ const App = () => (
               <Route path="/see-how-ito-responds" element={<Navigate to="/preview" replace />} />
               <Route path="/go" element={<Go />} />
               <Route path="/misread" element={<Misread />} />
-              <Route path="/witness" element={<WitnessHome />} />
+              <Route path="/witness" element={<Navigate to="/bystanderbeta" replace />} />
               <Route path="/witness/guide/:slug" element={<WitnessGuide />} />
               <Route path="/witness/practice" element={<WitnessPractice />} />
               <Route path="/witness/report" element={<WitnessReport />} />
