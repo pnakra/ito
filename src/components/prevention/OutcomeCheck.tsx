@@ -19,7 +19,6 @@ const witnessOutcomes = [
   { id: "stepped-in", label: "I stepped in or got help" },
   { id: "checked-on-them", label: "I checked on them" },
   { id: "told-someone", label: "I told someone who can act" },
-  { id: "saved-messages", label: "I saved what I had" },
   { id: "not-yet", label: "Nothing yet / not sure" },
   { id: "prefer-not-to-say", label: "Prefer not to say" },
 ];
@@ -34,6 +33,9 @@ const OutcomeCheck = ({ onSelect, witness }: OutcomeCheckProps) => {
 
   return (
     <div className="animate-fade-in space-y-6">
+      <div className="flex justify-end">
+        <span className="text-[13px] text-muted-foreground">2 of 2</span>
+      </div>
       <div className="bg-card shadow-card rounded-lg p-5">
         <h2 className="text-h2 mb-1">{witness ? "What did you do, or plan to do?" : "What did you do?"}</h2>
         <p className="text-muted-foreground text-body">
