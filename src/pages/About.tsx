@@ -13,7 +13,7 @@ const About = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
         title="About ito — Why this exists & how it works"
-        description="ito is a private place to think through hookups, consent, and confusing moments. No login, no account, nothing tied to you. Here's how it works and why."
+        description="ito is an anonymous place to think through hookups, consent, and confusing moments. No login, no account, nothing tied to you. Here's how it works and why."
         path="/about"
       />
       <Header />
