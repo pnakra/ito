@@ -103,9 +103,15 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
   const redirectToBystander = !isBystander && searchParams.get("role") === "other";
   // Pick up ?src= etc.; bystander mode tags every row with src=bystanderbeta.
   useEffect(() => {
-    refreshReferralMeta();
-    if (isBystander) setReferralSrc("bystanderbeta");
-    else setReferralSrc(undefined);
+    // URL ?src= wins; only then clear a leftover bystander tag.
+    const currentSrc = refreshReferralMeta().src;
+    if (isBystander) {
+      setReferralSrc("bystanderbeta");
+    } else if (currentSrc === "bystanderbeta") {
+      // Only clear when the tag came from bystander mode (same-tab move back
+      // to the main site). Never touch real URL sources like ?src=prolific.
+      setReferralSrc(undefined);
+    }
   }, [isBystander]);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingSubmitText, setPendingSubmitText] = useState<string | null>(null);
