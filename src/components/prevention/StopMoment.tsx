@@ -106,7 +106,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                     <p className="text-[14px]">If someone is passed out, can't respond, or is in danger, call 911.</p>
                   </div>
                 )}
-                <p>What other people say someone wants isn't that person saying it. What can help:</p>
+                <p>What can help:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   {witnessTiming === "now" && <li>Interrupt. Make an excuse, get their friends, get them out of there.</li>}
                   {witnessTiming === "soon" && (
@@ -121,7 +121,6 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                       <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
                     </>
                   )}
-                  <li>Save any messages. On Snapchat, take a photo of the screen with another phone. A screenshot or a save tells the group.</li>
                 </ul>
               </div>
             ) : (

@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import NarrativeInput from "@/components/narrative/NarrativeInput";
-import PreviewIntroModal from "@/components/narrative/PreviewIntroModal";
 
 import SignalFloor from "@/components/narrative/SignalFloor";
 import AdaptiveFollowUp from "@/components/narrative/AdaptiveFollowUp";
@@ -23,7 +22,7 @@ import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ConfidencePost from "@/components/prevention/ConfidencePost";
 import AgeConfidenceCheck, { type AgeConfidenceResult } from "@/components/narrative/AgeConfidenceCheck";
-import OutcomeFeedback, { feedbackMap } from "@/components/prevention/OutcomeFeedback";
+import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
 import { classifyRisk, detectFlagWords, formatSelectionsForAI } from "@/lib/riskClassification";
@@ -43,6 +42,7 @@ type FlowPhase =
   | "after-explanation"
   | "post-explanation-choice"
   | "follow-up-chat"
+  | "confidence-post"
   | "outcome"
   | "outcome-feedback"
   | "refusal"
@@ -156,6 +156,7 @@ const CheckIn = () => {
   // Set when a refusal would fire before the role is known: ask the role first.
   const refusalPendingRef = useRef(false);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
+  const [confidencePre, setConfidencePre] = useState<number | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
   // Pending narrative held while the mandatory age-check micro-step runs
   const [pendingAgeCheckText, setPendingAgeCheckText] = useState<string | null>(null);
@@ -384,6 +385,7 @@ const CheckIn = () => {
   };
 
   const handleAgeCheckSubmit = ({ ageUser, confidencePre }: AgeConfidenceResult) => {
+    setConfidencePre(confidencePre);
     logChoice("before", "age-check", ageUser);
     logSubmission({
       flowType: "before",
@@ -722,8 +724,7 @@ const CheckIn = () => {
   };
 
   // Post-explanation choices
-  const handlePostExplanationDone = () =>
-    setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
+  const handlePostExplanationDone = () => setPhase("confidence-post");
   
   const handlePostExplanationContinue = () => {
     setChatMessages([]);
@@ -884,7 +885,7 @@ const CheckIn = () => {
   };
 
   const handleFollowUpDone = () =>
-    setPhase(selectedOutcome ? "outcome-feedback" : "outcome");
+    setPhase(confidencePost === null ? "confidence-post" : "outcome");
 
   const handleOutcomeSelect = (outcome: string) => {
     if (selectedOutcome) return;
@@ -906,6 +907,7 @@ const CheckIn = () => {
       choiceValue: String(value),
       metadata: { scale: "1-5" },
     });
+    setPhase("outcome");
   };
 
   const resetFlow = () => {
@@ -926,6 +928,7 @@ const CheckIn = () => {
     setChatClosed(false);
     preChatNarrativeRef.current = "";
     setSelectedOutcome(null);
+    setConfidencePre(null);
     setConfidencePost(null);
     setPendingAgeCheckText(null);
     setReporterRole(presetRole);
@@ -968,8 +971,9 @@ const CheckIn = () => {
                 }
               }
               else if (phase === "post-explanation-choice") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
-              else if (phase === "follow-up-chat") setPhase("post-explanation-choice");
-              else if (phase === "outcome") setPhase("post-explanation-choice");
+              else if (phase === "follow-up-chat") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
+              else if (phase === "confidence-post") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
+              else if (phase === "outcome") setPhase("confidence-post");
               else if (phase === "outcome-feedback") setPhase("outcome");
               else resetFlow();
             }} />
@@ -997,9 +1001,9 @@ const CheckIn = () => {
                 isLoading={isLoading}
                 compact={shouldShowPatternWarning}
                 initialValue={prefillSituation}
-                hideSuggestions={!!prefillSituation || presetRole === "other"}
+                hideSuggestions={!!prefillSituation}
               />
-              {!prefillSituation && presetRole !== "other" && <PreviewIntroModal />}
+              {/* The first-visit preview popup is paused for this flow cleanup. */}
             </>
           )}
 
@@ -1170,80 +1174,16 @@ const CheckIn = () => {
           )}
 
 
-          {/* Mutuality Grounding (before-flow only) */}
-          {phase === "explanation" && !isLoading && analysis && explanationComplete && (
-            <MutualityGrounding
-              selectedMove={null}
-              showUncertaintyOptions={showUncertaintyOptions}
-              isActive={true}
-            />
-          )}
-
-          {/* Proactive ito follow-up question + immediate input
-              Renders right after the explanation so the first interactive prompt
-              is conversational, not a survey question.
-              Submitting jumps straight into the chat phase with seeded context. */}
-          {/* Gated to neutral ('No flag') risk only. For Red/Yellow, continuing
-              the conversation with a proactive prompt risks legitimizing coercive
-              framing — interruption is the correct posture there. */}
+          {/* Post-explanation choice */}
           {(phase === "explanation" || phase === "after-explanation") &&
             !isLoading &&
-            explanationComplete &&
-            riskHighWaterMark === "green" &&
-            (phase === "after-explanation"
-              ? afterAnalysis?.followUpQuestion
-              : analysis?.followUpQuestion) && (
-            <ItoProactiveFollowUp
-              question={
-                (phase === "after-explanation"
-                  ? afterAnalysis?.followUpQuestion
-                  : analysis?.followUpQuestion) || ""
-              }
-              onSubmit={handleProactiveFollowUpSubmit}
-              isLoading={isLoading}
-            />
-          )}
-
-          {/* Post-explanation choice — suppressed for No-flag, where the proactive
-              follow-up already gives the user a clear next move (type back, or
-              just leave). Avoids stacking two CTAs and reads less like a survey. */}
-          {(phase === "explanation" || phase === "after-explanation") &&
-            !isLoading &&
-            explanationComplete &&
-            riskHighWaterMark !== "green" && (
+            explanationComplete && (
             <PostExplanationChoice
               onDone={handlePostExplanationDone}
               onContinue={handlePostExplanationContinue}
               isActive={true}
             />
           )}
-
-          {/* Post-explanation confidence + outcome — asked after the interactive
-              follow-up prompts so "tell me more" / Done-Continue remain primary. */}
-          {(phase === "explanation" || phase === "after-explanation") &&
-            !isLoading &&
-            explanationComplete && (
-            <>
-              {confidencePost === null && (
-                <ConfidencePost onSelect={handleConfidencePost} />
-              )}
-              {confidencePost !== null && !selectedOutcome && (
-                <OutcomeCheck onSelect={handleOutcomeSelect} witness={reporterRole === "other"} />
-              )}
-              {selectedOutcome && (
-                <div className="bg-callout rounded-lg p-5">
-                  <p className="text-[15px] text-callout-foreground">
-                    {feedbackMap[
-                      reporterRole === "other" && selectedOutcome === "prefer-not-to-say"
-                        ? "witness-prefer-not-to-say"
-                        : selectedOutcome
-                    ] ?? feedbackMap["not-sure"]}
-                  </p>
-                </div>
-              )}
-            </>
-          )}
-
 
           {/* Follow-up Chat */}
           <ConversationalChat
@@ -1256,6 +1196,14 @@ const CheckIn = () => {
             isClosed={chatClosed}
             reporterRole={reporterRole}
           />
+
+          {phase === "confidence-post" && (
+            <ConfidencePost
+              onSelect={handleConfidencePost}
+              onSkip={() => setPhase("outcome")}
+              confidencePre={confidencePre}
+            />
+          )}
 
           {/* Outcome */}
           {phase === "outcome" && (

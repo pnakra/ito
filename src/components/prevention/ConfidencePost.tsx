@@ -2,11 +2,13 @@ import { useState } from "react";
 
 interface ConfidencePostProps {
   onSelect: (value: number) => void;
+  onSkip: () => void;
+  confidencePre: number | null;
 }
 
 const CONFIDENCE_SCALE = [1, 2, 3, 4, 5];
 
-const ConfidencePost = ({ onSelect }: ConfidencePostProps) => {
+const ConfidencePost = ({ onSelect, onSkip, confidencePre }: ConfidencePostProps) => {
   const [value, setValue] = useState<number | null>(null);
 
   const handleSelect = (n: number) => {
@@ -16,9 +18,16 @@ const ConfidencePost = ({ onSelect }: ConfidencePostProps) => {
   };
 
   return (
-    <div className="animate-fade-in space-y-4">
+    <div className="animate-fade-in flex min-h-[60vh] flex-col">
+      <div className="flex justify-end mb-6">
+        <span className="text-[13px] text-muted-foreground">1 of 2</span>
+      </div>
       <div className="bg-card shadow-card rounded-lg p-5 space-y-4">
-        <h2 className="text-h2">How sure are you now?</h2>
+        <h2 className="text-h2">
+          {confidencePre !== null
+            ? `You said ${confidencePre} out of 5 before. How sure are you now about what to do?`
+            : "How sure are you now about what to do?"}
+        </h2>
         <div className="grid grid-cols-5 gap-2.5">
           {CONFIDENCE_SCALE.map(n => (
             <button
@@ -39,6 +48,13 @@ const ConfidencePost = ({ onSelect }: ConfidencePostProps) => {
           <span>Very sure</span>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={onSkip}
+        className="mt-5 self-center text-[13px] text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Skip
+      </button>
     </div>
   );
 };

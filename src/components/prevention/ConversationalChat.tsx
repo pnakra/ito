@@ -129,6 +129,17 @@ const ConversationalChat = ({
         </div>
       )}
 
+      <div className="sticky bottom-[104px] z-10 flex justify-end bg-background py-2">
+        <Button
+          variant="outline"
+          onClick={onDone}
+          disabled={isLoading}
+          size="sm"
+        >
+          I'm good for now
+        </Button>
+      </div>
+
       <Textarea
         value={input}
         onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
@@ -147,14 +158,6 @@ const ConversationalChat = ({
           </span>
         )}
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            onClick={onDone}
-            disabled={isLoading}
-            size="sm"
-          >
-            Done
-          </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={!input.trim() || isLoading || isClosed}

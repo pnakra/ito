@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight } from "lucide-react";
-import { logSubmission } from "@/lib/submissionLogger";
-import { PREVIEW_CTA_TAKEN_KEY } from "@/components/narrative/PreviewIntroModal";
 
 const PLACEHOLDER_ROTATIONS = [
   "What's going on?",
@@ -25,10 +23,6 @@ interface NarrativeInputProps {
 const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  // If the user already took the preview CTA (from the first-visit modal),
-  // suppress the pulse/shimmer on the preview chip — it becomes noise.
-  // They still get the chip as a second entry point, just without the animation.
-  const [suppressChipPulse, setSuppressChipPulse] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   // Tracks which chip (if any) seeded the textarea. Used to distinguish
   // chip_unedited vs chip_edited submissions for entry-method analytics
@@ -42,12 +36,6 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
       setPlaceholderIndex(prev => (prev + 1) % PLACEHOLDER_ROTATIONS.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(PREVIEW_CTA_TAKEN_KEY) === "1") setSuppressChipPulse(true);
-    } catch { /* noop */ }
   }, []);
 
   useEffect(() => {
@@ -128,7 +116,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
         </svg>
       </div>
       <p className="text-[14px] text-muted-foreground text-center mb-6" style={{ lineHeight: 1.8 }}>
-        a private space to think through dating, sex, and situations that feel off
+        an anonymous space to think through sexual situations that feel off - for yourself, or someone else
       </p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
@@ -179,7 +167,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
           {[
             "They said yes but something felt off",
             "Should I try to hook up with her when I see her next",
-            "Did we only kiss because we were drunk?",
+            "my friend might be trying to pressure someone into having sex",
           ].map((prompt) => (
             <button
               key={prompt}
@@ -189,24 +177,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
               {prompt}
             </button>
           ))}
-          {/* Highlighted interactive preview chip — visually distinct.
-              Pulse is suppressed for users who already took the preview CTA. */}
-          <a
-            href="/preview"
-            onClick={() => {
-              logSubmission({
-                flowType: "before",
-                stepName: "preview_chip_clicked",
-                stepType: "choice",
-                metadata: { surface: "check-in", pulsing: !suppressChipPulse },
-              });
-            }}
-            className={`${suppressChipPulse ? "" : "ito-preview-chip "}inline-flex items-center gap-1.5 text-[14px] text-primary bg-primary/5 hover:bg-primary/10 px-3.5 py-2 rounded-[10px] transition-colors text-center leading-snug font-medium`}
-            aria-label="See how ito responds — interactive preview"
-          >
-            <span aria-hidden className="text-[10px]">▶</span>
-            See how ito responds
-          </a>
+          {/* The animated preview chip is paused; the /preview route remains available. */}
         </div>
       )}
 
