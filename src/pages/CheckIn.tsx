@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { looksSelfInvolved } from "@/lib/witnessGuards";
 import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { refreshReferralMeta } from "@/lib/referralMeta";
+import { useSearchParams, useNavigate, Navigate } from "react-router-dom";
+import { refreshReferralMeta, setReferralSrc } from "@/lib/referralMeta";
+import BystanderFirstScreenExtras from "@/components/bystander/BystanderFirstScreenExtras";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -84,11 +85,28 @@ const cleanList = (value: unknown): string[] => {
 
 const MAX_FOLLOWUP_RETRIES = 5;
 
-const CheckIn = () => {
+interface CheckInProps {
+  /** "normal" = main site, always about the user. "bystander" = /bystanderbeta only. */
+  mode?: "normal" | "bystander";
+}
+
+const BYSTANDER_CHIPS = [
+  "my friend might be trying to pressure someone into having sex",
+  "there's a message in the group chat I can't stop thinking about",
+  "someone told me what happened to them at a party",
+];
+
+const CheckIn = ({ mode = "normal" }: CheckInProps) => {
+  const isBystander = mode === "bystander";
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  // Pick up ?src= etc. when reached by in-app navigation (e.g. from /bystanderbeta).
-  useEffect(() => { refreshReferralMeta(); }, []);
+  const redirectToBystander = !isBystander && searchParams.get("role") === "other";
+  // Pick up ?src= etc.; bystander mode tags every row with src=bystanderbeta.
+  useEffect(() => {
+    refreshReferralMeta();
+    if (isBystander) setReferralSrc("bystanderbeta");
+    else setReferralSrc(undefined);
+  }, [isBystander]);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingSubmitText, setPendingSubmitText] = useState<string | null>(null);
   // Entry method for the current submission ("typed" | "chip_unedited" | "chip_edited").
@@ -149,7 +167,8 @@ const CheckIn = () => {
   // Snapshot of the narrative as it stood when the chat began
   const preChatNarrativeRef = useRef<string>("");
   // Reporter role: preset via ?role=other (bystander entry point) or asked at the stop screen.
-  const presetRole = (["self", "other", "unsure"] as const).find((r) => r === searchParams.get("role")) ?? null;
+  // Normal mode is always about the user; bystander mode asks who it's about.
+  const presetRole: "self" | null = isBystander ? null : "self";
   const reporterRoleRef = useRef<"self" | "other" | "unsure" | null>(presetRole);
   // Logs the text-pattern self-involvement check at most once per flow.
   const selfInvolvementLoggedRef = useRef(false);
@@ -388,9 +407,9 @@ const CheckIn = () => {
   const startIntake = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited") => {
     entryMethodRef.current = entryMethod;
     setPendingAgeCheckText(text);
-    if (presetRole === "other") {
-      setReporterRole("other");
-      setPhase("witness-timing");
+    if (!isBystander) {
+      setReporterRole("self");
+      setPhase("age-check");
     } else {
       setPhase("role-question");
     }
@@ -961,13 +980,19 @@ const CheckIn = () => {
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
 
+  if (redirectToBystander) return <Navigate to="/bystanderbeta" replace />;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SEO
-        title="Check in — Get an honest read | ito"
-        description="Write what's happening, or answer a few questions. ito gives you a thoughtful, non-judgmental read. Anonymous, nothing saved that identifies you."
-        path="/check-in"
-      />
+      {isBystander ? (
+        <SEO title="ito for bystanders (beta)" description="Saw or heard something that felt off? ito helps you work out what to do next." path="/bystanderbeta" noindex />
+      ) : (
+        <SEO
+          title="Check in — Get an honest read | ito"
+          description="Write what's happening, or answer a few questions. ito gives you a thoughtful, non-judgmental read. Anonymous, nothing saved that identifies you."
+          path="/check-in"
+        />
+      )}
       <Header />
       {showConsentModal && (
         <ConsentModal onConfirm={handleConsentConfirm} onCancel={handleConsentCancel} />
@@ -979,8 +1004,8 @@ const CheckIn = () => {
             <BackButton label="Back" onClick={() => {
               if (phase === "role-question") setPhase("narrative-input");
               else if (phase === "group-part") setPhase("role-question");
-              else if (phase === "witness-timing") setPhase(groupPart === "watching" ? "group-part" : presetRole === "other" ? "narrative-input" : "role-question");
-              else if (phase === "age-check") setPhase(reporterRole === "other" ? "witness-timing" : groupPart !== null ? "group-part" : "role-question");
+              else if (phase === "witness-timing") setPhase(groupPart === "watching" ? "group-part" : "role-question");
+              else if (phase === "age-check") setPhase(!isBystander ? "narrative-input" : reporterRole === "other" ? "witness-timing" : groupPart !== null ? "group-part" : "role-question");
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
@@ -1017,13 +1042,30 @@ const CheckIn = () => {
           {/* Phase 1: Narrative Input */}
           {phase === "narrative-input" && (
             <>
-              <NarrativeInput
-                onSubmit={handleNarrativeSubmit}
-                isLoading={isLoading}
-                compact={shouldShowPatternWarning}
-                initialValue={prefillSituation}
-                hideSuggestions={!!prefillSituation}
-              />
+              {isBystander ? (
+                <NarrativeInput
+                  onSubmit={handleNarrativeSubmit}
+                  isLoading={isLoading}
+                  compact={shouldShowPatternWarning}
+                  initialValue={prefillSituation}
+                  hideSuggestions={!!prefillSituation}
+                  tag="Beta"
+                  title="ito for bystanders"
+                  subtitle="You saw or heard something that felt off. Tell ito, and it will help you work out what to do next."
+                  placeholder="What did you see or hear?"
+                  chips={BYSTANDER_CHIPS}
+                >
+                  <BystanderFirstScreenExtras />
+                </NarrativeInput>
+              ) : (
+                <NarrativeInput
+                  onSubmit={handleNarrativeSubmit}
+                  isLoading={isLoading}
+                  compact={shouldShowPatternWarning}
+                  initialValue={prefillSituation}
+                  hideSuggestions={!!prefillSituation}
+                />
+              )}
               {/* <PreviewIntroModal /> is paused for this flow cleanup. */}
             </>
           )}
@@ -1261,6 +1303,7 @@ const CheckIn = () => {
                   : undefined
               }
               onReset={resetFlow}
+              beta={isBystander}
               onTip={
                 reporterRole === "other" && witnessTiming !== "now"
                   ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n") } })
