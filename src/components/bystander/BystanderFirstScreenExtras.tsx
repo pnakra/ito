@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import BystanderSectionHeading from "@/components/bystander/BystanderSectionHeading";
 
-/** Links only: feedback and funding live on their own screen. */
+const MAIL = "priya@overridelabsprevention.org";
+
+/** Links, plus the funding section, on the bystander beta first screen. */
 const BystanderFirstScreenExtras = () => {
   return (
     <div className="space-y-12">
@@ -13,11 +16,13 @@ const BystanderFirstScreenExtras = () => {
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
             <Link to="/bystanderbeta/feedback" className="underline hover:text-foreground">Tell us what to fix</Link>
             <Link to="/witness/report" className="underline hover:text-foreground">See what a report looks like</Link>
-            <Link to="/bystanderbeta/feedback#fund" className="underline hover:text-foreground">Fund or pilot this</Link>
           </div>
         </div>
+        <section id="fund" className="space-y-3 pt-4 scroll-mt-24">
+          <BystanderSectionHeading>Fund or pilot this</BystanderSectionHeading>
+          <p className="text-foreground/90">Want to fund this work or try it with your students, team, or chapter? Email <a className="underline" href={`mailto:${MAIL}`}>{MAIL}</a></p>
+        </section>
       </div>
-
     </div>
   );
 };
