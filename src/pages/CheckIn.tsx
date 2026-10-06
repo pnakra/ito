@@ -991,7 +991,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {isBystander ? (
-        <SEO title="ito for bystanders (beta)" description="Saw or heard something that felt off? ito helps you work out what to do next." path="/bystanderbeta" noindex />
+        <SEO title="ito — Is this ok? Bystander beta" description="Saw or heard something that felt off? ito helps you work out what to do next." path="/bystanderbeta" noindex />
       ) : (
         <SEO
           title="Check in — Get an honest read | ito"
@@ -1055,8 +1055,8 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                   compact={shouldShowPatternWarning}
                   initialValue={prefillSituation}
                   hideSuggestions={!!prefillSituation}
-                  tag="Beta"
-                  title="ito for bystanders"
+                  tag="Bystander beta"
+                  title="is this ok?"
                   subtitle="You saw or heard something that felt off. Tell ito, and it will help you work out what to do next."
                   placeholder="What did you see or hear?"
                   chips={BYSTANDER_CHIPS}
