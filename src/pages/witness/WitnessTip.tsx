@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -128,6 +128,10 @@ const WitnessTip = () => {
 
               <p className="text-sm text-muted-foreground">
                 Not sure about reporting? RAINN can talk it through at <a className="underline" href="tel:18006564673">1-800-656-4673</a>.
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                This is a beta. <Link to="/bystanderbeta#feedback" className="underline">Tell us what you think</Link>.
               </p>
             </section>
           )}
