@@ -3,6 +3,8 @@ import { RotateCcw } from "lucide-react";
 
 interface OutcomeFeedbackProps {
   outcomeId: string;
+  /** Optional display override — the logged value stays `outcomeId`. */
+  feedbackKey?: string;
   onReset: () => void;
 }
 
@@ -16,12 +18,13 @@ export const feedbackMap: Record<string, string> = {
   "told-someone": "Telling someone who can act matters. Write down what you saw while it is fresh.",
   "saved-messages": "Keep it private and backed up. It keeps their options open.",
   "not-yet": "It is not too late to check on them, or to talk it through with RAINN at 1-800-656-4673.",
-  "prefer-not-to-say": "That's fine. When things feel unclear, slowing down is usually the move.",
+"prefer-not-to-say": "That's fine. When things feel unclear, slowing down is usually the move.",
+  "witness-prefer-not-to-say": "That's fine. It is not too late to check on them, or to talk it through with RAINN at 1-800-656-4673.",
 };
 
 
-const OutcomeFeedback = ({ outcomeId, onReset }: OutcomeFeedbackProps) => {
-  const feedback = feedbackMap[outcomeId] || feedbackMap["not-sure"];
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset }: OutcomeFeedbackProps) => {
+  const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (
     <div className="text-center space-y-6 py-6 animate-fade-in">

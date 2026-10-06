@@ -977,6 +977,14 @@ const CheckIn = () => {
             <BackButton to="/" />
           )}
 
+          {reporterRole === "other" && witnessTiming === "now" &&
+            (phase === "explanation" || phase === "follow-up-chat") && (
+            <div className="space-y-1">
+              <a href="tel:911" className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors">Call 911</a>
+              <p className="text-[12px] text-muted-foreground text-center">If someone is passed out, can't respond, or is in danger, call 911.</p>
+            </div>
+          )}
+
           {shouldShowPatternWarning && phase === "narrative-input" && (
             <SessionPatternWarning />
           )}
@@ -1225,7 +1233,11 @@ const CheckIn = () => {
               {selectedOutcome && (
                 <div className="bg-callout rounded-lg p-5">
                   <p className="text-[15px] text-callout-foreground">
-                    {feedbackMap[selectedOutcome] ?? feedbackMap["not-sure"]}
+                    {feedbackMap[
+                      reporterRole === "other" && selectedOutcome === "prefer-not-to-say"
+                        ? "witness-prefer-not-to-say"
+                        : selectedOutcome
+                    ] ?? feedbackMap["not-sure"]}
                   </p>
                 </div>
               )}
@@ -1251,7 +1263,15 @@ const CheckIn = () => {
           )}
 
           {phase === "outcome-feedback" && selectedOutcome && (
-            <OutcomeFeedback outcomeId={selectedOutcome} onReset={resetFlow} />
+            <OutcomeFeedback
+              outcomeId={selectedOutcome}
+              feedbackKey={
+                reporterRole === "other" && selectedOutcome === "prefer-not-to-say"
+                  ? "witness-prefer-not-to-say"
+                  : undefined
+              }
+              onReset={resetFlow}
+            />
           )}
         </div>
       </main>
