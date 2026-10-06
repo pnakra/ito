@@ -16,6 +16,7 @@ type SessionRow = {
   source_type: string | null;
   referrer: string | null;
   is_prolific: boolean | null;
+  is_bystander_beta: boolean | null;
   prolific_pid: string | null;
   age_user: string | number | null;
   age_prefer_not_to_say: boolean | null;
@@ -215,7 +216,7 @@ function RoleSplit() {
     <section className="border border-border rounded p-4 space-y-3">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-xs uppercase tracking-wider text-muted-foreground">who it's about</h2>
-        <span className="text-[10px] font-mono text-muted-foreground">asked right after the story</span>
+        <span className="text-[10px] font-mono text-muted-foreground">bystander beta only</span>
       </div>
       {err ? <Empty note={`couldn't load: ${err}`} /> : !counts ? <Empty note="loading…" /> : total === 0 ? <Empty /> : (
         <div className="space-y-2">
@@ -291,7 +292,9 @@ function GrowthDashboard({ email }: { email: string }) {
   }, [load]);
 
   const stats = useMemo(() => {
-    const clean = rows.filter((r) => !r.flagged_junk);
+    const notJunk = rows.filter((r) => !r.flagged_junk);
+    const beta = notJunk.filter((r) => r.is_bystander_beta);
+    const clean = notJunk.filter((r) => !r.is_bystander_beta);
     const isReal = (r: SessionRow) => REAL_SOURCES.has((r.source_type ?? "").toLowerCase());
     const real = clean.filter(isReal);
     const organic = real.filter((r) => !r.is_prolific);
@@ -438,6 +441,8 @@ function GrowthDashboard({ email }: { email: string }) {
       readiness,
       readinessBottleneck,
       referrers,
+      betaCount: beta.length,
+      betaFollowup: beta.filter((r) => r.has_followup).length,
       junk,
     };
 
@@ -488,6 +493,7 @@ function GrowthDashboard({ email }: { email: string }) {
           <Stat label="sessions" value={String(stats.cleanTotal)} />
           <Stat label="real narrative" value={String(stats.real.length)} sub="typed / chip_edited" />
           <Stat label="prolific" value={String(stats.prolificCount)} />
+          <Stat label="bystander beta" value={String(stats.betaCount)} sub={`${stats.betaFollowup} with follow-up · counted separately`} />
           <Stat label="unique anon ids" value={String(stats.uniqueAnon)} />
           <Stat
             label="real w/ follow-up"
