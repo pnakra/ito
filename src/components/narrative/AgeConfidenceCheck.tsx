@@ -5,42 +5,73 @@ import { AGE_BAND_OPTIONS } from "@/types/signals";
 
 export const AGE_PREFER_NOT_TO_SAY = "prefer-not-to-say";
 
+export const AGE_NOT_SURE = "not-sure";
+
+export type ExtraAgeKey = "agePersonCrossing" | "ageOtherPerson" | "ageGroup";
+
+export interface ExtraAgeQuestion {
+  key: ExtraAgeKey;
+  question: string;
+}
+
 export interface AgeConfidenceResult {
   ageUser: string;
   confidencePre: number | null;
+  extraAges: Partial<Record<ExtraAgeKey, string>>;
 }
 
 interface AgeConfidenceCheckProps {
   onSubmit: (result: AgeConfidenceResult) => void;
   isLoading: boolean;
+  /** Optional second screen with two age questions (witness / group paths). */
+  extraAgeQuestions?: ExtraAgeQuestion[];
+  /** Back from the first screen goes to the previous intake question. */
+  onBackFromFirst?: () => void;
 }
 
-const TOTAL_STEPS = 2;
 const CONFIDENCE_SCALE = [1, 2, 3, 4, 5];
 
-const AgeConfidenceCheck = ({ onSubmit, isLoading }: AgeConfidenceCheckProps) => {
-  const [step, setStep] = useState<1 | 2>(1);
+const AgeConfidenceCheck = ({ onSubmit, isLoading, extraAgeQuestions = [] }: AgeConfidenceCheckProps) => {
+  const hasExtra = extraAgeQuestions.length > 0;
+  // step 1 = own age, "ages" = extra age screen, 2 = confidence
+  const [step, setStep] = useState<1 | "ages" | 2>(1);
   const [ageUser, setAgeUser] = useState("");
+  const [extraAges, setExtraAges] = useState<Partial<Record<ExtraAgeKey, string>>>({});
   const [confidence, setConfidence] = useState<number | null>(null);
 
-  const handleAgeContinue = () => {
-    if (!ageUser) return;
-    setStep(2);
+  const extraComplete = extraAgeQuestions.every((q) => !!extraAges[q.key]);
+
+  const handleContinue = () => {
+    if (step === 1) {
+      if (!ageUser) return;
+      setStep(hasExtra ? "ages" : 2);
+    } else if (step === "ages") {
+      if (!extraComplete) return;
+      setStep(2);
+    }
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(1);
+    if (step === 2) setStep(hasExtra ? "ages" : 1);
+    else if (step === "ages") setStep(1);
   };
 
   const handleSubmit = () => {
-    onSubmit({ ageUser, confidencePre: confidence });
+    onSubmit({ ageUser, confidencePre: confidence, extraAges });
   };
+
+  const optionClass = (selected: boolean) =>
+    `text-left px-4 h-[56px] rounded-[12px] text-[14px] transition-all duration-150 active:scale-[0.98] ${
+      selected
+        ? "bg-accent border-[1.5px] border-primary text-foreground"
+        : "bg-muted text-foreground hover:bg-muted/80 border-[1.5px] border-transparent"
+    }`;
 
   return (
     <div className="animate-fade-in flex flex-col min-h-[60vh]">
-      {/* Top bar: back + progress */}
+      {/* Top bar: back */}
       <div className="flex items-center justify-between mb-6">
-        {step > 1 ? (
+        {step !== 1 ? (
           <button
             onClick={handleBack}
             disabled={isLoading}
@@ -52,9 +83,6 @@ const AgeConfidenceCheck = ({ onSubmit, isLoading }: AgeConfidenceCheckProps) =>
         ) : (
           <div />
         )}
-        <span className="text-[13px] text-muted-foreground">
-          {step} of {TOTAL_STEPS}
-        </span>
       </div>
 
       <div className="flex-1">
@@ -80,6 +108,34 @@ const AgeConfidenceCheck = ({ onSubmit, isLoading }: AgeConfidenceCheckProps) =>
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {step === "ages" && (
+          <div className="animate-fade-in space-y-8">
+            {extraAgeQuestions.map((q) => (
+              <div key={q.key} className="space-y-5">
+                <h2 className="text-question">{q.question}</h2>
+                <div className="flex flex-col gap-2.5">
+                  {[...AGE_BAND_OPTIONS, { value: AGE_NOT_SURE, label: "Not sure" }].map((opt) => {
+                    const selected = extraAges[q.key] === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        onClick={() => setExtraAges((prev) => ({ ...prev, [q.key]: opt.value }))}
+                        disabled={isLoading}
+                        className={optionClass(selected)}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          {selected && <Check className="w-4 h-4 text-primary flex-shrink-0" />}
+                          {opt.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -117,12 +173,12 @@ const AgeConfidenceCheck = ({ onSubmit, isLoading }: AgeConfidenceCheckProps) =>
       {/* Bottom actions */}
       <div className="mt-auto pt-6 space-y-3">
         <Button
-          onClick={step === 1 ? handleAgeContinue : handleSubmit}
-          disabled={isLoading || (step === 1 ? !ageUser : false)}
+          onClick={step === 2 ? handleSubmit : handleContinue}
+          disabled={isLoading || (step === 1 ? !ageUser : step === "ages" ? !extraComplete : false)}
           size="default"
           className="w-full"
         >
-          {step === 1 ? "Continue" : "Go"}
+          {step === 2 ? "Go" : "Continue"}
           <ArrowRight className="ml-1.5 w-3.5 h-3.5" />
         </Button>
       </div>
