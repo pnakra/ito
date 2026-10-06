@@ -37,7 +37,7 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
           </button>
         )}
 
-        {          <div className="flex flex-col items-center text-center space-y-6">
+        <div className="flex flex-col items-center text-center space-y-6">
             <div className={`p-5 rounded-xl ${isRed ? "bg-signal-stop/10" : "bg-signal-pause/10"}`}>
               {isWitness ? (
                 <Eye className={`w-12 h-12 ${isRed ? "text-signal-stop" : "text-signal-pause"}`} strokeWidth={1.5} />
@@ -108,7 +108,6 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
               </div>
             )}
           </div>
-        }
       </div>
     </div>
   );
