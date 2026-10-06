@@ -18,9 +18,22 @@ interface NarrativeInputProps {
   compact?: boolean;
   initialValue?: string;
   hideSuggestions?: boolean;
+  title?: string;
+  subtitle?: string;
+  placeholder?: string;
+  chips?: string[];
+  tag?: string;
+  /** Extra content rendered under the chips (bystander first screen). */
+  children?: React.ReactNode;
 }
 
-const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions }: NarrativeInputProps) => {
+const DEFAULT_CHIPS = [
+  "They said yes but something felt off",
+  "Should I try to hook up with her when I see her next",
+  "Did we only kiss because we were drunk?",
+];
+
+const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSuggestions, title = "is this ok?", subtitle = "an anonymous space to think through dating, sex, and situations that feel off", placeholder = "What's on your mind?", chips = DEFAULT_CHIPS, tag, children }: NarrativeInputProps) => {
   const [text, setText] = useState(initialValue ?? "");
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -84,6 +97,11 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
 
   return (
     <div className={`min-h-[calc(100vh-60px)] flex flex-col justify-start ${compact ? 'pt-4' : 'pt-[2vh]'} animate-fade-in`}>
+      {tag && (
+        <div className="flex justify-center mb-2">
+          <span className="inline-block rounded border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-muted-foreground">{tag}</span>
+        </div>
+      )}
       <div className="relative inline-flex flex-col items-center mb-2">
         <h1
           className="text-foreground text-center"
@@ -96,7 +114,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
             fontStyle: 'italic',
           }}
         >
-          is this ok?
+          {title}
         </h1>
         {/* Hand-drawn underline */}
         <svg
@@ -116,7 +134,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
         </svg>
       </div>
       <p className="text-[14px] text-muted-foreground text-center mb-6" style={{ lineHeight: 1.8 }}>
-        an anonymous space to think through sexual situations that feel off - for yourself, or someone else
+        {subtitle}
       </p>
 
       <div className="bg-card shadow-card rounded-[16px] p-5 space-y-4">
@@ -129,7 +147,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
             setText(e.target.value.slice(0, maxLength));
           }}
           onKeyDown={handleKeyDown}
-          placeholder="What's on your mind?"
+          placeholder={placeholder}
           className="min-h-[100px] resize-none border-0 focus:border-0 shadow-none p-0 focus-visible:ring-0"
           style={{ boxShadow: "none" }}
           disabled={isLoading}
@@ -164,11 +182,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
           seeds the textarea; the preview chip routes to /preview. */}
       {!text && !isLoading && !hideSuggestions && (
         <div className="mt-3 flex flex-wrap gap-2 justify-center animate-fade-in">
-          {[
-            "They said yes but something felt off",
-            "Should I try to hook up with her when I see her next",
-            "my friend might be trying to pressure someone into having sex",
-          ].map((prompt) => (
+          {chips.map((prompt) => (
             <button
               key={prompt}
               onClick={() => handleChipTap(prompt)}
@@ -180,6 +194,8 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
           {/* The animated “See how ito responds” /preview chip is paused. */}
         </div>
       )}
+
+      {children}
 
       {/* Loading dots */}
       {isLoading && (

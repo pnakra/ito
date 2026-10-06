@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
-import { getReferralMeta } from "@/lib/referralMeta";
 
 interface OutcomeFeedbackProps {
   outcomeId: string;
@@ -10,6 +9,8 @@ interface OutcomeFeedbackProps {
   onReset: () => void;
   /** Witness-only: open the anonymous tip writer. */
   onTip?: () => void;
+  /** Bystander beta only: show the beta feedback link. */
+  beta?: boolean;
 }
 
 export const feedbackMap: Record<string, string> = {
@@ -27,7 +28,7 @@ export const feedbackMap: Record<string, string> = {
 };
 
 
-const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip }: OutcomeFeedbackProps) => {
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (
@@ -51,7 +52,7 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip }: OutcomeFeed
         Start over
       </Button>
 
-      {getReferralMeta().src === "bystanderbeta" && (
+      {beta && (
         <Link
           to="/bystanderbeta#feedback"
           className="block text-muted-foreground text-caption underline"
