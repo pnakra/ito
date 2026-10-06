@@ -145,6 +145,8 @@ const CheckIn = () => {
   // Reporter role: preset via ?role=other (bystander entry point) or asked at the stop screen.
   const presetRole = (["self", "other", "unsure"] as const).find((r) => r === searchParams.get("role")) ?? null;
   const reporterRoleRef = useRef<"self" | "other" | "unsure" | null>(presetRole);
+  // Logs the text-pattern self-involvement check at most once per flow.
+  const selfInvolvementLoggedRef = useRef(false);
   const [reporterRole, setReporterRoleState] = useState<"self" | "other" | "unsure" | null>(presetRole);
   const setReporterRole = useCallback((r: "self" | "other" | "unsure" | null) => {
     reporterRoleRef.current = r;
@@ -173,13 +175,16 @@ const CheckIn = () => {
     recordRunRaw(level, flagged);
   }, [recordRunRaw]);
 
-  // Self-involvement guard: a witness role is forced back to "self" when the text shows the user took part.
+  // Self-involvement text check is log-only now: the AI backstop
+  // (userTookPart / witnessDropped) handles people who actually took part,
+  // and a text-pattern misfire used to send real witnesses to the wrong screen.
   const applySelfInvolvementGuard = useCallback((text: string) => {
     if (reporterRoleRef.current === "other" && looksSelfInvolved(text)) {
-      setReporterRole("self");
-      logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: "self", metadata: { picked: "other", overridden: "self_involved_text" } });
+      if (selfInvolvementLoggedRef.current) return;
+      selfInvolvementLoggedRef.current = true;
+      logSubmission({ flowType: "before", stepName: "reporter-role-check", stepType: "choice", choiceValue: "possible_self_involvement", metadata: { picked: "other" } });
     }
-  }, [setReporterRole]);
+  }, []);
 
   const applyAiOverride = useCallback((reason: "ai_user_took_part" | "ai_witness_dropped") => {
     if (reporterRoleRef.current === "self") return;
@@ -450,6 +455,20 @@ const CheckIn = () => {
     if (gapResult.queryType === "crisis") {
       logSubmission({ flowType: "before", stepName: "crisis-redirect", stepType: "choice", metadata: { flag: "crisis", narrative: text.slice(0, 200) } });
       setPhase("crisis");
+      return;
+    }
+
+    // Preset witnesses (?role=other) skip the actor-shaped screens — the
+    // distress, out-of-scope, signal-floor, and follow-up questions are written
+    // for someone describing their own situation. The stop screen already asks
+    // a witness "When is this?", which covers timing.
+    if (reporterRoleRef.current === "other") {
+      resolvedTimingRef.current = gapResult.detectedTiming;
+      if (result.level === "yellow") {
+        setPhase("stop-moment");
+      } else {
+        fetchExplanation(cumulativeText, result.level, gapResult.detectedTiming);
+      }
       return;
     }
 
@@ -911,6 +930,7 @@ const CheckIn = () => {
     setReporterRole(presetRole);
     setWitnessTiming(null);
     refusalPendingRef.current = false;
+    selfInvolvementLoggedRef.current = false;
     resetSessionId();
   };
 
@@ -1004,20 +1024,16 @@ const CheckIn = () => {
               role={reporterRole}
               witnessTiming={witnessTiming}
               onRoleSelect={(picked) => {
-                const resolved = picked === "other" && looksSelfInvolved(getCumulativeText()) ? "self" : picked;
-                setReporterRole(resolved);
-                if (resolved !== picked) {
-                  logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: "self", metadata: { picked: "other", overridden: "self_involved_text" } });
-                } else {
-                  logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: picked, metadata: { role: picked } });
-                }
-                if (resolved === "other") {
+                setReporterRole(picked);
+                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: picked, metadata: { role: picked } });
+                if (picked === "other") {
                   undoLastRun();
                   refusalPendingRef.current = false;
                 } else if (refusalPendingRef.current) {
                   refusalPendingRef.current = false;
                   setPhase("refusal");
                 }
+                applySelfInvolvementGuard(getCumulativeText());
               }}
               onWitnessTiming={(t) => {
                 setWitnessTiming(t);
