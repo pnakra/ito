@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -15,12 +14,6 @@ const BystanderFeedback = () => {
   const [text, setText] = useState("");
   const [role, setRole] = useState("");
   const [sent, setSent] = useState(false);
-  const { hash } = useLocation();
-
-  useEffect(() => {
-    if (hash === "#fund") document.getElementById("fund")?.scrollIntoView();
-  }, [hash]);
-
   const send = () => {
     if (sent || text.trim().length < 5) return;
     logSubmission({
