@@ -120,7 +120,7 @@ const WitnessReport = () => {
               {brief.urgency === "happening_now" && (
                 <a href="tel:911" className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/40 text-signal-stop font-medium hover:bg-signal-stop/5 transition-colors">Call 911</a>
               )}
-              <h2 className="font-semibold text-foreground">3. What {r.id === "rainn" ? "RAINN" : `the ${r.label}`} would see</h2>
+              <h2 className="font-semibold text-foreground">3. What {r.id === "rainn" ? "RAINN" : `the ${(r.id === "police" || r.id === "house-leader") ? r.label.toLowerCase() : r.label}`} would see</h2>
               {safetyNotes.map((n) => (
                 <div key={n} className="rounded-lg border-2 border-signal-stop/50 bg-signal-stop/10 px-4 py-3 text-sm font-medium text-foreground">{n}</div>
               ))}

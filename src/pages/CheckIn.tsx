@@ -894,6 +894,7 @@ const CheckIn = () => {
     } else {
       logChoice("before", "outcome", outcome);
     }
+    if (phase === "outcome") setPhase("outcome-feedback");
   };
 
   const handleConfidencePost = (value: number) => {
@@ -959,7 +960,13 @@ const CheckIn = () => {
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
-              else if (phase === "explanation" || phase === "after-explanation") setPhase("signal-floor");
+              else if (phase === "explanation" || phase === "after-explanation") {
+                if (reporterRoleRef.current === "other") {
+                  setPhase(riskResult && riskHighWaterMark !== "green" ? "stop-moment" : "narrative-input");
+                } else {
+                  setPhase("signal-floor");
+                }
+              }
               else if (phase === "post-explanation-choice") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
               else if (phase === "follow-up-chat") setPhase("post-explanation-choice");
               else if (phase === "outcome") setPhase("post-explanation-choice");
@@ -982,9 +989,9 @@ const CheckIn = () => {
                 isLoading={isLoading}
                 compact={shouldShowPatternWarning}
                 initialValue={prefillSituation}
-                hideSuggestions={!!prefillSituation}
+                hideSuggestions={!!prefillSituation || presetRole === "other"}
               />
-              {!prefillSituation && <PreviewIntroModal />}
+              {!prefillSituation && presetRole !== "other" && <PreviewIntroModal />}
             </>
           )}
 
