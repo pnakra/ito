@@ -177,7 +177,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
               {prompt}
             </button>
           ))}
-          {/* The animated preview chip is paused; the /preview route remains available. */}
+          {/* The animated “See how ito responds” /preview chip is paused. */}
         </div>
       )}
 

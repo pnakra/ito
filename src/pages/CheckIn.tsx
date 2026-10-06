@@ -14,8 +14,6 @@ import AnimatedExplanationCard from "@/components/prevention/AnimatedExplanation
 import NeutralExplanationCard from "@/components/prevention/NeutralExplanationCard";
 import PostExplanationChoice from "@/components/prevention/PostExplanationChoice";
 import ConversationalChat from "@/components/prevention/ConversationalChat";
-import ItoProactiveFollowUp from "@/components/prevention/ItoProactiveFollowUp";
-import MutualityGrounding from "@/components/prevention/MutualityGrounding";
 import SessionPatternWarning from "@/components/prevention/SessionPatternWarning";
 import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
@@ -732,81 +730,6 @@ const CheckIn = () => {
     setPhase("follow-up-chat");
   };
 
-  // Proactive follow-up: user responds to ito's seeded question.
-  // Seed the chat with [ito's question, user reply], jump straight into chat phase,
-  // then fetch ito's next turn.
-  const handleProactiveFollowUpSubmit = async (userText: string) => {
-    const question = (detectedTiming === "after"
-      ? afterAnalysis?.followUpQuestion
-      : analysis?.followUpQuestion) || "";
-    if (!question) return;
-
-    preChatNarrativeRef.current = narrativeHistory.join("\n\n");
-
-    const seededHistory = [
-      { role: "assistant" as const, content: question },
-      { role: "user" as const, content: userText },
-    ];
-    setChatMessages(seededHistory);
-    setPhase("follow-up-chat");
-    setIsLoading(true);
-
-    const newHistory = [...narrativeHistory, userText];
-    setNarrativeHistory(newHistory);
-    const cumulativeText = newHistory.join("\n\n");
-    runSafetyClassification(cumulativeText);
-    logFreetext("before", "proactive-follow-up", userText);
-
-    try {
-      const followUpBody = {
-        message: userText,
-        conversationHistory: [{ role: "assistant" as const, content: question }],
-        initialContext: preChatNarrativeRef.current,
-        structuredSignals: structuredSignalsRef.current,
-        riskLevel: riskHighWaterMark,
-        reporterRole: reporterRoleRef.current,
-      };
-
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string; witness?: boolean; witnessDropped?: boolean }>(
-        "ito-followup",
-        followUpBody,
-        {
-          maxRetries: MAX_FOLLOWUP_RETRIES,
-          baseDelayMs: 900,
-          label: "ito-followup",
-        },
-      );
-
-      if (followUpData?.witnessDropped === true) applyAiOverride("ai_witness_dropped");
-
-      if (followUpData?.closed === true) {
-        setChatClosed(true);
-        logSubmission({
-          flowType: "before",
-          stepName: "chat-closed",
-          stepType: "choice",
-          choiceValue: "closed-adversarial",
-          metadata: { strikes: followUpData?.strikes ?? null, close_reason: followUpData?.closeReason ?? null },
-        });
-      }
-
-      const responseText = typeof followUpData?.response === "string" ? followUpData.response.trim() : "";
-      if (!responseText) throw new Error("Empty response. Try again.");
-
-      setChatMessages(prev => [...prev, { role: "assistant" as const, content: responseText }]);
-      logAIResponse("before", "proactive-follow-up-response", responseText);
-    } catch (error) {
-      console.error("Error in proactive follow-up:", error);
-      const userFacingError = isLikelyTransientEdgeError(error)
-        ? "Connection issue. Tap Send again in a few seconds."
-        : error instanceof Error && error.message
-          ? error.message
-          : "I’m having trouble right now. Can you try again?";
-      setChatMessages(prev => [...prev, { role: "assistant" as const, content: userFacingError }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   // Follow-up chat
   const handleFollowUpSubmit = async (message: string) => {
     const userMessage = { role: "user" as const, content: message };
@@ -939,7 +862,6 @@ const CheckIn = () => {
   };
 
   const isNeutralRisk = riskHighWaterMark === "green";
-  const showUncertaintyOptions = riskHighWaterMark === "yellow" || riskHighWaterMark === "red";
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
 
@@ -1003,7 +925,7 @@ const CheckIn = () => {
                 initialValue={prefillSituation}
                 hideSuggestions={!!prefillSituation}
               />
-              {/* The first-visit preview popup is paused for this flow cleanup. */}
+              {/* <PreviewIntroModal /> is paused for this flow cleanup. */}
             </>
           )}
 
