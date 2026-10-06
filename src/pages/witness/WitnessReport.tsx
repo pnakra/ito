@@ -33,6 +33,7 @@ const WitnessReport = () => {
   const [safetyNotes, setSafetyNotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const looksNow = /\b(right now|rn|happening now|as we speak|this second|this minute|at the moment|currently)\b/i.test(story);
   const r = RECIPIENTS.find((x) => x.id === recipient);
 
   const build = async () => {
@@ -113,6 +114,14 @@ const WitnessReport = () => {
               {loading ? "Building preview…" : "Show the preview"}
             </Button>
             {error && <p className="text-sm text-signal-stop">{error}</p>}
+            {looksNow && brief?.urgency !== "happening_now" && (
+              <div className="space-y-2">
+                <a href="tel:911" className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/40 text-signal-stop font-medium hover:bg-signal-stop/5 transition-colors">Call 911</a>
+                <div className="rounded-lg border-2 border-signal-stop/50 bg-signal-stop/10 px-4 py-3 text-sm font-medium text-foreground">
+                  If this is happening right now, call 911. This page is practice only and does not send anything.
+                </div>
+              </div>
+            )}
           </section>
 
           {brief && r && (
