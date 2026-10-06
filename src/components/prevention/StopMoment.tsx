@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Hand, Pause, X, Eye } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
 
 export type ReporterRole = "self" | "other" | "unsure";
+export type WitnessTiming = "now" | "soon" | "already";
 
 interface StopMomentProps {
   riskLevel: RiskLevel;
@@ -11,10 +11,18 @@ interface StopMomentProps {
   onAcknowledge: () => void;
   onDismiss?: () => void;
   isCrisis?: boolean;
-  /** Preset role (e.g. from a bystander entry point). When absent, the role question is asked first. */
+  /** Resolved role (controlled by the parent). When null, the role question is asked first. */
   role?: ReporterRole | null;
   onRoleSelect?: (role: ReporterRole) => void;
+  witnessTiming?: WitnessTiming | null;
+  onWitnessTiming?: (timing: WitnessTiming) => void;
 }
+
+const TIMING_OPTIONS: { value: WitnessTiming; label: string }[] = [
+  { value: "now", label: "Happening right now" },
+  { value: "soon", label: "It might happen soon" },
+  { value: "already", label: "It already happened" },
+];
 
 const ROLE_OPTIONS: { value: ReporterRole; label: string }[] = [
   { value: "self", label: "Something I'm doing, or might do" },
@@ -25,22 +33,19 @@ const ROLE_OPTIONS: { value: ReporterRole; label: string }[] = [
 const linkClass =
   "flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors";
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role: presetRole, onRoleSelect }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role = null, onRoleSelect, witnessTiming = null, onWitnessTiming }: StopMomentProps) => {
   const isRed = riskLevel === "red";
-  const [role, setRole] = useState<ReporterRole | null>(presetRole ?? null);
-  // Crisis (self-harm) keeps its own frame; no role question.
+  // Crisis (self-harm) keeps its own frame; no role or timing question.
   const needsRole = !isCrisis && role === null;
   const isWitness = !isCrisis && role === "other";
+  const needsTiming = isWitness && witnessTiming === null;
 
-  const pickRole = (r: ReporterRole) => {
-    setRole(r);
-    onRoleSelect?.(r);
-  };
+  const pickRole = (r: ReporterRole) => onRoleSelect?.(r);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-background/95 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div className="max-w-lg w-full p-8 rounded-lg relative bg-card shadow-card animate-scale-in">
-        {!isRed && onDismiss && !needsRole && (
+        {!isRed && onDismiss && !needsRole && !needsTiming && (
           <button
             onClick={onDismiss}
             className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -57,6 +62,17 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
             <div className="flex flex-col gap-3">
               {ROLE_OPTIONS.map((o) => (
                 <Button key={o.value} variant="outline" size="lg" className="w-full justify-start py-5 text-left whitespace-normal h-auto" onClick={() => pickRole(o.value)}>
+                  {o.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ) : needsTiming ? (
+          <div className="flex flex-col space-y-5">
+            <h2 className="text-h2 text-foreground">When is this?</h2>
+            <div className="flex flex-col gap-3">
+              {TIMING_OPTIONS.map((o) => (
+                <Button key={o.value} variant="outline" size="lg" className="w-full justify-start py-5 text-left whitespace-normal h-auto" onClick={() => onWitnessTiming?.(o.value)}>
                   {o.label}
                 </Button>
               ))}
@@ -84,11 +100,28 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
 
             {isWitness ? (
               <div className="text-body text-foreground/90 space-y-3 text-left w-full">
-                <p>What someone else says about her isn't her saying it. Here's what can help right now:</p>
+                {witnessTiming === "now" && (
+                  <div className="space-y-2">
+                    <a href="tel:911" className={linkClass}>Call 911</a>
+                    <p className="text-[14px]">If someone is passed out, can't respond, or is in danger, call 911.</p>
+                  </div>
+                )}
+                <p>What other people say someone wants isn't that person saying it. What can help:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>If it's still happening, get her out of the room or get her friends. A distraction works.</li>
-                  <li>If it already happened, check on her if you know her.</li>
-                  <li>Screenshot any messages before they disappear.</li>
+                  {witnessTiming === "now" && <li>Interrupt. Make an excuse, get their friends, get them out of there.</li>}
+                  {witnessTiming === "soon" && (
+                    <>
+                      <li>Say something plainly to the person planning it.</li>
+                      <li>Tell the person at risk, or someone close to them, if you can.</li>
+                    </>
+                  )}
+                  {witnessTiming === "already" && (
+                    <>
+                      <li>Check on them if you know them. Keep it short and let them lead.</li>
+                      <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
+                    </>
+                  )}
+                  <li>Save any messages. On Snapchat, take a photo of the screen with another phone. A screenshot or a save tells the group.</li>
                 </ul>
               </div>
             ) : (
