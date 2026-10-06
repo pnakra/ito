@@ -64,7 +64,7 @@ const About = () => {
                 No login. No account. No name, no email, nothing.
               </p>
               <p>
-                What you type gets used for the response and then it's gone. There's no way to trace it back to you.
+                What you type is anonymous and isn't linked to you. It may be reviewed to make ito better.
               </p>
             </div>
           </div>
@@ -113,7 +113,7 @@ const About = () => {
                   Can I download my conversation?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  No. Nothing saved that identifies you, so there's nothing to download. When you close the tab, the conversation is gone for good.
+                  No. Conversations aren't linked to you, so there's no way to look yours up or download it later.
                 </AccordionContent>
               </AccordionItem>
 
@@ -122,7 +122,7 @@ const About = () => {
                   How do I delete my history?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-body">
-                  There's no account and no login. Conversations are anonymous, and they may be reviewed to make ito better. Nothing is saved that identifies you.
+                  You can't, because nothing is linked to you. There's no account and no login. Conversations are anonymous, and they may be reviewed to make ito better.
                 </AccordionContent>
               </AccordionItem>
 
