@@ -66,7 +66,13 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                 )}
                 <p>What can help:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  {witnessTiming === "now" && <li>Interrupt. Make an excuse, get their friends, get them out of there.</li>}
+                  {witnessTiming === "now" && (
+                    <>
+                      <li>Text or call their friends. You don't have to be the one who steps in.</li>
+                      <li>Tell whoever is in charge: a host, a sober monitor, an RA, security.</li>
+                      <li>Or make an excuse that needs no explaining and get them out of there.</li>
+                    </>
+                  )}
                   {witnessTiming === "soon" && (
                     <>
                       <li>Say something plainly to the person planning it.</li>

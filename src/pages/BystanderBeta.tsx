@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,13 @@ const BystanderBeta = () => {
   const [text, setText] = useState("");
   const [role, setRole] = useState("");
   const [sent, setSent] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#feedback") {
+      document.getElementById("feedback")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location]);
 
   const send = () => {
     if (text.trim().length < 5) return;
@@ -40,6 +47,7 @@ const BystanderBeta = () => {
             <span className="inline-block rounded border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-muted-foreground">Beta</span>
             <h1 className="font-serif italic text-[40px] leading-tight text-foreground">ito for bystanders</h1>
             <p className="text-[18px] font-semibold text-foreground">You saw something, heard something, or got a message you can't stop thinking about. ito helps you work out what to do next.</p>
+            <p className="text-sm text-muted-foreground">Try it, then <a href="#feedback" className="underline">tell us what to fix</a>.</p>
           </div>
 
           <section className="space-y-3">
@@ -55,17 +63,13 @@ const BystanderBeta = () => {
             ))}
           </section>
 
-          <section className="space-y-2">
-            <h2 className="font-serif text-[22px] text-foreground">Good to know</h2>
-            <p className="text-foreground/90">ito is an AI, not a person. It can't call anyone or send help. If someone is in danger right now, call <a className="underline" href="tel:911">911</a>.</p>
-            <p className="text-foreground/90">Anonymous. Nothing saved that identifies you.</p>
-            <p className="text-foreground/90">This is an early version, so tell us where it gets things wrong.</p>
-          </section>
-
-          <section className="space-y-3">
+          <section id="feedback" className="space-y-3 scroll-mt-24">
             <h2 className="font-serif text-[22px] text-foreground">Tell us what you think</h2>
             {sent ? (
-              <p className="text-foreground">Thanks. That went straight to the team.</p>
+              <>
+                <p className="text-foreground">Thanks. That went straight to the team.</p>
+                <p className="text-sm text-muted-foreground">Feedback is anonymous. Want a reply? Email <a className="underline" href="mailto:priya@overridelabsprevention.org">priya@overridelabsprevention.org</a></p>
+              </>
             ) : (
               <>
                 <Textarea
@@ -88,8 +92,21 @@ const BystanderBeta = () => {
                 </label>
                 <p className="text-sm text-muted-foreground">Don't include names or anything that identifies someone.</p>
                 <Button onClick={send} disabled={text.trim().length < 5} size="lg" className="w-full">Send feedback</Button>
+                <p className="text-sm text-muted-foreground">Feedback is anonymous. Want a reply? Email <a className="underline" href="mailto:priya@overridelabsprevention.org">priya@overridelabsprevention.org</a></p>
               </>
             )}
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="font-serif text-[22px] text-foreground">Good to know</h2>
+            <p className="text-foreground/90">ito is an AI, not a person. It can't call anyone or send help. If someone is in danger right now, call <a className="underline" href="tel:911">911</a>.</p>
+            <p className="text-foreground/90">Anonymous. Nothing saved that identifies you.</p>
+            <p className="text-foreground/90">This is an early version, so tell us where it gets things wrong.</p>
+          </section>
+
+          <section className="space-y-2">
+            <h2 className="font-serif text-[22px] text-foreground">Fund or pilot this</h2>
+            <p className="text-foreground/90">Want to fund this work or try it with your students, team, or chapter? Email <a className="underline" href="mailto:priya@overridelabsprevention.org">priya@overridelabsprevention.org</a></p>
           </section>
         </div>
       </main>

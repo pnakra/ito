@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
+import { getReferralMeta } from "@/lib/referralMeta";
 
 interface OutcomeFeedbackProps {
   outcomeId: string;
@@ -48,6 +50,15 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip }: OutcomeFeed
         <RotateCcw className="w-4 h-4 mr-2" />
         Start over
       </Button>
+
+      {getReferralMeta().src === "bystanderbeta" && (
+        <Link
+          to="/bystanderbeta#feedback"
+          className="block text-muted-foreground text-caption underline"
+        >
+          Tell us what you think of this beta
+        </Link>
+      )}
     </div>
   );
 };
