@@ -53,10 +53,6 @@ const BystanderFeedback = () => {
             )}
             <p className="text-sm text-muted-foreground">Feedback is anonymous. Want a reply? Email <a className="underline" href={`mailto:${MAIL}`}>{MAIL}</a></p>
           </section>
-          <section id="fund" className="space-y-2 scroll-mt-24">
-            <BystanderSectionHeading>Fund or pilot this</BystanderSectionHeading>
-            <p className="text-foreground/90">Want to fund this work or try it with your students, team, or chapter? Email <a className="underline" href={`mailto:${MAIL}`}>{MAIL}</a></p>
-          </section>
         </div>
       </main>
     </div>
