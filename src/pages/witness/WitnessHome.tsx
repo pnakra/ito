@@ -8,6 +8,7 @@ const MAIN = [
   { to: "/check-in?role=other", title: "Tell ito what you saw", body: "Describe it in your own words and get an honest read on what to do." },
   { to: "/witness/practice", title: "Practice", body: "Short rounds where you practice stepping in, before it's real." },
   { to: "/witness/report", title: "What a report looks like", body: "Practice only. See how your story would reach someone who can act, without your name." },
+  { to: "/witness/tip", title: "Write an anonymous tip", body: "Turn what you saw into a short summary you can paste into a police tip form." },
 ];
 
 const WitnessHome = () => (
