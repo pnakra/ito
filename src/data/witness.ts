@@ -28,7 +28,7 @@ export const GUIDES: Guide[] = [
       {
         heading: "One move, right now",
         points: [
-          "Screenshot it before it disappears.",
+          "Save it before it disappears. On Snapchat, take a photo of the screen with another phone, because a screenshot tells the group.",
           "Go find her, or find her friends, and get her somewhere else.",
           "Reply in the chat to break the momentum: \"nah, nobody's going up\". One voice changes what a group does more than you'd think.",
           "If she's passed out or can't stand, call 911.",
@@ -70,10 +70,10 @@ export const GUIDES: Guide[] = [
       {
         heading: "Do this now",
         points: [
-          "Screenshot messages, with the sender's name and time visible.",
-          "On Snapchat, long-press to save in chat. Screenshot too, in case it's deleted.",
+          "Capture messages with the sender's name and time visible.",
+          "On Snapchat, saving or screenshotting a message is visible to the chat. Take a photo of the screen with another phone or device instead.",
           "Write down what you saw: time, place, who was there, how drunk or high people were. Do it today while it's fresh.",
-          "Email the screenshots and notes to yourself so they're backed up.",
+          "Email the photos and notes to yourself so they're backed up.",
         ],
       },
       {
@@ -200,7 +200,7 @@ export const PRACTICE: PracticeScenario[] = [
         ],
         prompt: "What do you do?",
         choices: [
-          { text: "Screenshot it and go find her", d: "Document", points: 3, pressure: 1, feedback: "Saving it and moving toward her is the strongest early move." },
+          { text: "Save the message and go find her", d: "Document", points: 3, pressure: 1, feedback: "Saving it and moving toward her is the strongest early move. On Snapchat, photograph the screen with another phone so the group isn't tipped off." },
           { text: "Reply \"nah bro nobody's going up\"", d: "Direct", points: 2, pressure: 2, feedback: "Breaking the momentum in the chat matters. Now get to her too." },
           { text: "Leave it on read", d: "None", points: 0, pressure: 0, feedback: "Silence reads as agreement to the group. \"She's gone\" means she can't consent." },
         ],
