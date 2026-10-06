@@ -11,6 +11,11 @@ export const feedbackMap: Record<string, string> = {
   "checked-in": "Stopping or asking is how you make sure everyone's okay.",
   "didnt-proceed": "Not going through with it is always an okay choice.",
   "not-sure": "When things feel confusing, it usually helps to slow down sooner.",
+  "stepped-in": "Stepping in is hard. If you are still worried about them, checking in later helps too.",
+  "checked-on-them": "Letting them lead is the right way to do it. RAINN is at 1-800-656-4673 if they want options.",
+  "told-someone": "Telling someone who can act matters. Write down what you saw while it is fresh.",
+  "saved-messages": "Keep it private and backed up. It keeps their options open.",
+  "not-yet": "It is not too late to check on them, or to talk it through with RAINN at 1-800-656-4673.",
   "prefer-not-to-say": "That's fine. When things feel unclear, slowing down is usually the move.",
 };
 

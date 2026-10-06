@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { RiskLevel } from "@/types/risk";
 
 interface SessionRiskState {
@@ -25,8 +25,11 @@ function getInitialState(): SessionRiskState {
 export function useSessionRiskTracking() {
   const [state, setState] = useState<SessionRiskState>(getInitialState);
 
+  const prevStateRef = useRef<SessionRiskState | null>(null);
+
   const recordRun = useCallback((riskLevel: RiskLevel, hadFlaggedWords: boolean) => {
     setState((prev) => {
+      prevStateRef.current = prev;
       const updated = {
         runCount: prev.runCount + 1,
         yellowOrRedCount:
@@ -46,6 +49,19 @@ export function useSessionRiskTracking() {
     });
   }, []);
 
+  // Undo the most recent recordRun (e.g. once a submission turns out to be a witness report).
+  const undoLastRun = useCallback(() => {
+    const prev = prevStateRef.current;
+    if (!prev) return;
+    prevStateRef.current = null;
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(prev));
+    } catch {
+      // Ignore storage errors
+    }
+    setState(prev);
+  }, []);
+
   const shouldShowPatternWarning = state.yellowOrRedCount >= 2;
   
   const shouldRefuse = state.coercivePatternCount >= 2;
@@ -57,5 +73,6 @@ export function useSessionRiskTracking() {
     shouldShowPatternWarning,
     shouldRefuse,
     recordRun,
+    undoLastRun,
   };
 }

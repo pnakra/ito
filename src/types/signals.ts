@@ -10,6 +10,7 @@ export interface StructuredSignals {
   ageOther?: string;
   intent?: string;
   relationship?: string;
+  witnessTiming?: "now" | "soon" | "already";
 }
 
 export const TIMING_OPTIONS = [
