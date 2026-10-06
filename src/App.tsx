@@ -29,6 +29,8 @@ import WitnessHome from "./pages/witness/WitnessHome";
 import WitnessGuide from "./pages/witness/WitnessGuide";
 import WitnessPractice from "./pages/witness/WitnessPractice";
 import WitnessReport from "./pages/witness/WitnessReport";
+import WitnessTip from "./pages/witness/WitnessTip";
+import BystanderBeta from "./pages/BystanderBeta";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,8 @@ const App = () => (
               <Route path="/witness/guide/:slug" element={<WitnessGuide />} />
               <Route path="/witness/practice" element={<WitnessPractice />} />
               <Route path="/witness/report" element={<WitnessReport />} />
+              <Route path="/witness/tip" element={<WitnessTip />} />
+              <Route path="/bystanderbeta" element={<BystanderBeta />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

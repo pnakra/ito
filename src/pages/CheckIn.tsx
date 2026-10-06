@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { looksSelfInvolved } from "@/lib/witnessGuards";
 import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { refreshReferralMeta } from "@/lib/referralMeta";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -85,6 +86,9 @@ const MAX_FOLLOWUP_RETRIES = 5;
 
 const CheckIn = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  // Pick up ?src= etc. when reached by in-app navigation (e.g. from /bystanderbeta).
+  useEffect(() => { refreshReferralMeta(); }, []);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingSubmitText, setPendingSubmitText] = useState<string | null>(null);
   // Entry method for the current submission ("typed" | "chip_unedited" | "chip_edited").
@@ -1257,6 +1261,11 @@ const CheckIn = () => {
                   : undefined
               }
               onReset={resetFlow}
+              onTip={
+                reporterRole === "other" && witnessTiming !== "now"
+                  ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n") } })
+                  : undefined
+              }
             />
           )}
         </div>

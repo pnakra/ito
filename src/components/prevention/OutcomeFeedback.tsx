@@ -6,6 +6,8 @@ interface OutcomeFeedbackProps {
   /** Optional display override — the logged value stays `outcomeId`. */
   feedbackKey?: string;
   onReset: () => void;
+  /** Witness-only: open the anonymous tip writer. */
+  onTip?: () => void;
 }
 
 export const feedbackMap: Record<string, string> = {
@@ -23,7 +25,7 @@ export const feedbackMap: Record<string, string> = {
 };
 
 
-const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset }: OutcomeFeedbackProps) => {
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (
@@ -32,6 +34,12 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset }: OutcomeFeedbackPro
         <p className="text-[17px] font-semibold text-callout-foreground">{feedback}</p>
       </div>
       
+      {onTip && (
+        <Button variant="outline" size="lg" onClick={onTip} className="w-full">
+          Turn this into an anonymous tip
+        </Button>
+      )}
+
       <Button
         variant="ghost"
         onClick={onReset}

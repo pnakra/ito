@@ -123,3 +123,14 @@ export function getReferralMeta(): ReferralMeta {
   referralMeta = init();
   return referralMeta;
 }
+
+/**
+ * Re-read attribution params from the current URL and merge them into the
+ * stored session meta. Call on in-app navigation into a tagged entry point
+ * (e.g. /check-in?src=bystanderbeta reached via a Link), since the import-time
+ * capture only sees the first URL the app loaded on.
+ */
+export function refreshReferralMeta(): ReferralMeta {
+  referralMeta = init();
+  return referralMeta;
+}
