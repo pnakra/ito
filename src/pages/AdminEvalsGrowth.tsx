@@ -194,11 +194,13 @@ function RoleSplit() {
       for (let from = 0; ; from += 1000) {
         const { data, error } = await adminSupabase
           .from("submissions")
-          .select("choice_value")
+          .select("choice_value, metadata")
           .eq("step_name", "reporter-role")
           .range(from, from + 999);
         if (error) { setErr(error.message); return; }
-        for (const r of (data ?? []) as { choice_value: string | null }[]) {
+        for (const r of (data ?? []) as { choice_value: string | null; metadata: unknown }[]) {
+          const junk = (r.metadata as { flagged_junk?: unknown } | null)?.flagged_junk;
+          if (junk === "true" || junk === true) continue;
           const k = r.choice_value ?? "unknown";
           acc[k] = (acc[k] ?? 0) + 1;
         }
