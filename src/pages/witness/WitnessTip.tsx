@@ -131,7 +131,7 @@ const WitnessTip = () => {
               </p>
 
               <p className="text-sm text-muted-foreground">
-                This is a beta. <Link to="/bystanderbeta#feedback" className="underline">Tell us what you think</Link>.
+                This is a beta. <Link to="/bystanderbeta/feedback" className="underline">Tell us what you think</Link>.
               </p>
             </section>
           )}

@@ -54,7 +54,7 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta }: Outco
 
       {beta && (
         <Link
-          to="/bystanderbeta#feedback"
+          to="/bystanderbeta/feedback"
           className="block text-muted-foreground text-caption underline"
         >
           Tell us what you think of this beta

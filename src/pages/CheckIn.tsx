@@ -91,9 +91,9 @@ interface CheckInProps {
 }
 
 const BYSTANDER_CHIPS = [
-  "my friend might be trying to pressure someone into having sex",
-  "there's a message in the group chat I can't stop thinking about",
-  "someone told me what happened to them at a party",
+  "My friend might be trying to pressure someone into having sex",
+  "There's a message in the group chat I can't stop thinking about",
+  "Someone told me what happened to them at a party",
 ];
 
 const CheckIn = ({ mode = "normal" }: CheckInProps) => {
