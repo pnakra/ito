@@ -21,18 +21,20 @@ interface SignalFloorProps {
   onSkip: () => void;
   isLoading: boolean;
   detectedTiming?: "before" | "after" | "unclear";
+  /** Prefill for the other person's age when already asked earlier. */
+  initialAgeOther?: string;
 }
 
 const TOTAL_STEPS = 4;
 
-const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming }: SignalFloorProps) => {
+const SignalFloor = ({ onSubmit, onSkip, isLoading, detectedTiming, initialAgeOther }: SignalFloorProps) => {
   const [step, setStep] = useState(1);
   const [timing, setTiming] = useState<string>(
     detectedTiming === "after" ? "already-happened" :
     detectedTiming === "before" ? "deciding" : ""
   );
   const [physicalStage, setPhysicalStage] = useState<string[]>([]);
-  const [ageOther, setAgeOther] = useState("");
+  const [ageOther, setAgeOther] = useState(initialAgeOther ?? "");
   const [intent, setIntent] = useState("");
 
   const togglePhysical = (value: string) => {

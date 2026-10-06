@@ -11,6 +11,11 @@ export interface StructuredSignals {
   intent?: string;
   relationship?: string;
   witnessTiming?: "now" | "soon" | "already";
+  group?: boolean;
+  groupPart?: "in" | "considering" | "watching";
+  agePersonCrossing?: string;
+  ageOtherPerson?: string;
+  ageGroup?: string;
 }
 
 export const TIMING_OPTIONS = [

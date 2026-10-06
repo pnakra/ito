@@ -210,16 +210,16 @@ function RoleSplit() {
     })();
   }, []);
   const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
-  const labels: Record<string, string> = { self: "about themselves", other: "witness / someone else", unsure: "not sure" };
+  const labels: Record<string, string> = { self: "about themselves", other: "witness / someone else", unsure: "not sure", group: "a group of us" };
   return (
     <section className="border border-border rounded p-4 space-y-3">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-xs uppercase tracking-wider text-muted-foreground">who it's about</h2>
-        <span className="text-[10px] font-mono text-muted-foreground">answers at the warning screen</span>
+        <span className="text-[10px] font-mono text-muted-foreground">asked right after the story</span>
       </div>
       {err ? <Empty note={`couldn't load: ${err}`} /> : !counts ? <Empty note="loading…" /> : total === 0 ? <Empty /> : (
         <div className="space-y-2">
-          {["self", "other", "unsure"].map((k) => (
+          {["self", "other", "group", "unsure"].map((k) => (
             <ProgressRow key={k} label={labels[k]} count={counts[k] ?? 0} target={total} />
           ))}
         </div>
