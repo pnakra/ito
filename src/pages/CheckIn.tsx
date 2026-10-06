@@ -594,6 +594,7 @@ const CheckIn = () => {
 
   // Fetch AI explanation
   const fetchExplanation = async (text: string, riskLevel: RiskLevel, timing: "before" | "after" | "unclear") => {
+    applySelfInvolvementGuard(text);
     const isAfter = timing === "after";
     setPhase(isAfter ? "after-explanation" : "explanation");
     setIsLoading(true);
