@@ -19,7 +19,8 @@ import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ConfidencePost from "@/components/prevention/ConfidencePost";
-import AgeConfidenceCheck, { type AgeConfidenceResult } from "@/components/narrative/AgeConfidenceCheck";
+import AgeConfidenceCheck, { type AgeConfidenceResult, type ExtraAgeQuestion } from "@/components/narrative/AgeConfidenceCheck";
+import IntakeChoice from "@/components/narrative/IntakeChoice";
 import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
@@ -32,6 +33,9 @@ import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/i
 
 type FlowPhase =
   | "narrative-input"
+  | "role-question"
+  | "group-part"
+  | "witness-timing"
   | "age-check"
   | "signal-floor"
   | "follow-up-questions"
@@ -151,8 +155,10 @@ const CheckIn = () => {
     setReporterRoleState(r);
   }, []);
   const [witnessTiming, setWitnessTiming] = useState<"now" | "soon" | "already" | null>(null);
-  // Set when a refusal would fire before the role is known: ask the role first.
-  const refusalPendingRef = useRef(false);
+  // Group answer to "Where are you in it?" (only for "a group of us").
+  const [groupPart, setGroupPart] = useState<"in" | "considering" | "watching" | null>(null);
+  // Whether the witness card was shown in this flow (for the Back button).
+  const [witnessCardShown, setWitnessCardShown] = useState(false);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [confidencePre, setConfidencePre] = useState<number | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
@@ -163,14 +169,13 @@ const CheckIn = () => {
   const {
     shouldShowPatternWarning,
     recordRun: recordRunRaw,
-    undoLastRun,
     coercivePatternCount,
     yellowOrRedCount,
   } = useSessionRiskTracking();
 
-  // Witness submissions never count toward session risk tracking.
+  // Only "self" runs count toward session risk tracking.
   const recordRun = useCallback((level: RiskLevel, flagged: boolean) => {
-    if (reporterRoleRef.current === "other") return;
+    if (reporterRoleRef.current !== "self") return;
     recordRunRaw(level, flagged);
   }, [recordRunRaw]);
 
@@ -316,15 +321,9 @@ const CheckIn = () => {
     }
     
     applySelfInvolvementGuard(cumulativeText);
-    if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current !== "other") {
+    if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current === "self") {
       recordRun(riskResult.level, hasFlaggedWords);
-      if (reporterRoleRef.current === null) {
-        refusalPendingRef.current = true;
-        resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
-        setPhase("stop-moment");
-      } else {
-        setPhase("refusal");
-      }
+      setPhase("refusal");
       return;
     }
     
@@ -372,19 +371,101 @@ const CheckIn = () => {
       setShowConsentModal(true);
       return;
     }
-    startAgeCheck(text, entryMethod);
+    startIntake(text, entryMethod);
   };
 
-  // Mandatory age + pre-confidence micro-step, before any AI work starts
-  const startAgeCheck = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited") => {
+  const updateSignals = (patch: Partial<StructuredSignals>) => {
+    const next: StructuredSignals = { ...structuredSignalsRef.current, ...patch };
+    structuredSignalsRef.current = next;
+    setStructuredSignals(next);
+  };
+
+  // Intake starts with "who is this about", unless the role is preset to other (/witness).
+  const startIntake = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited") => {
     entryMethodRef.current = entryMethod;
     setPendingAgeCheckText(text);
+    if (presetRole === "other") {
+      setReporterRole("other");
+      setPhase("witness-timing");
+    } else {
+      setPhase("role-question");
+    }
+  };
+
+  const handleRoleQuestion = (picked: "self" | "other" | "group") => {
+    logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: picked, metadata: { role: picked } });
+    if (picked === "group") {
+      updateSignals({ group: true });
+      setPhase("group-part");
+      return;
+    }
+    setGroupPart(null);
+    const { group: _g, groupPart: _gp, ...rest } = structuredSignalsRef.current;
+    structuredSignalsRef.current = rest;
+    setStructuredSignals(rest);
+    setReporterRole(picked);
+    setPhase(picked === "other" ? "witness-timing" : "age-check");
+  };
+
+  const handleGroupPart = (part: "in" | "considering" | "watching") => {
+    logSubmission({ flowType: "before", stepName: "group-part", stepType: "choice", choiceValue: part, metadata: { groupPart: part } });
+    setGroupPart(part);
+    updateSignals({ group: true, groupPart: part });
+    const role = part === "watching" ? "other" : "self";
+    setReporterRole(role);
+    setPhase(role === "other" ? "witness-timing" : "age-check");
+  };
+
+  const handleWitnessTiming = (t: "now" | "soon" | "already") => {
+    setWitnessTiming(t);
+    logSubmission({ flowType: "before", stepName: "witness-timing", stepType: "choice", choiceValue: t, metadata: { witnessTiming: t } });
+    const { timing: _t, ...rest } = structuredSignalsRef.current;
+    const next: StructuredSignals = { ...rest, witnessTiming: t };
+    if (t === "already") next.timing = "already-happened";
+    resolvedTimingRef.current = t === "already" ? "after" : "before";
+    structuredSignalsRef.current = next;
+    setStructuredSignals(next);
+    if (t === "now") {
+      // Happening right now: ask nothing else.
+      const text = pendingAgeCheckText ?? "";
+      setPendingAgeCheckText(null);
+      if (text) processNarrativeSubmit(text, entryMethodRef.current);
+      else setPhase("narrative-input");
+      return;
+    }
     setPhase("age-check");
   };
 
-  const handleAgeCheckSubmit = ({ ageUser, confidencePre }: AgeConfidenceResult) => {
+  const extraAgeQuestions: ExtraAgeQuestion[] =
+    groupPart !== null
+      ? [
+          { key: "ageGroup", question: "How old are most of the group?" },
+          { key: "ageOtherPerson", question: "How old is the other person?" },
+        ]
+      : reporterRole === "other"
+        ? [
+            { key: "agePersonCrossing", question: "How old is the person who might be crossing a line?" },
+            { key: "ageOtherPerson", question: "How old is the other person?" },
+          ]
+        : [];
+
+  const EXTRA_AGE_STEP: Record<string, string> = {
+    agePersonCrossing: "age-person-crossing",
+    ageOtherPerson: "age-other-person",
+    ageGroup: "age-group",
+  };
+
+  const handleAgeCheckSubmit = ({ ageUser, confidencePre, extraAges }: AgeConfidenceResult) => {
     setConfidencePre(confidencePre);
     logChoice("before", "age-check", ageUser);
+    const agePatch: Partial<StructuredSignals> = {};
+    for (const q of extraAgeQuestions) {
+      const v = extraAges[q.key];
+      if (!v) continue;
+      logChoice("before", EXTRA_AGE_STEP[q.key], v);
+      agePatch[q.key] = v;
+    }
+    if (Object.keys(agePatch).length > 0) updateSignals(agePatch);
     logSubmission({
       flowType: "before",
       stepName: "confidence-pre",
@@ -435,19 +516,18 @@ const CheckIn = () => {
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
     applySelfInvolvementGuard(cumulativeText);
     
-    if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current !== "other") {
+    if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current === "self") {
       recordRun(result.level, hasFlaggedWords);
-      if (reporterRoleRef.current === null) {
-        refusalPendingRef.current = true;
-        setPhase("stop-moment");
-      } else {
-        setPhase("refusal");
-      }
+      setPhase("refusal");
       return;
     }
     
     if (result.level === "red") {
       recordRun(result.level, hasFlaggedWords);
+      if (reporterRoleRef.current === "other") {
+        setDetectedTiming(resolvedTimingRef.current);
+        setWitnessCardShown(true);
+      }
       setPhase("stop-moment");
       return;
     }
@@ -458,16 +538,15 @@ const CheckIn = () => {
       return;
     }
 
-    // Preset witnesses (?role=other) skip the actor-shaped screens — the
-    // distress, out-of-scope, signal-floor, and follow-up questions are written
-    // for someone describing their own situation. The stop screen already asks
-    // a witness "When is this?", which covers timing.
+    // Witnesses skip the actor-shaped screens. Timing was already asked
+    // ("When is this?"). The card shows only for "now" (or red, above).
     if (reporterRoleRef.current === "other") {
-      resolvedTimingRef.current = gapResult.detectedTiming;
-      if (result.level === "yellow") {
+      setDetectedTiming(resolvedTimingRef.current);
+      if (structuredSignalsRef.current.witnessTiming === "now") {
+        setWitnessCardShown(true);
         setPhase("stop-moment");
       } else {
-        fetchExplanation(cumulativeText, result.level, gapResult.detectedTiming);
+        fetchExplanation(cumulativeText, result.level, resolvedTimingRef.current);
       }
       return;
     }
@@ -501,7 +580,7 @@ const CheckIn = () => {
   const handleConsentConfirm = () => {
     setShowConsentModal(false);
     if (pendingSubmitText) {
-      startAgeCheck(pendingSubmitText, pendingEntryMethodRef.current);
+      startIntake(pendingSubmitText, pendingEntryMethodRef.current);
       setPendingSubmitText(null);
     }
   };
@@ -513,9 +592,15 @@ const CheckIn = () => {
 
   // Handle signal floor submission
   const handleSignalFloorSubmit = (incoming: StructuredSignals) => {
-    // Preserve ageUser captured in the mandatory age-check micro-step
+    // Preserve intake answers (age, group, extra ages) captured before the signal floor
+    const prev = structuredSignalsRef.current;
     const signals: StructuredSignals = {
-      ...(structuredSignalsRef.current.ageUser ? { ageUser: structuredSignalsRef.current.ageUser } : {}),
+      ...(prev.ageUser ? { ageUser: prev.ageUser } : {}),
+      ...(prev.group ? { group: prev.group } : {}),
+      ...(prev.groupPart ? { groupPart: prev.groupPart } : {}),
+      ...(prev.ageGroup ? { ageGroup: prev.ageGroup } : {}),
+      ...(prev.ageOtherPerson ? { ageOtherPerson: prev.ageOtherPerson } : {}),
+      ...(prev.agePersonCrossing ? { agePersonCrossing: prev.agePersonCrossing } : {}),
       ...incoming,
     };
     setStructuredSignals(signals);
@@ -856,12 +941,19 @@ const CheckIn = () => {
     setPendingAgeCheckText(null);
     setReporterRole(presetRole);
     setWitnessTiming(null);
-    refusalPendingRef.current = false;
+    setGroupPart(null);
+    setWitnessCardShown(false);
     selfInvolvementLoggedRef.current = false;
     resetSessionId();
   };
 
   const isNeutralRisk = riskHighWaterMark === "green";
+  const readText = [
+    analysis?.signalLabel, ...(analysis?.why ?? []), analysis?.suggestion, analysis?.followUpQuestion,
+    afterAnalysis?.clarityCheck, afterAnalysis?.otherPersonPerspective, afterAnalysis?.accountabilitySteps,
+    afterAnalysis?.avoidingRepetition, afterAnalysis?.yourPatterns, afterAnalysis?.nextSteps, afterAnalysis?.followUpQuestion,
+  ].filter(Boolean).join(" ");
+  const showWitness911 = reporterRole === "other" && (riskHighWaterMark === "red" || readText.includes("911"));
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
 
@@ -881,13 +973,16 @@ const CheckIn = () => {
         <div className="max-w-2xl mx-auto space-y-6">
           {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
-              if (phase === "age-check") setPhase("narrative-input");
+              if (phase === "role-question") setPhase("narrative-input");
+              else if (phase === "group-part") setPhase("role-question");
+              else if (phase === "witness-timing") setPhase(groupPart === "watching" ? "group-part" : presetRole === "other" ? "narrative-input" : "role-question");
+              else if (phase === "age-check") setPhase(reporterRole === "other" ? "witness-timing" : groupPart !== null ? "group-part" : "role-question");
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
               else if (phase === "explanation" || phase === "after-explanation") {
                 if (reporterRoleRef.current === "other") {
-                  setPhase(riskResult && riskHighWaterMark !== "green" ? "stop-moment" : "narrative-input");
+                  setPhase(witnessCardShown && riskResult ? "stop-moment" : "narrative-input");
                 } else {
                   setPhase("signal-floor");
                 }
@@ -903,8 +998,8 @@ const CheckIn = () => {
             <BackButton to="/" />
           )}
 
-          {reporterRole === "other" && witnessTiming === "now" &&
-            (phase === "explanation" || phase === "follow-up-chat") && (
+          {showWitness911 &&
+            (phase === "explanation" || phase === "after-explanation" || phase === "follow-up-chat") && (
             <div className="space-y-1">
               <a href="tel:911" className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors">Call 911</a>
               <p className="text-[12px] text-muted-foreground text-center">If someone is passed out, can't respond, or is in danger, call 911.</p>
@@ -930,9 +1025,51 @@ const CheckIn = () => {
           )}
 
 
+          {phase === "role-question" && (
+            <IntakeChoice
+              heading="Are you asking about a personal situation, or something you're observing?"
+              options={[
+                { value: "self", label: "This is about me" },
+                { value: "other", label: "This is about someone else" },
+                { value: "group", label: "This is about a group of us" },
+              ]}
+              note="Asking so ito gets this right."
+              onSelect={handleRoleQuestion}
+            />
+          )}
+
+          {phase === "group-part" && (
+            <IntakeChoice
+              heading="Where are you in it?"
+              options={[
+                { value: "in", label: "I'm part of it" },
+                { value: "considering", label: "I'm thinking about joining in" },
+                { value: "watching", label: "I'm seeing or hearing about it" },
+              ]}
+              onSelect={handleGroupPart}
+            />
+          )}
+
+          {phase === "witness-timing" && (
+            <IntakeChoice
+              heading="When is this?"
+              options={[
+                { value: "now", label: "Happening right now" },
+                { value: "soon", label: "It might happen soon" },
+                { value: "already", label: "It already happened" },
+              ]}
+              onSelect={handleWitnessTiming}
+            />
+          )}
+
           {/* Phase 1b: Mandatory age + pre-confidence check */}
           {phase === "age-check" && (
-            <AgeConfidenceCheck onSubmit={handleAgeCheckSubmit} isLoading={isLoading} />
+            <AgeConfidenceCheck
+              key={`${reporterRole}-${groupPart}`}
+              onSubmit={handleAgeCheckSubmit}
+              isLoading={isLoading}
+              extraAgeQuestions={extraAgeQuestions}
+            />
           )}
 
           {/* Phase 2: Signal Floor */}
@@ -942,6 +1079,11 @@ const CheckIn = () => {
               onSkip={handleSignalFloorSkip}
               isLoading={isLoading}
               detectedTiming={detectedTiming}
+              initialAgeOther={
+                structuredSignals.ageOtherPerson && structuredSignals.ageOtherPerson !== "not-sure"
+                  ? structuredSignals.ageOtherPerson
+                  : undefined
+              }
             />
           )}
 
@@ -964,32 +1106,6 @@ const CheckIn = () => {
               isCrisis={riskResult.isCrisis}
               role={reporterRole}
               witnessTiming={witnessTiming}
-              onRoleSelect={(picked) => {
-                setReporterRole(picked);
-                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: picked, metadata: { role: picked } });
-                if (picked === "other") {
-                  undoLastRun();
-                  refusalPendingRef.current = false;
-                } else if (refusalPendingRef.current) {
-                  refusalPendingRef.current = false;
-                  setPhase("refusal");
-                }
-                applySelfInvolvementGuard(getCumulativeText());
-              }}
-              onWitnessTiming={(t) => {
-                setWitnessTiming(t);
-                logSubmission({ flowType: "before", stepName: "witness-timing", stepType: "choice", choiceValue: t, metadata: { witnessTiming: t } });
-                const next: StructuredSignals = { ...structuredSignalsRef.current, witnessTiming: t };
-                if (t === "already") {
-                  next.timing = "already-happened";
-                  resolvedTimingRef.current = "after";
-                  setDetectedTiming("after");
-                } else {
-                  resolvedTimingRef.current = "before";
-                }
-                structuredSignalsRef.current = next;
-                setStructuredSignals(next);
-              }}
             />
           )}
 
