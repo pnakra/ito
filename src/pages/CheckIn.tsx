@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { looksSelfInvolved } from "@/lib/witnessGuards";
 import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -144,6 +145,14 @@ const CheckIn = () => {
   // Reporter role: preset via ?role=other (bystander entry point) or asked at the stop screen.
   const presetRole = (["self", "other", "unsure"] as const).find((r) => r === searchParams.get("role")) ?? null;
   const reporterRoleRef = useRef<"self" | "other" | "unsure" | null>(presetRole);
+  const [reporterRole, setReporterRoleState] = useState<"self" | "other" | "unsure" | null>(presetRole);
+  const setReporterRole = useCallback((r: "self" | "other" | "unsure" | null) => {
+    reporterRoleRef.current = r;
+    setReporterRoleState(r);
+  }, []);
+  const [witnessTiming, setWitnessTiming] = useState<"now" | "soon" | "already" | null>(null);
+  // Set when a refusal would fire before the role is known: ask the role first.
+  const refusalPendingRef = useRef(false);
   const [selectedOutcome, setSelectedOutcome] = useState<string | null>(null);
   const [confidencePost, setConfidencePost] = useState<number | null>(null);
   // Pending narrative held while the mandatory age-check micro-step runs
@@ -152,10 +161,31 @@ const CheckIn = () => {
   // Session tracking
   const {
     shouldShowPatternWarning,
-    recordRun,
+    recordRun: recordRunRaw,
+    undoLastRun,
     coercivePatternCount,
     yellowOrRedCount,
   } = useSessionRiskTracking();
+
+  // Witness submissions never count toward session risk tracking.
+  const recordRun = useCallback((level: RiskLevel, flagged: boolean) => {
+    if (reporterRoleRef.current === "other") return;
+    recordRunRaw(level, flagged);
+  }, [recordRunRaw]);
+
+  // Self-involvement guard: a witness role is forced back to "self" when the text shows the user took part.
+  const applySelfInvolvementGuard = useCallback((text: string) => {
+    if (reporterRoleRef.current === "other" && looksSelfInvolved(text)) {
+      setReporterRole("self");
+      logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: "self", metadata: { picked: "other", overridden: "self_involved_text" } });
+    }
+  }, [setReporterRole]);
+
+  const applyAiOverride = useCallback((reason: "ai_user_took_part" | "ai_witness_dropped") => {
+    if (reporterRoleRef.current === "self") return;
+    setReporterRole("self");
+    logSubmission({ flowType: "before", stepName: "reporter-role-override", stepType: "choice", choiceValue: "self", metadata: { reason } });
+  }, [setReporterRole]);
 
   // Get cumulative text from all narrative inputs
   const getCumulativeText = useCallback(() => {
@@ -281,9 +311,16 @@ const CheckIn = () => {
       return;
     }
     
-    if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
+    applySelfInvolvementGuard(cumulativeText);
+    if (riskResult.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current !== "other") {
       recordRun(riskResult.level, hasFlaggedWords);
-      setPhase("refusal");
+      if (reporterRoleRef.current === null) {
+        refusalPendingRef.current = true;
+        resolvedTimingRef.current = resolveEffectiveTiming(signals, gapResult.detectedTiming);
+        setPhase("stop-moment");
+      } else {
+        setPhase("refusal");
+      }
       return;
     }
     
@@ -320,7 +357,7 @@ const CheckIn = () => {
     }
 
     fetchExplanation(cumulativeText, riskResult.level, resolvedTimingRef.current);
-  }, [coercivePatternCount, recordRun, resolveEffectiveTiming]);
+  }, [coercivePatternCount, recordRun, resolveEffectiveTiming, applySelfInvolvementGuard]);
 
   // Handle initial narrative submission — go to signal floor
   const handleNarrativeSubmit = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited" = "typed") => {
@@ -391,10 +428,16 @@ const CheckIn = () => {
     const { riskResult: result, gapResult } = runSafetyClassification(cumulativeText);
     
     const hasFlaggedWords = (result.flaggedWords?.length ?? 0) > 0;
+    applySelfInvolvementGuard(cumulativeText);
     
-    if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1) {
+    if (result.level === "red" && hasFlaggedWords && coercivePatternCount >= 1 && reporterRoleRef.current !== "other") {
       recordRun(result.level, hasFlaggedWords);
-      setPhase("refusal");
+      if (reporterRoleRef.current === null) {
+        refusalPendingRef.current = true;
+        setPhase("stop-moment");
+      } else {
+        setPhase("refusal");
+      }
       return;
     }
     
@@ -551,6 +594,7 @@ const CheckIn = () => {
 
   // Fetch AI explanation
   const fetchExplanation = async (text: string, riskLevel: RiskLevel, timing: "before" | "after" | "unclear") => {
+    applySelfInvolvementGuard(text);
     const isAfter = timing === "after";
     setPhase(isAfter ? "after-explanation" : "explanation");
     setIsLoading(true);
@@ -583,6 +627,7 @@ const CheckIn = () => {
       // === END DIAGNOSTICS ===
       
       if (typeof data?.error === "string") throw new Error(data.error);
+      if (data?.userTookPart === true) applyAiOverride("ai_user_took_part");
 
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
@@ -702,7 +747,7 @@ const CheckIn = () => {
         reporterRole: reporterRoleRef.current,
       };
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string; witness?: boolean; witnessDropped?: boolean }>(
         "ito-followup",
         followUpBody,
         {
@@ -711,6 +756,8 @@ const CheckIn = () => {
           label: "ito-followup",
         },
       );
+
+      if (followUpData?.witnessDropped === true) applyAiOverride("ai_witness_dropped");
 
       if (followUpData?.closed === true) {
         setChatClosed(true);
@@ -766,7 +813,7 @@ const CheckIn = () => {
 
       console.log("[ITO-DIAG] followup request body:", JSON.stringify(followUpBody).slice(0, 500));
 
-      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string }>(
+      const followUpData = await invokeEdgeFunctionWithRetry<{ response?: unknown; closed?: boolean; strikes?: number; closeReason?: string; witness?: boolean; witnessDropped?: boolean }>(
         "ito-followup",
         followUpBody,
         {
@@ -777,6 +824,8 @@ const CheckIn = () => {
       );
 
       console.log("[ITO-DIAG] followup response data:", JSON.stringify(followUpData).slice(0, 300));
+
+      if (followUpData?.witnessDropped === true) applyAiOverride("ai_witness_dropped");
 
       if (followUpData?.closed === true) {
         setChatClosed(true);
@@ -821,7 +870,11 @@ const CheckIn = () => {
   const handleOutcomeSelect = (outcome: string) => {
     if (selectedOutcome) return;
     setSelectedOutcome(outcome);
-    logChoice("before", "outcome", outcome);
+    if (reporterRoleRef.current === "other") {
+      logSubmission({ flowType: "before", stepName: "outcome", stepType: "choice", choiceValue: outcome, metadata: { role: "other" } });
+    } else {
+      logChoice("before", "outcome", outcome);
+    }
   };
 
   const handleConfidencePost = (value: number) => {
@@ -855,6 +908,9 @@ const CheckIn = () => {
     setSelectedOutcome(null);
     setConfidencePost(null);
     setPendingAgeCheckText(null);
+    setReporterRole(presetRole);
+    setWitnessTiming(null);
+    refusalPendingRef.current = false;
     resetSessionId();
   };
 
@@ -945,10 +1001,37 @@ const CheckIn = () => {
               stopMessage={riskResult.stopMessage}
               onAcknowledge={handleStopMomentAcknowledge}
               isCrisis={riskResult.isCrisis}
-              role={reporterRoleRef.current}
-              onRoleSelect={(role) => {
-                reporterRoleRef.current = role;
-                logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: role, metadata: { role } });
+              role={reporterRole}
+              witnessTiming={witnessTiming}
+              onRoleSelect={(picked) => {
+                const resolved = picked === "other" && looksSelfInvolved(getCumulativeText()) ? "self" : picked;
+                setReporterRole(resolved);
+                if (resolved !== picked) {
+                  logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: "self", metadata: { picked: "other", overridden: "self_involved_text" } });
+                } else {
+                  logSubmission({ flowType: "before", stepName: "reporter-role", stepType: "choice", choiceValue: picked, metadata: { role: picked } });
+                }
+                if (resolved === "other") {
+                  undoLastRun();
+                  refusalPendingRef.current = false;
+                } else if (refusalPendingRef.current) {
+                  refusalPendingRef.current = false;
+                  setPhase("refusal");
+                }
+              }}
+              onWitnessTiming={(t) => {
+                setWitnessTiming(t);
+                logSubmission({ flowType: "before", stepName: "witness-timing", stepType: "choice", choiceValue: t, metadata: { witnessTiming: t } });
+                const next: StructuredSignals = { ...structuredSignalsRef.current, witnessTiming: t };
+                if (t === "already") {
+                  next.timing = "already-happened";
+                  resolvedTimingRef.current = "after";
+                  setDetectedTiming("after");
+                } else {
+                  resolvedTimingRef.current = "before";
+                }
+                structuredSignalsRef.current = next;
+                setStructuredSignals(next);
               }}
             />
           )}
@@ -1041,7 +1124,7 @@ const CheckIn = () => {
                 analysis={analysis}
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
-                reporterRole={reporterRoleRef.current}
+                reporterRole={reporterRole}
               />
             )
           )}
@@ -1114,7 +1197,7 @@ const CheckIn = () => {
                 <ConfidencePost onSelect={handleConfidencePost} />
               )}
               {confidencePost !== null && !selectedOutcome && (
-                <OutcomeCheck onSelect={handleOutcomeSelect} />
+                <OutcomeCheck onSelect={handleOutcomeSelect} witness={reporterRole === "other"} />
               )}
               {selectedOutcome && (
                 <div className="bg-callout rounded-lg p-5">
@@ -1136,12 +1219,12 @@ const CheckIn = () => {
             isActive={phase === "follow-up-chat"}
             riskLevel={riskHighWaterMark}
             isClosed={chatClosed}
-            reporterRole={reporterRoleRef.current}
+            reporterRole={reporterRole}
           />
 
           {/* Outcome */}
           {phase === "outcome" && (
-            <OutcomeCheck onSelect={handleOutcomeSelect} />
+            <OutcomeCheck onSelect={handleOutcomeSelect} witness={reporterRole === "other"} />
           )}
 
           {phase === "outcome-feedback" && selectedOutcome && (

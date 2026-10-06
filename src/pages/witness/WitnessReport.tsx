@@ -4,7 +4,7 @@ import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { RECIPIENTS, type RecipientId } from "@/data/witness";
 
 interface Brief {
@@ -20,6 +20,8 @@ interface Brief {
   reporter_willing_to: string;
   reporter_identifiers_removed: string[];
   style_flags: string[];
+  reporter_involved?: boolean;
+  harmed_person_details_removed?: string[];
 }
 
 const URGENCY = { happening_now: "Happening now", recent: "Recent", past: "In the past" };
@@ -28,6 +30,7 @@ const WitnessReport = () => {
   const [recipient, setRecipient] = useState<RecipientId | null>(null);
   const [story, setStory] = useState("");
   const [brief, setBrief] = useState<Brief | null>(null);
+  const [safetyNotes, setSafetyNotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const r = RECIPIENTS.find((x) => x.id === recipient);
@@ -39,7 +42,18 @@ const WitnessReport = () => {
     const { data, error } = await supabase.functions.invoke("witness-report-brief", { body: { story, recipient } });
     setLoading(false);
     if (error || !data?.brief) setError("Couldn't build the preview. Try again in a moment.");
-    else setBrief(data.brief);
+    else {
+      const b = data.brief as Brief;
+      setBrief({
+        ...b,
+        what_was_seen: b.what_was_seen ?? [],
+        evidence: b.evidence ?? [],
+        reporter_identifiers_removed: b.reporter_identifiers_removed ?? [],
+        style_flags: b.style_flags ?? [],
+        harmed_person_details_removed: b.harmed_person_details_removed ?? [],
+      });
+      setSafetyNotes(Array.isArray(data.safety_notes) ? data.safety_notes : []);
+    }
   };
 
   const Row = ({ label, value }: { label: string; value: string | string[] }) => (
@@ -72,7 +86,7 @@ const WitnessReport = () => {
               {RECIPIENTS.map((x) => (
                 <button
                   key={x.id}
-                  onClick={() => { setRecipient(x.id); setBrief(null); }}
+                  onClick={() => { setRecipient(x.id); setBrief(null); setSafetyNotes([]); }}
                   className={`text-left rounded-lg border p-3 transition-colors ${recipient === x.id ? "border-foreground" : "border-border hover:border-foreground/40"}`}
                 >
                   <div className="font-medium text-foreground">{x.label}</div>
@@ -103,7 +117,13 @@ const WitnessReport = () => {
 
           {brief && r && (
             <section className="space-y-4">
+              {brief.urgency === "happening_now" && (
+                <a href="tel:911" className="flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/40 text-signal-stop font-medium hover:bg-signal-stop/5 transition-colors">Call 911</a>
+              )}
               <h2 className="font-semibold text-foreground">3. What {r.id === "rainn" ? "RAINN" : `the ${r.label}`} would see</h2>
+              {safetyNotes.map((n) => (
+                <div key={n} className="rounded-lg border-2 border-signal-stop/50 bg-signal-stop/10 px-4 py-3 text-sm font-medium text-foreground">{n}</div>
+              ))}
               <div className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-mono text-xs text-muted-foreground">ANONYMOUS WITNESS REPORT · PRACTICE</div>
@@ -126,6 +146,15 @@ const WitnessReport = () => {
                 {brief.reporter_identifiers_removed.length ? (
                   <ul className="list-disc pl-4 text-foreground/90">{brief.reporter_identifiers_removed.map((x) => <li key={x}>{x}</li>)}</ul>
                 ) : <p className="text-muted-foreground">Nothing found.</p>}
+                {(brief.harmed_person_details_removed ?? []).length > 0 && (
+                  <>
+                    <div className="font-medium text-foreground pt-2">Taken out to protect the person harmed</div>
+                    <ul className="list-disc pl-4 text-foreground/90">{(brief.harmed_person_details_removed ?? []).map((x) => <li key={x}>{x}</li>)}</ul>
+                  </>
+                )}
+                {brief.reporter_involved === true && (
+                  <p className="pt-2 text-foreground">This preview keeps your own part in. It can't be left out.</p>
+                )}
                 {brief.style_flags.length > 0 && (
                   <>
                     <div className="font-medium text-foreground pt-2">Details that might still point to you</div>

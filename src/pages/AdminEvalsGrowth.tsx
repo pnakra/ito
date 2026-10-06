@@ -48,6 +48,9 @@ const OUTCOMES = [
   "prefer-not-to-say",
 ] as const;
 
+// Witness outcome ids (role "other") are excluded from the actor outcome numbers.
+const WITNESS_OUTCOMES = new Set(["stepped-in", "checked-on-them", "told-someone", "saved-messages", "not-yet"]);
+const isWitnessOutcome = (o: string | null) => WITNESS_OUTCOMES.has((o ?? "").trim().toLowerCase());
 const OUTCOME_READINESS_TARGET = 100; // per group, for a 15-20pt outcome-rate difference to be trustworthy
 const CONFIDENCE_READINESS_TARGET = 30; // per group, for a confidence-delta difference to be trustworthy
 
@@ -350,7 +353,7 @@ function GrowthDashboard({ email }: { email: string }) {
     let outcomeAny = 0;
     for (const r of organic) {
       const o = (r.outcome ?? "").trim().toLowerCase();
-      if (!o) continue;
+      if (!o || WITNESS_OUTCOMES.has(o)) continue;
       outcomeAny += 1;
       if (outcomeCounts.has(o)) outcomeCounts.set(o, (outcomeCounts.get(o) ?? 0) + 1);
       else outcomeOther += 1;
@@ -372,7 +375,7 @@ function GrowthDashboard({ email }: { email: string }) {
     for (const r of organic) {
       const g = comparisonAgeGroup(r);
       if (!g) continue;
-      if ((r.outcome ?? "").trim() !== "") readiness[g].outcome += 1;
+      if ((r.outcome ?? "").trim() !== "" && !isWitnessOutcome(r.outcome)) readiness[g].outcome += 1;
       if (typeof r.confidence_pre === "number" && typeof r.confidence_post === "number") {
         readiness[g].bothConf += 1;
       }
@@ -415,7 +418,7 @@ function GrowthDashboard({ email }: { email: string }) {
       prolificCount: prolific.length,
       uniqueAnon: uniqueAnon.size,
       realFollowup: real.filter((r) => r.has_followup).length,
-      realOutcome: real.filter((r) => (r.outcome ?? "").trim() !== "").length,
+      realOutcome: real.filter((r) => (r.outcome ?? "").trim() !== "" && !isWitnessOutcome(r.outcome)).length,
       ageCounts,
       ageTrend,
       sessionsTrend,

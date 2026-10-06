@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 
 interface OutcomeCheckProps {
   onSelect: (outcome: string) => void;
+  witness?: boolean;
 }
 
 const outcomes = [
@@ -14,8 +15,16 @@ const outcomes = [
   { id: "prefer-not-to-say", label: "Prefer not to say" },
 ];
 
+const witnessOutcomes = [
+  { id: "stepped-in", label: "I stepped in or got help" },
+  { id: "checked-on-them", label: "I checked on them" },
+  { id: "told-someone", label: "I told someone who can act" },
+  { id: "saved-messages", label: "I saved what I had" },
+  { id: "not-yet", label: "Nothing yet / not sure" },
+  { id: "prefer-not-to-say", label: "Prefer not to say" },
+];
 
-const OutcomeCheck = ({ onSelect }: OutcomeCheckProps) => {
+const OutcomeCheck = ({ onSelect, witness }: OutcomeCheckProps) => {
   const [selected, setSelected] = useState<string | null>(null);
 
   const handleSelect = (id: string) => {
@@ -26,14 +35,14 @@ const OutcomeCheck = ({ onSelect }: OutcomeCheckProps) => {
   return (
     <div className="animate-fade-in space-y-6">
       <div className="bg-card shadow-card rounded-lg p-5">
-        <h2 className="text-h2 mb-1">What did you do?</h2>
+        <h2 className="text-h2 mb-1">{witness ? "What did you do, or plan to do?" : "What did you do?"}</h2>
         <p className="text-muted-foreground text-body">
           Just for you to think about. Anonymous. Nothing saved that identifies you.
         </p>
       </div>
       
       <div className="grid grid-cols-2 gap-2">
-        {outcomes.map((outcome) => (
+        {(witness ? witnessOutcomes : outcomes).map((outcome) => (
           <button
             key={outcome.id}
             onClick={() => handleSelect(outcome.id)}
