@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => ({
       input: {
         main: path.resolve(__dirname, "index.html"),
         bystanderbeta: path.resolve(__dirname, "bystanderbeta/index.html"),
+        practice: path.resolve(__dirname, "practice/index.html"),
       },
     },
   },
