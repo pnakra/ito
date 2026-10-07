@@ -50,26 +50,33 @@ const Practice = () => {
     window.scrollTo({ top: 0 });
   }, [screen]);
 
+  const logQueue = useRef<Promise<void>>(Promise.resolve());
+
   const log = (
     stepName: string,
     stepType: "choice" | "freetext" | "practice_reply",
     value: { choice?: string; text?: string; summary?: string },
     extra: Record<string, unknown> = {},
   ) => {
-    logSubmission({
-      flowType: "practice",
-      stepName,
-      stepType,
-      choiceValue: value.choice,
-      freetextValue: value.text,
-      aiResponseSummary: value.summary,
-      metadata: {
-        surface: "practice",
-        scenario: scenarioIdRef.current,
-        run: runRef.current || null,
-        ...extra,
-      },
-    });
+    const metadata = {
+      surface: "practice",
+      scenario: scenarioIdRef.current,
+      run: runRef.current || null,
+      ...extra,
+    };
+    logQueue.current = logQueue.current
+      .then(() =>
+        logSubmission({
+          flowType: "practice",
+          stepName,
+          stepType,
+          choiceValue: value.choice,
+          freetextValue: value.text,
+          aiResponseSummary: value.summary,
+          metadata,
+        }),
+      )
+      .catch(() => {});
   };
 
   const loadList = useCallback(async () => {
