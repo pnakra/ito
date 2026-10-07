@@ -5,3 +5,4 @@
 - Witness content (guides, practice scenarios, report recipients) lives in `src/data/witness.ts`; practice scores stay in localStorage only.
 - The report flow is practice-only: `witness-report-brief` returns a preview and must never send or store anything until legal review and vetted recipients exist.
 - Beta feedback and funding use a dedicated `/bystanderbeta/feedback` page; all beta feedback links target it so they work independently of check-in phase.
+- Practice (/practice) is unlinked and adults only. `practice-roleplay` in this repo is a proxy; scenes, prompts and scoring live on the external Supabase project. Practice rows are logged with flow_type "practice" and never with step_type "ai_response".

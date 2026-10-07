@@ -17,6 +17,7 @@ type SessionRow = {
   referrer: string | null;
   is_prolific: boolean | null;
   is_bystander_beta: boolean | null;
+  is_practice: boolean | null;
   prolific_pid: string | null;
   age_user: string | number | null;
   age_prefer_not_to_say: boolean | null;
@@ -292,7 +293,9 @@ function GrowthDashboard({ email }: { email: string }) {
   }, [load]);
 
   const stats = useMemo(() => {
-    const notJunk = rows.filter((r) => !r.flagged_junk);
+    const notJunkAll = rows.filter((r) => !r.flagged_junk);
+    const practice = notJunkAll.filter((r) => r.is_practice);
+    const notJunk = notJunkAll.filter((r) => !r.is_practice);
     const beta = notJunk.filter((r) => r.is_bystander_beta);
     const clean = notJunk.filter((r) => !r.is_bystander_beta);
     const isReal = (r: SessionRow) => REAL_SOURCES.has((r.source_type ?? "").toLowerCase());
@@ -442,6 +445,7 @@ function GrowthDashboard({ email }: { email: string }) {
       readinessBottleneck,
       referrers,
       betaCount: beta.length,
+      practiceCount: practice.length,
       betaFollowup: beta.filter((r) => r.has_followup).length,
       junk,
     };
@@ -494,6 +498,7 @@ function GrowthDashboard({ email }: { email: string }) {
           <Stat label="real narrative" value={String(stats.real.length)} sub="typed / chip_edited" />
           <Stat label="prolific" value={String(stats.prolificCount)} />
           <Stat label="bystander beta" value={String(stats.betaCount)} sub={`${stats.betaFollowup} with follow-up · counted separately`} />
+          <Stat label="practice" value={String(stats.practiceCount)} sub="counted separately" />
           <Stat label="unique anon ids" value={String(stats.uniqueAnon)} />
           <Stat
             label="real w/ follow-up"

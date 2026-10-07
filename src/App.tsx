@@ -31,6 +31,7 @@ import WitnessReport from "./pages/witness/WitnessReport";
 import WitnessTip from "./pages/witness/WitnessTip";
 import BystanderBeta from "./pages/BystanderBeta";
 import BystanderFeedback from "./pages/BystanderFeedback";
+import Practice from "./pages/Practice";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/witness/tip" element={<WitnessTip />} />
               <Route path="/bystanderbeta" element={<BystanderBeta />} />
               <Route path="/bystanderbeta/feedback" element={<BystanderFeedback />} />
+              <Route path="/practice" element={<Practice />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

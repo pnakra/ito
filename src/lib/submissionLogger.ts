@@ -4,8 +4,8 @@ import { getReferralMeta } from "./referralMeta";
 const PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID;
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-type FlowType = "before" | "after-crossed" | "after-someone-crossed";
-type StepType = "choice" | "freetext" | "ai_response";
+type FlowType = "before" | "after-crossed" | "after-someone-crossed" | "practice";
+type StepType = "choice" | "freetext" | "ai_response" | "practice_reply";
 
 let currentSessionId: string | null = null;
 let currentMessageIndex = 0;

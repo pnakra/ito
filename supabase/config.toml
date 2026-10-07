@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.notify-preview-slack]
 verify_jwt = false
+
+[functions.practice-roleplay]
+verify_jwt = false
