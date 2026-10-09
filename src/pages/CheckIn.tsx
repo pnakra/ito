@@ -1038,7 +1038,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               else if (phase === "follow-up-chat") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
               else if (phase === "confidence-post") setPhase(detectedTiming === "after" ? "after-explanation" : "explanation");
               else if (phase === "outcome") setPhase("confidence-post");
-              else if (phase === "outcome-feedback") setPhase("outcome");
+              else if (phase === "outcome-feedback") { setSelectedOutcome(null); setPhase("outcome"); }
               else resetFlow();
             }} />
           ) : (
