@@ -1006,6 +1006,18 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
+          {isBystander && (
+            <div className="flex justify-end -mb-2">
+              <a
+                href="/bystanderbeta/feedback"
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center min-h-[44px] rounded-full border border-border px-4 text-[13px] text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Give feedback
+              </a>
+            </div>
+          )}
           {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
               if (phase === "role-question") setPhase("narrative-input");
