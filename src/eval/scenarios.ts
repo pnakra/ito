@@ -1,4 +1,4 @@
-// AI eval scenarios for ito — v8 suite (150 scenarios).
+// AI eval scenarios for ito — v9 suite (300 scenarios: v8's 150 plus v9Additions in scenariosV9.ts).
 // Corpus-grounded rebuild: categories and mode distribution derived bottom-up
 // from ~1,500 r/teenagers + r/datingadvice posts (~552 High/Medium prevention-
 // relevance). Full sourcing rationale lives in the v6 workbook README.
@@ -2186,4 +2186,5 @@ const witnessMirror: EvalScenario[] = [
   },
 ];
 
-export const ALL_SCENARIOS: EvalScenario[] = [...noFlag, ...yellow, ...red, ...adversarial, ...drift, ...redteam, ...bystander, ...witnessMirror];
+import { v9Additions } from "./scenariosV9";
+export const ALL_SCENARIOS: EvalScenario[] = [...noFlag, ...yellow, ...red, ...adversarial, ...drift, ...redteam, ...bystander, ...witnessMirror, ...v9Additions];
