@@ -27,6 +27,7 @@ import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
 import AfterExplanationCard from "@/components/after/AfterExplanationCard";
 import { detectGaps, narrativeToDecisionState, detectSubmissionFlag, type DetectedGap } from "@/lib/narrativeGapDetection";
 import { classifyRisk, detectFlagWords, formatSelectionsForAI } from "@/lib/riskClassification";
+import { fetchAiRiskTier, combineRisk, type AiRiskTier } from "@/lib/aiRiskTier";
 import { useSessionRiskTracking } from "@/hooks/useSessionRiskTracking";
 import { logChoice, logFreetext, logAIResponse, logSubmission, resetSessionId } from "@/lib/submissionLogger";
 import type { RiskLevel } from "@/types/risk";
@@ -155,6 +156,9 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
   const [detectedTiming, setDetectedTiming] = useState<"before" | "after" | "unclear">("unclear");
   // Ref stores the resolved timing synchronously so stop-moment acknowledge uses the correct value
   const resolvedTimingRef = useRef<"before" | "after" | "unclear">("unclear");
+  // AI risk tier for the original narrative (see src/lib/aiRiskTier.ts).
+  const aiTierRef = useRef<{ text: string; result: AiRiskTier } | null>(null);
+  const aiTierPromiseRef = useRef<Promise<AiRiskTier> | null>(null);
   // Ref stores structuredSignals synchronously for use in fetchExplanation
   const structuredSignalsRef = useRef<StructuredSignals>({});
   
@@ -297,7 +301,18 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
   const runSafetyClassification = useCallback((text: string) => {
     const gapResult = detectGaps(text);
     const decisionState = narrativeToDecisionState(text, gapResult.detectedTiming);
-    const result = classifyRisk(decisionState);
+    const rulesResult = classifyRisk(decisionState);
+    const ai = aiTierRef.current;
+    const combined = combineRisk(rulesResult, ai?.result ?? null, {
+      textIsOriginal: !!ai && text.trim() === ai.text.trim(),
+      queryType: gapResult.queryType,
+    });
+    const result =
+      combined.source === "ai-raise"
+        ? { ...rulesResult, level: "red" as RiskLevel, stopMessage: "Stop. What you've described includes serious red flags that indicate harm.", reasoning: "Your description contains language associated with non-consensual or harmful behavior." }
+        : combined.source === "ai-lower"
+          ? { ...rulesResult, level: "green" as RiskLevel, stopMessage: "", reasoning: "You have clear positive signals and no complicating factors." }
+          : rulesResult;
     
     updateRiskLevel(result.level);
     setRiskResult(result);
@@ -412,6 +427,13 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
   // Intake starts with "who is this about", unless the role is preset to other (/witness).
   const startIntake = (text: string, entryMethod: "typed" | "chip_unedited" | "chip_edited") => {
     entryMethodRef.current = entryMethod;
+    // Start the AI risk check now; it usually finishes while the user answers the next screen.
+    aiTierRef.current = null;
+    aiTierPromiseRef.current = fetchAiRiskTier(text).then((r) => {
+      aiTierRef.current = { text, result: r };
+      logSubmission({ flowType: "before", stepName: "ai-risk-tier", stepType: "choice", choiceValue: r?.tier ?? "unavailable", metadata: { confidence: r?.confidence ?? null, categories: r?.categories ?? [] } });
+      return r;
+    });
     setPendingAgeCheckText(text);
     if (!isBystander) {
       setReporterRole("self");
@@ -419,6 +441,13 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
     } else {
       setPhase("role-question");
     }
+  };
+
+  // Give the AI risk check up to 2.5s to finish before classifying the first narrative.
+  const runAfterAiTier = (fn: () => void) => {
+    const p = aiTierPromiseRef.current;
+    if (!p || aiTierRef.current) { fn(); return; }
+    Promise.race([p, new Promise((resolve) => setTimeout(resolve, 2500))]).then(() => fn());
   };
 
   const handleRoleQuestion = (picked: "self" | "other" | "group") => {
@@ -458,7 +487,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
       // Happening right now: ask nothing else.
       const text = pendingAgeCheckText ?? "";
       setPendingAgeCheckText(null);
-      if (text) processNarrativeSubmit(text, entryMethodRef.current);
+      if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
       else setPhase("narrative-input");
       return;
     }
@@ -513,7 +542,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
 
     const text = pendingAgeCheckText ?? "";
     setPendingAgeCheckText(null);
-    if (text) processNarrativeSubmit(text, entryMethodRef.current);
+    if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
     else setPhase("narrative-input");
   };
 
