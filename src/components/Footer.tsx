@@ -1,6 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {
+  const { pathname } = useLocation();
+  if (pathname === "/webinar") return null;
+
   return (
     <footer className="border-t border-border/30 mt-auto">
       <div className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-y-2">
