@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { hasCampusResourceLinks, loadCampusResources } from "@/lib/campusResources";
+import type { StructuredSignals } from "@/types/signals";
 
-const CampusResources = () => {
+const CampusResources = ({ targetPreference }: { targetPreference?: StructuredSignals["targetPreference"] }) => {
   const [config] = useState(loadCampusResources);
   if (!hasCampusResourceLinks(config) || !config) return null;
+  const limitReporting = targetPreference === "no-report" || targetPreference === "no-share";
   const links = [
     { url: config.supportUrl, label: "Campus support" },
-    { url: config.titleIxUrl, label: "Title IX information" },
-    { url: config.reportUrl, label: "Campus reporting or tip form" },
+    { url: limitReporting ? undefined : config.titleIxUrl, label: "Title IX information" },
+    { url: limitReporting ? undefined : config.reportUrl, label: "Campus reporting or tip form" },
   ].filter((link) => Boolean(link.url));
+  if (links.length === 0) return null;
 
   return (
     <section className="w-full rounded-lg border border-border bg-card p-4 text-left space-y-3">

@@ -250,7 +250,10 @@ function BystanderPilotSnapshot({ rows }: { rows: SessionRow[] }) {
           .eq("step_name", "witness-practice-complete")
           .range(from, from + 999);
         if (error) {
-          if (!cancelled) setPracticeError(error.message);
+          if (!cancelled) {
+            setPracticeError(error.message);
+            setLoadingPractice(false);
+          }
           return;
         }
         all.push(...((data ?? []) as PracticeCompletionRow[]));

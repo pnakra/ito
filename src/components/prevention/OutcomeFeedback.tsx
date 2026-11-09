@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
 import CampusResources from "@/components/bystander/CampusResources";
+import type { StructuredSignals } from "@/types/signals";
 
 interface OutcomeFeedbackProps {
   outcomeId: string;

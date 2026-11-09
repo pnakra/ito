@@ -13,7 +13,7 @@ export const INTERVENTION_ACTIONS: Record<InterventionId, InterventionAction> = 
   direct: {
     id: "direct",
     fiveD: "Direct",
-    fiveC: "Challenge the abuse",
+    fiveC: "Challenge",
     reason: "Names the problem plainly and interrupts the idea that everyone in the group agrees.",
   },
   distract: {
