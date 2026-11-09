@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { hasCampusResourceLinks, parseCampusResources } from "./campusResources";
+import { hasCampusResourceLinks, parseCampusResources } from "../src/lib/campusResources";
 
 describe("campus pilot links", () => {
   test("accepts named campus support and reporting links over HTTPS", () => {

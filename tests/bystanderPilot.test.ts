@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { summarizeBystanderPilot } from "./bystanderPilot";
+import { summarizeBystanderPilot } from "../src/lib/bystanderPilot";
 
 describe("aggregate bystander pilot snapshot", () => {
   test("computes confidence change from paired answers only", () => {
