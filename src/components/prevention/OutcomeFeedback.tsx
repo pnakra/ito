@@ -15,6 +15,7 @@ interface OutcomeFeedbackProps {
   beta?: boolean;
   /** Witness-only: show any campus links supplied with the pilot URL. */
   witness?: boolean;
+  targetPreference?: StructuredSignals["targetPreference"];
 }
 
 export const feedbackMap: Record<string, string> = {

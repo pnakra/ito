@@ -39,6 +39,7 @@ const WitnessTip = () => {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [campusResources] = useState(loadCampusResources);
+  const targetPreference = (location.state as { targetPreference?: "no-report" | "no-share" | "no-contact" | "open-to-help" | "unknown" } | null)?.targetPreference;
   const looksNow = /\b(right now|rn|happening now|as we speak|this second|this minute|at the moment|currently)\b/i.test(story);
 
   const build = async () => {

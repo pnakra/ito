@@ -1387,9 +1387,10 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               onReset={resetFlow}
               beta={isBystander}
               witness={reporterRole === "other"}
+              targetPreference={structuredSignals.targetPreference}
               onTip={
                 reporterRole === "other" && witnessTiming !== "now"
-                  ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n") } })
+                  ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n"), targetPreference: structuredSignals.targetPreference } })
                   : undefined
               }
             />
