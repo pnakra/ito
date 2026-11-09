@@ -40,6 +40,8 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness
         <p className="text-[17px] font-semibold text-callout-foreground">{feedback}</p>
       </div>
       
+      {witness && <CampusResources />}
+
       {onTip && (
         <Button variant="outline" size="lg" onClick={onTip} className="w-full">
           Turn this into an anonymous tip

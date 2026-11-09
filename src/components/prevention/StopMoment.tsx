@@ -95,6 +95,8 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
               <p className="text-body text-foreground/90">{stopMessage}</p>
             )}
 
+            {isWitness && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
+
             <Button
               onClick={onAcknowledge}
               size="lg"

@@ -150,7 +150,9 @@ const AfterExplanationCard = ({ results, isLoading, onComplete, reporterRole, wi
           </div>
           <div className="bg-muted/20 border border-border/50 rounded-md p-4 ml-6">
             <p className="text-sm whitespace-pre-wrap">{results.accountabilitySteps}</p>
+            {reporterRole === "other" && <InterventionActionLabel text={`${results.accountabilitySteps} ${results.nextSteps ?? ""}`} />}
           </div>
+          {reporterRole === "other" && <div className="ml-6"><WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} /></div>}
         </div>
       )}
 
