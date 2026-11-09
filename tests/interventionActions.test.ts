@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getInterventionAction, getWitnessSafetyNotes, isOnlineWitnessContext } from "../src/lib/interventionActions";
+import { getInterventionAction, getWitnessSafetyNotes, getWitnessSuggestionOverride, isOnlineWitnessContext } from "../src/lib/interventionActions";
 
  describe("bystander intervention labels", () => {
   test("labels saving timestamps and URLs as Document / Collect evidence", () => {

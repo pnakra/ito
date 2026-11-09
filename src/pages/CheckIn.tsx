@@ -34,7 +34,7 @@ import { logChoice, logFreetext, logAIResponse, logSubmission, resetSessionId } 
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
 import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/invokeEdgeFunctionWithRetry";
-import { isOnlineWitnessContext } from "@/lib/interventionActions";
+import { isOnlineWitnessContext, getWitnessSuggestionOverride } from "@/lib/interventionActions";
 
 type FlowPhase =
   | "narrative-input"
