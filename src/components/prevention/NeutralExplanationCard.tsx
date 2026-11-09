@@ -75,8 +75,12 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete, reporterRole,
       </div>
 
       {showCallout && analysis.suggestion && (
-        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in">
-          <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
+        <div className="space-y-3 animate-fade-in">
+          <div className="bg-callout rounded-[12px] px-5 py-4">
+            <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
+            {reporterRole === "other" && <InterventionActionLabel text={analysis.suggestion} />}
+          </div>
+          {reporterRole === "other" && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
         </div>
       )}
     </div>

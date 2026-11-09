@@ -27,7 +27,7 @@ type RevealStep = "clarityCheck" | "perspective" | "patterns" | "accountability"
 
 const ALL_STEPS: RevealStep[] = ["clarityCheck", "perspective", "patterns", "accountability", "nextSteps", "forward", "complete"];
 
-const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanationCardProps) => {
+const AfterExplanationCard = ({ results, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: AfterExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("clarityCheck");
 
   const availableSteps = useMemo(() => {

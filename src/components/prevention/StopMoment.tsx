@@ -23,7 +23,7 @@ interface StopMomentProps {
 const linkClass =
   "flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors";
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role = null, witnessTiming = null }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role = null, witnessTiming = null, witnessSignals, onlineContext = false }: StopMomentProps) => {
   const isRed = riskLevel === "red";
   // Crisis (self-harm) keeps its own frame.
   const isWitness = !isCrisis && role === "other";

@@ -30,7 +30,10 @@ const Play = ({ s, onDone, onComplete }: { s: PracticeScenario; onDone: (score: 
   const next = () => {
     setPicked(null);
     if (round + 1 < s.rounds.length) setRound(round + 1);
-    else setFinished(true);
+    else {
+      setFinished(true);
+      onComplete();
+    }
   };
 
   if (finished) {

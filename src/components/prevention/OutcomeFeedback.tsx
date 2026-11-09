@@ -31,7 +31,7 @@ export const feedbackMap: Record<string, string> = {
 };
 
 
-const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta }: OutcomeFeedbackProps) => {
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness = false }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (

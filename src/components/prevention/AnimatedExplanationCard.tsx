@@ -93,9 +93,15 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole
 
       {/* Callout — appears last */}
       {showCallout && analysis.suggestion && (
-        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in flex items-start gap-3">
-          <ArrowRightIcon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-[15px] font-medium text-foreground leading-relaxed">{analysis.suggestion}</p>
+        <div className="space-y-3 animate-fade-in">
+          <div className="bg-callout rounded-[12px] px-5 py-4 flex items-start gap-3">
+            <ArrowRightIcon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-medium text-foreground leading-relaxed">{analysis.suggestion}</p>
+              {reporterRole === "other" && <InterventionActionLabel text={analysis.suggestion} />}
+            </div>
+          </div>
+          {reporterRole === "other" && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
         </div>
       )}
 
