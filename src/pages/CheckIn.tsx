@@ -1073,6 +1073,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               else if (phase === "group-part") setPhase("role-question");
               else if (phase === "witness-timing") setPhase(groupPart === "watching" ? "group-part" : "role-question");
               else if (phase === "age-check") setPhase(!isBystander ? "narrative-input" : reporterRole === "other" ? "witness-timing" : groupPart !== null ? "group-part" : "role-question");
+              else if (phase === "witness-safety") setPhase("age-check");
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
               else if (phase === "stop-moment") setPhase("narrative-input");
