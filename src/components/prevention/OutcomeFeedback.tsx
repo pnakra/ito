@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
+import CampusResources from "@/components/bystander/CampusResources";
+import type { StructuredSignals } from "@/types/signals";
 
 interface OutcomeFeedbackProps {
   outcomeId: string;
@@ -11,6 +13,9 @@ interface OutcomeFeedbackProps {
   onTip?: () => void;
   /** Bystander beta only: show the beta feedback link. */
   beta?: boolean;
+  /** Witness-only: show any campus links supplied with the pilot URL. */
+  witness?: boolean;
+  targetPreference?: StructuredSignals["targetPreference"];
 }
 
 export const feedbackMap: Record<string, string> = {
@@ -28,7 +33,7 @@ export const feedbackMap: Record<string, string> = {
 };
 
 
-const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta }: OutcomeFeedbackProps) => {
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness = false, targetPreference }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (
@@ -37,6 +42,8 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta }: Outco
         <p className="text-[17px] font-semibold text-callout-foreground">{feedback}</p>
       </div>
       
+      {witness && <CampusResources targetPreference={targetPreference} />}
+
       {onTip && (
         <Button variant="outline" size="lg" onClick={onTip} className="w-full">
           Turn this into an anonymous tip

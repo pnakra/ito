@@ -5,6 +5,7 @@ import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { PRACTICE, type PracticeChoice, type PracticeScenario } from "@/data/witness";
+import { logSubmission } from "@/lib/submissionLogger";
 
 const STORE = "ito_witness_practice_v1";
 type Scores = Record<string, number>;
@@ -12,7 +13,7 @@ const loadScores = (): Scores => {
   try { return JSON.parse(localStorage.getItem(STORE) || "{}"); } catch { return {}; }
 };
 
-const Play = ({ s, onDone }: { s: PracticeScenario; onDone: (score: number) => void }) => {
+const Play = ({ s, onDone, onComplete }: { s: PracticeScenario; onDone: (score: number) => void; onComplete: () => void }) => {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [pressure, setPressure] = useState(2);
@@ -29,7 +30,10 @@ const Play = ({ s, onDone }: { s: PracticeScenario; onDone: (score: number) => v
   const next = () => {
     setPicked(null);
     if (round + 1 < s.rounds.length) setRound(round + 1);
-    else setFinished(true);
+    else {
+      setFinished(true);
+      onComplete();
+    }
   };
 
   if (finished) {
@@ -95,6 +99,17 @@ const WitnessPractice = () => {
   const [scores, setScores] = useState<Scores>(loadScores);
   const [active, setActive] = useState<PracticeScenario | null>(null);
 
+  const completed = (id: string) => {
+    // Completion only: scores never leave this device.
+    logSubmission({
+      flowType: "before",
+      stepName: "witness-practice-complete",
+      stepType: "choice",
+      choiceValue: id,
+      metadata: { surface: "bystander_pilot", practice_completed: true },
+    });
+  };
+
   const done = (id: string, score: number) => {
     const next = { ...scores, [id]: Math.max(scores[id] ?? 0, score) };
     setScores(next);
@@ -117,7 +132,7 @@ const WitnessPractice = () => {
           {active ? (
             <>
               <h1 className="text-h2 text-foreground">{active.title}</h1>
-              <Play key={active.id} s={active} onDone={(sc) => done(active.id, sc)} />
+              <Play key={active.id} s={active} onDone={(sc) => done(active.id, sc)} onComplete={() => completed(active.id)} />
             </>
           ) : (
             <>

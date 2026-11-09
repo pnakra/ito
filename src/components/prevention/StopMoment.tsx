@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Hand, Pause, X, Eye } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
+import type { StructuredSignals } from "@/types/signals";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 export type ReporterRole = "self" | "other" | "unsure";
 export type WitnessTiming = "now" | "soon" | "already";
@@ -14,12 +16,14 @@ interface StopMomentProps {
   /** Effective role, asked before classification. */
   role?: ReporterRole | null;
   witnessTiming?: WitnessTiming | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
 const linkClass =
   "flex items-center justify-center w-full py-3 rounded-lg border border-signal-stop/20 text-signal-stop text-[14px] font-medium hover:bg-signal-stop/5 transition-colors";
 
-const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role = null, witnessTiming = null }: StopMomentProps) => {
+const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis, role = null, witnessTiming = null, witnessSignals, onlineContext = false }: StopMomentProps) => {
   const isRed = riskLevel === "red";
   // Crisis (self-harm) keeps its own frame.
   const isWitness = !isCrisis && role === "other";
@@ -75,14 +79,32 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                   )}
                   {witnessTiming === "soon" && (
                     <>
-                      <li>Say something plainly to the person planning it.</li>
-                      <li>Tell the person at risk, or someone close to them, if you can.</li>
+                      {witnessSignals?.witnessSafety === "self" || witnessSignals?.witnessSafety === "both" || witnessSignals?.witnessSafety === "target" ? (
+                        <li>Use a lower-profile option. Ask someone trusted to step in rather than confronting anyone.</li>
+                      ) : (
+                        <li>Say something plainly to the person planning it.</li>
+                      )}
+                      {witnessSignals?.targetPreference === "no-contact" ? (
+                        <li>Ask someone they trust to check in instead of contacting them yourself.</li>
+                      ) : witnessSignals?.targetPreference === "no-report" || witnessSignals?.targetPreference === "no-share" ? (
+                        <li>Ask what they want before telling anyone else or sharing details.</li>
+                      ) : (
+                        <li>Tell the person at risk, or someone close to them, if you can.</li>
+                      )}
                     </>
                   )}
                   {witnessTiming === "already" && (
                     <>
-                      <li>Check on them if you know them. Keep it short and let them lead.</li>
-                      <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
+                      {witnessSignals?.targetPreference === "no-contact" ? (
+                        <li>Ask someone they trust to check in instead of contacting them yourself.</li>
+                      ) : (
+                        <li>Check on them if you know them. Keep it short and let them lead.</li>
+                      )}
+                      {witnessSignals?.targetPreference === "no-report" || witnessSignals?.targetPreference === "no-share" ? (
+                        <li>Keep what you saved private. Ask what they want before reporting or sharing it.</li>
+                      ) : (
+                        <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
+                      )}
                     </>
                   )}
                 </ul>
@@ -90,6 +112,8 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
             ) : (
               <p className="text-body text-foreground/90">{stopMessage}</p>
             )}
+
+            {isWitness && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
 
             <Button
               onClick={onAcknowledge}

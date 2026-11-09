@@ -279,6 +279,20 @@
 
 ---
 
+## 16A. BYSTANDER SAFETY AND ONLINE GUIDANCE
+
+**Safety heading:** "Before you act, what could make this backfire?"
+**Safety subheading:** "This helps ito avoid suggesting a move that puts you or them at more risk."
+**Retaliation question:** "Could stepping in lead to retaliation?"
+**Preference question:** "What has the person targeted said they want?"
+
+**Online heading:** "Do not help the post spread."
+**Online guidance:** "Do not reply, quote, repost, or tag the person. Report it in the app, save evidence privately, and ask the person targeted what they want shared."
+
+**Intervention labels:** Related 5 D and 5 C actions, with a short reason. These labels explain the suggested move; they do not change the AI response.
+
+---
+
 ## 17. OUTCOME CHECK (OutcomeCheck.tsx)
 
 **Heading:** "What did you do?"

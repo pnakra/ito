@@ -37,6 +37,31 @@ export const GUIDES: Guide[] = [
     ],
   },
   {
+    slug: "anonymous-posts",
+    title: "Sidechat, Fizz, and anonymous posts",
+    short: "Stop a pile-on without giving the post more attention.",
+    intro: "On anonymous apps, a reply can keep a harmful post visible even when the reply disagrees with it. The goal is to limit its reach, support the person targeted, and get it removed.",
+    sections: [
+      {
+        heading: "Do not amplify it",
+        points: [
+          "Do not reply, quote, repost, or tag the person targeted. Engagement can push the post to more people.",
+          "Do not move it into a group chat to ask whether everyone has seen it. That creates another audience.",
+          "Do not post their name or photo to defend them. That can make identification easier.",
+        ],
+      },
+      {
+        heading: "Do this instead",
+        points: [
+          "Report the post in Sidechat, Fizz, or the platform where it appeared. Ask a moderator or campus contact to act if the app does not.",
+          "Save the URL, timestamps, and relevant messages privately. Do not forward them around.",
+          "Check on the person targeted privately. Ask what they want done with anything you saved and whether they want help reporting it.",
+          "If they are an adult and no one is in immediate danger, let them lead decisions about reporting and sharing.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "check-on-her",
     title: "Check on her",
     short: "What to say that night or the next morning, without pressure.",
@@ -337,6 +362,64 @@ export const PRACTICE: PracticeScenario[] = [
       },
     ],
     sayForReal: "\"She's not into it. Drop it.\"",
+  },
+  {
+    id: "him-sidechat",
+    track: "him",
+    title: "The Sidechat pile-on",
+    setup: "An anonymous Sidechat post names someone from your residence hall. The comments are getting more personal.",
+    rounds: [
+      {
+        messages: [
+          { from: "Anonymous", text: "here's her profile, ask her what happened last night" },
+          { from: "Anonymous", text: "keep this thread going" },
+        ],
+        prompt: "What do you do?",
+        choices: [
+          { text: "Report the thread and save the URL and timestamps privately", d: "Document", points: 3, pressure: 1, feedback: "Reporting and preserving the details helps without adding another audience." },
+          { text: "Reply with her side of the story", d: "Direct", points: 0, pressure: 1, feedback: "Even a defense can boost the thread and reveal more about her. Report it and check on her privately instead." },
+          { text: "Repost it in the house chat so everyone can condemn it", d: "None", points: 0, pressure: 1, feedback: "That gives the post a new audience. Do not move the pile-on somewhere else." },
+        ],
+      },
+      {
+        messages: [{ from: "Her", text: "please don't send it to anyone else" }],
+        prompt: "She answers your private check-in.",
+        choices: [
+          { text: "Ask what she wants done with the screenshots and whether she wants help reporting", d: "Delay", points: 3, pressure: -1, feedback: "She leads decisions about her story and the evidence when there is no immediate danger." },
+          { text: "Send everything to Title IX without telling her", d: "Delegate", points: 1, pressure: 1, feedback: "Reporting may be the right option, but she asked you not to share. Talk through options with her first unless someone is in immediate danger." },
+        ],
+      },
+    ],
+    sayForReal: "\"I reported the thread. I saved the details privately. What do you want me to do with them?\"",
+  },
+  {
+    id: "him-fizz",
+    track: "him",
+    title: "The Fizz rumor",
+    setup: "A Fizz post is spreading a rumor about someone in your chapter. People are adding names and photos.",
+    rounds: [
+      {
+        messages: [
+          { from: "Anonymous", text: "someone drop the pics" },
+          { from: "Anonymous", text: "quote this so it stays at the top" },
+        ],
+        prompt: "What is the first move?",
+        choices: [
+          { text: "Report the post and ask a campus contact for help getting it removed", d: "Delegate", points: 3, pressure: 1, feedback: "A moderator or campus contact can act without you adding engagement." },
+          { text: "Comment that everyone should stop", d: "Direct", points: 1, pressure: 1, feedback: "The intention is good, but the comment can keep the post visible. Use the report route instead." },
+          { text: "Download and post the photos to ask who is in them", d: "None", points: 0, pressure: 1, feedback: "That spreads identifying content. Keep any evidence private." },
+        ],
+      },
+      {
+        messages: [{ from: "Them", text: "I don't want to talk about it" }],
+        prompt: "They answer your check-in.",
+        choices: [
+          { text: "Give them space and ask whether someone they trust can check in", d: "Delay", points: 3, pressure: -1, feedback: "Support does not require them to tell you the story or keep talking to you." },
+          { text: "Keep asking until they explain", d: "None", points: 0, pressure: 1, feedback: "They set a boundary. Let them lead." },
+        ],
+      },
+    ],
+    sayForReal: "\"I won't share it. I can help report it, or give you space. What would help?\"",
   },
 ];
 

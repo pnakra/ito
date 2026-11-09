@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface NeutralAnalysisData {
   signalLabel: string;
@@ -10,9 +13,12 @@ interface NeutralExplanationCardProps {
   analysis: NeutralAnalysisData | null;
   isLoading: boolean;
   onComplete?: () => void;
+  reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
-const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExplanationCardProps) => {
+const NeutralExplanationCard = ({ analysis, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: NeutralExplanationCardProps) => {
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);
 
@@ -69,8 +75,12 @@ const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExpl
       </div>
 
       {showCallout && analysis.suggestion && (
-        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in">
-          <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
+        <div className="space-y-3 animate-fade-in">
+          <div className="bg-callout rounded-[12px] px-5 py-4">
+            <p className="text-[15px] font-medium italic text-foreground leading-relaxed">{analysis.suggestion}</p>
+            {reporterRole === "other" && <InterventionActionLabel text={analysis.suggestion} />}
+          </div>
+          {reporterRole === "other" && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
         </div>
       )}
     </div>

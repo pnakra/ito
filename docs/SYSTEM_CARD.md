@@ -212,7 +212,14 @@ Even when risk computes as GREEN (Level 0):
 
 The static pass can only **escalate** risk. The AI pass cannot change the risk level.
 
-### 7.5 Anti-Coaching Constraints
+### 7.5 Bystander Safety and Anti-Amplification
+
+The bystander frame uses the same risk engine and adds two deterministic safeguards:
+
+- Non-emergency witness flows ask about retaliation risk and the targeted person's reporting, sharing, and contact preferences. Guidance must not require confrontation or treat reporting as the default when an adult has asked for privacy and no one is in immediate danger.
+- Sidechat, Fizz, group-chat, and other online contexts show anti-amplification guidance: do not reply, quote, repost, tag, or move the content into another audience. Report through the platform, preserve evidence privately, and let the targeted person lead sharing decisions when there is no immediate danger.
+
+### 7.6 Anti-Coaching Constraints
 
 YELLOW and RED prompts include explicit instructions:
 - "Do NOT advise on how to progress or escalate physical touch"

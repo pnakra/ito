@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 import { RECIPIENTS, type RecipientId } from "@/data/witness";
+import CampusResources from "@/components/bystander/CampusResources";
 
 interface Brief {
   urgency: "happening_now" | "recent" | "past";
@@ -172,6 +173,7 @@ const WitnessReport = () => {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">In a real report, this is where it would be sent. Right now it goes nowhere.</p>
+              <CampusResources />
             </section>
           )}
         </div>

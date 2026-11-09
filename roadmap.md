@@ -12,3 +12,8 @@
 - [x] Webinar deck: problem, shared ito engine, 5 C's + 5 D's, product, practice, pilot close
 - [x] Webinar deck QA: keyboard/grid/present/print flows and all-slide visual review
 - [x] Propose focused product additions after the deck; do not change the product flow without approval
+- [x] Label bystander suggestions with 5 C's / 5 D's actions and plain-language reasons
+- [x] Add Sidechat/Fizz scenarios and anti-amplification guidance
+- [x] Add a witness safety/retaliation check that keeps the targeted person's preferences central
+- [x] Support configurable campus-specific help and reporting links
+- [x] Add an aggregate-only bystander pilot snapshot: confidence, intervention type, practice completion

@@ -4,6 +4,7 @@ import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams, useNavigate, Navigate } from "react-router-dom";
 import { refreshReferralMeta, setReferralSrc } from "@/lib/referralMeta";
 import BystanderFirstScreenExtras from "@/components/bystander/BystanderFirstScreenExtras";
+import WitnessSafetyCheck, { type WitnessSafetyResult } from "@/components/bystander/WitnessSafetyCheck";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -33,6 +34,7 @@ import { logChoice, logFreetext, logAIResponse, logSubmission, resetSessionId } 
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
 import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/invokeEdgeFunctionWithRetry";
+import { isOnlineWitnessContext, getWitnessSuggestionOverride } from "@/lib/interventionActions";
 
 type FlowPhase =
   | "narrative-input"
@@ -40,6 +42,7 @@ type FlowPhase =
   | "group-part"
   | "witness-timing"
   | "age-check"
+  | "witness-safety"
   | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
@@ -93,7 +96,8 @@ interface CheckInProps {
 
 const BYSTANDER_CHIPS = [
   "My friend might be trying to pressure someone into having sex",
-  "There's a message in the group chat I can't stop thinking about",
+  "Someone on Sidechat named a student and people are piling on",
+  "A Fizz post is spreading a rumor about my friend",
   "Someone told me what happened to them at a party",
 ];
 
@@ -541,6 +545,21 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
     }
 
     const text = pendingAgeCheckText ?? "";
+    if (reporterRoleRef.current === "other" && structuredSignalsRef.current.witnessTiming !== "now") {
+      // Keep the narrative pending while safety and the targeted person's wishes are checked.
+      setPhase("witness-safety");
+      return;
+    }
+    setPendingAgeCheckText(null);
+    if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
+    else setPhase("narrative-input");
+  };
+
+  const handleWitnessSafetySubmit = ({ safety, targetPreference }: WitnessSafetyResult) => {
+    updateSignals({ witnessSafety: safety, targetPreference });
+    logSubmission({ flowType: "before", stepName: "witness-safety", stepType: "choice", choiceValue: safety });
+    logSubmission({ flowType: "before", stepName: "target-preference", stepType: "choice", choiceValue: targetPreference });
+    const text = pendingAgeCheckText ?? "";
     setPendingAgeCheckText(null);
     if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
     else setPhase("narrative-input");
@@ -793,15 +812,26 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
 
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
-      const suggestion = cleanText(data?.suggestion);
+      const rawSuggestion = cleanText(data?.suggestion);
       const followUpQuestion = cleanText(data?.followUpQuestion);
 
       const clarityCheck = cleanText(data?.clarityCheck);
       const otherPersonPerspective = cleanText(data?.otherPersonPerspective);
       const yourPatterns = cleanText(data?.yourPatterns);
-      const accountabilitySteps = cleanText(data?.accountabilitySteps);
-      const avoidingRepetition = cleanText(data?.avoidingRepetition);
-      const nextSteps = cleanText(data?.nextSteps);
+      const rawAccountabilitySteps = cleanText(data?.accountabilitySteps);
+      const rawAvoidingRepetition = cleanText(data?.avoidingRepetition);
+      const rawNextSteps = cleanText(data?.nextSteps);
+      const witnessOverride = reporterRoleRef.current === "other"
+        ? getWitnessSuggestionOverride(
+            structuredSignalsRef.current,
+            isOnlineWitnessContext(text),
+            `${rawSuggestion} ${rawAccountabilitySteps} ${rawNextSteps}`,
+          )
+        : null;
+      const suggestion = witnessOverride ?? rawSuggestion;
+      const accountabilitySteps = witnessOverride ?? rawAccountabilitySteps;
+      const nextSteps = witnessOverride ? "" : rawNextSteps;
+      const avoidingRepetition = witnessOverride ? "" : rawAvoidingRepetition;
 
       console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck, "followUpQuestion:", followUpQuestion);
       console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
@@ -1012,6 +1042,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
     afterAnalysis?.avoidingRepetition, afterAnalysis?.yourPatterns, afterAnalysis?.nextSteps, afterAnalysis?.followUpQuestion,
   ].filter(Boolean).join(" ");
   const showWitness911 = reporterRole === "other" && (riskHighWaterMark === "red" || readText.includes("911"));
+  const onlineWitnessContext = reporterRole === "other" && isOnlineWitnessContext(narrativeHistory.join(" "));
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
 
@@ -1053,12 +1084,13 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               else if (phase === "group-part") setPhase("role-question");
               else if (phase === "witness-timing") setPhase(groupPart === "watching" ? "group-part" : "role-question");
               else if (phase === "age-check") setPhase(!isBystander ? "narrative-input" : reporterRole === "other" ? "witness-timing" : groupPart !== null ? "group-part" : "role-question");
+              else if (phase === "witness-safety") setPhase("age-check");
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
-              else if (phase === "stop-moment") setPhase("narrative-input");
+              else if (phase === "stop-moment") setPhase(reporterRoleRef.current === "other" && witnessTiming !== "now" ? "witness-safety" : "narrative-input");
               else if (phase === "explanation" || phase === "after-explanation") {
                 if (reporterRoleRef.current === "other") {
-                  setPhase(witnessCardShown && riskResult ? "stop-moment" : "narrative-input");
+                  setPhase(witnessCardShown && riskResult ? "stop-moment" : witnessTiming !== "now" ? "witness-safety" : "narrative-input");
                 } else {
                   setPhase("signal-floor");
                 }
@@ -1165,6 +1197,10 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
             />
           )}
 
+          {phase === "witness-safety" && reporterRole === "other" && (
+            <WitnessSafetyCheck onSubmit={handleWitnessSafetySubmit} />
+          )}
+
           {/* Phase 2: Signal Floor */}
           {phase === "signal-floor" && (
             <SignalFloor
@@ -1199,6 +1235,8 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               isCrisis={riskResult.isCrisis}
               role={reporterRole}
               witnessTiming={witnessTiming}
+              witnessSignals={structuredSignals}
+              onlineContext={onlineWitnessContext}
             />
           )}
 
@@ -1284,6 +1322,9 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                 analysis={analysis}
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
+                reporterRole={reporterRole}
+                witnessSignals={structuredSignals}
+                onlineContext={onlineWitnessContext}
               />
             ) : (
               <AnimatedExplanationCard
@@ -1291,6 +1332,8 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
                 reporterRole={reporterRole}
+                witnessSignals={structuredSignals}
+                onlineContext={onlineWitnessContext}
               />
             )
           )}
@@ -1301,6 +1344,9 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               results={afterAnalysis}
               isLoading={isLoading}
               onComplete={() => setExplanationComplete(true)}
+              reporterRole={reporterRole}
+              witnessSignals={structuredSignals}
+              onlineContext={onlineWitnessContext}
             />
           )}
 
@@ -1351,9 +1397,11 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               }
               onReset={resetFlow}
               beta={isBystander}
+              witness={reporterRole === "other"}
+              targetPreference={structuredSignals.targetPreference}
               onTip={
                 reporterRole === "other" && witnessTiming !== "now"
-                  ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n") } })
+                  ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n"), targetPreference: structuredSignals.targetPreference } })
                   : undefined
               }
             />

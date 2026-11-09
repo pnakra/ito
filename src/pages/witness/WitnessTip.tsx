@@ -6,6 +6,8 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
+import CampusResources from "@/components/bystander/CampusResources";
+import { hasCampusResourceLinks, loadCampusResources } from "@/lib/campusResources";
 
 // Practice-style page: nothing is logged, sent, or saved.
 
@@ -36,6 +38,8 @@ const WitnessTip = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [campusResources] = useState(loadCampusResources);
+  const targetPreference = (location.state as { targetPreference?: "no-report" | "no-share" | "no-contact" | "open-to-help" | "unknown" } | null)?.targetPreference;
   const looksNow = /\b(right now|rn|happening now|as we speak|this second|this minute|at the moment|currently)\b/i.test(story);
 
   const build = async () => {
@@ -121,10 +125,14 @@ const WitnessTip = () => {
                 <List items={brief.style_flags ?? []} />
               </div>
 
-              <div className="rounded-lg border border-border p-4 text-sm space-y-1">
-                <div className="font-medium text-foreground">Where to paste it</div>
-                <p className="text-foreground/90">Search for your city or campus police and the words anonymous tip. ito can't pick the form for you.</p>
-              </div>
+              {hasCampusResourceLinks(campusResources) ? (
+                <CampusResources targetPreference={targetPreference} />
+              ) : (
+                <div className="rounded-lg border border-border p-4 text-sm space-y-1">
+                  <div className="font-medium text-foreground">Where to paste it</div>
+                  <p className="text-foreground/90">Search for your city or campus police and the words anonymous tip. ito can't pick the form for you.</p>
+                </div>
+              )}
 
               <p className="text-sm text-muted-foreground">
                 Not sure about reporting? RAINN can talk it through at <a className="underline" href="tel:18006564673">1-800-656-4673</a>.

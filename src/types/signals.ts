@@ -11,6 +11,8 @@ export interface StructuredSignals {
   intent?: string;
   relationship?: string;
   witnessTiming?: "now" | "soon" | "already";
+  witnessSafety?: "self" | "target" | "both" | "none" | "unsure";
+  targetPreference?: "no-report" | "no-share" | "no-contact" | "open-to-help" | "unknown";
   group?: boolean;
   groupPart?: "in" | "considering" | "watching";
   agePersonCrossing?: string;

@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Eye, ArrowRight, ChevronRight, Heart, Repeat, AlertTriangle } from "lucide-react";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface ReflectionResult {
   clarityCheck: string;
@@ -15,13 +18,16 @@ interface AfterExplanationCardProps {
   results: ReflectionResult | null;
   isLoading: boolean;
   onComplete?: () => void;
+  reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
 type RevealStep = "clarityCheck" | "perspective" | "patterns" | "accountability" | "nextSteps" | "forward" | "complete";
 
 const ALL_STEPS: RevealStep[] = ["clarityCheck", "perspective", "patterns", "accountability", "nextSteps", "forward", "complete"];
 
-const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanationCardProps) => {
+const AfterExplanationCard = ({ results, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: AfterExplanationCardProps) => {
   const [currentStep, setCurrentStep] = useState<RevealStep>("clarityCheck");
 
   const availableSteps = useMemo(() => {
@@ -144,7 +150,9 @@ const AfterExplanationCard = ({ results, isLoading, onComplete }: AfterExplanati
           </div>
           <div className="bg-muted/20 border border-border/50 rounded-md p-4 ml-6">
             <p className="text-sm whitespace-pre-wrap">{results.accountabilitySteps}</p>
+            {reporterRole === "other" && <InterventionActionLabel text={`${results.accountabilitySteps} ${results.nextSteps ?? ""}`} />}
           </div>
+          {reporterRole === "other" && <div className="ml-6"><WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} /></div>}
         </div>
       )}
 

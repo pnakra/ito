@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import RiskBadge from "@/components/RiskBadge";
 import { AlertTriangle, MessageCircle, ArrowRight as ArrowRightIcon } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface AnalysisData {
   riskLevel: RiskLevel;
@@ -15,9 +18,11 @@ interface AnimatedExplanationCardProps {
   isLoading: boolean;
   onComplete?: () => void;
   reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
-const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole }: AnimatedExplanationCardProps) => {
+const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: AnimatedExplanationCardProps) => {
   const [showBadge, setShowBadge] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);
@@ -88,9 +93,15 @@ const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole
 
       {/* Callout — appears last */}
       {showCallout && analysis.suggestion && (
-        <div className="bg-callout rounded-[12px] px-5 py-4 animate-fade-in flex items-start gap-3">
-          <ArrowRightIcon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-[15px] font-medium text-foreground leading-relaxed">{analysis.suggestion}</p>
+        <div className="space-y-3 animate-fade-in">
+          <div className="bg-callout rounded-[12px] px-5 py-4 flex items-start gap-3">
+            <ArrowRightIcon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-medium text-foreground leading-relaxed">{analysis.suggestion}</p>
+              {reporterRole === "other" && <InterventionActionLabel text={analysis.suggestion} />}
+            </div>
+          </div>
+          {reporterRole === "other" && <WitnessSafetyGuidance signals={witnessSignals} online={onlineContext} />}
         </div>
       )}
 
