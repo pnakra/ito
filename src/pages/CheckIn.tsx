@@ -1186,6 +1186,10 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
             />
           )}
 
+          {phase === "witness-safety" && reporterRole === "other" && (
+            <WitnessSafetyCheck onSubmit={handleWitnessSafetySubmit} />
+          )}
+
           {/* Phase 2: Signal Floor */}
           {phase === "signal-floor" && (
             <SignalFloor
