@@ -18,6 +18,9 @@ interface AfterExplanationCardProps {
   results: ReflectionResult | null;
   isLoading: boolean;
   onComplete?: () => void;
+  reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
 type RevealStep = "clarityCheck" | "perspective" | "patterns" | "accountability" | "nextSteps" | "forward" | "complete";

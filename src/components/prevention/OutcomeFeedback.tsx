@@ -12,6 +12,8 @@ interface OutcomeFeedbackProps {
   onTip?: () => void;
   /** Bystander beta only: show the beta feedback link. */
   beta?: boolean;
+  /** Witness-only: show any campus links supplied with the pilot URL. */
+  witness?: boolean;
 }
 
 export const feedbackMap: Record<string, string> = {

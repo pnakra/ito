@@ -13,9 +13,12 @@ interface NeutralExplanationCardProps {
   analysis: NeutralAnalysisData | null;
   isLoading: boolean;
   onComplete?: () => void;
+  reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
-const NeutralExplanationCard = ({ analysis, isLoading, onComplete }: NeutralExplanationCardProps) => {
+const NeutralExplanationCard = ({ analysis, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: NeutralExplanationCardProps) => {
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);
 

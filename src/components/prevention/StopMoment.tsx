@@ -16,6 +16,8 @@ interface StopMomentProps {
   /** Effective role, asked before classification. */
   role?: ReporterRole | null;
   witnessTiming?: WitnessTiming | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
 const linkClass =

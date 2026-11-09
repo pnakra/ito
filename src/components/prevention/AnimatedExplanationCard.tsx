@@ -18,9 +18,11 @@ interface AnimatedExplanationCardProps {
   isLoading: boolean;
   onComplete?: () => void;
   reporterRole?: "self" | "other" | "unsure" | null;
+  witnessSignals?: Partial<StructuredSignals> | null;
+  onlineContext?: boolean;
 }
 
-const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole }: AnimatedExplanationCardProps) => {
+const AnimatedExplanationCard = ({ analysis, isLoading, onComplete, reporterRole, witnessSignals, onlineContext = false }: AnimatedExplanationCardProps) => {
   const [showBadge, setShowBadge] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCallout, setShowCallout] = useState(false);

@@ -13,7 +13,7 @@ const loadScores = (): Scores => {
   try { return JSON.parse(localStorage.getItem(STORE) || "{}"); } catch { return {}; }
 };
 
-const Play = ({ s, onDone }: { s: PracticeScenario; onDone: (score: number) => void }) => {
+const Play = ({ s, onDone, onComplete }: { s: PracticeScenario; onDone: (score: number) => void; onComplete: () => void }) => {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [pressure, setPressure] = useState(2);
