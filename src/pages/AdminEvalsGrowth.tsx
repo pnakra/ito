@@ -3,6 +3,7 @@ import { adminSupabase } from "@/lib/adminSupabase";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import EvalsTabs from "@/components/evals/EvalsTabs";
 import SEO from "@/components/SEO";
+import { INTERVENTION_LABELS, summarizeBystanderPilot, type PracticeCompletionRow } from "@/lib/bystanderPilot";
 
 type SessionRow = {
   session_id: string;
@@ -513,6 +514,7 @@ function GrowthDashboard({ email }: { email: string }) {
         </section>
 
         <RoleSplit />
+        <BystanderPilotSnapshot rows={beta} />
 
         {/* 1.5 — sessions over time */}
         <section className="border border-border rounded p-4 space-y-4">
