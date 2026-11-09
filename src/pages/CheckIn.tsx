@@ -1224,6 +1224,8 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               isCrisis={riskResult.isCrisis}
               role={reporterRole}
               witnessTiming={witnessTiming}
+              witnessSignals={structuredSignals}
+              onlineContext={onlineWitnessContext}
             />
           )}
 
@@ -1309,6 +1311,9 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                 analysis={analysis}
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
+                reporterRole={reporterRole}
+                witnessSignals={structuredSignals}
+                onlineContext={onlineWitnessContext}
               />
             ) : (
               <AnimatedExplanationCard
@@ -1316,6 +1321,8 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                 isLoading={isLoading}
                 onComplete={() => setExplanationComplete(true)}
                 reporterRole={reporterRole}
+                witnessSignals={structuredSignals}
+                onlineContext={onlineWitnessContext}
               />
             )
           )}
@@ -1326,6 +1333,9 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               results={afterAnalysis}
               isLoading={isLoading}
               onComplete={() => setExplanationComplete(true)}
+              reporterRole={reporterRole}
+              witnessSignals={structuredSignals}
+              onlineContext={onlineWitnessContext}
             />
           )}
 
@@ -1376,6 +1386,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               }
               onReset={resetFlow}
               beta={isBystander}
+              witness={reporterRole === "other"}
               onTip={
                 reporterRole === "other" && witnessTiming !== "now"
                   ? () => navigate("/witness/tip", { state: { story: narrativeHistory.join("\n\n") } })
