@@ -1076,10 +1076,10 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
               else if (phase === "witness-safety") setPhase("age-check");
               else if (phase === "signal-floor") setPhase("narrative-input");
               else if (phase === "follow-up-questions") setPhase("signal-floor");
-              else if (phase === "stop-moment") setPhase("narrative-input");
+              else if (phase === "stop-moment") setPhase(reporterRoleRef.current === "other" && witnessTiming !== "now" ? "witness-safety" : "narrative-input");
               else if (phase === "explanation" || phase === "after-explanation") {
                 if (reporterRoleRef.current === "other") {
-                  setPhase(witnessCardShown && riskResult ? "stop-moment" : "narrative-input");
+                  setPhase(witnessCardShown && riskResult ? "stop-moment" : witnessTiming !== "now" ? "witness-safety" : "narrative-input");
                 } else {
                   setPhase("signal-floor");
                 }
