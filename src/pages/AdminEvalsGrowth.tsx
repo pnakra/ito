@@ -231,6 +231,90 @@ function RoleSplit() {
   );
 }
 
+function BystanderPilotSnapshot({ rows }: { rows: SessionRow[] }) {
+  const [completions, setCompletions] = useState<PracticeCompletionRow[]>([]);
+  const [loadingPractice, setLoadingPractice] = useState(true);
+  const [practiceError, setPracticeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingPractice(true);
+      setPracticeError(null);
+      const all: PracticeCompletionRow[] = [];
+      for (let from = 0; ; from += 1000) {
+        // Deliberately select only aggregate-safe fields: no narrative or chat text.
+        const { data, error } = await adminSupabase
+          .from("submissions")
+          .select("session_id, choice_value")
+          .eq("step_name", "witness-practice-complete")
+          .range(from, from + 999);
+        if (error) {
+          if (!cancelled) setPracticeError(error.message);
+          return;
+        }
+        all.push(...((data ?? []) as PracticeCompletionRow[]));
+        if (!data || data.length < 1000) break;
+      }
+      if (!cancelled) setCompletions(all);
+      if (!cancelled) setLoadingPractice(false);
+    })();
+    return () => { cancelled = true; };
+  }, [rows]);
+
+  const summary = useMemo(() => summarizeBystanderPilot(rows, completions), [rows, completions]);
+  const scenarioLabels: Record<string, string> = {
+    "him-sidechat": "Sidechat pile-on",
+    "him-fizz": "Fizz rumor",
+    "him-groupchat": "Group chat",
+    "him-stairs": "On the stairs",
+    "him-morning": "The morning after",
+  };
+
+  return (
+    <section className="border border-border rounded p-4 space-y-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 className="text-xs uppercase tracking-wider text-muted-foreground">bystander pilot snapshot</h2>
+        <span className="text-[10px] font-mono text-muted-foreground">aggregate only · n={rows.length}</span>
+      </div>
+      <p className="text-xs font-mono text-muted-foreground">Counts and averages only. No story text, chat content, or practice scores are used here.</p>
+      {rows.length === 0 ? <Empty /> : (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <Stat label="confidence pre" value={summary.confidencePre?.toFixed(2) ?? "–"} sub={`${summary.confidenceCount} paired answers`} />
+            <Stat label="confidence post" value={summary.confidencePost?.toFixed(2) ?? "–"} sub={`${summary.confidenceCount} paired answers`} />
+            <Stat
+              label="confidence delta"
+              value={summary.confidenceDelta !== null ? `${summary.confidenceDelta >= 0 ? "+" : ""}${summary.confidenceDelta.toFixed(2)}` : "–"}
+              sub="post − pre"
+            />
+            <Stat
+              label="practice completion"
+              value={loadingPractice ? "…" : `${summary.practiceSessions} sessions`}
+              sub={`${summary.practiceCompletions} scenarios completed`}
+            />
+          </div>
+          {practiceError && <Empty note={`practice counts couldn't load: ${practiceError}`} />}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2.5">
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground">selected intervention</h3>
+              {summary.answeredOutcomes === 0 ? <Empty /> : [...summary.interventions.entries()].map(([id, count]) => (
+                <BarRow key={id} label={INTERVENTION_LABELS[id] ?? id} count={count} total={summary.answeredOutcomes} />
+              ))}
+            </div>
+            <div className="space-y-2.5">
+              <h3 className="text-[10px] uppercase tracking-wider text-muted-foreground">practice scenarios completed</h3>
+              {summary.practiceCompletions === 0 ? <Empty note={loadingPractice ? "loading…" : "not enough data yet"} /> : [...summary.scenarios.entries()].map(([id, count]) => (
+                <BarRow key={id} label={scenarioLabels[id] ?? id} count={count} total={summary.practiceCompletions} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 function GrowthDashboard({ email }: { email: string }) {
   const [rows, setRows] = useState<SessionRow[]>([]);
   const [loading, setLoading] = useState(true);
