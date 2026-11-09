@@ -360,7 +360,7 @@ function GrowthDashboard({ email }: { email: string }) {
     for (let from = 0; ; from += PAGE) {
       const { data, error } = await adminSupabase
         .from("session_summary")
-        .select("*")
+        .select("session_id, started_at, last_activity_at, anon_id, total_steps, followup_steps, has_followup, source_type, referrer, is_prolific, is_bystander_beta, is_practice, prolific_pid, age_user, age_prefer_not_to_say, confidence_pre, confidence_post, outcome, flagged_junk")
         .order("started_at", { ascending: false })
         .range(from, from + PAGE - 1);
       if (error) {
