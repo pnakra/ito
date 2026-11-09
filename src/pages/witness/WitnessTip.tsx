@@ -6,6 +6,8 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
+import CampusResources from "@/components/bystander/CampusResources";
+import { hasCampusResourceLinks, loadCampusResources } from "@/lib/campusResources";
 
 // Practice-style page: nothing is logged, sent, or saved.
 

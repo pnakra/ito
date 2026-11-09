@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 import { RECIPIENTS, type RecipientId } from "@/data/witness";
+import CampusResources from "@/components/bystander/CampusResources";
 
 interface Brief {
   urgency: "happening_now" | "recent" | "past";
