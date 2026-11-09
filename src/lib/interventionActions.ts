@@ -85,6 +85,32 @@ export function isOnlineWitnessContext(text: string): boolean {
     || /\b(post|repost|reposted|comment|comments|screenshot|thread)\b/i.test(text);
 }
 
+/** Deterministic display guard: safety answers and anti-amplification outrank AI wording. */
+export function getWitnessSuggestionOverride(
+  signals: Partial<StructuredSignals> | null | undefined,
+  online: boolean,
+  originalSuggestion: string,
+): string | null {
+  switch (signals?.targetPreference) {
+    case "no-share":
+      return "Keep the post, screenshots, and their story private. Ask what they want before reporting or sharing anything; if someone is in immediate danger, call 911.";
+    case "no-report":
+      return "Check in privately and ask what support, if any, they want. Do not report or share identifying details without their permission unless someone is in immediate danger.";
+    case "no-contact":
+      return "Ask someone they trust to check in instead of contacting them yourself. Keep any evidence private and ask before sharing it.";
+  }
+  if (signals?.witnessSafety === "self" || signals?.witnessSafety === "both") {
+    return "Use a lower-profile option: report through the platform or ask someone trusted to step in. You do not have to confront anyone.";
+  }
+  if (signals?.witnessSafety === "target") {
+    return "Check in privately and ask someone trusted to help without drawing more attention to them. Avoid a public confrontation.";
+  }
+  if (online && /\b(reply|comment|quote|repost|tag|share (it|the|this)|send it to|post (it|the|this))\b/i.test(originalSuggestion)) {
+    return "Do not reply or repost. Report the content in the app, save evidence privately, and ask the person targeted what they want shared.";
+  }
+  return null;
+}
+
 export function getWitnessSafetyNotes(signals?: Partial<StructuredSignals> | null): string[] {
   if (!signals) return [];
   const notes: string[] = [];
