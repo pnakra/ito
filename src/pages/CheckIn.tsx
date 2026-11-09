@@ -812,15 +812,26 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
 
       const signalLabel = cleanText(data?.signalLabel) || "Check in with them";
       const why = cleanList(data?.why);
-      const suggestion = cleanText(data?.suggestion);
+      const rawSuggestion = cleanText(data?.suggestion);
       const followUpQuestion = cleanText(data?.followUpQuestion);
 
       const clarityCheck = cleanText(data?.clarityCheck);
       const otherPersonPerspective = cleanText(data?.otherPersonPerspective);
       const yourPatterns = cleanText(data?.yourPatterns);
-      const accountabilitySteps = cleanText(data?.accountabilitySteps);
-      const avoidingRepetition = cleanText(data?.avoidingRepetition);
-      const nextSteps = cleanText(data?.nextSteps);
+      const rawAccountabilitySteps = cleanText(data?.accountabilitySteps);
+      const rawAvoidingRepetition = cleanText(data?.avoidingRepetition);
+      const rawNextSteps = cleanText(data?.nextSteps);
+      const witnessOverride = reporterRoleRef.current === "other"
+        ? getWitnessSuggestionOverride(
+            structuredSignalsRef.current,
+            isOnlineWitnessContext(text),
+            `${rawSuggestion} ${rawAccountabilitySteps} ${rawNextSteps}`,
+          )
+        : null;
+      const suggestion = witnessOverride ?? rawSuggestion;
+      const accountabilitySteps = witnessOverride ?? rawAccountabilitySteps;
+      const nextSteps = witnessOverride ? "" : rawNextSteps;
+      const avoidingRepetition = witnessOverride ? "" : rawAvoidingRepetition;
 
       console.log("[ITO-DIAG] Cleaned — signalLabel:", signalLabel, "why:", why, "suggestion:", suggestion, "clarityCheck:", clarityCheck, "followUpQuestion:", followUpQuestion);
       console.log("[ITO-DIAG] Phase:", isAfter ? "after-explanation" : "explanation", "isNeutralRisk:", riskLevel === "green");
