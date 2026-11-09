@@ -126,7 +126,7 @@ const WitnessTip = () => {
               </div>
 
               {hasCampusResourceLinks(campusResources) ? (
-                <CampusResources />
+                <CampusResources targetPreference={targetPreference} />
               ) : (
                 <div className="rounded-lg border border-border p-4 text-sm space-y-1">
                   <div className="font-medium text-foreground">Where to paste it</div>

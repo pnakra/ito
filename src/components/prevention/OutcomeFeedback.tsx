@@ -33,7 +33,7 @@ export const feedbackMap: Record<string, string> = {
 };
 
 
-const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness = false }: OutcomeFeedbackProps) => {
+const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness = false, targetPreference }: OutcomeFeedbackProps) => {
   const feedback = feedbackMap[feedbackKey ?? outcomeId] || feedbackMap["not-sure"];
 
   return (
@@ -42,7 +42,7 @@ const OutcomeFeedback = ({ outcomeId, feedbackKey, onReset, onTip, beta, witness
         <p className="text-[17px] font-semibold text-callout-foreground">{feedback}</p>
       </div>
       
-      {witness && <CampusResources />}
+      {witness && <CampusResources targetPreference={targetPreference} />}
 
       {onTip && (
         <Button variant="outline" size="lg" onClick={onTip} className="w-full">
