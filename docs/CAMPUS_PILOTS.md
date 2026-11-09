@@ -29,4 +29,4 @@ The internal growth dashboard shows:
 - Selected witness outcome / intervention type
 - Practice completions and unique completing sessions
 
-The practice-completion query selects only session IDs and scenario IDs. It does not select narrative text, chat text, or practice scores. Practice scores remain on the visitor's device.
+The growth dashboard's session query explicitly excludes narrative text. The practice-completion query selects only session IDs and scenario IDs, not chat text or practice scores. Practice scores remain on the visitor's device.

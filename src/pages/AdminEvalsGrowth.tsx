@@ -13,7 +13,6 @@ type SessionRow = {
   total_steps: number | null;
   followup_steps: number | null;
   has_followup: boolean | null;
-  narrative_text: string | null;
   source_type: string | null;
   referrer: string | null;
   is_prolific: boolean | null;
