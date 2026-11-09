@@ -44,7 +44,7 @@ export const GroupChatVisual = ({ responded = false }: { responded?: boolean }) 
 export const EntryProductVisual = () => (
   <div className="mx-auto w-full max-w-[650px] rounded-[36px] border border-border bg-card p-9 shadow-2xl shadow-background/30">
     <div className="mb-7 text-center">
-      <span className="slide-chrome rounded border border-border px-3 py-1 uppercase tracking-wider text-muted-foreground">Bystander beta</span>
+      <div><span className="slide-chrome inline-block rounded border border-border px-3 py-1 uppercase tracking-wider text-muted-foreground">Bystander beta</span></div>
       <ItoWordmark className="mt-5 text-[58px] leading-none text-foreground" />
       <p className="slide-caption mx-auto mt-5 max-w-[480px] text-muted-foreground">You saw or heard something that felt off. Tell ito, and it will help you work out what to do next.</p>
     </div>

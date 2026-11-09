@@ -58,7 +58,7 @@ const ProblemSlide = () => (
       <div className="flex flex-col justify-center space-y-7">
         {[
           ["Uncertainty", "“Is this really that serious?”"],
-          ["Diffused responsibility", "“Someone else will say something.”"],
+          ["Diffusion of responsibility", "“Someone else will say something.”"],
           ["Social cost", "“What if they turn on me?”"],
         ].map(([title, quote], i) => (
           <div key={title} className="grid grid-cols-[70px_1fr] items-start gap-5 rounded-2xl border border-border bg-card/60 p-6">
@@ -80,7 +80,7 @@ const SharedEngineSlide = () => (
     <div className="grid h-full grid-cols-[1fr_0.9fr] items-center gap-[100px]">
       <div>
         <Kicker>One calm outside perspective</Kicker>
-        <SlideTitle className="italic">ito helps people catch the moment before it becomes harm.</SlideTitle>
+        <SlideTitle className="italic">ito helps people find a next move before a moment turns into harm.</SlideTitle>
         <div className="mt-12 space-y-6">
           <div className="rounded-2xl border border-border bg-card p-6">
             <p className="slide-body-lg font-medium text-foreground">“This is about me”</p>
@@ -135,7 +135,7 @@ const InProductSlide = () => (
       <ResponseProductVisual />
       <div>
         <Kicker>Guidance in the moment</Kicker>
-        <SlideTitle className="text-[76px]">The framework becomes a next move.</SlideTitle>
+        <SlideTitle>The framework becomes a next move.</SlideTitle>
         <div className="mt-9 space-y-6">
           <div className="grid grid-cols-[46px_1fr] gap-4">
             <span className="slide-subtitle font-serif italic text-primary">1</span>
@@ -294,13 +294,13 @@ const BystanderWebinar = () => {
       <SEO title={`${index + 1}/${slides.length} — ${slides[index].title} | ito webinar`} description="Online bystander intervention, the 5 C's, the 5 D's, and ito." path="/webinar" noindex />
 
       {!presenting && (
-        <header className="absolute inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-5">
-          <div className="flex items-center gap-3"><ItoWordmark className="text-[22px] text-foreground" /><span className="text-xs uppercase tracking-wider text-muted-foreground">Webinar</span></div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setGridOpen((open) => !open)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><Grid2X2 className="h-4 w-4" />Grid</button>
-            <button onClick={() => setNotesOpen((open) => !open)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><MessageSquareText className="h-4 w-4" />Notes</button>
-            <button onClick={() => window.open("/webinar?print=1", "_blank", "noopener,noreferrer")} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><Printer className="h-4 w-4" />Export PDF</button>
-            <button onClick={() => void present()} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground"><Maximize2 className="h-4 w-4" />Present</button>
+        <header className="absolute inset-x-0 top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-3 sm:px-5">
+          <div className="flex items-center gap-3"><ItoWordmark className="text-[22px] text-foreground" /><span className="hidden text-xs uppercase tracking-wider text-muted-foreground sm:inline">Webinar</span></div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button aria-label="Slide grid" onClick={() => setGridOpen((open) => !open)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><Grid2X2 className="h-4 w-4" /><span className="hidden md:inline">Grid</span></button>
+            <button aria-label="Speaker notes" onClick={() => setNotesOpen((open) => !open)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><MessageSquareText className="h-4 w-4" /><span className="hidden md:inline">Notes</span></button>
+            <button aria-label="Export PDF" onClick={() => window.open("/webinar?print=1", "_blank", "noopener,noreferrer")} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"><Printer className="h-4 w-4" /><span className="hidden md:inline">Export PDF</span></button>
+            <button aria-label="Present slides" onClick={() => void present()} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground sm:px-4"><Maximize2 className="h-4 w-4" /><span className="hidden sm:inline">Present</span></button>
           </div>
         </header>
       )}
