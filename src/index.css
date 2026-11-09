@@ -305,4 +305,110 @@ input:focus {
   pointer-events: none;
 }
 
+/* Webinar slides: fixed 1920×1080 canvases using ito's night palette. */
+.slide-content {
+  --slide-background: 220 12% 8%;
+  --slide-foreground: 220 5% 85%;
+  --slide-card: 220 12% 11%;
+  --slide-primary: 215 18% 55%;
+  --slide-muted: 220 10% 15%;
+  --slide-muted-foreground: 220 8% 65%;
+  --slide-border: 220 10% 18%;
+
+  --background: var(--slide-background);
+  --foreground: var(--slide-foreground);
+  --card: var(--slide-card);
+  --card-foreground: var(--slide-foreground);
+  --primary: var(--slide-primary);
+  --primary-foreground: 220 12% 8%;
+  --muted: var(--slide-muted);
+  --muted-foreground: var(--slide-muted-foreground);
+  --accent: 215 12% 18%;
+  --accent-foreground: var(--slide-foreground);
+  --callout: 220 10% 14%;
+  --callout-foreground: var(--slide-foreground);
+  --border: var(--slide-border);
+
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+  background: hsl(var(--slide-background));
+  color: hsl(var(--slide-foreground));
+  font-family: "Geist", system-ui, sans-serif;
+
+  --slide-title-lg: 112px;
+  --slide-title: 82px;
+  --slide-subtitle: 46px;
+  --slide-body-lg: 34px;
+  --slide-body: 29px;
+  --slide-caption: 23px;
+  --slide-kicker: 21px;
+  --slide-chrome: 19px;
+}
+
+.slide-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -960px;
+  margin-top: -540px;
+  transform: scale(var(--scale));
+  transform-origin: center center;
+}
+
+.slide-content .font-serif {
+  font-family: "Newsreader", Georgia, serif;
+}
+
+.slide-title-lg { font-size: var(--slide-title-lg); line-height: 0.98; letter-spacing: -0.045em; }
+.slide-title { font-size: var(--slide-title); line-height: 1.03; letter-spacing: -0.035em; }
+.slide-subtitle { font-size: var(--slide-subtitle); line-height: 1.14; letter-spacing: -0.02em; }
+.slide-body-lg { font-size: var(--slide-body-lg); line-height: 1.22; }
+.slide-body { font-size: var(--slide-body); line-height: 1.3; }
+.slide-caption { font-size: var(--slide-caption); line-height: 1.35; }
+.slide-kicker { font-size: var(--slide-kicker); line-height: 1.1; letter-spacing: 0.13em; text-transform: uppercase; }
+.slide-chrome,
+.slide-footer,
+.slide-page { font-size: var(--slide-chrome); line-height: 1.2; }
+.slide-page { white-space: nowrap; }
+
+.webinar-print-page {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  break-after: page;
+  page-break-after: always;
+}
+
+@page {
+  size: 1920px 1080px;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body,
+  #root,
+  .webinar-print {
+    width: 1920px;
+    margin: 0;
+    padding: 0;
+    background: hsl(220 12% 8%);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .webinar-print-page {
+    position: relative;
+  }
+
+  .webinar-print-page .slide-wrapper {
+    left: 0;
+    top: 0;
+    margin: 0;
+    transform: none;
+  }
+}
+
 

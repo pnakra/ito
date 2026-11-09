@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
         main: path.resolve(__dirname, "index.html"),
         bystanderbeta: path.resolve(__dirname, "bystanderbeta/index.html"),
         practice: path.resolve(__dirname, "practice/index.html"),
+        webinar: path.resolve(__dirname, "webinar/index.html"),
       },
     },
   },
