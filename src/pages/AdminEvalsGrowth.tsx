@@ -533,6 +533,7 @@ function GrowthDashboard({ email }: { email: string }) {
       readinessBottleneck,
       referrers,
       betaCount: beta.length,
+      betaRows: beta,
       practiceCount: practice.length,
       betaFollowup: beta.filter((r) => r.has_followup).length,
       junk,
@@ -601,7 +602,7 @@ function GrowthDashboard({ email }: { email: string }) {
         </section>
 
         <RoleSplit />
-        <BystanderPilotSnapshot rows={beta} />
+        <BystanderPilotSnapshot rows={stats.betaRows} />
 
         {/* 1.5 — sessions over time */}
         <section className="border border-border rounded p-4 space-y-4">
