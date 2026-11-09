@@ -4,6 +4,7 @@ import ConsentModal, { hasSessionConsent } from "@/components/ConsentModal";
 import { useSearchParams, useNavigate, Navigate } from "react-router-dom";
 import { refreshReferralMeta, setReferralSrc } from "@/lib/referralMeta";
 import BystanderFirstScreenExtras from "@/components/bystander/BystanderFirstScreenExtras";
+import WitnessSafetyCheck, { type WitnessSafetyResult } from "@/components/bystander/WitnessSafetyCheck";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
@@ -33,6 +34,7 @@ import { logChoice, logFreetext, logAIResponse, logSubmission, resetSessionId } 
 import type { RiskLevel } from "@/types/risk";
 import { type StructuredSignals, serializeSignals, getTopMissingSignal } from "@/types/signals";
 import { invokeEdgeFunctionWithRetry, isLikelyTransientEdgeError } from "@/lib/invokeEdgeFunctionWithRetry";
+import { isOnlineWitnessContext } from "@/lib/interventionActions";
 
 type FlowPhase =
   | "narrative-input"
@@ -40,6 +42,7 @@ type FlowPhase =
   | "group-part"
   | "witness-timing"
   | "age-check"
+  | "witness-safety"
   | "signal-floor"
   | "follow-up-questions"
   | "stop-moment"
@@ -93,7 +96,8 @@ interface CheckInProps {
 
 const BYSTANDER_CHIPS = [
   "My friend might be trying to pressure someone into having sex",
-  "There's a message in the group chat I can't stop thinking about",
+  "Someone on Sidechat named a student and people are piling on",
+  "A Fizz post is spreading a rumor about my friend",
   "Someone told me what happened to them at a party",
 ];
 
