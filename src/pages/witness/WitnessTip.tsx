@@ -124,10 +124,14 @@ const WitnessTip = () => {
                 <List items={brief.style_flags ?? []} />
               </div>
 
-              <div className="rounded-lg border border-border p-4 text-sm space-y-1">
-                <div className="font-medium text-foreground">Where to paste it</div>
-                <p className="text-foreground/90">Search for your city or campus police and the words anonymous tip. ito can't pick the form for you.</p>
-              </div>
+              {hasCampusResourceLinks(campusResources) ? (
+                <CampusResources />
+              ) : (
+                <div className="rounded-lg border border-border p-4 text-sm space-y-1">
+                  <div className="font-medium text-foreground">Where to paste it</div>
+                  <p className="text-foreground/90">Search for your city or campus police and the words anonymous tip. ito can't pick the form for you.</p>
+                </div>
+              )}
 
               <p className="text-sm text-muted-foreground">
                 Not sure about reporting? RAINN can talk it through at <a className="underline" href="tel:18006564673">1-800-656-4673</a>.
