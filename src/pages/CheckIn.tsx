@@ -545,6 +545,21 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
     }
 
     const text = pendingAgeCheckText ?? "";
+    if (reporterRoleRef.current === "other" && structuredSignalsRef.current.witnessTiming !== "now") {
+      // Keep the narrative pending while safety and the targeted person's wishes are checked.
+      setPhase("witness-safety");
+      return;
+    }
+    setPendingAgeCheckText(null);
+    if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
+    else setPhase("narrative-input");
+  };
+
+  const handleWitnessSafetySubmit = ({ safety, targetPreference }: WitnessSafetyResult) => {
+    updateSignals({ witnessSafety: safety, targetPreference });
+    logSubmission({ flowType: "before", stepName: "witness-safety", stepType: "choice", choiceValue: safety });
+    logSubmission({ flowType: "before", stepName: "target-preference", stepType: "choice", choiceValue: targetPreference });
+    const text = pendingAgeCheckText ?? "";
     setPendingAgeCheckText(null);
     if (text) runAfterAiTier(() => processNarrativeSubmit(text, entryMethodRef.current));
     else setPhase("narrative-input");
