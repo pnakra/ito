@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Hand, Pause, X, Eye } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
+import type { StructuredSignals } from "@/types/signals";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 export type ReporterRole = "self" | "other" | "unsure";
 export type WitnessTiming = "now" | "soon" | "already";

@@ -5,6 +5,7 @@ import SEO from "@/components/SEO";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { PRACTICE, type PracticeChoice, type PracticeScenario } from "@/data/witness";
+import { logSubmission } from "@/lib/submissionLogger";
 
 const STORE = "ito_witness_practice_v1";
 type Scores = Record<string, number>;

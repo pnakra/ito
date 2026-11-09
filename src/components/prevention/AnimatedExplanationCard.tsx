@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import RiskBadge from "@/components/RiskBadge";
 import { AlertTriangle, MessageCircle, ArrowRight as ArrowRightIcon } from "lucide-react";
 import type { RiskLevel } from "@/types/risk";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface AnalysisData {
   riskLevel: RiskLevel;

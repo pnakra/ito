@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface NeutralAnalysisData {
   signalLabel: string;

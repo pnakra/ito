@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Eye, ArrowRight, ChevronRight, Heart, Repeat, AlertTriangle } from "lucide-react";
+import type { StructuredSignals } from "@/types/signals";
+import InterventionActionLabel from "@/components/bystander/InterventionActionLabel";
+import WitnessSafetyGuidance from "@/components/bystander/WitnessSafetyGuidance";
 
 interface ReflectionResult {
   clarityCheck: string;
