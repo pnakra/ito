@@ -79,14 +79,32 @@ const StopMoment = ({ riskLevel, stopMessage, onAcknowledge, onDismiss, isCrisis
                   )}
                   {witnessTiming === "soon" && (
                     <>
-                      <li>Say something plainly to the person planning it.</li>
-                      <li>Tell the person at risk, or someone close to them, if you can.</li>
+                      {witnessSignals?.witnessSafety === "self" || witnessSignals?.witnessSafety === "both" || witnessSignals?.witnessSafety === "target" ? (
+                        <li>Use a lower-profile option. Ask someone trusted to step in rather than confronting anyone.</li>
+                      ) : (
+                        <li>Say something plainly to the person planning it.</li>
+                      )}
+                      {witnessSignals?.targetPreference === "no-contact" ? (
+                        <li>Ask someone they trust to check in instead of contacting them yourself.</li>
+                      ) : witnessSignals?.targetPreference === "no-report" || witnessSignals?.targetPreference === "no-share" ? (
+                        <li>Ask what they want before telling anyone else or sharing details.</li>
+                      ) : (
+                        <li>Tell the person at risk, or someone close to them, if you can.</li>
+                      )}
                     </>
                   )}
                   {witnessTiming === "already" && (
                     <>
-                      <li>Check on them if you know them. Keep it short and let them lead.</li>
-                      <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
+                      {witnessSignals?.targetPreference === "no-contact" ? (
+                        <li>Ask someone they trust to check in instead of contacting them yourself.</li>
+                      ) : (
+                        <li>Check on them if you know them. Keep it short and let them lead.</li>
+                      )}
+                      {witnessSignals?.targetPreference === "no-report" || witnessSignals?.targetPreference === "no-share" ? (
+                        <li>Keep what you saved private. Ask what they want before reporting or sharing it.</li>
+                      ) : (
+                        <li>Tell someone who can act: an adult you trust, or RAINN at 1-800-656-4673.</li>
+                      )}
                     </>
                   )}
                 </ul>

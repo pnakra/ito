@@ -21,4 +21,17 @@ import { getInterventionAction, getWitnessSafetyNotes, getWitnessSuggestionOverr
   test("retaliation against the witness avoids required confrontation", () => {
     expect(getWitnessSafetyNotes({ witnessSafety: "self" })[0]).toContain("do not have to confront anyone");
   });
+  test("a no-share answer replaces an AI instruction to report or share", () => {
+    const override = getWitnessSuggestionOverride({ targetPreference: "no-share" }, true, "Report the post and send it to Title IX");
+    expect(override).toContain("Keep the post, screenshots, and their story private");
+    expect(override).not.toContain("send it to Title IX");
+  });
+  test("online AI wording cannot instruct the witness to amplify a post", () => {
+    const override = getWitnessSuggestionOverride({}, true, "Reply to the post and defend them");
+    expect(override).toContain("Do not reply or repost");
+  });
+  test("retaliation risk replaces an AI instruction to confront someone", () => {
+    const override = getWitnessSuggestionOverride({ witnessSafety: "self" }, false, "Tell him to stop in front of everyone");
+    expect(override).toContain("You do not have to confront anyone");
+  });
 });
