@@ -1031,6 +1031,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
     afterAnalysis?.avoidingRepetition, afterAnalysis?.yourPatterns, afterAnalysis?.nextSteps, afterAnalysis?.followUpQuestion,
   ].filter(Boolean).join(" ");
   const showWitness911 = reporterRole === "other" && (riskHighWaterMark === "red" || readText.includes("911"));
+  const onlineWitnessContext = reporterRole === "other" && isOnlineWitnessContext(narrativeHistory.join(" "));
   const shouldShowAfterHandoff = yellowOrRedCount >= 2;
 
 
