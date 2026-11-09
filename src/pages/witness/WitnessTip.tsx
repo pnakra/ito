@@ -38,6 +38,7 @@ const WitnessTip = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [campusResources] = useState(loadCampusResources);
   const looksNow = /\b(right now|rn|happening now|as we speak|this second|this minute|at the moment|currently)\b/i.test(story);
 
   const build = async () => {

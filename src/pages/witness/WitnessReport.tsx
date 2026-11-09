@@ -173,6 +173,7 @@ const WitnessReport = () => {
                 )}
               </div>
               <p className="text-sm text-muted-foreground">In a real report, this is where it would be sent. Right now it goes nowhere.</p>
+              <CampusResources />
             </section>
           )}
         </div>
