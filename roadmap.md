@@ -19,3 +19,5 @@
 - [x] Add an aggregate-only bystander pilot snapshot: confidence, intervention type, practice completion
 - [x] Simplify all seven webinar slides, follow one online-to-in-person situation, and move detail into speaker notes
 - [x] Verify the revised webinar slides, reveal, notes, navigation, and print on desktop and mobile
+- [x] Reorder the deck into the four-part structure and add the 14-slide build/frameworks/demos version
+- [x] Publish the deck for sharing and export a 16-page PDF backup
