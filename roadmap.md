@@ -17,3 +17,5 @@
 - [x] Add a witness safety/retaliation check that keeps the targeted person's preferences central
 - [x] Support configurable campus-specific help and reporting links
 - [x] Add an aggregate-only bystander pilot snapshot: confidence, intervention type, practice completion
+- [x] Simplify all seven webinar slides, follow one online-to-in-person situation, and move detail into speaker notes
+- [x] Verify the revised webinar slides, reveal, notes, navigation, and print on desktop and mobile
