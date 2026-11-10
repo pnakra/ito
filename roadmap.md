@@ -21,3 +21,4 @@
 - [x] Verify the revised webinar slides, reveal, notes, navigation, and print on desktop and mobile
 - [x] Reorder the deck into the four-part structure and add the 14-slide build/frameworks/demos version
 - [x] Publish the deck for sharing and export a 16-page PDF backup
+- [x] Point every ito link at isthisok.app instead of the Lovable address
