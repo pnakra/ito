@@ -34,7 +34,7 @@ export const GroupChatVisual = ({ responded = false }: { responded?: boolean }) 
       {responded && (
         <div className="ml-auto max-w-[86%] rounded-2xl rounded-br-md bg-accent px-6 py-4 text-right">
           <p className="slide-caption mb-1 text-muted-foreground">You</p>
-          <p className="slide-body font-medium text-foreground">nah, nobody's going up. I'm getting her friends.</p>
+          <p className="slide-body font-medium text-foreground">Nobody's going up. Let's get her friends.</p>
         </div>
       )}
     </div>
@@ -46,7 +46,6 @@ export const EntryProductVisual = () => (
     <div className="mb-7 text-center">
       <div><span className="slide-chrome inline-block rounded border border-border px-3 py-1 uppercase tracking-wider text-muted-foreground">Bystander beta</span></div>
       <ItoWordmark className="mt-5 text-[58px] leading-none text-foreground" />
-      <p className="slide-caption mx-auto mt-5 max-w-[480px] text-muted-foreground">You saw or heard something that felt off. Tell ito, and it will help you work out what to do next.</p>
     </div>
     <div className="rounded-2xl bg-background p-6">
       <p className="slide-body text-muted-foreground">What did you see or hear?</p>
@@ -55,38 +54,24 @@ export const EntryProductVisual = () => (
         <span className="slide-chrome inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground">Go <ArrowRight className="h-4 w-4" /></span>
       </div>
     </div>
-    <div className="mt-6 space-y-3">
-      <p className="slide-caption text-center text-muted-foreground">Are you asking about a personal situation, or something you're observing?</p>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="slide-chrome rounded-xl border border-primary bg-accent px-4 py-3 text-center text-foreground">This is about someone else</div>
-        <div className="slide-chrome rounded-xl border border-border px-4 py-3 text-center text-muted-foreground">This is about me</div>
-      </div>
-    </div>
+
   </div>
 );
 
 export const ResponseProductVisual = () => (
-  <div className="mx-auto w-full max-w-[660px] rounded-[36px] border border-border bg-card p-9 shadow-2xl shadow-background/30">
-    <div className="flex justify-center">
-      <div className="slide-chrome inline-flex items-center gap-3 rounded-full border border-primary bg-accent px-5 py-3 font-semibold text-primary">
-        <Hand className="h-6 w-6" /> What you can do
-      </div>
+  <div className="w-full rounded-lg border border-border bg-card p-10 shadow-2xl shadow-background/30">
+    <div className="flex items-center gap-4">
+      <Hand className="h-9 w-9 text-primary" aria-hidden="true" />
+      <p className="slide-body-lg font-medium text-foreground">What you can do</p>
+      <span className="slide-chrome ml-auto text-muted-foreground">Illustrative response</span>
     </div>
-    <div className="mt-8 space-y-6">
-      <div className="flex gap-4">
-        <span className="slide-chrome flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">1</span>
-        <p className="slide-body text-foreground">Secondhand isn't consent. She has to say yes to each person herself.</p>
-      </div>
-      <div className="flex gap-4">
-        <span className="slide-chrome flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">2</span>
-        <p className="slide-body text-foreground">If people are drinking or on something, they may not be able to say yes at all.</p>
-      </div>
+    <p className="slide-body mt-8 text-foreground">Being intoxicated is not consent. Nobody can say yes for her.</p>
+    <div className="mt-8 border-l-2 border-primary pl-7">
+      <p className="slide-subtitle font-serif text-foreground">Get her friends. If safe, interrupt the chat:</p>
+      <p className="slide-body-lg mt-5 text-foreground">“Nobody's going up. Let's get her friends.”</p>
     </div>
-    <div className="mt-8 flex items-start gap-4 rounded-2xl bg-callout p-6">
-      <ArrowRight className="mt-1 h-7 w-7 shrink-0 text-primary" />
-      <p className="slide-body font-medium text-foreground">Save the message, find her friends, and reply to break the momentum: “nah, nobody's going up.”</p>
-    </div>
-    <p className="slide-chrome mt-6 text-center text-muted-foreground">A reflection tool, not a ruling.</p>
+    <p className="slide-caption mt-8 text-primary">Call in support · Delegate</p>
+    <p className="slide-caption mt-2 text-muted-foreground">Bring in someone she trusts.</p>
   </div>
 );
 

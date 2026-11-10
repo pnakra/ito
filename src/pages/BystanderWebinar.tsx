@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, ExternalLink, Grid2X2, Maximize2, MessageSquareText, Printer, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Grid2X2, Hand, Maximize2, MessageSquareText, Printer, X } from "lucide-react";
 import SEO from "@/components/SEO";
+import { Button } from "@/components/ui/button";
 import SlideLayout from "@/components/webinar/SlideLayout";
 import {
   EntryProductVisual,
   GroupChatVisual,
   ItoWordmark,
-  PracticeProductVisual,
-  ReportProductVisual,
   ResponseProductVisual,
 } from "@/components/webinar/ProductVisuals";
 
@@ -28,49 +27,40 @@ const ProductLink = ({ href, children }: { href: string; children: ReactNode }) 
   </a>
 );
 
-const OpeningSlide = () => (
-  <SlideLayout page={1} section="Campus + Greek life">
-    <div className="grid flex-1 grid-cols-[1.04fr_0.96fr] items-center gap-[100px]">
-      <div>
-        <Kicker>Online bystander intervention</Kicker>
-        <SlideTitle className="slide-title-lg italic">Someone always sees it first.</SlideTitle>
-        <p className="slide-subtitle mt-9 max-w-[800px] text-muted-foreground">The next move can change what happens next.</p>
-        <div className="mt-14 flex items-center gap-5 text-muted-foreground">
-          <ItoWordmark className="text-[42px] text-foreground" />
-          <span className="h-12 w-px bg-border" />
-          <p className="slide-caption max-w-[360px]">A practical tool for campus and Greek life communities</p>
+const OpeningSlide = ({ print = false }: { print?: boolean }) => {
+  const [revealed, setRevealed] = useState(false);
+  const showResponse = print || revealed;
+  return (
+    <SlideLayout page={1} section="Campus + Greek life">
+      <div className="grid flex-1 grid-cols-[1fr_1fr] items-center gap-[100px]">
+        <div>
+          <Kicker>Online bystander intervention · EndTAB + Priya</Kicker>
+          <SlideTitle className="slide-title-lg italic">What would you do next?</SlideTitle>
+          <div className="mt-12"><ItoWordmark className="text-[52px] text-foreground" /></div>
+          {!print && (
+            <Button variant="outline" className="slide-body mt-12 h-16 w-auto px-8" onClick={() => setRevealed((value) => !value)} aria-expanded={revealed}>
+              {revealed ? "Hide one possible move" : "Reveal one possible move"}<ArrowRight />
+            </Button>
+          )}
+          {showResponse && <p className="slide-caption mt-8 max-w-[650px] text-muted-foreground">One option, only if it is safe to speak up.</p>}
         </div>
+        <GroupChatVisual responded={showResponse} />
       </div>
-      <div className="relative">
-        <div className="absolute -inset-10 rounded-full bg-primary/5 blur-3xl" />
-        <div className="relative"><GroupChatVisual responded /></div>
-      </div>
-    </div>
-  </SlideLayout>
-);
+    </SlideLayout>
+  );
+};
 
 const ProblemSlide = () => (
   <SlideLayout page={2} section="The problem">
-    <Kicker>The bystander equation changes in a group chat</Kicker>
-    <SlideTitle>Silence can start to look like agreement.</SlideTitle>
-    <div className="mt-[64px] grid flex-1 grid-cols-[0.9fr_1.1fr] gap-[100px]">
-      <GroupChatVisual />
-      <div className="flex flex-col justify-center space-y-7">
-        {[
-          ["Uncertainty", "“Is this really that serious?”"],
-          ["Diffusion of responsibility", "“Someone else will say something.”"],
-          ["Social cost", "“What if they turn on me?”"],
-        ].map(([title, quote], i) => (
-          <div key={title} className="grid grid-cols-[70px_1fr] items-start gap-5 rounded-2xl border border-border bg-card/60 p-6">
-            <span className="slide-subtitle font-serif italic text-primary">0{i + 1}</span>
-            <div>
-              <p className="slide-body-lg font-medium text-foreground">{title}</p>
-              <p className="slide-body mt-1 text-muted-foreground">{quote}</p>
-            </div>
-          </div>
-        ))}
-        <p className="slide-caption max-w-[720px] pt-2 text-muted-foreground">Online, messages travel, evidence can disappear, and the person targeted may not be in the room. The opening to act can be easy to miss.</p>
-      </div>
+    <Kicker>The pause before anyone acts</Kicker>
+    <SlideTitle>Silence can look like agreement.</SlideTitle>
+    <div className="mt-20 flex flex-1 flex-col justify-center gap-12">
+      {["“Is it serious?”", "“Someone else will act.”", "“What if they turn on me?”"].map((quote, i) => (
+        <div key={quote} className="flex items-center gap-10 border-b border-border pb-9">
+          <span className="slide-body-lg font-serif italic text-primary">0{i + 1}</span>
+          <p className="slide-subtitle text-foreground">{quote}</p>
+        </div>
+      ))}
     </div>
   </SlideLayout>
 );
@@ -79,19 +69,18 @@ const SharedEngineSlide = () => (
   <SlideLayout page={3} section="The product">
     <div className="grid h-full grid-cols-[1fr_0.9fr] items-center gap-[100px]">
       <div>
-        <Kicker>One calm outside perspective</Kicker>
-        <SlideTitle className="italic">ito helps people find a next move before a moment turns into harm.</SlideTitle>
-        <div className="mt-12 space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <p className="slide-body-lg font-medium text-foreground">“This is about me”</p>
-            <p className="slide-body mt-2 text-muted-foreground">Slow down, check the story, and rethink what consent actually looks like.</p>
+        <Kicker>ito</Kicker>
+        <SlideTitle className="slide-title-lg italic">A pause before harm.</SlideTitle>
+        <div className="mt-16 space-y-10">
+          <div className="border-l-2 border-border pl-7">
+            <p className="slide-body-lg font-medium text-foreground">About me</p>
+            <p className="slide-body mt-3 text-muted-foreground">Rethink your next move.</p>
           </div>
-          <div className="rounded-2xl border border-primary bg-accent/60 p-6">
-            <p className="slide-body-lg font-medium text-foreground">“This is about someone else”</p>
-            <p className="slide-body mt-2 text-muted-foreground">Name what feels off, consider safety, and choose a concrete way to step in.</p>
+          <div className="border-l-2 border-primary pl-7">
+            <p className="slide-body-lg font-medium text-foreground">About someone else</p>
+            <p className="slide-body mt-3 text-muted-foreground">Find a way to step in.</p>
           </div>
         </div>
-        <p className="slide-caption mt-8 text-muted-foreground">Two entry points. One shared reflection and safety engine.</p>
       </div>
       <EntryProductVisual />
     </div>
@@ -99,118 +88,100 @@ const SharedEngineSlide = () => (
 );
 
 const frameworks = [
-  ["Check in with the person targeted", "Delay", "“Are you ok?” after a post, party, or incident."],
-  ["Change the space", "Distract", "Change the subject, amplify something else, or create an exit."],
-  ["Call in support", "Delegate", "Bring in friends, a moderator, sober monitor, Title IX, or RAINN."],
-  ["Collect evidence", "Document", "Save messages and timestamps. Ask what the person wants done with them."],
-  ["Challenge the behavior", "Direct", "“Nah, nobody's going up.” Clear, calm, and only when safe."],
+  ["Check in", "Delay"],
+  ["Change the space", "Distract"],
+  ["Call in support", "Delegate"],
+  ["Collect evidence", "Document"],
+  ["Challenge the abuse", "Direct"],
 ];
 
 const FrameworkSlide = () => (
   <SlideLayout page={4} section="The action vocabulary">
     <Kicker>EndTAB's 5 C's + the 5 D's</Kicker>
-    <div className="flex items-end justify-between gap-8">
-      <SlideTitle>Two frameworks. Five practical moves.</SlideTitle>
-      <p className="slide-caption max-w-[450px] pb-2 text-right text-muted-foreground">Paired here by function, not as formal equivalents.</p>
+    <SlideTitle>Two frameworks. Five moves.</SlideTitle>
+    <div className="mt-14 grid grid-cols-[1fr_80px_1fr] gap-x-14 border-b border-border pb-5">
+      <p className="slide-caption text-muted-foreground">5 C's · EndTAB</p><span />
+      <p className="slide-caption text-muted-foreground">5 D's · Right To Be</p>
     </div>
-    <div className="mt-10 flex-1 space-y-3">
-      {frameworks.map(([c, d, example], i) => (
-        <div key={c} className="grid grid-cols-[1.05fr_0.42fr_1.25fr] items-center gap-7 rounded-2xl border border-border bg-card/70 px-7 py-[17px]">
-          <div className="flex items-center gap-5">
-            <span className="slide-chrome flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">{i + 1}</span>
-            <p className="slide-body font-medium text-foreground">{c}</p>
-          </div>
-          <p className="slide-body-lg font-serif italic text-primary">{d}</p>
-          <p className="slide-caption text-muted-foreground">{example}</p>
+    <div className="flex flex-1 flex-col justify-center">
+      {frameworks.map(([c, d]) => (
+        <div key={c} className="grid grid-cols-[1fr_80px_1fr] items-center gap-x-14 border-b border-border py-7">
+          <p className="slide-body-lg font-medium text-foreground">{c}</p>
+          <ArrowRight className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+          <p className="slide-subtitle font-serif italic text-primary">{d}</p>
         </div>
       ))}
     </div>
-    <p className="slide-chrome mt-5 text-muted-foreground">5 C's adapted from the EndTAB training deck. 5 D's popularized by Right To Be.</p>
+    <p className="slide-chrome mt-6 text-muted-foreground">Paired by function, not formal equivalents.</p>
   </SlideLayout>
 );
 
 const InProductSlide = () => (
   <SlideLayout page={5} section="Inside the bystander beta">
-    <div className="grid h-full grid-cols-[0.9fr_1fr] items-center gap-[90px]">
+    <Kicker>The same group chat. A concrete next move.</Kicker>
+    <SlideTitle>The framework becomes action.</SlideTitle>
+    <div className="mt-10 flex items-center gap-6 text-muted-foreground">
+      {["Understand", "Consider safety", "Choose a move"].map((label, i) => (
+        <div key={label} className="flex items-center gap-6">
+          {i > 0 && <ArrowRight className="h-8 w-8 text-primary" aria-hidden="true" />}
+          <p className="slide-body-lg">{label}</p>
+        </div>
+      ))}
+    </div>
+    <div className="mt-12 grid flex-1 grid-cols-[1.4fr_0.6fr] items-center gap-20">
       <ResponseProductVisual />
       <div>
-        <Kicker>Guidance in the moment</Kicker>
-        <SlideTitle>The framework becomes a next move.</SlideTitle>
-        <div className="mt-9 space-y-6">
-          <div className="grid grid-cols-[46px_1fr] gap-4">
-            <span className="slide-subtitle font-serif italic text-primary">1</span>
-            <div><p className="slide-body-lg font-medium text-foreground">Understand the moment</p><p className="slide-caption mt-1 text-muted-foreground">Who is involved, when it happened, immediate safety, and what was actually seen.</p></div>
-          </div>
-          <div className="grid grid-cols-[46px_1fr] gap-4">
-            <span className="slide-subtitle font-serif italic text-primary">2</span>
-            <div><p className="slide-body-lg font-medium text-foreground">Combine safe actions</p><p className="slide-caption mt-1 text-muted-foreground">Document the message. Delegate to friends. Directly break the group's momentum.</p></div>
-          </div>
-          <div className="grid grid-cols-[46px_1fr] gap-4">
-            <span className="slide-subtitle font-serif italic text-primary">3</span>
-            <div><p className="slide-body-lg font-medium text-foreground">Keep support within reach</p><p className="slide-caption mt-1 text-muted-foreground">Guides, crisis links, and a report preview help people understand their options.</p></div>
-          </div>
-        </div>
-        <div className="mt-8"><ProductLink href="/bystanderbeta">Open the bystander beta</ProductLink></div>
+        <p className="slide-subtitle font-serif italic text-foreground">A next move.<br />Not a ruling.</p>
+        <div className="mt-12"><ProductLink href="/bystanderbeta">Open the bystander beta</ProductLink></div>
       </div>
     </div>
   </SlideLayout>
 );
 
 const PracticeSlide = () => (
-  <SlideLayout page={6} section="From knowledge to practice">
-    <div className="grid h-full grid-cols-[1fr_0.92fr] items-center gap-[100px]">
-      <div>
-        <Kicker>Practice under social pressure</Kicker>
-        <SlideTitle className="italic">Rehearse the words before you need them.</SlideTitle>
-        <p className="slide-body-lg mt-8 max-w-[850px] text-muted-foreground">Short scenarios turn the 5 D's into choices, tradeoffs, and language someone can actually use.</p>
-        <div className="mt-9 grid grid-cols-3 gap-4">
-          {[["Online", "The group chat"], ["In person", "On the stairs"], ["After", "The morning after"]].map(([label, title]) => (
-            <div key={title} className="rounded-2xl border border-border bg-card p-5">
-              <p className="slide-chrome uppercase tracking-wider text-primary">{label}</p>
-              <p className="slide-body mt-2 font-medium text-foreground">{title}</p>
-            </div>
-          ))}
-        </div>
-        <p className="slide-caption mt-7 text-muted-foreground">Earlier moves score higher. Group pressure changes after each choice. Scores stay on the device.</p>
-        <div className="mt-7"><ProductLink href="/witness/practice">Try a practice scenario</ProductLink></div>
+  <SlideLayout page={6} section="From online to in person">
+    <Kicker>One situation. Two openings to act.</Kicker>
+    <SlideTitle className="italic">Rehearse the words.</SlideTitle>
+    <div className="mt-16 grid flex-1 grid-cols-[1fr_80px_1fr] items-center gap-10">
+      <div className="border-t-2 border-primary pt-10">
+        <MessageSquareText className="mb-8 h-14 w-14 text-primary" aria-hidden="true" />
+        <p className="slide-body-lg font-medium text-foreground">Online · The group chat</p>
+        <p className="slide-subtitle mt-9 font-serif text-foreground">“Nobody's going up. Let's get her friends.”</p>
+        <p className="slide-caption mt-8 text-muted-foreground">Direct + Delegate</p>
       </div>
-      <PracticeProductVisual />
+      <ArrowRight className="h-12 w-12 text-primary" aria-hidden="true" />
+      <div className="border-t-2 border-border pt-10">
+        <Hand className="mb-8 h-14 w-14 text-primary" aria-hidden="true" />
+        <p className="slide-body-lg font-medium text-foreground">In person · At the stairs</p>
+        <p className="slide-subtitle mt-9 font-serif text-foreground">“Let's head downstairs. Your friends are there.”</p>
+        <p className="slide-caption mt-8 text-muted-foreground">Distract + Delegate</p>
+      </div>
     </div>
+    <div className="mt-8"><ProductLink href="/witness/practice">Try a practice scenario</ProductLink></div>
   </SlideLayout>
 );
 
 const ClosingSlide = () => (
   <SlideLayout page={7} section="Beyond the webinar">
-    <div className="grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-[100px]">
-      <div>
-        <Kicker>A one-off training is a place to start</Kicker>
-        <SlideTitle className="slide-title-lg italic">Training ends. The group chat doesn't.</SlideTitle>
-        <p className="slide-subtitle mt-9 max-w-[920px] text-muted-foreground">ito puts a calm next move in someone's pocket, online and off.</p>
-        <div className="mt-10 flex flex-wrap gap-4">
-          <ProductLink href="/bystanderbeta">Open the bystander beta</ProductLink>
-          <ProductLink href="/witness/practice">Practice a scenario</ProductLink>
-        </div>
-      </div>
-      <div className="space-y-5">
-        <ReportProductVisual />
-        <div className="rounded-[28px] border border-primary bg-accent/50 p-7">
-          <p className="slide-body-lg font-serif italic text-foreground">Pilot it with your campus or chapter.</p>
-          <a href="mailto:priya@overridelabsprevention.org" className="slide-body mt-3 inline-block text-primary underline underline-offset-4">priya@overridelabsprevention.org</a>
-          <p className="slide-chrome mt-4 text-muted-foreground">Bystander beta · No account or login · Reporting is preview-only</p>
-        </div>
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>Keep the next move within reach</Kicker>
+      <SlideTitle className="slide-title-lg max-w-[1400px] italic">Training ends.<br />The group chat doesn't.</SlideTitle>
+      <div className="mt-20 border-t border-border pt-10">
+        <p className="slide-subtitle font-serif text-foreground">Pilot ito with your campus or chapter.</p>
+        <a href="mailto:priya@overridelabsprevention.org" className="slide-body mt-6 inline-block text-primary underline underline-offset-4">priya@overridelabsprevention.org</a>
       </div>
     </div>
   </SlideLayout>
 );
 
 const slides: WebinarSlide[] = [
-  { title: "Someone always sees it first", notes: "Open with the group chat. The goal is not to turn every bystander into a hero. It is to make one safe, concrete move easier to find.", element: <OpeningSlide /> },
-  { title: "Silence can start to look like agreement", notes: "Name the three barriers: uncertainty, diffused responsibility, and social cost. Online spaces add distance, scale, permanence, and disappearing evidence.", element: <ProblemSlide /> },
-  { title: "One shared ito engine", notes: "Start high level. ito began with the person whose own behavior may be heading toward harm. The bystander frame uses the same engine for the person watching. It offers reflection and a next move, not a ruling.", element: <SharedEngineSlide /> },
-  { title: "The 5 C's and 5 D's", notes: "Walk down the five rows. The pairings are functional, not official equivalences. Stress indirect options and safety. Documenting should preserve the targeted person's choices, not spread the material further.", element: <FrameworkSlide /> },
-  { title: "The framework inside the product", notes: "Demo the bystander beta here if useful. The product asks who the situation is about and when it is happening, then gives situational guidance. The example combines Document, Delegate, and Direct. Reporting remains a preview and never sends.", element: <InProductSlide /> },
-  { title: "Practice before it is real", notes: "The practice scenarios cover online, in-person, and after-the-fact moments. Choices affect the group-pressure display and are labeled with the 5 D's. Scores stay on the device.", element: <PracticeSlide /> },
-  { title: "Beyond the webinar", notes: "Close on continuity: training builds the vocabulary, and ito makes that vocabulary available in the moment. Invite campuses and chapters to pilot the bystander beta and share feedback.", element: <ClosingSlide /> },
+  { title: "What would you do next?", notes: "Open with the house group chat and let the audience sit with it for ten seconds. Ask what they would do next, then take one or two responses before revealing one possible move. This is an illustrative situation, not a visitor's conversation. A message about someone being 'gone' raises a concern about capacity to consent; nobody else can give consent for her. The aim is not to make every bystander confront the group. Direct language is one option only if safe; a trusted friend or sober monitor can be a lower-risk first move. This same situation will carry us from the chat to the stairs.", element: <OpeningSlide /> },
+  { title: "Silence can look like agreement", notes: "Use the three quotes to name uncertainty, diffusion of responsibility, and social cost without reading a paragraph from the slide. In our group chat, each person may be waiting for someone else. Online spaces add scale, distance, and messages that can spread or disappear. A laugh or repost can amplify harm; silence does not establish agreement or consent. These are reasons people hesitate, not excuses. ito is designed to interrupt that hesitation with a concrete, context-sensitive option.", element: <ProblemSlide /> },
+  { title: "A pause before harm", notes: "Introduce ito at a high level: an anonymous reflection tool designed to interrupt momentum toward harm. About me focuses on the person whose own behavior may cause harm: challenge assumptions and rethink the next move. About someone else helps a bystander name the concern and consider an intervention. These are two frames on one shared safety engine, not separate products. ito offers a reflection and a next move, never a ruling or permission. Anonymous conversations may be reviewed to improve the tool. Return to our example: the person reading that house chat can bring the situation to the bystander beta.", element: <SharedEngineSlide /> },
+  { title: "The 5 C's and 5 D's", notes: "The supplied EndTAB deck contains five C's. Use its full labels here: Check in, Change the space, Call in support, Collect evidence, Challenge the abuse. These are paired by function with Right To Be's five D's, not formal equivalents or a required sequence. Tell the same story in five ways: check in privately afterward (Delay); change the conversation or create an exit (Distract); bring in her friends or a sober monitor (Delegate); preserve the message privately if safe and ask what she wants done with it (Document); interrupt the invitation if safe (Direct). Do not forward evidence or spread her story. Checking in can also happen immediately; Delay does not mean waiting during danger. Keep her preferences, retaliation risk, and immediate safety central.", element: <FrameworkSlide /> },
+  { title: "The framework becomes action", notes: "The enlarged product example is illustrative, not a guaranteed AI response. Explain the three beats aloud. Understand: who this is about, what was seen or heard, timing, and ages. Consider safety: possible retaliation and what the person targeted wants; an immediate situation skips the extra safety questions. Choose a move: a concrete suggestion with a 5 C/5 D label and rationale. In this chat, getting her friends is Delegate; interrupting the group's momentum is Direct only if safe. Preserve messages privately rather than reposting. The product adjusts displayed suggestions to safety and no-share/no-report preferences. Online guidance covers anonymous posts such as Sidechat and Fizz. Configured campus support links are available, while reporting links are suppressed for no-report/no-share preferences. Guides and crisis resources remain within reach. The report simulator is preview-only: it never sends or stores a report.", element: <InProductSlide /> },
+  { title: "Rehearse the words", notes: "Carry the same situation out of the phone and into the house. Online, a direct message can interrupt momentum and bring in support. At the stairs, a low-key invitation downstairs can create an exit without a public confrontation. These are example words, not a universal script; do not invent a ride or a friend who is not there. If speaking up risks retaliation, delegate instead. If someone is in immediate danger, seek emergency help rather than waiting for the tool. Bystander practice includes online, in-person, and after-the-fact scenes. Choices receive 5 D labels; timing and group pressure affect the exercise. Practice scores stay on the device. The separate adults-only roleplay beta offers a typed exchange and debrief. The point is to make a safe option easier to say under pressure, not reward heroics.", element: <PracticeSlide /> },
+  { title: "Training ends. The group chat doesn't.", notes: "Close with one invitation: pilot ito with your campus or chapter and share feedback. Training supplies the vocabulary; ito makes a possible next move available when the group chat becomes an in-person moment. A pilot can include validated campus support links and an aggregate-only snapshot of confidence change, selected intervention type, and practice completion. It does not expose narratives or query practice scores. Reporting remains preview-only pending legal review and vetted recipients. The longer-term goal is fewer sexual assaults, not a claim of proven impact. A practical usage measure is how many people get ito's read on their situation each week. Invite discussion about where people hesitate and which moments the pilot should address.", element: <ClosingSlide /> },
 ];
 
 const clampSlide = (value: string | null) => {
@@ -284,7 +255,7 @@ const BystanderWebinar = () => {
     return (
       <main className="webinar-print !pb-0">
         <SEO title="From seeing it to stepping in | ito webinar" description="Online bystander intervention for campus and Greek life communities." path="/webinar" noindex />
-        {slides.map((slide, i) => <div className="webinar-print-page" key={slide.title}>{slide.element}</div>)}
+        {slides.map((slide, i) => <div className="webinar-print-page" key={slide.title}>{i === 0 ? <OpeningSlide print /> : slide.element}</div>)}
       </main>
     );
   }
