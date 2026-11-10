@@ -282,7 +282,7 @@ const BystanderWebinar = () => {
             {slides.map((slide, i) => (
               <button key={slide.title} onClick={() => { goTo(i); setGridOpen(false); }} className="group text-left">
                 <div className={`aspect-video overflow-hidden rounded-xl border bg-card transition-colors ${i === index ? "border-primary" : "border-border group-hover:border-primary/60"}`}>
-                  <div className="pointer-events-none h-full w-full">{slide.element}</div>
+                  <div className="pointer-events-none h-full w-full">{i === 0 ? <OpeningSlide print /> : slide.element}</div>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground"><span className="mr-2 font-mono text-primary">{String(i + 1).padStart(2, "0")}</span>{slide.title}</p>
               </button>
@@ -313,7 +313,7 @@ const BystanderWebinar = () => {
       )}
 
       {notesOpen && !gridOpen && (
-        <aside className="absolute inset-x-0 bottom-0 z-40 border-t border-border bg-card px-6 py-5 shadow-2xl">
+        <aside className="absolute inset-x-0 bottom-0 z-40 max-h-[65dvh] overflow-y-auto border-t border-border bg-card px-6 py-5 shadow-2xl">
           <div className="mx-auto flex max-w-4xl items-start gap-5">
             <MessageSquareText className="mt-1 h-5 w-5 shrink-0 text-primary" />
             <div><p className="text-xs uppercase tracking-wider text-muted-foreground">Speaker notes · {index + 1}/{slides.length}</p><p className="mt-2 text-base leading-relaxed text-foreground">{slides[index].notes}</p></div>
