@@ -48,23 +48,6 @@ const OpeningSlide = ({ print = false }: { print?: boolean }) => {
   );
 };
 
-const ProblemSlide = () => (
-  <SlideLayout page={2} section="The problem">
-    <In><Kicker>The pause before anyone acts</Kicker></In>
-    <In d={150}><SlideTitle>Silence can look like agreement.</SlideTitle></In>
-    <div className="mt-20 flex flex-1 flex-col justify-center gap-12">
-      {["“Is it serious?”", "“Someone else will act.”", "“What if they turn on me?”"].map((quote, i) => (
-        <In key={quote} d={500 + i * 450}>
-          <div className="flex items-center gap-10 border-b border-border pb-9">
-            <span className="slide-body-lg font-serif italic text-primary">0{i + 1}</span>
-            <p className="slide-subtitle text-foreground">{quote}</p>
-          </div>
-        </In>
-      ))}
-    </div>
-  </SlideLayout>
-);
-
 const builtOn = [
   { icon: BookOpen, title: "Rooted in research", line: "Consent + bystander frameworks" },
   { icon: Cpu, title: "Rules first, then AI", line: "AI can raise concern. Never lower it." },
@@ -342,7 +325,6 @@ const slides: WebinarSlide[] = [
   { title: "Two doors. One engine.", notes: "Two entry points share one safety engine. About me: for the person whose own behavior may cause harm, to challenge assumptions and rethink the next move. About someone else: for the bystander. Same safety rules, same evaluation suite, not separate products. ito offers a reflection and a next move, never a ruling or permission.", element: <SharedEngineSlide /> },
   { title: "Safety is the product", notes: "What makes this safe AI. One: deterministic safety rules run before any AI, and the AI read can raise concern but never lower a red flag. Two: ito never gives permission; it challenges coercive framing and will not help with harm. Three: crisis routes are built in, 911 for immediate danger, 988 and Crisis Text Line. Four: every change is tested against a 300-scenario evaluation suite, including adversarial attempts, before it ships.", element: <SafeAiSlide /> },
   { title: "What would you do next?", notes: "Open with the house group chat and let the audience sit with it for ten seconds. Ask what they would do next, then take one or two responses before revealing one possible move. This is an illustrative situation. 'Gone' raises a concern about capacity to consent; nobody else can give consent for her. Direct language is one option only if safe; a trusted friend or sober monitor can be a lower-risk first move.", element: <OpeningSlide />, printElement: <OpeningSlide print /> },
-  { title: "Silence can look like agreement", notes: "Name uncertainty, diffusion of responsibility, and social cost without reading a paragraph. Online spaces add scale, distance, and messages that spread or disappear. A laugh or repost can amplify harm; silence does not establish agreement or consent. These are reasons people hesitate, not excuses.", element: <ProblemSlide /> },
   { title: "Built for both", notes: "Say this plainly: the bystander beta is built for online and in-person intervention. Online covers group chats, anonymous apps like Sidechat and Fizz, DMs and stories. In person covers parties, chapter houses, walking home. Either setting runs the same path: understand what happened, check safety and the targeted person's wishes, and choose a concrete move. A situation does not have to start online to use it.", element: <BothSlide /> },
   { title: "Complementary, not translations", notes: "These are EndTAB's exact five C's from the supplied deck: Check in with the Victim, Change the Space, Call in Support, Collect Evidence, Challenge the Abuse. Next to them, Right To Be's five D's: Direct, Distract, Delegate, Document, Delay. They overlap but are not one-to-one. EndTAB's Change the Space is about amplifying the positive and drowning out the abuse online, which is broader than Distract. Check in can happen immediately, not only later. The next five slides show each C as it appears in the product.", element: <FrameworkSlide /> },
   { title: "Check in with the Victim", notes: "Live in the product: before suggesting a move for a situation that is not happening right now, the bystander beta asks two questions. What could make this backfire, including retaliation against the person targeted. And what does the person targeted want. If they asked not to share it, ito changes the displayed suggestion to keep the post, screenshots, and their story private and to ask before reporting or sharing. Immediate situations skip these questions so nothing slows down a 911 call. This applies online and in person.", element: <DemoSlide page={7} c="5 C's · Check in with the Victim" d="Their wishes shape the move." title="Ask before acting." online inPerson demo={<SafetyCheckDemo />} link={{ href: "/bystanderbeta", label: "Open the bystander beta" }} /> },
