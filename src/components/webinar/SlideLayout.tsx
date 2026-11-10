@@ -12,7 +12,7 @@ interface SlideLayoutProps {
 }
 
 /** Fixed 1920×1080 canvas shared by the editor, thumbnails, presenter, and print. */
-const SlideLayout = ({ children, page: pageProp, section = "Online bystander intervention", className = "", total: totalProp = 15 }: SlideLayoutProps) => {
+const SlideLayout = ({ children, page: pageProp, section = "Online bystander intervention", className = "", total: totalProp = 16 }: SlideLayoutProps) => {
   const position = useContext(SlidePageContext);
   const page = position?.page ?? pageProp;
   const total = position?.total ?? totalProp;
