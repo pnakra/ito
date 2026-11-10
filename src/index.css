@@ -412,3 +412,15 @@ input:focus {
 }
 
 
+
+/* Webinar entrance animations (disabled for print and reduced motion). */
+@keyframes wb-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes wb-pick { from { border-color: hsl(var(--border)); background: transparent; } to { } }
+@keyframes wb-fade { to { opacity: 0.35; text-decoration: line-through; } }
+@keyframes wb-pulse { 0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35); } 50% { box-shadow: 0 0 0 28px hsl(var(--primary) / 0); } }
+.wb-in { animation: wb-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--d, 0) * 1ms); }
+.wb-pick { animation: wb-pick 0.4s ease both; animation-delay: calc(var(--d2, 0) * 1ms); }
+.wb-fade-out { animation: wb-fade 0.6s ease 2.2s forwards; }
+.wb-pulse { animation: wb-pulse 2.6s ease-in-out 1s infinite; }
+.webinar-print .wb-in, .webinar-print .wb-pick, .webinar-print .wb-pulse { animation: none; }
+@media (prefers-reduced-motion: reduce) { .wb-in, .wb-pick, .wb-fade-out, .wb-pulse { animation: none; } }
