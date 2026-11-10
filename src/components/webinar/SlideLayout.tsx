@@ -5,10 +5,11 @@ interface SlideLayoutProps {
   page: number;
   section?: string;
   className?: string;
+  total?: number;
 }
 
 /** Fixed 1920×1080 canvas shared by the editor, thumbnails, presenter, and print. */
-const SlideLayout = ({ children, page, section = "Online bystander intervention", className = "" }: SlideLayoutProps) => {
+const SlideLayout = ({ children, page, section = "Online bystander intervention", className = "", total = 14 }: SlideLayoutProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -37,7 +38,7 @@ const SlideLayout = ({ children, page, section = "Online bystander intervention"
         </div>
         <footer className="slide-footer absolute bottom-[38px] left-[120px] right-[120px] flex items-center justify-between text-muted-foreground">
           <span>ito / Override Labs · {section}</span>
-          <span className="slide-page">{String(page).padStart(2, "0")} / 07</span>
+          <span className="slide-page">{String(page).padStart(2, "0")} / {String(total).padStart(2, "0")}</span>
         </footer>
       </div>
     </div>
