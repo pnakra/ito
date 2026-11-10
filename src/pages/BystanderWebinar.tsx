@@ -32,7 +32,7 @@ const OpeningSlide = ({ print = false }: { print?: boolean }) => {
     <SlideLayout page={1} section="Campus + Greek life">
       <div className="grid flex-1 grid-cols-[1fr_1fr] items-center gap-[100px]">
         <div>
-          <In><Kicker>Online + in-person bystander intervention · EndTAB + Priya</Kicker></In>
+          <In><Kicker>The bystander moment</Kicker></In>
           <In d={150}><SlideTitle className="slide-title-lg italic">What would you do next?</SlideTitle></In>
           <In d={300}><div className="mt-12"><ItoWordmark className="text-[52px] text-foreground" /></div></In>
           {!print && (
