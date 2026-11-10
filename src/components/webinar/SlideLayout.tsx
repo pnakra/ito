@@ -1,4 +1,7 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+
+/** Slide position comes from the deck order so reordering never leaves stale page numbers. */
+export const SlidePageContext = createContext<{ page: number; total: number } | null>(null);
 
 interface SlideLayoutProps {
   children: ReactNode;
@@ -9,7 +12,10 @@ interface SlideLayoutProps {
 }
 
 /** Fixed 1920×1080 canvas shared by the editor, thumbnails, presenter, and print. */
-const SlideLayout = ({ children, page, section = "Online bystander intervention", className = "", total = 14 }: SlideLayoutProps) => {
+const SlideLayout = ({ children, page: pageProp, section = "Online bystander intervention", className = "", total: totalProp = 16 }: SlideLayoutProps) => {
+  const position = useContext(SlidePageContext);
+  const page = position?.page ?? pageProp;
+  const total = position?.total ?? totalProp;
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
