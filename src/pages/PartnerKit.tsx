@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import Flyer, { type FlyerTheme } from "@/components/partner/Flyer";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { partnerDb } from "@/lib/partnerDb";
+import { partnerDb, trackPartnerEvent } from "@/lib/partnerDb";
 import { FOCUS_OPTIONS, MESSAGES, REACH_OPTIONS, STAFF_FAQ, type PartnerFocus } from "@/data/partnerKit";
 
 const FONT_HREF = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Instrument+Serif:ital@1&display=swap";
@@ -36,11 +36,12 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h2 className="font-serif text-[26px] leading-tight text-foreground">{children}</h2>;
 }
 
-function CopyCard({ label, text }: { label: string; text: string }) {
+function CopyCard({ label, text, focus }: { label: string; text: string; focus: PartnerFocus }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
     setCopied(true);
+    trackPartnerEvent("copy_message", { detail: label, focus });
     setTimeout(() => setCopied(false), 2000);
   };
   return (
@@ -65,7 +66,8 @@ const SECTIONS = [
 ] as const;
 const sectionCls = "space-y-5 scroll-mt-40 lg:scroll-mt-24";
 
-function goTo(id: string) {
+function goTo(id: string, detail: string = id) {
+  trackPartnerEvent("nav_click", { detail });
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   history.replaceState(null, "", `#${id}`);
 }
@@ -84,8 +86,16 @@ function FocusToggle({ focus, setFocus, compact }: { focus: PartnerFocus; setFoc
 }
 
 export default function PartnerKit() {
-  const [focus, setFocus] = useState<PartnerFocus>("bystander");
-  const [theme, setTheme] = useState<FlyerTheme>("dark");
+  const [focus, setFocusState] = useState<PartnerFocus>("bystander");
+  const [theme, setThemeState] = useState<FlyerTheme>("dark");
+  const setFocus = (f: PartnerFocus) => { if (f !== focus) trackPartnerEvent("version_change", { focus: f }); setFocusState(f); };
+  const setTheme = (t: FlyerTheme) => { if (t !== theme) trackPartnerEvent("theme_change", { theme: t, focus }); setThemeState(t); };
+  const viewed = useRef(false);
+  useEffect(() => {
+    if (viewed.current) return;
+    viewed.current = true;
+    trackPartnerEvent("page_view", { focus });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [org, setOrg] = useState("");
   const [busy, setBusy] = useState<"pdf" | "png" | null>(null);
   const [active, setActive] = useState<string>("messages");
@@ -137,6 +147,7 @@ export default function PartnerKit() {
       const pdf = new jsPDF({ orientation: "portrait", unit: "in", format: "letter" });
       pdf.addImage(png, "PNG", 0, 0, 8.5, 11);
       pdf.save(`${fileBase}.pdf`);
+      trackPartnerEvent("download_pdf", { focus, theme, org_text: org.trim() || null });
     } finally { setBusy(null); }
   };
   const downloadPng = async () => {
@@ -146,6 +157,7 @@ export default function PartnerKit() {
       const png = await render(letterRef.current, 1.5);
       const a = document.createElement("a");
       a.href = png; a.download = `${fileBase}.png`; a.click();
+      trackPartnerEvent("download_png", { focus, theme, org_text: org.trim() || null });
     } finally { setBusy(null); }
   };
 
@@ -168,7 +180,7 @@ export default function PartnerKit() {
           <div className="mt-6 max-w-3xl bg-card shadow-card rounded-lg p-5 space-y-3 border-l-2 border-primary">
             <h2 className="text-[17px] font-medium text-foreground">Planning to share it? Tell us when.</h2>
             <p className="text-[15px] leading-relaxed text-muted-foreground">Students use ito anonymously and we don't track them, so we can't see which schools or chapters are using it. A quick note about when and where you're sharing it is the only way we know it's reaching people, and it helps us keep it free.</p>
-            <a href="#rollout" onClick={(e) => { e.preventDefault(); goTo("rollout"); }} className={primaryBtn}>Tell us when you're sharing it</a>
+            <a href="#rollout" onClick={(e) => { e.preventDefault(); goTo("rollout", "callout"); }} className={primaryBtn}>Tell us when you're sharing it</a>
           </div>
 
           <div className="lg:hidden sticky top-0 z-20 -mx-5 mt-8 px-5 py-2 bg-background/95 backdrop-blur space-y-2 border-b border-border">
@@ -213,7 +225,7 @@ export default function PartnerKit() {
             <div className="space-y-14 min-w-0">
           <section id="messages" className={sectionCls}>
             <SectionTitle>Share it in a message</SectionTitle>
-            <div className="space-y-4">{MESSAGES[focus].map((m) => <CopyCard key={focus + m.label} label={m.label} text={m.text} />)}</div>
+            <div className="space-y-4">{MESSAGES[focus].map((m) => <CopyCard key={focus + m.label} label={m.label} text={m.text} focus={focus} />)}</div>
           </section>
 
           <section id="flyer" className={sectionCls}>
@@ -274,16 +286,16 @@ export default function PartnerKit() {
                 </AccordionItem>
               ))}
             </Accordion>
-            <AskForm />
+            <AskForm focus={focus} />
           </section>
 
           <section id="talk" className={"bg-card shadow-card rounded-lg p-6 space-y-4 scroll-mt-40 lg:scroll-mt-24"}>
             <SectionTitle>Want to talk?</SectionTitle>
             <div className="flex flex-wrap items-center gap-3 text-[15px] text-muted-foreground">
-              <a href="https://calendly.com/priya-overridelabsprevention/ito-evaluation" target="_blank" rel="noopener noreferrer" className={primaryBtn}>Book 20 minutes</a>
-              <span>or email <a className="underline text-foreground" href="mailto:priya@overridelabsprevention.org">priya@overridelabsprevention.org</a></span>
+              <a href="https://calendly.com/priya-overridelabsprevention/ito-evaluation" target="_blank" rel="noopener noreferrer" onClick={() => trackPartnerEvent("calendly_click", { focus })} className={primaryBtn}>Book 20 minutes</a>
+              <span>or email <a className="underline text-foreground" href="mailto:priya@overridelabsprevention.org" onClick={() => trackPartnerEvent("email_click", { focus })}>priya@overridelabsprevention.org</a></span>
             </div>
-            <Link to="/witness/report" className="inline-block text-[13px] text-muted-foreground underline hover:text-foreground">See what an anonymous tip looks like</Link>
+            <Link to="/witness/report" onClick={() => trackPartnerEvent("witness_example_click", { focus })} className="inline-block text-[13px] text-muted-foreground underline hover:text-foreground">See what an anonymous tip looks like</Link>
           </section>
             </div>
           </div>
@@ -293,7 +305,7 @@ export default function PartnerKit() {
   );
 }
 
-function AskForm() {
+function AskForm({ focus }: { focus: PartnerFocus }) {
   const [q, setQ] = useState(""); const [org, setOrg] = useState(""); const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const submit = async (e: React.FormEvent) => {
@@ -303,6 +315,7 @@ function AskForm() {
     const { error } = await partnerDb.from("partner_questions").insert({
       question: q.trim().slice(0, 1000), asker_org: org.trim() || null, asker_email: email.trim() || null, status: "pending",
     });
+    if (!error) trackPartnerEvent("question_submitted", { focus });
     setState(error ? "error" : "done");
   };
   if (state === "done") return <p className="bg-card shadow-card rounded-lg p-5 text-[15px]">Thanks. Priya will answer, and helpful answers get added here.</p>;
@@ -336,6 +349,7 @@ function ShareForm({ focus }: { focus: PartnerFocus }) {
       focus: version, contact_email: email.trim() || null, notes: notes.trim().slice(0, 1000) || null,
       share_status: status, share_date: date || null,
     });
+    if (!error) trackPartnerEvent("share_submitted", { detail: status, focus: version });
     setState(error ? "error" : "done");
   };
   if (state === "done") return <p className="bg-card shadow-card rounded-lg p-5 text-[15px]">{status === "planned" ? "Thank you, this really helps. We'll check in around then." : "Thank you, this really helps."}</p>;

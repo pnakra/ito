@@ -89,7 +89,7 @@ const Privacy = () => {
 
             <h3 className="font-medium mt-4 mb-1">Partner Forms</h3>
             <p>
-              If staff at a school or organization ask us a question or tell us where they shared ito on our partner kit page, we store what they enter, including an optional email address, to reply and to understand where ito is being shared.
+              If staff at a school or organization ask us a question or tell us where they shared ito on our partner kit page, we store what they enter, including an optional email address, to reply and to understand where ito is being shared. On the partner kit page we also record basic activity, like which version and flyer style is chosen, flyer downloads, copied messages, and the organization name typed onto a flyer, so we can see how the kit is used. This page is meant for staff and partners, and this activity is not linked to anyone's use of is this ok?.
             </p>
 
             <h3 className="font-medium mt-4 mb-1">What We Do NOT Collect</h3>

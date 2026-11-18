@@ -4,6 +4,7 @@ import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import SEO from "@/components/SEO";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminSupabase } from "@/lib/adminSupabase";
+import ActivityTab from "@/components/partner/ActivityTab";
 
 /** Untyped view of the admin client: holds the gate's session, never the public client's storage. */
 const db = adminSupabase as unknown as SupabaseClient;
@@ -64,12 +65,14 @@ function Inner({ session }: { session: Session }) {
       <div className="max-w-5xl mx-auto space-y-6">
         <h1 className="font-serif text-3xl">Partner kit admin</h1>
         {err && <p className="text-sm text-destructive font-mono">{err}</p>}
-        <Tabs defaultValue="questions">
-          <TabsList>
+        <Tabs defaultValue="activity">
+          <TabsList className="flex-wrap h-auto">
+            <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="questions">Questions ({qs.filter((q) => q.status === "pending").length} pending)</TabsTrigger>
             <TabsTrigger value="shares">Shares ({shares.length})</TabsTrigger>
             <TabsTrigger value="heard">Where people heard ({refs.length})</TabsTrigger>
           </TabsList>
+          <TabsContent value="activity"><ActivityTab db={db} /></TabsContent>
           <TabsContent value="questions" className="space-y-4">
             {qs.length === 0 && <p className="text-sm text-muted-foreground">No questions yet.</p>}
             {qs.map((q) => (
