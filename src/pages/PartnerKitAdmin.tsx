@@ -9,8 +9,16 @@ import { adminSupabase } from "@/lib/adminSupabase";
 const db = adminSupabase as unknown as SupabaseClient;
 
 interface Q { id: string; created_at: string; question: string; asker_org: string | null; asker_email: string | null; answer: string | null; status: string; answered_at: string | null }
-interface S { id: string; created_at: string; org: string; where_shared: string; reach: string | null; focus: string | null; contact_email: string | null; notes: string | null }
+interface S { id: string; created_at: string; org: string; where_shared: string; reach: string | null; focus: string | null; contact_email: string | null; notes: string | null; share_status: string | null; share_date: string | null }
 interface R { flow: string; source: string; org_text: string | null }
+
+/** Upcoming planned shares first (soonest date first), then everything else newest first. */
+function sortShares(list: S[]): S[] {
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = (s: S) => s.share_status === "planned" && (!s.share_date || s.share_date >= today);
+  const up = list.filter(upcoming).sort((a, b) => (a.share_date ?? "9999").localeCompare(b.share_date ?? "9999"));
+  return [...up, ...list.filter((s) => !upcoming(s))];
+}
 
 const fmt = (d: string) => new Date(d).toLocaleString();
 
@@ -29,7 +37,7 @@ function Inner({ session }: { session: Session }) {
     const list = (a.data as Q[] | null) ?? [];
     setQs([...list.filter((q) => q.status === "pending"), ...list.filter((q) => q.status !== "pending")]);
     setDrafts(Object.fromEntries(list.map((q) => [q.id, q.answer ?? ""])));
-    setShares((b.data as S[] | null) ?? []); setRefs((c.data as R[] | null) ?? []);
+    setShares(sortShares((b.data as S[] | null) ?? [])); setRefs((c.data as R[] | null) ?? []);
   }, []);
   useEffect(() => { load(); }, [load, session]);
 
@@ -82,9 +90,9 @@ function Inner({ session }: { session: Session }) {
           </TabsContent>
           <TabsContent value="shares" className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead><tr>{["Date", "Org", "Where", "Reach", "Version", "Email", "Notes"].map((h) => <th key={h} className={cell + " font-medium"}>{h}</th>)}</tr></thead>
+              <thead><tr>{["Submitted", "Status", "Share date", "Org", "Where", "Reach", "Version", "Email", "Notes"].map((h) => <th key={h} className={cell + " font-medium"}>{h}</th>)}</tr></thead>
               <tbody>{shares.map((s) => (
-                <tr key={s.id}><td className={cell}>{fmt(s.created_at)}</td><td className={cell}>{s.org}</td><td className={cell}>{s.where_shared}</td><td className={cell}>{s.reach ?? ""}</td><td className={cell}>{s.focus ?? ""}</td><td className={cell}>{s.contact_email ?? ""}</td><td className={cell + " whitespace-pre-line"}>{s.notes ?? ""}</td></tr>
+                <tr key={s.id}><td className={cell}>{fmt(s.created_at)}</td><td className={cell}>{s.share_status ?? ""}</td><td className={cell}>{s.share_date ?? ""}</td><td className={cell}>{s.org}</td><td className={cell}>{s.where_shared}</td><td className={cell}>{s.reach ?? ""}</td><td className={cell}>{s.focus ?? ""}</td><td className={cell}>{s.contact_email ?? ""}</td><td className={cell + " whitespace-pre-line"}>{s.notes ?? ""}</td></tr>
               ))}</tbody>
             </table>
           </TabsContent>
