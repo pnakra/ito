@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
+import { ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import SEO from "@/components/SEO";
 import Flyer, { type FlyerTheme } from "@/components/partner/Flyer";
@@ -361,14 +362,20 @@ function ShareForm({ focus }: { focus: PartnerFocus }) {
         <input required minLength={2} maxLength={500} className={field} value={where} onChange={(e) => setWhere(e.target.value)} placeholder="Chapter GroupMe, spring newsletter, RA training..." /></label>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5"><span className="text-[14px]">Roughly how many people?</span>
-          <select className={field} value={reach} onChange={(e) => setReach(e.target.value)}>
-            <option value="">Choose one</option>
-            {REACH_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-          </select></label>
+          <div className="relative">
+            <select className={`${field} appearance-none pr-10`} value={reach} onChange={(e) => setReach(e.target.value)}>
+              <option value="">Choose one</option>
+              {REACH_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          </div></label>
         <label className="block space-y-1.5"><span className="text-[14px]">Which version?</span>
-          <select className={field} value={version} onChange={(e) => setVersion(e.target.value as PartnerFocus)}>
-            {FOCUS_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-          </select></label>
+          <div className="relative">
+            <select className={`${field} appearance-none pr-10`} value={version} onChange={(e) => setVersion(e.target.value as PartnerFocus)}>
+              {FOCUS_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          </div></label>
       </div>
       <label className="block space-y-1.5"><span className="text-[14px]">Email (optional)</span>
         <input type="email" maxLength={200} className={field} value={email} onChange={(e) => setEmail(e.target.value)} /></label>
