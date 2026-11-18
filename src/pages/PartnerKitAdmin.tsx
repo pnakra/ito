@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import SEO from "@/components/SEO";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { partnerDb } from "@/lib/partnerDb";
+import { adminSupabase } from "@/lib/adminSupabase";
+
+/** Untyped view of the admin client: holds the gate's session, never the public client's storage. */
+const db = adminSupabase as unknown as SupabaseClient;
 
 interface Q { id: string; created_at: string; question: string; asker_org: string | null; asker_email: string | null; answer: string | null; status: string; answered_at: string | null }
 interface S { id: string; created_at: string; org: string; where_shared: string; reach: string | null; focus: string | null; contact_email: string | null; notes: string | null }
@@ -12,22 +15,15 @@ interface R { flow: string; source: string; org_text: string | null }
 const fmt = (d: string) => new Date(d).toLocaleString();
 
 function Inner({ session }: { session: Session }) {
-  const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [qs, setQs] = useState<Q[]>([]); const [shares, setShares] = useState<S[]>([]); const [refs, setRefs] = useState<R[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
 
-  // Hand the gate's admin session to the shared client so all queries go through src/lib/supabase.ts.
-  useEffect(() => {
-    partnerDb.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token })
-      .then(({ error }) => { if (error) setErr(error.message); setReady(true); });
-  }, [session]);
-
   const load = useCallback(async () => {
     const [a, b, c] = await Promise.all([
-      partnerDb.from("partner_questions").select("*").order("created_at", { ascending: false }),
-      partnerDb.from("partner_shares").select("*").order("created_at", { ascending: false }),
-      partnerDb.from("referral_sources").select("flow,source,org_text"),
+      db.from("partner_questions").select("*").order("created_at", { ascending: false }),
+      db.from("partner_shares").select("*").order("created_at", { ascending: false }),
+      db.from("referral_sources").select("flow,source,org_text"),
     ]);
     setErr(a.error?.message ?? b.error?.message ?? c.error?.message ?? null);
     const list = (a.data as Q[] | null) ?? [];
@@ -35,10 +31,10 @@ function Inner({ session }: { session: Session }) {
     setDrafts(Object.fromEntries(list.map((q) => [q.id, q.answer ?? ""])));
     setShares((b.data as S[] | null) ?? []); setRefs((c.data as R[] | null) ?? []);
   }, []);
-  useEffect(() => { if (ready) load(); }, [ready, load]);
+  useEffect(() => { load(); }, [load, session]);
 
   const update = async (id: string, patch: Record<string, unknown>) => {
-    const { error } = await partnerDb.from("partner_questions").update(patch).eq("id", id);
+    const { error } = await db.from("partner_questions").update(patch).eq("id", id);
     if (error) setErr(error.message); else load();
   };
 
