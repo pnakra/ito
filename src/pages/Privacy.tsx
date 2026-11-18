@@ -13,11 +13,11 @@ const Privacy = () => {
       <main className="flex-1 container mx-auto px-4 py-12 max-w-2xl">
         <h1 className="text-2xl font-semibold mb-2">Privacy Policy</h1>
         <p className="text-muted-foreground mb-1 text-[15px]">Is This OK? (ito)</p>
-        <p className="text-muted-foreground mb-1 text-[15px]">Effective Date: March 21, 2026</p>
+        <p className="text-muted-foreground mb-1 text-[15px]">Effective Date: November 18, 2026</p>
         <p className="text-muted-foreground mb-6 text-[15px]">
           Operated by Override Labs |{" "}
-          <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-            overridelabspreventiontech@gmail.com
+          <a href="mailto:priya@overridelabsprevention.org" className="underline">
+            priya@overridelabsprevention.org
           </a>
         </p>
 
@@ -36,8 +36,8 @@ const Privacy = () => {
             </p>
             <p className="mt-2">
               Contact us at:{" "}
-              <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-                overridelabspreventiontech@gmail.com
+              <a href="mailto:priya@overridelabsprevention.org" className="underline">
+                priya@overridelabsprevention.org
               </a>
             </p>
           </section>
@@ -49,8 +49,8 @@ const Privacy = () => {
             </p>
             <p className="mt-2">
               If we become aware that we have collected information from a child under 13, we will delete it promptly. If you believe a child under 13 has submitted information through ito, please contact us at{" "}
-              <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-                overridelabspreventiontech@gmail.com
+              <a href="mailto:priya@overridelabsprevention.org" className="underline">
+                priya@overridelabsprevention.org
               </a>.
             </p>
           </section>
@@ -60,7 +60,7 @@ const Privacy = () => {
 
             <h3 className="font-medium mt-4 mb-1">Scenario Submissions</h3>
             <p>
-              When you use ito, you may type out a scenario or situation you are navigating. This text is submitted anonymously — we do not ask for your name, email, phone number, or any account information. It is stored in our secure database to help us understand how users engage with the tool and improve our responses, and reviewed by our team in aggregate to assess product quality and safety.
+              When you use ito, you may type out a scenario or situation you are navigating. This text is submitted anonymously — we do not ask for your name, email, phone number, or any account information. It is stored in our secure database. Our small team may read individual submissions to check quality and safety and to improve ito's responses.
             </p>
             <p className="mt-2 font-medium">
               Important: Please do not include personally identifying information about yourself or others (such as full names, school names, or contact details) in your scenario text.
@@ -79,7 +79,7 @@ const Privacy = () => {
 
             <h3 className="font-medium mt-4 mb-1">Operational Data</h3>
             <p>
-              When you submit a scenario, our systems generate an internal notification so our team is aware of new submissions. This notification contains the submission text and is used solely for product monitoring and safety review.
+              When you submit a scenario, our systems send an internal notification to our team's workspace (Slack) so our team is aware of new submissions. This notification contains the submission text and is used solely for product monitoring and safety review.
             </p>
 
             <h3 className="font-medium mt-4 mb-1">What We Do NOT Collect</h3>
@@ -98,7 +98,7 @@ const Privacy = () => {
           <section>
             <h2 className="text-lg font-medium mb-2">5. How We Share Your Information</h2>
             <p>
-              We share information only with service providers necessary to operate ito: Supabase (database), Vercel (hosting), and Google Analytics (usage analytics). We may also disclose information if required by law or to protect the safety of any person. We do not sell, rent, or share your data with advertisers or data brokers.
+              We share information only with service providers necessary to operate ito: Anthropic (the AI model that generates ito's responses, which processes the text you type), Supabase (database), Vercel (hosting), Slack (internal team notifications), and Google Analytics (usage analytics). We may also disclose information if required by law or to protect the safety of any person. We do not sell, rent, or share your data with advertisers or data brokers.
             </p>
           </section>
 
@@ -106,8 +106,8 @@ const Privacy = () => {
             <h2 className="text-lg font-medium mb-2">6. Data Retention</h2>
             <p>
               Submission text is retained as long as needed to operate and improve ito. If you would like your submission deleted, contact us at{" "}
-              <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-                overridelabspreventiontech@gmail.com
+              <a href="mailto:priya@overridelabsprevention.org" className="underline">
+                priya@overridelabsprevention.org
               </a>{" "}
               with the approximate text of your submission so we can locate and remove it.
             </p>
@@ -131,8 +131,8 @@ const Privacy = () => {
             <h2 className="text-lg font-medium mb-2">9. Your Rights</h2>
             <p>
               Depending on where you live, you may have rights to access, correct, or delete data we hold. To make a request, contact us at{" "}
-              <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-                overridelabspreventiontech@gmail.com
+              <a href="mailto:priya@overridelabsprevention.org" className="underline">
+                priya@overridelabsprevention.org
               </a>.
               {" "}California residents: we do not sell personal information and do not engage in cross-context behavioral advertising.
             </p>
@@ -156,8 +156,8 @@ const Privacy = () => {
             <h2 className="text-lg font-medium mb-2">12. Contact Us</h2>
             <p>Override Labs</p>
             <p>
-              <a href="mailto:overridelabspreventiontech@gmail.com" className="underline">
-                overridelabspreventiontech@gmail.com
+              <a href="mailto:priya@overridelabsprevention.org" className="underline">
+                priya@overridelabsprevention.org
               </a>
             </p>
             <p>
