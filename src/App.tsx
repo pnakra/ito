@@ -25,6 +25,8 @@ import Misread from "./pages/Misread";
 import AdminAuthGate from "@/components/evals/AdminAuthGate";
 import AdminSessions from "./pages/AdminSessions";
 import Footer from "./components/Footer";
+import PartnerKit from "./pages/PartnerKit";
+import PartnerKitAdmin from "./pages/PartnerKitAdmin";
 import WitnessGuide from "./pages/witness/WitnessGuide";
 import WitnessPractice from "./pages/witness/WitnessPractice";
 import WitnessReport from "./pages/witness/WitnessReport";
@@ -77,6 +79,8 @@ const App = () => (
               <Route path="/bystanderbeta" element={<BystanderBeta />} />
               <Route path="/bystanderbeta/feedback" element={<BystanderFeedback />} />
               <Route path="/practice" element={<Practice />} />
+              <Route path="/partner-kit" element={<PartnerKit />} />
+              <Route path="/partner-kit/admin" element={<PartnerKitAdmin />} />
               <Route path="/webinar" element={<BystanderWebinar />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

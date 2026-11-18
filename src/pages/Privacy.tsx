@@ -82,6 +82,16 @@ const Privacy = () => {
               When you submit a scenario, our systems send an internal notification to our team's workspace (Slack) so our team is aware of new submissions. This notification contains the submission text and is used solely for product monitoring and safety review.
             </p>
 
+            <h3 className="font-medium mt-4 mb-1">How You Heard About ito (Optional)</h3>
+            <p>
+              At the end of a session we may ask, optionally, how you heard about ito, for example through your school or chapter. Your answer is stored separately from what you typed and is not linked to it. We use it only to count how people find ito and to share totals with organizations that share ito, and only once enough people have answered that no one can be identified.
+            </p>
+
+            <h3 className="font-medium mt-4 mb-1">Partner Forms</h3>
+            <p>
+              If staff at a school or organization ask us a question or tell us where they shared ito on our partner kit page, we store what they enter, including an optional email address, to reply and to understand where ito is being shared.
+            </p>
+
             <h3 className="font-medium mt-4 mb-1">What We Do NOT Collect</h3>
             <p>
               We do not collect your name, email, contact information, device identifiers, advertising IDs, or any information that would allow us to contact you.

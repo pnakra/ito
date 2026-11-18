@@ -22,6 +22,7 @@ import RefusalCard from "@/components/prevention/RefusalCard";
 import AfterHandoff from "@/components/prevention/AfterHandoff";
 import OutcomeCheck from "@/components/prevention/OutcomeCheck";
 import ConfidencePost from "@/components/prevention/ConfidencePost";
+import ReferralSourceCard from "@/components/prevention/ReferralSourceCard";
 import AgeConfidenceCheck, { type AgeConfidenceResult, type ExtraAgeQuestion } from "@/components/narrative/AgeConfidenceCheck";
 import IntakeChoice from "@/components/narrative/IntakeChoice";
 import OutcomeFeedback from "@/components/prevention/OutcomeFeedback";
@@ -1066,18 +1067,6 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
 
       <main className="flex-1 container mx-auto px-5 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {isBystander && (
-            <div className="flex justify-end -mb-2">
-              <a
-                href="/bystanderbeta/feedback"
-                target="_blank"
-                rel="noopener"
-                className="inline-flex items-center min-h-[44px] rounded-full border border-border px-4 text-[13px] text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                Give feedback
-              </a>
-            </div>
-          )}
           {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {
               if (phase === "role-question") setPhase("narrative-input");
@@ -1405,6 +1394,10 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
                   : undefined
               }
             />
+          )}
+
+          {phase === "outcome-feedback" && selectedOutcome && (
+            <ReferralSourceCard flow={isBystander ? "bystander" : "main"} />
           )}
         </div>
       </main>
