@@ -16,7 +16,7 @@ const PracticeGate = ({ onAnswer }: { onAnswer: (adult: boolean) => void }) => (
   <div className="animate-fade-in space-y-6">
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <h1 className="text-h2">ito practice</h1>
+        <h2 className="text-h2">ito practice</h2>
         <span className="text-[11px] uppercase tracking-wide text-muted-foreground border border-border rounded-full px-2 py-0.5">
           Beta
         </span>

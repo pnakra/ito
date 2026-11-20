@@ -211,6 +211,7 @@ const Practice = () => {
       />
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 pb-12">
+        <h1 className="sr-only">ito practice</h1>
         <div className="max-w-2xl mx-auto">
           {screen === "gate" && <PracticeGate onAnswer={onGate} />}
           {screen === "under18" && <PracticeUnder18 />}
