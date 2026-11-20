@@ -32,7 +32,7 @@ const Index = () => {
       <SEO
         title="ito — Is this ok? Anonymous read on hookups & consent"
         description="Get an honest, non-judgmental perspective on sex, dating, and consent. Anonymous, nothing saved that identifies you."
-        path="/"
+        path="/welcome"
       />
       <Header />
 

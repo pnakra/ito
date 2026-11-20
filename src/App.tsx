@@ -48,6 +48,7 @@ const App = () => (
           <div className="flex flex-col min-h-screen">
             <Routes>
               <Route path="/" element={<Navigate to="/check-in" replace />} />
+              <Route path="/welcome" element={<Index />} />
               <Route path="/check-in" element={<CheckIn />} />
               <Route path="/chat" element={<CheckIn />} />
               <Route path="/about" element={<About />} />
