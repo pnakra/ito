@@ -31,6 +31,7 @@ const BystanderFeedback = () => {
       <SEO title="Beta feedback | ito" description="Share feedback on the ito bystander beta or get in touch about funding or a pilot." path="/bystanderbeta/feedback" noindex />
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 pb-12">
+        <h1 className="sr-only">Bystander beta feedback</h1>
         <div className="max-w-2xl mx-auto space-y-12">
           <BackButton to="/bystanderbeta" />
           <section className="space-y-3">

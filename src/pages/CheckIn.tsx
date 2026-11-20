@@ -1066,6 +1066,7 @@ const CheckIn = ({ mode = "normal" }: CheckInProps) => {
       )}
 
       <main className="flex-1 container mx-auto px-5 py-8">
+        <h1 className="sr-only">{mode === "bystander" ? "Think through something you saw or heard" : "Get an anonymous perspective on sex, dating, and consent"}</h1>
         <div className="max-w-2xl mx-auto space-y-6">
           {phase !== "narrative-input" ? (
             <BackButton label="Back" onClick={() => {

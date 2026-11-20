@@ -131,7 +131,7 @@ const WitnessPractice = () => {
           <BackButton to="/witness" />
           {active ? (
             <>
-              <h1 className="text-h2 text-foreground">{active.title}</h1>
+              <h2 className="text-h2 text-foreground">{active.title}</h2>
               <Play key={active.id} s={active} onDone={(sc) => done(active.id, sc)} onComplete={() => completed(active.id)} />
             </>
           ) : (

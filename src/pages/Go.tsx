@@ -49,6 +49,7 @@ const Go = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground text-sm">
+      <h1 className="sr-only">Opening ito</h1>
       Loading…
     </div>
   );

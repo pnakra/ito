@@ -131,6 +131,7 @@ const Misread = () => {
       />
 
       <main className="flex-1 container mx-auto max-w-[420px] px-5 pt-8 pb-16" style={{ fontFamily: "Geist, system-ui, sans-serif" }}>
+        <h1 className="sr-only">Did ito misread your situation?</h1>
         {/* Timestamp */}
         <div className="text-center mb-6">
           <span className="text-[11px] tracking-[0.2em] uppercase" style={{ color: "#666" }}>

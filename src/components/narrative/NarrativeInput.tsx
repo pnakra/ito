@@ -103,7 +103,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
         </div>
       )}
       <div className="relative inline-flex flex-col items-center mb-2">
-        <h1
+        <h2
           className="text-foreground text-center"
           style={{
             fontFamily: '"Newsreader", "Georgia", serif',
@@ -115,7 +115,7 @@ const NarrativeInput = ({ onSubmit, isLoading, compact, initialValue, hideSugges
           }}
         >
           {title}
-        </h1>
+        </h2>
         {/* Hand-drawn underline */}
         <svg
           className="mt-1 text-primary/30"
