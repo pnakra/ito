@@ -21,6 +21,22 @@ const BlogArticle = () => {
     mainEntityOfPage: `https://isthisok.app/blog/${article.slug}`,
   };
 
+  const faqs = article.content.flatMap((section) => section.faqs ?? []);
+  const jsonLd = faqs.length
+    ? [
+        articleJsonLd,
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        },
+      ]
+    : articleJsonLd;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
@@ -28,7 +44,7 @@ const BlogArticle = () => {
         description={article.metaDescription}
         path={`/blog/${article.slug}`}
         type="article"
-        jsonLd={articleJsonLd}
+        jsonLd={jsonLd}
       />
       <Header />
       <main className="flex-1 container mx-auto px-5 py-8 sm:py-12">
@@ -49,7 +65,37 @@ const BlogArticle = () => {
                   return (
                     <p key={i} className="text-body text-muted-foreground">
                       {section.text}
+                      {section.link && (
+                        <>
+                          {" "}
+                          <Link
+                            to={section.link.to}
+                            className="text-foreground underline underline-offset-4 hover:text-primary transition-colors"
+                          >
+                            {section.link.text}
+                          </Link>
+                          .
+                        </>
+                      )}
                     </p>
+                  );
+                case "answer":
+                  return (
+                    <div key={i} className="rounded-lg border border-border bg-card p-5">
+                      <p className="text-caption text-muted-foreground mb-1">Short answer</p>
+                      <p className="text-body text-foreground">{section.text}</p>
+                    </div>
+                  );
+                case "faq":
+                  return (
+                    <div key={i} className="space-y-5">
+                      {section.faqs?.map((f, j) => (
+                        <div key={j} className="space-y-1">
+                          <h3 className="text-body font-medium text-foreground">{f.q}</h3>
+                          <p className="text-body text-muted-foreground">{f.a}</p>
+                        </div>
+                      ))}
+                    </div>
                   );
                 case "list":
                   return (

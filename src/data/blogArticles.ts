@@ -7,9 +7,13 @@ export interface BlogArticle {
 }
 
 export interface ArticleSection {
-  type: "paragraph" | "heading" | "list" | "cta";
+  type: "paragraph" | "heading" | "list" | "cta" | "answer" | "faq";
   text?: string;
   items?: string[];
+  /** Optional internal link appended to a paragraph. */
+  link?: { text: string; to: string };
+  /** Question and answer pairs for "faq" sections. */
+  faqs?: { q: string; a: string }[];
 }
 
 export const blogArticles: BlogArticle[] = [
@@ -36,6 +40,7 @@ export const blogArticles: BlogArticle[] = [
       { type: "paragraph", text: "This is the harder question. If something about how things went doesn't sit right with you, if they seemed distant, or went quiet when things escalated, or didn't really participate, that discomfort is worth taking seriously." },
       { type: "paragraph", text: "It doesn't automatically mean something went wrong. But it does mean something was happening for them that didn't fully make it into words. And the right move is to check in directly, not to talk yourself out of the feeling." },
       { type: "paragraph", text: "\"Hey, how are you feeling about the other night?\" is a complete sentence. It gives them space to share if something felt off, without you having to confess to anything or make it heavier than it needs to be." },
+      { type: "paragraph", text: "If they said maybe or seemed unsure beforehand, read", link: { text: "what \"maybe\" really means", to: "/blog/what-does-it-mean-when-she-says-maybe" } },
       { type: "heading", text: "Is It Okay to Hook Up With a Friend?" },
       { type: "paragraph", text: "Hooking up with a friend changes the dynamic. That's just true. Whether it's okay depends less on some universal rule and more on whether both of you were genuinely on the same page about what it meant and what happens next." },
       { type: "paragraph", text: "What makes friend hookups complicated is the unspoken assumptions on either side. One person might think it was a one-time thing. The other might be hoping it means something more. Neither of you might be sure." },
@@ -77,6 +82,7 @@ export const blogArticles: BlogArticle[] = [
       { type: "heading", text: "What Does It Mean When She Pulls Away?" },
       { type: "paragraph", text: "If you move closer and she pulls back, physically or in the conversation, that's a signal worth respecting, not overriding." },
       { type: "paragraph", text: "It might mean she's nervous. It might mean she's not feeling it right now. It might mean she's interested but not ready. What it doesn't mean is that you should keep pushing to find out which one." },
+      { type: "paragraph", text: "If she said maybe, here's", link: { text: "what \"maybe\" usually means and how to respond", to: "/blog/what-does-it-mean-when-she-says-maybe" } },
       { type: "paragraph", text: "The cleanest move when someone pulls away is to give them space and let them close the distance if they want to. If she's into it, she'll often come to you. And if she doesn't, you have your answer without having pushed." },
       { type: "heading", text: "How to Make a Move Without Making It Weird" },
       { type: "paragraph", text: "The most reliable way to make a move is also the simplest: ask." },
@@ -204,12 +210,13 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     slug: "what-does-it-mean-when-she-says-maybe",
-    title: "What Does It Mean When She Says Maybe?",
-    metaDescription: "She said maybe, or something that wasn't quite yes. Here's what that actually means and how to respond to mixed signals.",
+    title: "Does Maybe Mean Yes or No? What \"Maybe\" Means in Dating and Hookups",
+    metaDescription: "Does maybe mean yes? When it comes to kissing or hooking up, no. Here's what \"maybe\" usually means, what to say back, and how to handle mixed signals.",
     shortDescription: "What \"maybe\" actually means and how to respond to mixed signals.",
     content: [
+      { type: "answer", text: "When it comes to anything physical, maybe isn't yes. It means they haven't decided, so the move is to slow down and let them decide without pressure. If you only get a yes after pushing, that isn't a real yes." },
       { type: "paragraph", text: "She didn't say yes. She didn't say no. She said maybe, or \"I don't know,\" or \"we'll see,\" or she just kind of didn't answer. And now you're trying to figure out what that actually means." },
-      { type: "paragraph", text: "Maybe means maybe. It's genuine uncertainty, not a soft yes or a hard no, and how you respond to it matters a lot." },
+      { type: "paragraph", text: "Maybe means maybe. It's real uncertainty, not a soft yes, and sometimes it's a polite no. How you respond to it matters a lot." },
       { type: "heading", text: "What \"Maybe\" Usually Means" },
       { type: "paragraph", text: "When someone says maybe to something physical or romantic, they're usually in one of a few places:" },
       { type: "list", items: [
@@ -231,9 +238,17 @@ export const blogArticles: BlogArticle[] = [
         "Not pushing when they hesitate",
         "Asking directly: \"What do you actually want here?\"",
         "Being okay with the answer, whatever it is",
-        "Not interpreting continued proximity as a green light if they haven't actually said yes",
+        "Not treating them staying close as a yes if they haven't actually said yes",
       ]},
       { type: "paragraph", text: "Mixed signals aren't an invitation to keep trying until you get a yes. They're a signal that something isn't clear yet, and clarity is worth waiting for." },
+      { type: "heading", text: "Common Questions About \"Maybe\"" },
+      { type: "faq", faqs: [
+        { q: "Does maybe mean yes?", a: "Not for anything physical. A yes sounds like a yes. Maybe means they're unsure, and unsure means wait." },
+        { q: "Does maybe mean no?", a: "Sometimes. Some people say maybe because a direct no feels awkward or unsafe. Treat it as \"not now\" and let them bring it back up if they want to." },
+        { q: "What should I say when someone says maybe?", a: "Something low pressure, like \"No rush, we don't have to do anything.\" Then actually mean it." },
+        { q: "Is it ok to ask again later?", a: "Once, at a different time, without pressure, is fine. Asking over and over until the answer changes is pushing." },
+        { q: "What if they said maybe and then went along with it?", a: "Going along with something isn't the same as wanting it. If you're not sure how it went for them, check in, and think it through with ito." },
+      ]},
       { type: "heading", text: "If Something Already Happened and You're Not Sure It Was Okay" },
       { type: "paragraph", text: "If you moved forward despite a maybe, or pushed past hesitation, and now you're wondering if that was okay, that's worth looking at honestly." },
       { type: "paragraph", text: "ito is a free, anonymous tool for thinking through exactly those situations. You describe what happened and get an honest, non-judgmental read on what's going on and what to do next." },
@@ -296,6 +311,7 @@ export const blogArticles: BlogArticle[] = [
       { type: "paragraph", text: "Check in. Not with some awkward clinical script. Just stay present enough to notice if something shifts. Are they still engaged? Have they gone quiet? Did something change?" },
       { type: "paragraph", text: "Slow down if anything feels unclear. The moment where you're not sure if they're okay is the moment to pause, not the moment to keep going and hope for the best." },
       { type: "paragraph", text: "Take no as a complete answer. A no at any point, even in the middle of something, is a no. Someone being into something earlier doesn't mean they're into it now." },
+      { type: "paragraph", text: "The same goes for maybe. Here's", link: { text: "why maybe isn't a yes", to: "/blog/what-does-it-mean-when-she-says-maybe" } },
       { type: "heading", text: "After" },
       { type: "paragraph", text: "Check in. A simple \"how are you doing?\" after a hookup matters more than most people think. It signals that you see them as a person, beyond what happened between you. And it gives them space to share if something felt off, which you'd rather know than not know." },
       { type: "heading", text: "If Something Didn't Go the Way You Hoped" },
@@ -330,10 +346,10 @@ export const blogArticles: BlogArticle[] = [
   {
     slug: "how-to-ask-without-killing-the-mood",
     title: "How to Ask Without Killing the Mood",
-    metaDescription: "Worried that checking in makes things awkward? It doesn't. Here's how to ask in a way that keeps the vibe, and why it makes things better.",
-    shortDescription: "Checking in doesn’t kill the vibe. How to ask in a way that keeps things good, and why it helps.",
+    metaDescription: "Worried that checking in makes things awkward? It doesn't. Here's how to ask in a way that keeps the mood, and why it makes things better.",
+    shortDescription: "Checking in doesn’t kill the mood. How to ask in a way that keeps things good, and why it helps.",
     content: [
-      { type: "paragraph", text: "The number one reason guys don't check in is they think it'll kill the vibe. Like there's this fragile mood that shatters the second anyone uses words. The mood is way sturdier than you think, and checking in usually makes it better, not worse." },
+      { type: "paragraph", text: "The number one reason guys don't check in is they think it'll kill the mood. Like there's this fragile mood that shatters the second anyone uses words. The mood is way sturdier than you think, and checking in usually makes it better, not worse." },
       { type: "heading", text: "Why asking works" },
       { type: "paragraph", text: "Think about it from her side. She's also wondering what's okay, also a little nervous, also trying to read you. When you check in, you're answering the question she's already asking herself." },
       { type: "paragraph", text: "Real confidence is being comfortable enough to say \"you into this?\" and mean it." },
@@ -347,10 +363,10 @@ export const blogArticles: BlogArticle[] = [
       ]},
       { type: "paragraph", text: "Say it like you mean it, not like you're reading terms and conditions. Tone does half the work: relaxed and genuine, not anxious or performative." },
       { type: "heading", text: "Read the answer, not just the words" },
-      { type: "paragraph", text: "A real yes sounds like a yes: engaged, present, matching your energy. If you get a hesitant \"yeah... I guess\" or a shrug, that's not a green light. Treat it like a yellow one: slow down, give it space. Only keep going if she gets clearly enthusiastic on her own. A check-in later isn't a second shot at the yes." },
+      { type: "paragraph", text: "A real yes sounds like a yes: engaged, present, matching your energy. If you get a hesitant \"yeah... I guess\" or a shrug, that's not a yes. Slow down and give it space. Only keep going if she gets clearly enthusiastic on her own. A check-in later isn't a second shot at the yes." },
       { type: "paragraph", text: "And if she says no or not right now? \"Cool, no worries.\" And actually mean it. No sulking, no \"are you sure?\", no making her manage your disappointment. How you handle a no says a lot about you." },
       { type: "heading", text: "The mood myth" },
-      { type: "paragraph", text: "The idea that talking ruins the moment comes from movies. In real life, the thing that ruins the moment is one person quietly not being sure and the other person pretending not to notice. That's what actually kills the vibe: afterward, when it sits wrong with both of you." },
+      { type: "paragraph", text: "The idea that talking ruins the moment comes from movies. In real life, the thing that ruins the moment is one person quietly not being sure and the other person pretending not to notice. That's what actually kills the mood: afterward, when it sits wrong with both of you." },
       { type: "paragraph", text: "A thirty-second check-in now beats a three-day spiral later." },
       { type: "paragraph", text: "If you’re working through a situation like this one, ito is a free, anonymous tool for getting an honest read. You describe what happened in your own words. No judgment, no lectures, just a clear-eyed look at what's going on and what to do next." },
       { type: "cta", text: "Get an honest read with ito →" },
@@ -359,7 +375,7 @@ export const blogArticles: BlogArticle[] = [
   {
     slug: "how-to-bring-up-condoms",
     title: "How to Bring Up Condoms Without Making It Awkward",
-    metaDescription: "Worried it kills the vibe? It doesn't. How to handle protection smoothly, what to do if she reacts weird, and why handling it directly is the right call.",
+    metaDescription: "Worried it kills the mood? It doesn't. How to handle protection smoothly, what to do if she reacts weird, and why handling it directly is the right call.",
     shortDescription: "Five seconds that feel like a big deal. How to handle protection smoothly and confidently.",
     content: [
       { type: "paragraph", text: "Almost every guy stresses about this, and almost none of them need to. Bringing up condoms feels like a big deal beforehand and takes about five seconds in practice. Here's how to make those five seconds smooth." },
@@ -521,7 +537,7 @@ export const blogArticles: BlogArticle[] = [
   {
     slug: "she-was-into-it-over-text",
     title: "She Was Into It Over Text But Quiet in Person",
-    metaDescription: "Flirty over text, shy in real life? What the gap means, why it happens, and how to handle it without assuming the texts were a green light.",
+    metaDescription: "Flirty over text, shy in real life? What the gap means, why it happens, and how to handle it without assuming the texts were a yes.",
     shortDescription: "Flirty over text, quiet in person. What the gap means and how to handle it without assuming.",
     content: [
       { type: "paragraph", text: "Over text she was flirty, sending signals, maybe even the one escalating. In person she's quiet, a little closed off, not matching the energy at all. So which one is real? And what are you supposed to do with the gap?" },
@@ -529,7 +545,7 @@ export const blogArticles: BlogArticle[] = [
       { type: "paragraph", text: "Texting is low-stakes. There's time to think, no body to manage, no eyes on you. Some people are bold over text and shy in person. That's just how they're wired, and it doesn't mean the interest wasn't real." },
       { type: "paragraph", text: "The quiet version is real too. The texts were her feeling comfortable. In person she might be nervous, unsure, or just not ready for the real-life version of what she pictured over text." },
       { type: "heading", text: "The mistake to avoid" },
-      { type: "paragraph", text: "Treating the texts as a standing green light. \"But you were into it over text\" is not something you ever want to say out loud. It puts her in the position of defending a boundary she has every right to set, and it tells her the texts locked her in." },
+      { type: "paragraph", text: "Treating the texts as a standing yes. \"But you were into it over text\" is not something you ever want to say out loud. It puts her in the position of defending a boundary she has every right to set, and it tells her the texts locked her in." },
       { type: "paragraph", text: "The texts were about the idea. In person she's deciding about the reality, and those don't have to match." },
       { type: "heading", text: "What to do" },
       { type: "paragraph", text: "**Reset to zero.** Act like the texts gave you context, not permission. Read the room as it is right now, not as the chat log suggested it would be." },
