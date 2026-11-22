@@ -22,3 +22,6 @@
 - [x] Reorder the deck into the four-part structure and add the 14-slide build/frameworks/demos version
 - [x] Publish the deck for sharing and export a 16-page PDF backup
 - [x] Point every ito link at isthisok.app instead of the Lovable address
+- [x] Rebuild /welcome using the Ash reference and existing ito content
+- [x] Verify welcome navigation, FAQ, and desktop/mobile layout
+- [ ] Add a welcome testimonial once the user supplies an approved quote

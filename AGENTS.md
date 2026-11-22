@@ -10,3 +10,4 @@
 - Campus bystander pilots supply validated HTTPS support/reporting links through the URL parameters documented in `docs/CAMPUS_PILOTS.md`; no school contacts are hardcoded, and witness no-report/no-share preferences suppress reporting links.
 - The bystander pilot snapshot is aggregate-only. Witness practice logs completion with a scenario ID, while practice scores stay in localStorage and are never queried by the dashboard.
 - Partner kit (/partner-kit, /partner-kit/admin) and referral_sources use only src/lib/supabase.ts (via src/lib/partnerDb.ts); referral rows carry flow, source and org_text only, never session or anon ids, so they stay unlinkable.
+- /welcome is an isolated editorial page with scoped welcome styles and presentation-only phone visuals; it must not alter the shared check-in engine or the homepage redirect.

@@ -424,3 +424,133 @@ input:focus {
 .wb-pulse { animation: wb-pulse 2.6s ease-in-out 1s infinite; }
 .webinar-print .wb-in, .webinar-print .wb-pick, .webinar-print .wb-pulse { animation: none; }
 @media (prefers-reduced-motion: reduce) { .wb-in, .wb-pick, .wb-fade-out, .wb-pulse { animation: none; } }
+
+/* Welcome is an isolated editorial presentation; product-flow styles stay unchanged. */
+.welcome-page {
+  --welcome-surface: 220 10% 94%;
+  --welcome-ink: 220 15% 12%;
+  --welcome-paper: 220 12% 98%;
+  --welcome-phone: 220 12% 8%;
+  --welcome-phone-ink: 220 5% 90%;
+  --welcome-bubble: 220 10% 20%;
+  --welcome-bubble-alt: 215 24% 31%;
+  --welcome-phone-border: 220 8% 48%;
+  --welcome-accent: 12 46% 65%;
+  --welcome-shadow: 0 24px 60px hsl(220 15% 4% / .18);
+  color: hsl(var(--foreground)); background: hsl(var(--background)); letter-spacing: 0;
+}
+.dark .welcome-page { --welcome-surface: 220 10% 12%; --welcome-ink: 220 5% 85%; --welcome-paper: 220 12% 16%; --welcome-shadow: 0 24px 60px hsl(220 15% 4% / .4); }
+.welcome-page h1, .welcome-page h2, .welcome-page h3 { letter-spacing: 0; }
+.welcome-page main { padding-bottom: 3rem; }
+.welcome-skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 18px; background: hsl(var(--foreground)); color: hsl(var(--background)); }
+.welcome-skip:focus { top: 12px; }
+.welcome-header { position: sticky; top: 0; z-index: 50; background: hsl(var(--background) / .97); border-bottom: 1px solid hsl(var(--border) / .6); }
+.welcome-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 88px; padding: 0 32px; gap: 24px; }
+.welcome-nav-left, .welcome-nav-right { display: flex; align-items: center; gap: 12px; }
+.welcome-nav-right { justify-content: flex-end; gap: 8px; }
+.welcome-nav a { color: hsl(var(--foreground)); text-decoration: none; }
+.welcome-wordmark { font: italic 48px/1 "Newsreader", Georgia, serif; }
+.welcome-small-cta { border-radius: 999px; background: hsl(var(--foreground)); color: hsl(var(--background)) !important; padding: 0 18px; }
+.welcome-exit { color: hsl(var(--muted-foreground)); padding: 0 8px; }
+.welcome-menu-toggle, .welcome-mobile-menu { display: none; }
+.welcome-hero { text-align: center; padding: 76px 24px 48px; overflow: hidden; }
+.welcome-eyebrow { font-size: 12px; color: hsl(var(--muted-foreground)); font-weight: 500; }
+.welcome-hero h1 { font: italic 112px/1.05 "Newsreader", Georgia, serif; margin: 20px auto 30px; width: fit-content; position: relative; }
+.welcome-hero h1 svg { position: absolute; width: 82%; height: 18px; left: 9%; bottom: -12px; fill: none; stroke: hsl(var(--welcome-accent)); stroke-width: 2; stroke-linecap: round; }
+.welcome-intro { max-width: 720px; margin: 0 auto; font-size: 22px; line-height: 1.5; text-wrap: balance; }
+.welcome-anonymous { font-size: 13px; color: hsl(var(--muted-foreground)); margin: 18px 0 22px; }
+.welcome-primary-cta { width: auto; min-width: 220px; border-radius: 999px; background: hsl(var(--foreground)); color: hsl(var(--background)); }
+.welcome-primary-cta:hover { background: hsl(var(--foreground) / .88); }
+.welcome-hero-phone { margin: 58px auto 0; width: fit-content; }
+.welcome-hero-footnote { font: italic 22px/1.4 "Newsreader", Georgia, serif; color: hsl(var(--muted-foreground)); margin: 32px 0 0; }
+.welcome-phone { width: 306px; height: 596px; position: relative; display: flex; flex-direction: column; background: hsl(var(--welcome-phone)); color: hsl(var(--welcome-phone-ink)); border: 5px solid hsl(var(--welcome-phone-border)); border-radius: 46px; padding: 13px 16px 22px; box-shadow: var(--welcome-shadow); overflow: hidden; text-align: left; flex-shrink: 0; }
+.welcome-phone-status { height: 26px; display: flex; justify-content: space-between; align-items: center; padding: 0 7px; font-size: 11px; font-weight: 600; }
+.welcome-phone-island { width: 85px; height: 24px; border-radius: 20px; background: hsl(var(--welcome-phone-ink) / .08); }
+.welcome-phone-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid hsl(var(--welcome-phone-ink) / .12); padding: 20px 0 15px; }
+.welcome-phone-header span { font: italic 23px/1 "Newsreader", Georgia, serif; }
+.welcome-phone-content { flex: 1; padding: 22px 0 12px; animation: welcome-enter .6s both; }
+.welcome-phone-caption { font-size: 11px; text-align: center; color: hsl(var(--welcome-phone-ink) / .65); }
+.welcome-messages { margin-top: 22px; display: flex; flex-direction: column; gap: 13px; }
+.welcome-message { width: 89%; font-size: 12px; line-height: 1.55; padding: 12px 14px; background: hsl(var(--welcome-bubble)); border-radius: 17px 17px 17px 5px; animation: welcome-enter .7s both; }
+.welcome-message-1 { align-self: flex-end; background: hsl(var(--welcome-bubble-alt)); border-radius: 17px 17px 5px 17px; animation-delay: .6s; }
+.welcome-message-2 { animation-delay: 1.2s; }
+.welcome-phone-compose { display: flex; justify-content: space-between; align-items: center; border: 1px solid hsl(var(--welcome-phone-ink) / .2); border-radius: 24px; padding: 9px 12px; font-size: 11px; color: hsl(var(--welcome-phone-ink) / .6); }
+.welcome-phone-home { width: 95px; height: 4px; border-radius: 4px; background: hsl(var(--welcome-phone-ink) / .7); position: absolute; bottom: 8px; left: calc(50% - 47px); }
+.welcome-phone-note { padding: 22px 6px; }
+.welcome-phone-note h3 { font: 32px/1.15 "Newsreader", Georgia, serif; margin: 20px 0; }
+.welcome-phone-note p { font-size: 12px; line-height: 1.65; color: hsl(var(--welcome-phone-ink) / .75); }
+.welcome-note-label { font-size: 11px; color: hsl(var(--welcome-accent)); }
+.welcome-note-rule { border-top: 1px solid hsl(var(--welcome-phone-ink) / .15); margin: 24px 0; }
+.welcome-phone-private { padding-top: 36px; }
+.welcome-story { background: hsl(var(--welcome-surface)); padding: 72px 32px; scroll-margin-top: 88px; }
+.welcome-story-inner { max-width: 1050px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start; }
+.welcome-feature { min-height: 640px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.welcome-feature h2 { font: 48px/1.12 "Newsreader", Georgia, serif; text-wrap: balance; margin: 26px 0 22px; }
+.welcome-feature > p { font-size: 17px; line-height: 1.7; color: hsl(var(--muted-foreground)); max-width: 390px; }
+.welcome-text-link { width: auto; height: auto; min-height: 44px; margin-top: 18px; padding: 0; color: hsl(var(--foreground)); font-weight: 500; }
+.welcome-sticky-phone { position: sticky; top: calc(50dvh - 252px); display: flex; justify-content: center; padding-top: 22px; }
+.welcome-mobile-phone { display: none; }
+.welcome-explore { display: grid; grid-template-columns: 1fr 1fr; }
+.welcome-explore-item { display: block; padding-bottom: 44px; }
+.welcome-explore-item:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -4px; }
+.welcome-explore-visual { height: 470px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+.welcome-about-visual { background: hsl(var(--welcome-paper)); position: relative; flex-direction: column; }
+.welcome-about-visual img { width: 104px; height: 104px; border-radius: 24px; object-fit: contain; }
+.welcome-about-visual span { font: italic 64px/1 "Newsreader", Georgia, serif; margin-top: 24px; }
+.welcome-partner-visual { background: hsl(var(--welcome-surface)); }
+.welcome-partner-visual img { width: 255px; height: auto; transform: rotate(-7deg); box-shadow: var(--welcome-shadow); transition: transform .4s; }
+.welcome-explore-item:hover .welcome-partner-visual img { transform: rotate(-3deg); }
+.welcome-explore-label { display: flex; align-items: center; justify-content: space-between; margin: 28px 36px 10px; gap: 16px; }
+.welcome-explore-label h2 { font: 36px/1.2 "Newsreader", Georgia, serif; }
+.welcome-explore-item > p { margin: 0 36px; color: hsl(var(--muted-foreground)); }
+.welcome-faq { max-width: 1150px; margin: 0 auto; padding: 95px 32px 110px; display: grid; grid-template-columns: 1fr 2fr; gap: 100px; }
+.welcome-faq-heading h2 { font: 64px/1 "Newsreader", Georgia, serif; margin-bottom: 24px; }
+.welcome-faq-heading p { color: hsl(var(--muted-foreground)); }
+.welcome-faq-heading a { color: hsl(var(--foreground)); text-decoration: underline; text-underline-offset: 4px; }
+.welcome-faq-items button { font-size: 18px; min-height: 80px; gap: 20px; }
+.welcome-faq-items button svg { flex-shrink: 0; }
+.welcome-faq-items [role="region"] { font-size: 15px; max-width: 640px; line-height: 1.7; }
+.welcome-close { padding: 80px 24px; background: hsl(var(--welcome-surface)); text-align: center; }
+.welcome-close h2 { font: 64px/1.1 "Newsreader", Georgia, serif; margin: 24px 0 32px; }
+.welcome-close p { color: hsl(var(--muted-foreground)); font-size: 12px; margin-top: 28px; }
+.welcome-credit { padding: 32px 24px 0; font-size: 12px; color: hsl(var(--muted-foreground)); text-align: center; }
+@keyframes welcome-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 1600px) { .welcome-hero { padding-top: 100px; } }
+@media (max-width: 1100px) { .welcome-nav { padding: 0 20px; gap: 12px; } .welcome-nav-left { gap: 0; } .welcome-nav-right { gap: 0; } .welcome-story-inner { gap: 40px; } .welcome-faq { gap: 48px; } }
+@media (max-width: 767px) {
+  .welcome-nav { min-height: 72px; grid-template-columns: auto 1fr; padding: 0 18px; }
+  .welcome-wordmark { font-size: 38px; }
+  .welcome-nav-left, .welcome-desktop-link { display: none; }
+  .welcome-menu-toggle { display: inline-flex; }
+  .welcome-nav-right { gap: 2px; }
+  .welcome-exit { font-size: 12px; }
+  .welcome-mobile-menu { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid hsl(var(--border)); padding: 8px 16px; }
+  .welcome-mobile-menu a { color: hsl(var(--foreground)); }
+  .welcome-hero { padding: 42px 20px 36px; }
+  .welcome-hero h1 { font-size: 68px; margin: 18px auto 30px; }
+  .welcome-intro { font-size: 18px; max-width: 430px; }
+  .welcome-anonymous { font-size: 12px; margin: 18px 0; }
+  .welcome-hero-phone { margin-top: 38px; }
+  .welcome-hero-footnote { font-size: 19px; max-width: 280px; margin: 28px auto 0; }
+  .welcome-story { padding: 12px 24px 40px; scroll-margin-top: 72px; }
+  .welcome-story-inner { display: block; }
+  .welcome-sticky-phone { display: none; }
+  .welcome-feature { min-height: 0; padding: 58px 0 28px; align-items: center; text-align: center; }
+  .welcome-feature h2 { font-size: 38px; max-width: 440px; margin-top: 20px; }
+  .welcome-feature > p { font-size: 16px; max-width: 420px; }
+  .welcome-mobile-phone { display: block; margin-top: 38px; }
+  .welcome-explore { grid-template-columns: 1fr; }
+  .welcome-explore-visual { height: 350px; }
+  .welcome-explore-label { margin: 24px 24px 8px; }
+  .welcome-explore-label h2 { font-size: 32px; }
+  .welcome-explore-item > p { margin: 0 24px; }
+  .welcome-partner-visual img { width: 220px; }
+  .welcome-faq { display: block; padding: 64px 24px; }
+  .welcome-faq-heading { margin-bottom: 32px; }
+  .welcome-faq-heading h2 { font-size: 48px; }
+  .welcome-faq-items button { font-size: 16px; min-height: 76px; }
+  .welcome-close { padding: 60px 24px; }
+  .welcome-close h2 { font-size: 44px; }
+}
+@media (max-width: 360px) { .welcome-nav { padding: 0 12px; gap: 8px; } .welcome-small-cta { padding: 0 12px; } .welcome-phone { width: 282px; height: 596px; } .welcome-hero h1 { font-size: 60px; } }
+@media (prefers-reduced-motion: reduce) { .welcome-page *, .welcome-page *::before, .welcome-page *::after { animation: none !important; transition: none !important; } }
