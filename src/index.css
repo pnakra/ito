@@ -490,6 +490,12 @@ input:focus {
 .welcome-text-link { width: auto; height: auto; min-height: 44px; margin-top: 18px; padding: 0; color: hsl(var(--foreground)); font-weight: 500; }
 .welcome-sticky-phone { position: sticky; top: calc(50dvh - 252px); display: flex; justify-content: center; padding-top: 22px; }
 .welcome-mobile-phone { display: none; }
+.welcome-quote { padding: 96px 24px; background: hsl(var(--welcome-surface)); text-align: center; }
+.welcome-quote blockquote { max-width: 860px; margin: 0 auto; }
+.welcome-quote-rule { width: 44px; height: 2px; border: 0; background: hsl(var(--welcome-accent)); margin: 0 auto 36px; }
+.welcome-quote p { font: italic 40px/1.35 "Newsreader", Georgia, serif; text-wrap: balance; }
+.welcome-quote .welcome-quote-support { font: italic 21px/1.6 "Newsreader", Georgia, serif; color: hsl(var(--muted-foreground)); margin-top: 26px; }
+.welcome-quote cite { display: block; margin-top: 32px; font: normal 12px/1.5 "Geist Sans", sans-serif; color: hsl(var(--muted-foreground)); }
 .welcome-explore { display: grid; grid-template-columns: 1fr 1fr; }
 .welcome-explore-item { display: block; padding-bottom: 44px; }
 .welcome-explore-item:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -4px; }
@@ -539,6 +545,9 @@ input:focus {
   .welcome-feature h2 { font-size: 38px; max-width: 440px; margin-top: 20px; }
   .welcome-feature > p { font-size: 16px; max-width: 420px; }
   .welcome-mobile-phone { display: block; margin-top: 38px; }
+  .welcome-quote { padding: 64px 24px; }
+  .welcome-quote p { font-size: 27px; }
+  .welcome-quote .welcome-quote-support { font-size: 16px; }
   .welcome-explore { grid-template-columns: 1fr; }
   .welcome-explore-visual { height: 350px; }
   .welcome-explore-label { margin: 24px 24px 8px; }

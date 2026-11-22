@@ -74,6 +74,15 @@ export default function Index() {
           </div>
         </section>
 
+        <section className="welcome-quote" aria-label="What a beta user said">
+          <blockquote>
+            <hr className="welcome-quote-rule" />
+            <p>“It highlighted concerns I had in the moment so articulately I wanted to cry and laugh at the same time.”</p>
+            <p className="welcome-quote-support">“It gave very reasonable responses that still allowed for individual decision, but still treated red flags with unwavering seriousness.”</p>
+            <cite>From ito beta feedback</cite>
+          </blockquote>
+        </section>
+
         <section className="welcome-explore" aria-label="Explore ito">
           <Link to="/about" className="welcome-explore-item"><div className="welcome-explore-visual welcome-about-visual"><img src={itoLogo} alt="ito" loading="lazy" /><span>is this ok?</span></div><div className="welcome-explore-label"><h2>Why ito exists</h2><ArrowUpRight aria-hidden="true" /></div><p>A way to pause before something goes wrong.</p></Link>
           <Link to="/partner-kit" className="welcome-explore-item"><div className="welcome-explore-visual welcome-partner-visual"><img src={flyerAsset.url} alt="The ito bystander flyer available in the partner kit" loading="lazy" /></div><div className="welcome-explore-label"><h2>Share ito</h2><ArrowUpRight aria-hidden="true" /></div><p>For campuses, communities, and the people looking out for them.</p></Link>
