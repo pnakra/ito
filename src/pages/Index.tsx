@@ -1,20 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { ArrowRight, ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, LockKeyhole, Menu, Moon, Sun, X } from "lucide-react";
 import { logVisit } from "@/lib/logVisit";
 import SEO from "@/components/SEO";
-import WelcomePhone from "@/components/WelcomePhone";
+import WelcomePhone, { type WelcomeScreen } from "@/components/WelcomePhone";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import flyerAsset from "@/assets/welcome-partner-flyer.png.asset.json";
 import itoLogo from "@/assets/ito-logo.png";
 
-const FEATURES = [
-  { screen: "messages" as const, number: "01", title: "You don’t need the right words.", text: "Write what’s happening in your own words. Sex, dating, and the moments you’re still thinking about. Start wherever you are." },
-  { screen: "pause" as const, number: "02", title: "An honest read. Not permission.", text: "A way to pause and notice what you might be missing, before something goes wrong. Only the other person can tell you what they want." },
-  { screen: "bystander" as const, number: "03", title: "For the moments you’re not part of, too.", text: "Something you saw. Something you heard. Something that felt off. Think through what to do next without having to be sure first.", link: "/bystanderbeta", label: "Try the bystander beta" },
-  { screen: "privacy" as const, number: "04", title: "Anonymous. Not linked to you.", text: "No login. No account. No name or email. What you type is anonymous and may be reviewed to make ito better.", link: "/privacy", label: "Read the privacy policy" },
+const FEATURES: { screen: WelcomeScreen; number: string; eyebrow: string; title: string; text: string; link?: string; label?: string }[] = [
+  { screen: "messages", number: "01", eyebrow: "How it works", title: "You don’t need the right words.", text: "Write what’s happening in your own words. Sex, dating, and the moments you’re still thinking about." },
+  { screen: "pause", number: "02", eyebrow: "How it works", title: "An honest read. Not permission.", text: "A way to pause and notice what you might be missing. Only the other person can tell you what they want." },
+  { screen: "bystander", number: "03", eyebrow: "Looking out for someone", title: "For the moments you’re not part of, too.", text: "Something you saw or heard that felt off. Think through what to do next without having to be sure first.", link: "/bystanderbeta", label: "Try the bystander beta" },
 ];
 const FAQS = [
   { question: "What is ito?", answer: "ito is for the moment when you’re not sure if something was okay, or if something you’re about to do is okay. You write what’s going on and get an honest read on things you might be missing." },
@@ -28,20 +26,22 @@ const FAQS = [
 export default function Index() {
   const { theme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeScreen, setActiveScreen] = useState<(typeof FEATURES)[number]["screen"]>("messages");
-  const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [active, setActive] = useState(0);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => { logVisit(); }, []);
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const feature = FEATURES[Number((entry.target as HTMLElement).dataset.index)];
-        if (feature) setActiveScreen(feature.screen);
-      });
-    }, { rootMargin: "-30% 0px -30% 0px", threshold: 0 });
-    featureRefs.current.forEach((node) => { if (node) observer.observe(node); });
+      entries.forEach((entry) => { if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.index)); });
+    }, { root: trackRef.current, threshold: 0.6 });
+    slideRefs.current.forEach((node) => { if (node) observer.observe(node); });
     return () => observer.disconnect();
   }, []);
+  const goTo = (index: number) => {
+    const i = Math.max(0, Math.min(FEATURES.length - 1, index));
+    const track = trackRef.current; const slide = slideRefs.current[i];
+    if (track && slide) track.scrollTo({ left: slide.offsetLeft - (track.clientWidth - slide.clientWidth) / 2, behavior: "smooth" });
+  };
   const closeMenu = () => setMenuOpen(false);
 
   return (
@@ -63,15 +63,29 @@ export default function Index() {
           <p className="welcome-intro">Get an honest perspective on sex, dating,<br className="hidden sm:block" /> and everything in between.</p>
           <p className="welcome-anonymous">Anonymous. No sign-in. Not linked to you.</p>
           <Button asChild className="welcome-primary-cta"><Link to="/check-in">Get an honest read <ArrowRight /></Link></Button>
-          <div className="welcome-hero-phone"><WelcomePhone /></div>
           <p className="welcome-hero-footnote">For the moment you think, “Wait… was that weird?”</p>
         </section>
 
         <section id="how-it-works" className="welcome-story" aria-label="How ito works">
-          <div className="welcome-story-inner">
-            <div className="welcome-story-copy">{FEATURES.map((feature, index) => <div className="welcome-feature" key={feature.screen} data-index={index} ref={(node) => { featureRefs.current[index] = node; }}><span className="welcome-eyebrow">{feature.number} / {feature.screen === "privacy" ? "Your privacy" : feature.screen === "bystander" ? "Looking out for someone" : "How it works"}</span><h2>{feature.title}</h2><p>{feature.text}</p>{feature.link && <Button asChild variant="link" className="welcome-text-link"><Link to={feature.link}>{feature.label}<ArrowUpRight /></Link></Button>}<div className="welcome-mobile-phone"><WelcomePhone screen={feature.screen} /></div></div>)}</div>
-            <div className="welcome-sticky-phone"><WelcomePhone screen={activeScreen} /></div>
+          <div className="welcome-carousel" ref={trackRef}>
+            {FEATURES.map((f, i) => <div key={f.screen} className={`welcome-slide${i === active ? " is-active" : ""}`} data-index={i} ref={(n) => { slideRefs.current[i] = n; }} onClick={() => i !== active && goTo(i)}>
+              <WelcomePhone screen={f.screen} active={i === active} />
+              <div className="welcome-slide-copy"><span className="welcome-eyebrow">{f.number} / {f.eyebrow}</span><h2>{f.title}</h2><p>{f.text}</p>{f.link && <Button asChild variant="link" className="welcome-text-link"><Link to={f.link}>{f.label}<ArrowUpRight /></Link></Button>}</div>
+            </div>)}
           </div>
+          <div className="welcome-carousel-controls">
+            <Button variant="outline" size="icon" aria-label="Previous" disabled={active === 0} onClick={() => goTo(active - 1)}><ArrowLeft /></Button>
+            <div className="welcome-dots">{FEATURES.map((f, i) => <button key={f.screen} aria-label={`Show ${f.title}`} aria-current={i === active} className={i === active ? "is-active" : ""} onClick={() => goTo(i)} />)}</div>
+            <Button variant="outline" size="icon" aria-label="Next" disabled={active === FEATURES.length - 1} onClick={() => goTo(active + 1)}><ArrowRight /></Button>
+          </div>
+        </section>
+
+        <section className="welcome-privacy" aria-labelledby="welcome-privacy-title">
+          <LockKeyhole size={36} strokeWidth={1} aria-hidden="true" />
+          <span className="welcome-eyebrow">04 / Your privacy</span>
+          <h2 id="welcome-privacy-title">No name. No account.<br />Not linked to you.</h2>
+          <p>No login, no email. What you type is anonymous and may be reviewed to make ito better.</p>
+          <Button asChild variant="link" className="welcome-text-link"><Link to="/privacy">Read the privacy policy<ArrowUpRight /></Link></Button>
         </section>
 
         <section className="welcome-quote" aria-label="What a beta user said">
@@ -79,13 +93,12 @@ export default function Index() {
             <hr className="welcome-quote-rule" />
             <p>“It highlighted concerns I had in the moment so articulately I wanted to cry and laugh at the same time.”</p>
             <p className="welcome-quote-support">“It gave very reasonable responses that still allowed for individual decision, but still treated red flags with unwavering seriousness.”</p>
-            <cite>From ito beta feedback</cite>
           </blockquote>
         </section>
 
         <section className="welcome-explore" aria-label="Explore ito">
           <Link to="/about" className="welcome-explore-item"><div className="welcome-explore-visual welcome-about-visual"><img src={itoLogo} alt="ito" loading="lazy" /><span>is this ok?</span></div><div className="welcome-explore-label"><h2>Why ito exists</h2><ArrowUpRight aria-hidden="true" /></div><p>A way to pause before something goes wrong.</p></Link>
-          <Link to="/partner-kit" className="welcome-explore-item"><div className="welcome-explore-visual welcome-partner-visual"><img src={flyerAsset.url} alt="The ito bystander flyer available in the partner kit" loading="lazy" /></div><div className="welcome-explore-label"><h2>Share ito</h2><ArrowUpRight aria-hidden="true" /></div><p>For campuses, communities, and the people looking out for them.</p></Link>
+          <Link to="/partner-kit" className="welcome-explore-item"><div className="welcome-explore-visual welcome-partner-visual"><span>pass it on.</span></div><div className="welcome-explore-label"><h2>Share ito</h2><ArrowUpRight aria-hidden="true" /></div><p>For campuses, communities, and the people looking out for them.</p></Link>
         </section>
 
         <section id="faq" className="welcome-faq"><div className="welcome-faq-heading"><h2>FAQ</h2><p>More questions?<br /><a href="mailto:priya@overridelabsprevention.org">Send an email <ArrowUpRight size={14} className="inline" /></a></p></div><Accordion type="single" collapsible className="welcome-faq-items">{FAQS.map((faq, index) => <AccordionItem key={faq.question} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{faq.question}</AccordionTrigger><AccordionContent className="text-muted-foreground">{faq.answer}{index === 2 && <> <Link to="/privacy" className="underline underline-offset-4">Read the privacy policy.</Link></>}</AccordionContent></AccordionItem>)}</Accordion></section>

@@ -504,8 +504,8 @@ input:focus {
 .welcome-about-visual img { width: 104px; height: 104px; border-radius: 24px; object-fit: contain; }
 .welcome-about-visual span { font: italic 64px/1 "Newsreader", Georgia, serif; margin-top: 24px; }
 .welcome-partner-visual { background: hsl(var(--welcome-surface)); }
-.welcome-partner-visual img { width: 255px; height: auto; transform: rotate(-7deg); box-shadow: var(--welcome-shadow); transition: transform .4s; }
-.welcome-explore-item:hover .welcome-partner-visual img { transform: rotate(-3deg); }
+.welcome-partner-visual span { font: italic 64px/1 "Newsreader", Georgia, serif; transition: transform .4s; }
+.welcome-explore-item:hover .welcome-partner-visual span { transform: translateY(-4px); }
 .welcome-explore-label { display: flex; align-items: center; justify-content: space-between; margin: 28px 36px 10px; gap: 16px; }
 .welcome-explore-label h2 { font: 36px/1.2 "Newsreader", Georgia, serif; }
 .welcome-explore-item > p { margin: 0 36px; color: hsl(var(--muted-foreground)); }
@@ -553,7 +553,7 @@ input:focus {
   .welcome-explore-label { margin: 24px 24px 8px; }
   .welcome-explore-label h2 { font-size: 32px; }
   .welcome-explore-item > p { margin: 0 24px; }
-  .welcome-partner-visual img { width: 220px; }
+  .welcome-partner-visual span { font-size: 48px; }
   .welcome-faq { display: block; padding: 64px 24px; }
   .welcome-faq-heading { margin-bottom: 32px; }
   .welcome-faq-heading h2 { font-size: 48px; }
@@ -563,3 +563,30 @@ input:focus {
 }
 @media (max-width: 360px) { .welcome-nav { padding: 0 12px; gap: 8px; } .welcome-small-cta { padding: 0 12px; } .welcome-phone { width: 282px; height: 596px; } .welcome-hero h1 { font-size: 60px; } }
 @media (prefers-reduced-motion: reduce) { .welcome-page *, .welcome-page *::before, .welcome-page *::after { animation: none !important; transition: none !important; } }
+
+/* welcome carousel */
+.welcome-message-you { align-self: flex-end; background: hsl(var(--welcome-bubble-alt)); border-radius: 17px 17px 5px 17px; }
+.welcome-message-ito { width: 92%; background: hsl(var(--welcome-bubble)); }
+.welcome-message-ito .welcome-note-label { display: block; margin-bottom: 6px; }
+.welcome-typing { display: flex; gap: 4px; padding: 12px 14px; width: fit-content; background: hsl(var(--welcome-bubble)); border-radius: 17px 17px 17px 5px; }
+.welcome-typing span { width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--welcome-phone-ink) / .6); animation: welcome-dot 1s infinite; }
+.welcome-typing span:nth-child(2) { animation-delay: .15s; } .welcome-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes welcome-dot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+.welcome-story { padding: 72px 0 56px; }
+.welcome-carousel { display: flex; gap: 48px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 8px calc(50% - 170px); }
+.welcome-carousel::-webkit-scrollbar { display: none; }
+.welcome-slide { flex: 0 0 340px; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: .4; transform: scale(.92); transition: opacity .5s, transform .5s; cursor: pointer; }
+.welcome-slide.is-active { opacity: 1; transform: none; cursor: default; }
+.welcome-slide-copy { margin-top: 32px; display: flex; flex-direction: column; align-items: center; }
+.welcome-slide-copy h2 { font: 32px/1.15 "Newsreader", Georgia, serif; text-wrap: balance; margin: 16px 0 12px; }
+.welcome-slide-copy p { font-size: 15px; line-height: 1.65; color: hsl(var(--muted-foreground)); }
+.welcome-carousel-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 28px; }
+.welcome-dots { display: flex; gap: 8px; }
+.welcome-dots button { width: 8px; height: 8px; border-radius: 8px; background: hsl(var(--muted-foreground) / .4); transition: width .3s, background .3s; }
+.welcome-dots button.is-active { width: 24px; background: hsl(var(--foreground)); }
+.welcome-privacy { padding: 96px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.welcome-privacy h2 { font: 48px/1.12 "Newsreader", Georgia, serif; }
+.welcome-privacy p { max-width: 440px; font-size: 16px; line-height: 1.7; color: hsl(var(--muted-foreground)); }
+@media (max-width: 700px) { .welcome-story { padding: 40px 0; } .welcome-carousel { gap: 16px; padding: 8px calc(50% - 153px); } .welcome-slide { flex-basis: 306px; } .welcome-privacy h2 { font-size: 36px; } }
+@media (max-width: 360px) { .welcome-carousel { padding: 8px calc(50% - 141px); } .welcome-slide { flex-basis: 282px; } }
+@media (prefers-reduced-motion: reduce) { .welcome-slide, .welcome-typing span { transition: none; animation: none; } }
