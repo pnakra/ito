@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { ArrowLeft, ArrowRight, ArrowUpRight, LockKeyhole, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { logVisit } from "@/lib/logVisit";
 import SEO from "@/components/SEO";
 import WelcomePhone, { type WelcomeScreen } from "@/components/WelcomePhone";
@@ -80,25 +80,16 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="welcome-privacy" aria-labelledby="welcome-privacy-title">
-          <LockKeyhole size={36} strokeWidth={1} aria-hidden="true" />
-          <span className="welcome-eyebrow">04 / Your privacy</span>
-          <h2 id="welcome-privacy-title">No name. No account.<br />Not linked to you.</h2>
-          <p>No login, no email. What you type is anonymous and may be reviewed to make ito better.</p>
-          <Button asChild variant="link" className="welcome-text-link"><Link to="/privacy">Read the privacy policy<ArrowUpRight /></Link></Button>
-        </section>
-
         <section className="welcome-quote" aria-label="What a beta user said">
           <blockquote>
             <hr className="welcome-quote-rule" />
             <p>“It highlighted concerns I had in the moment so articulately I wanted to cry and laugh at the same time.”</p>
-            <p className="welcome-quote-support">“It gave very reasonable responses that still allowed for individual decision, but still treated red flags with unwavering seriousness.”</p>
+            <cite>ito user, November 2026</cite>
           </blockquote>
         </section>
 
         <section className="welcome-explore" aria-label="Explore ito">
           <Link to="/about" className="welcome-explore-item"><div className="welcome-explore-visual welcome-about-visual"><img src={itoLogo} alt="ito" loading="lazy" /><span>is this ok?</span></div><div className="welcome-explore-label"><h2>Why ito exists</h2><ArrowUpRight aria-hidden="true" /></div><p>A way to pause before something goes wrong.</p></Link>
-          <Link to="/partner-kit" className="welcome-explore-item"><div className="welcome-explore-visual welcome-partner-visual"><span>pass it on.</span></div><div className="welcome-explore-label"><h2>Share ito</h2><ArrowUpRight aria-hidden="true" /></div><p>For campuses, communities, and the people looking out for them.</p></Link>
         </section>
 
         <section id="faq" className="welcome-faq"><div className="welcome-faq-heading"><h2>FAQ</h2><p>More questions?<br /><a href="mailto:priya@overridelabsprevention.org">Send an email <ArrowUpRight size={14} className="inline" /></a></p></div><Accordion type="single" collapsible className="welcome-faq-items">{FAQS.map((faq, index) => <AccordionItem key={faq.question} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{faq.question}</AccordionTrigger><AccordionContent className="text-muted-foreground">{faq.answer}{index === 2 && <> <Link to="/privacy" className="underline underline-offset-4">Read the privacy policy.</Link></>}</AccordionContent></AccordionItem>)}</Accordion></section>
