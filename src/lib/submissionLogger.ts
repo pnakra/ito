@@ -9,6 +9,7 @@ type StepType = "choice" | "freetext" | "ai_response" | "practice_reply";
 
 let currentSessionId: string | null = null;
 let currentMessageIndex = 0;
+let conversionSentForSession: string | null = null;
 
 function getSessionId(): string {
   if (!currentSessionId) {
@@ -81,6 +82,26 @@ export async function logSubmission({
     }
   } catch (err) {
     console.error("[submissionLogger] Network error:", err);
+  }
+
+  // One Google Ads conversion per session, sent only when the user gets their
+  // read back. Carries flow_type alone — no freetext, choices, AI text,
+  // session id, anon id or other metadata.
+  if (
+    stepType === "ai_response" &&
+    flowType !== "practice" &&
+    conversionSentForSession !== currentSessionId
+  ) {
+    conversionSentForSession = currentSessionId;
+    try {
+      (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.(
+        "event",
+        "ito_submission",
+        { flow_type: flowType }
+      );
+    } catch {
+      // Analytics must never break logging.
+    }
   }
 }
 
