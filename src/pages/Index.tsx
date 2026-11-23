@@ -57,12 +57,12 @@ export default function Index() {
       </header>
       <main id="welcome-main" tabIndex={-1}>
         <section className="welcome-hero" aria-labelledby="welcome-title">
-          <p className="welcome-eyebrow">A moment to pause.</p>
+          <p className="welcome-eyebrow">{"\n"}</p>
           <h1 id="welcome-title">is this ok?<svg viewBox="0 0 330 18" aria-hidden="true"><path d="M4 10 C70 3 105 15 160 9 S265 4 324 10 M35 15 Q175 8 300 14" /></svg></h1>
           <p className="welcome-intro">Get an honest perspective on sex, dating,<br className="hidden sm:block" /> and everything in between.</p>
           <p className="welcome-anonymous">Anonymous. No sign-in. Not linked to you.</p>
           <Button asChild className="welcome-primary-cta"><Link to="/check-in">Get an honest read <ArrowRight /></Link></Button>
-          <p className="welcome-hero-footnote">For the moment you think, “Wait… was that weird?”</p>
+          <p className="welcome-hero-footnote">{"\n"}</p>
         </section>
 
         <section id="how-it-works" className="welcome-story" aria-label="How ito works">
