@@ -495,16 +495,15 @@ input:focus {
 .welcome-quote-rule { width: 44px; height: 2px; border: 0; background: hsl(var(--welcome-accent)); margin: 0 auto 36px; }
 .welcome-quote p { font: italic 40px/1.35 "Newsreader", Georgia, serif; text-wrap: balance; }
 .welcome-quote cite { display: block; margin-top: 32px; font: normal 12px/1.5 "Geist Sans", sans-serif; color: hsl(var(--muted-foreground)); }
-.welcome-explore { display: grid; }
-.welcome-explore-item { display: block; padding-bottom: 44px; }
+.welcome-explore { display: grid; max-width: 1150px; margin: 0 auto; padding: 32px 32px 80px; }
+.welcome-explore-item { display: block; padding: 44px 0 40px; border-top: 1px solid hsl(var(--border)); }
+.welcome-explore-item:first-child { border-top: 0; padding-top: 12px; }
 .welcome-explore-item:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: -4px; }
-.welcome-explore-visual { height: 470px; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-.welcome-about-visual { background: hsl(var(--welcome-paper)); position: relative; flex-direction: column; }
-.welcome-about-visual img { width: 104px; height: 104px; border-radius: 24px; object-fit: contain; }
-.welcome-about-visual span { font: italic 64px/1 "Newsreader", Georgia, serif; margin-top: 24px; }
-.welcome-explore-label { display: flex; align-items: center; justify-content: space-between; margin: 28px 36px 10px; gap: 16px; }
+.welcome-explore-label { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .welcome-explore-label h2 { font: 36px/1.2 "Newsreader", Georgia, serif; }
-.welcome-explore-item > p { margin: 0 36px; color: hsl(var(--muted-foreground)); }
+.welcome-explore-label svg { transition: transform 180ms ease; }
+.welcome-explore-item:hover .welcome-explore-label svg { transform: translate(3px, -3px); }
+.welcome-explore-item > p { margin: 12px 0 0; color: hsl(var(--muted-foreground)); }
 .welcome-faq { max-width: 1150px; margin: 0 auto; padding: 95px 32px 110px; display: grid; grid-template-columns: 1fr 2fr; gap: 100px; }
 .welcome-faq-heading h2 { font: 64px/1 "Newsreader", Georgia, serif; margin-bottom: 24px; }
 .welcome-faq-heading p { color: hsl(var(--muted-foreground)); }
@@ -543,10 +542,9 @@ input:focus {
   .welcome-mobile-phone { display: block; margin-top: 38px; }
   .welcome-quote { padding: 64px 24px; }
   .welcome-quote p { font-size: 27px; }
-  .welcome-explore-visual { height: 350px; }
-  .welcome-explore-label { margin: 24px 24px 8px; }
+  .welcome-explore { padding: 20px 24px 60px; }
+  .welcome-explore-item { padding: 34px 0 32px; }
   .welcome-explore-label h2 { font-size: 32px; }
-  .welcome-explore-item > p { margin: 0 24px; }
   .welcome-faq { display: block; padding: 64px 24px; }
   .welcome-faq-heading { margin-bottom: 32px; }
   .welcome-faq-heading h2 { font-size: 48px; }

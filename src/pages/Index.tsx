@@ -7,7 +7,6 @@ import SEO from "@/components/SEO";
 import WelcomePhone, { type WelcomeScreen } from "@/components/WelcomePhone";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import itoLogo from "@/assets/ito-logo.png";
 
 const FEATURES: { screen: WelcomeScreen; number: string; eyebrow: string; title: string; text: string; link?: string; label?: string }[] = [
   { screen: "messages", number: "01", eyebrow: "How it works", title: "You don’t need the right words.", text: "Write what’s happening in your own words. Sex, dating, and the moments you’re still thinking about." },
@@ -89,7 +88,8 @@ export default function Index() {
         </section>
 
         <section className="welcome-explore" aria-label="Explore ito">
-          <Link to="/about" className="welcome-explore-item"><div className="welcome-explore-visual welcome-about-visual"><img src={itoLogo} alt="ito" loading="lazy" /><span>is this ok?</span></div><div className="welcome-explore-label"><h2>Why ito exists</h2><ArrowUpRight aria-hidden="true" /></div><p>A way to pause before something goes wrong.</p></Link>
+          <Link to="/about" className="welcome-explore-item"><div className="welcome-explore-label"><h2>Why ito exists</h2><ArrowUpRight aria-hidden="true" /></div><p>A way to pause before something goes wrong.</p></Link>
+          <Link to="/partner-kit" className="welcome-explore-item"><div className="welcome-explore-label"><h2>Share ito</h2><ArrowUpRight aria-hidden="true" /></div><p>For campuses, communities, and the people looking out for them.</p></Link>
         </section>
 
         <section id="faq" className="welcome-faq"><div className="welcome-faq-heading"><h2>FAQ</h2><p>More questions?<br /><a href="mailto:priya@overridelabsprevention.org">Send an email <ArrowUpRight size={14} className="inline" /></a></p></div><Accordion type="single" collapsible className="welcome-faq-items">{FAQS.map((faq, index) => <AccordionItem key={faq.question} value={`faq-${index}`}><AccordionTrigger className="text-left hover:no-underline">{faq.question}</AccordionTrigger><AccordionContent className="text-muted-foreground">{faq.answer}{index === 2 && <> <Link to="/privacy" className="underline underline-offset-4">Read the privacy policy.</Link></>}</AccordionContent></AccordionItem>)}</Accordion></section>
